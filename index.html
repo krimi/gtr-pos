@@ -349,6 +349,7 @@
 
     <!-- REGLEMENTS -->
     <div class="section" id="sec-reglements">
+      <button class="btn" style="background:linear-gradient(180deg,#4dbf8c,var(--success));" onclick="QuickReglement.open()" data-i18n="quickReglementBtn">+ تسجيل تسديد سريع</button>
       <div class="kpi-row">
         <div class="kpi-card ok"><div class="val" id="reglTotalClients">0.000</div><div class="lbl" data-i18n="reglFromClients">تسديدات من العملاء</div></div>
         <div class="kpi-card warn"><div class="val" id="reglTotalFournisseurs">0.000</div><div class="lbl" data-i18n="reglToFournisseurs">تسديدات للموردين</div></div>
@@ -405,7 +406,9 @@
     <div class="sheet-body">
       <div class="field"><label data-i18n="clientCode">رمز العميل</label><input id="cCode" readonly></div>
       <div class="field"><label data-i18n="clientName">اسم العميل</label><input id="cName"></div>
-      <div class="field"><label data-i18n="phone">الهاتف</label><input id="cPhone"></div>
+      <div class="field"><label data-i18n="phone">الهاتف 1</label><input id="cPhone"></div>
+      <div class="field"><label data-i18n="phone2">الهاتف 2</label><input id="cPhone2"></div>
+      <div class="field"><label data-i18n="phone3">الهاتف 3</label><input id="cPhone3"></div>
       <div class="field"><label data-i18n="address">العنوان</label><input id="cAddress"></div>
       <div class="field"><label data-i18n="balance">الرصيد (د.ت)</label><input id="cBalance" type="number" step="0.001" value="0"></div>
       <div class="field"><label data-i18n="notes">ملاحظات</label><input id="cNotes"></div>
@@ -463,6 +466,24 @@
     </div>
   </div>
 
+  <!-- Quick règlement sheet -->
+  <div class="sheet" id="sheet-quickreglement">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><h3 data-i18n="quickReglementTitle">تسجيل تسديد سريع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
+    <div class="sheet-body">
+      <div class="field"><label data-i18n="quickReglementWho">النوع</label>
+        <select id="qrType" onchange="QuickReglement.refreshTargets()">
+          <option value="client" data-i18n="quickReglementClient">تسديد من عميل</option>
+          <option value="fournisseur" data-i18n="quickReglementFournisseur">تسديد لمورد</option>
+        </select>
+      </div>
+      <div class="field"><label data-i18n="quickReglementTarget">الاسم</label><select id="qrTarget" onchange="QuickReglement.showHint()"><option value="">-- اختر --</option></select></div>
+      <div style="font-size:12.5px; color:var(--muted); margin:-6px 0 10px;" id="qrBalanceHint"></div>
+      <div class="field"><label data-i18n="reglementAmount">مبلغ التسديد (د.ت)</label><input id="qrAmount" type="number" step="0.001"></div>
+      <button class="btn save" onclick="QuickReglement.save()" data-i18n="quickReglementSave">💾 تسجيل التسديد</button>
+    </div>
+  </div>
+
   <!-- Fournisseur sheet -->
   <div class="sheet" id="sheet-fournisseurs">
     <div class="sheet-handle"></div>
@@ -470,7 +491,9 @@
     <div class="sheet-body">
       <div class="field"><label data-i18n="fournisseurCode">رمز المورد</label><input id="fCode" readonly></div>
       <div class="field"><label data-i18n="fournisseurName">اسم المورد</label><input id="fName"></div>
-      <div class="field"><label data-i18n="phone">الهاتف</label><input id="fPhone"></div>
+      <div class="field"><label data-i18n="phone">الهاتف 1</label><input id="fPhone"></div>
+      <div class="field"><label data-i18n="phone2">الهاتف 2</label><input id="fPhone2"></div>
+      <div class="field"><label data-i18n="phone3">الهاتف 3</label><input id="fPhone3"></div>
       <div class="field"><label data-i18n="address">العنوان</label><input id="fAddress"></div>
       <div class="field"><label data-i18n="balance">الرصيد (د.ت)</label><input id="fBalance" type="number" step="0.001" value="0"></div>
       <div class="field"><label data-i18n="notes">ملاحظات</label><input id="fNotes"></div>
@@ -505,6 +528,7 @@
       <div class="field"><label data-i18n="paymentMethod">طريقة الدفع</label><select id="vPayment"><option data-i18n="payCash">نقدا</option><option data-i18n="payCheck">شيك</option><option data-i18n="payTransfer">تحويل بنكي</option><option data-i18n="payCredit">آجل</option></select></div>
       <div class="section-title" style="margin-top:4px;" data-i18n="addArticleTitle">إضافة صنف</div>
       <div class="field"><label data-i18n="article">الصنف</label><select id="viArticle" onchange="Ventes.fillArticle()"><option value="">-- اختر --</option></select></div>
+      <div id="viStockHint" style="font-size:11.5px; color:var(--muted); margin:-6px 0 8px 2px;"></div>
       <div class="field"><label data-i18n="manualName">أو اسم يدوي</label><input id="viManualName" placeholder="صنف غير موجود بالقائمة"></div>
       <div class="field-row">
         <div class="field"><label data-i18n="price">السعر (د.ت)</label><input id="viPrice" type="number" step="0.001" oninput="Ventes.calcLine()"></div>
@@ -545,6 +569,7 @@
       <div class="field"><label data-i18n="paymentMethod">طريقة الدفع</label><select id="pPayment"><option data-i18n="payCash">نقدا</option><option data-i18n="payCheck">شيك</option><option data-i18n="payTransfer">تحويل بنكي</option><option data-i18n="payCredit">آجل</option></select></div>
       <div class="section-title" style="margin-top:4px;" data-i18n="addArticleTitle">إضافة صنف</div>
       <div class="field"><label data-i18n="article">الصنف</label><select id="piArticle" onchange="Achats.fillArticle()"><option value="">-- اختر --</option></select></div>
+      <div id="piStockHint" style="font-size:11.5px; color:var(--muted); margin:-6px 0 8px 2px;"></div>
       <div class="field"><label data-i18n="manualName">أو اسم يدوي</label><input id="piManualName" placeholder="صنف غير موجود بالقائمة"></div>
       <div class="field-row">
         <div class="field"><label data-i18n="price">السعر (د.ت)</label><input id="piPrice" type="number" step="0.001" oninput="Achats.calcLine()"></div>
@@ -576,6 +601,14 @@
     <div class="sheet-header"><h3 data-i18n="companySheetTitle">بيانات المؤسسة</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
     <div class="sheet-body">
       <div class="field"><label data-i18n="companyName">اسم المؤسسة</label><input id="cpyName"></div>
+      <div class="field"><label data-i18n="companyLogo">الشعار (Logo)</label>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <img id="cpyLogoPreview" style="width:44px; height:44px; border-radius:8px; object-fit:cover; background:#f0f2f8; display:none;">
+          <input type="file" id="cpyLogoInput" accept="image/*" style="display:none;" onchange="CompanyInfo.handleLogoUpload(this)">
+          <button type="button" class="btn outline small" style="margin:0;" onclick="document.getElementById('cpyLogoInput').click()" data-i18n="chooseLogo">اختر صورة</button>
+          <button type="button" class="btn del small" style="margin:0; flex:none; padding:9px 14px;" onclick="CompanyInfo.removeLogo()" data-i18n="removeLogo">✕</button>
+        </div>
+      </div>
       <div class="field"><label data-i18n="companyAddress">العنوان</label><input id="cpyAddress"></div>
       <div class="field"><label data-i18n="companyPhone1">هاتف 1</label><input id="cpyPhone1"></div>
       <div class="field"><label data-i18n="companyPhone2">هاتف 2</label><input id="cpyPhone2"></div>
@@ -708,7 +741,7 @@ const translations = {
     statsTitle:'📊 إحصائيات', kpiNbVentes:'عدد فواتير البيع', kpiNbAchats:'عدد فواتير الشراء', kpiCaisseSolde:'رصيد الكاسة', kpiSoldesClients:'مجموع أرصدة العملاء',
     searchClients:'🔍 بحث بالاسم أو الهاتف...', searchArticles:'🔍 بحث باسم الصنف...', searchFournisseurs:'🔍 بحث بالاسم أو الهاتف...',
     searchVentes:'🔍 بحث برقم المبيعات أو العميل...', searchAchats:'🔍 بحث برقم المشتريات أو المورد...',
-    clientSheetTitle:'بيانات العميل', clientCode:'رمز العميل', clientName:'اسم العميل', phone:'الهاتف', address:'العنوان', balance:'الرصيد (د.ت)', notes:'ملاحظات',
+    clientSheetTitle:'بيانات العميل', clientCode:'رمز العميل', clientName:'اسم العميل', phone:'الهاتف', phone2:'الهاتف 2', phone3:'الهاتف 3', address:'العنوان', balance:'الرصيد (د.ت)', notes:'ملاحظات',
     specialPricesTitle:'أسعار خاصة بهذا الحريف', article:'الصنف', specialPrice:'السعر الخاص (د.ت)', addSpecialPrice:'+ إضافة سعر خاص', specialPriceShort:'السعر الخاص',
     save:'💾 حفظ', edit:'✏️ تعديل', delete:'🗑 حذف',
     articleSheetTitle:'بيانات الصنف', articleCode:'رمز الصنف', articleName:'اسم الصنف', salePrice:'سعر البيع العادي (د.ت)', costPrice:'سعر الشراء (د.ت)', stockQty:'الكمية بالمخزون',
@@ -720,13 +753,19 @@ const translations = {
     achatSheetTitle:'عملية شراء', achatNum:'رقم المشتريات', fournisseur:'المورد', fournisseurPhone:'هاتف المورد', fournisseurAddress:'عنوان المورد', saveAchat:'💾 حفظ عملية الشراء',
     manualName:'أو اسم يدوي', reglementTitle:'تسديد', reglementAmount:'مبلغ التسديد (د.ت)', addReglement:'+ تسجيل تسديد', reglementHistory:'سجل التسديدات',
     reglFromClients:'تسديدات من العملاء', reglToFournisseurs:'تسديدات للموردين', searchReglements:'🔍 بحث بالاسم...',
+    quickReglementBtn:'+ تسجيل تسديد سريع', quickReglementTitle:'تسجيل تسديد سريع', quickReglementWho:'النوع',
+    quickReglementClient:'تسديد من عميل', quickReglementFournisseur:'تسديد لمورد', quickReglementTarget:'الاسم', quickReglementSave:'💾 تسجيل التسديد',
     balancesClientsTitle:'أرصدة العملاء', balancesFournisseursTitle:'أرصدة الموردين',
+    quickReglementBtn:'+ تسجيل تسديد سريع', quickReglementTitle:'تسجيل تسديد سريع',
+    quickReglementWho:'النوع', quickReglementClient:'تسديد من عميل', quickReglementFournisseur:'تسديد لمورد',
+    quickReglementTarget:'الاسم', quickReglementSave:'💾 تسجيل التسديد',
     statementTitle:'كشف حساب', fromDate:'من', toDate:'إلى', query:'🔍 استعلام',
     accountSummaryTitle:'وضعية الحساب', invoiceTotal:'مبلغ الفاتورة', paidOnInvoice:'المدفوع من الفاتورة', remainingInvoice:'الباقي من الفاتورة', totalAccountBalance:'المتخلد بالذمة (الرصيد الكلي)',
     shareWhatsapp:'📱 إرسال الفاتورة عبر واتساب',
     invoiceHeaderVente:'فاتورة بيع', invoiceHeaderAchat:'فاتورة شراء', invDate:'التاريخ', invClient:'العميل', invSupplier:'المورد',
     invTotal:'المجموع', invPaid:'المدفوع', invRemaining:'الباقي',
     printInvoice:'🖨️ طباعة الفاتورة', companySheetTitle:'بيانات المؤسسة', companyName:'اسم المؤسسة', companyAddress:'العنوان',
+    companyLogo:'الشعار (Logo)', chooseLogo:'اختر صورة', removeLogo:'✕',
     companyPhone1:'هاتف 1', companyPhone2:'هاتف 2', companyPhone3:'هاتف 3',
     invPurchaseInvoice:'فاتورة مشتريات', invSaleInvoice:'فاتورة مبيعات', invPaymentMethod:'الدفع', invNum:'رقم الفاتورة', invDateField:'تاريخها',
     invSupplierName:'اسم المورد', invClientName:'اسم العميل', invSupplierAddr:'عنوان المورد', invClientAddr:'عنوان العميل',
@@ -746,7 +785,7 @@ const translations = {
     statsTitle:'📊 Statistiques', kpiNbVentes:'Nombre de ventes', kpiNbAchats:"Nombre d'achats", kpiCaisseSolde:'Solde de caisse', kpiSoldesClients:'Total des soldes clients',
     searchClients:'🔍 Rechercher par nom ou téléphone...', searchArticles:'🔍 Rechercher un article...', searchFournisseurs:'🔍 Rechercher par nom ou téléphone...',
     searchVentes:'🔍 Rechercher par n° ou client...', searchAchats:'🔍 Rechercher par n° ou fournisseur...',
-    clientSheetTitle:'Fiche client', clientCode:'Code client', clientName:'Nom du client', phone:'Téléphone', address:'Adresse', balance:'Solde (TND)', notes:'Notes',
+    clientSheetTitle:'Fiche client', clientCode:'Code client', clientName:'Nom du client', phone:'Téléphone', phone2:'Téléphone 2', phone3:'Téléphone 3', address:'Adresse', balance:'Solde (TND)', notes:'Notes',
     specialPricesTitle:'Prix spéciaux pour ce client', article:'Article', specialPrice:'Prix spécial (TND)', addSpecialPrice:'+ Ajouter un prix spécial', specialPriceShort:'Prix spécial',
     save:'💾 Enregistrer', edit:'✏️ Modifier', delete:'🗑 Supprimer',
     articleSheetTitle:'Fiche article', articleCode:'Code article', articleName:"Nom de l'article", salePrice:'Prix de vente normal (TND)', costPrice:"Prix d'achat (TND)", stockQty:'Quantité en stock',
@@ -758,13 +797,19 @@ const translations = {
     achatSheetTitle:'Achat', achatNum:"N° d'achat", fournisseur:'Fournisseur', fournisseurPhone:'Téléphone du fournisseur', fournisseurAddress:'Adresse du fournisseur', saveAchat:"💾 Enregistrer l'achat",
     manualName:'Ou nom manuel', reglementTitle:'Règlement', reglementAmount:'Montant du règlement (TND)', addReglement:'+ Enregistrer un règlement', reglementHistory:'Historique des règlements',
     reglFromClients:'Règlements des clients', reglToFournisseurs:'Règlements aux fournisseurs', searchReglements:'🔍 Rechercher par nom...',
+    quickReglementBtn:'+ Règlement rapide', quickReglementTitle:'Règlement rapide', quickReglementWho:'Type',
+    quickReglementClient:'Règlement client', quickReglementFournisseur:'Règlement fournisseur', quickReglementTarget:'Nom', quickReglementSave:'💾 Enregistrer le règlement',
     balancesClientsTitle:'Soldes des clients', balancesFournisseursTitle:'Soldes des fournisseurs',
+    quickReglementBtn:'+ Règlement rapide', quickReglementTitle:'Règlement rapide',
+    quickReglementWho:'Type', quickReglementClient:'Règlement client', quickReglementFournisseur:'Règlement fournisseur',
+    quickReglementTarget:'Nom', quickReglementSave:'💾 Enregistrer le règlement',
     statementTitle:'Relevé de compte', fromDate:'Du', toDate:'Au', query:'🔍 Rechercher',
     accountSummaryTitle:'État du compte', invoiceTotal:'Montant de la facture', paidOnInvoice:'Payé sur la facture', remainingInvoice:'Reste sur la facture', totalAccountBalance:'Solde total dû',
     shareWhatsapp:'📱 Envoyer la facture via WhatsApp',
     invoiceHeaderVente:'Facture de vente', invoiceHeaderAchat:"Facture d'achat", invDate:'Date', invClient:'Client', invSupplier:'Fournisseur',
     invTotal:'Total', invPaid:'Payé', invRemaining:'Reste',
     printInvoice:'🖨️ Imprimer la facture', companySheetTitle:"Infos de l'entreprise", companyName:"Nom de l'entreprise", companyAddress:'Adresse',
+    companyLogo:'Logo', chooseLogo:'Choisir une image', removeLogo:'✕',
     companyPhone1:'Téléphone 1', companyPhone2:'Téléphone 2', companyPhone3:'Téléphone 3',
     invPurchaseInvoice:"Facture d'achat", invSaleInvoice:'Facture de vente', invPaymentMethod:'Paiement', invNum:'N° de facture', invDateField:'Date',
     invSupplierName:'Nom du fournisseur', invClientName:'Nom du client', invSupplierAddr:'Adresse du fournisseur', invClientAddr:'Adresse du client',
@@ -950,7 +995,7 @@ function refreshClientSelect(){
 function refreshSupplierSelect(){
   $('pSupplier').innerHTML = '<option value="">-- اختر --</option>' + fournisseurs.map(f=>`<option value="${f.id}">${f.name}</option>`).join('');
 }
-let companyInfo = {name:'GTR POS', address:'', phone1:'', phone2:'', phone3:''};
+let companyInfo = {name:'GTR POS', address:'', phone1:'', phone2:'', phone3:'', logo:''};
 const CompanyInfo = {
   load(){
     $('cpyName').value = companyInfo.name;
@@ -958,6 +1003,30 @@ const CompanyInfo = {
     $('cpyPhone1').value = companyInfo.phone1;
     $('cpyPhone2').value = companyInfo.phone2;
     $('cpyPhone3').value = companyInfo.phone3;
+    this.updateLogoPreview();
+  },
+  updateLogoPreview(){
+    const img = $('cpyLogoPreview');
+    if(companyInfo.logo){ img.src = companyInfo.logo; img.style.display='inline-block'; }
+    else{ img.style.display='none'; img.src=''; }
+  },
+  handleLogoUpload(input){
+    const file = input.files[0]; if(!file) return;
+    if(file.size > 700000){ showToast('الصورة كبيرة، اختر صورة أصغر (أقل من 700kb)'); input.value=''; return; }
+    const reader = new FileReader();
+    reader.onload = e=>{
+      companyInfo.logo = e.target.result;
+      this.updateLogoPreview();
+      saveState();
+      showToast('تم رفع الشعار، لا تنسى الضغط على حفظ');
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  },
+  removeLogo(){
+    companyInfo.logo = '';
+    this.updateLogoPreview();
+    saveState();
   },
   save(){
     companyInfo = {
@@ -965,8 +1034,10 @@ const CompanyInfo = {
       address: $('cpyAddress').value.trim(),
       phone1: $('cpyPhone1').value.trim(),
       phone2: $('cpyPhone2').value.trim(),
-      phone3: $('cpyPhone3').value.trim()
+      phone3: $('cpyPhone3').value.trim(),
+      logo: companyInfo.logo || ''
     };
+    saveState();
     showToast('تم حفظ بيانات المؤسسة');
     closeSheet();
   }
@@ -1043,7 +1114,9 @@ function buildInvoiceHtml(opts){
       <td>${l.total.toFixed(3)}</td>
     </tr>`).join('');
   const totalQty = opts.lines.reduce((a,l)=>a+l.qty,0);
+  const logoHtml = c.logo ? `<div style="text-align:center; margin-bottom:6px;"><img src="${c.logo}" style="max-width:80px; max-height:80px; object-fit:contain;"></div>` : '';
   return `
+    ${logoHtml}
     <div class="inv-top">
       <div class="inv-datetime">Date: ${dateStr}<br>Time: ${timeStr}</div>
       <div class="inv-company">
@@ -1099,7 +1172,7 @@ function refreshArticleSelects(){
 const Clients = {
   editingId:null, specialPrices:[], reglements:[],
   reset(){ this.editingId=null; this.specialPrices=[]; this.reglements=[]; $('cCode').value='CL-'+String(nextId.clients).padStart(4,'0');
-    $('cName').value=''; $('cPhone').value=''; $('cAddress').value=''; $('cBalance').value='0'; $('cNotes').value='';
+    $('cName').value=''; $('cPhone').value=''; $('cPhone2').value=''; $('cPhone3').value=''; $('cAddress').value=''; $('cBalance').value='0'; $('cNotes').value='';
     $('cpArticle').value=''; $('cpPrice').value=''; $('crAmount').value=''; $('csFrom').value=''; $('csTo').value=''; $('csResults').innerHTML='';
     this.renderSpecialPrices(); this.renderReglements(); },
   addSpecialPrice(){
@@ -1174,6 +1247,7 @@ const Clients = {
   save(){
     if(!$('cName').value.trim()){ showToast('أدخل اسم العميل'); return; }
     const rec={id:this.editingId??nextId.clients, name:$('cName').value.trim(), phone:$('cPhone').value,
+      phone2:$('cPhone2').value, phone3:$('cPhone3').value,
       address:$('cAddress').value, balance:parseFloat($('cBalance').value)||0, notes:$('cNotes').value,
       specialPrices:[...this.specialPrices], reglements:[...this.reglements]};
     if(this.editingId!=null){ clients[clients.findIndex(c=>c.id===this.editingId)]=rec; showToast('تم التعديل'); }
@@ -1194,7 +1268,7 @@ const Clients = {
   load(id){
     const c=clients.find(x=>x.id===id); if(!c) return;
     this.editingId=id; $('cCode').value='CL-'+String(id).padStart(4,'0');
-    $('cName').value=c.name; $('cPhone').value=c.phone; $('cAddress').value=c.address;
+    $('cName').value=c.name; $('cPhone').value=c.phone; $('cPhone2').value=c.phone2||''; $('cPhone3').value=c.phone3||''; $('cAddress').value=c.address;
     $('cBalance').value=c.balance; $('cNotes').value=c.notes;
     this.specialPrices = c.specialPrices ? [...c.specialPrices] : [];
     this.reglements = c.reglements ? [...c.reglements] : [];
@@ -1266,7 +1340,7 @@ const Articles = {
 const Fournisseurs = {
   editingId:null, reglements:[],
   reset(){ this.editingId=null; this.reglements=[]; $('fCode').value='FR-'+String(nextId.fournisseurs).padStart(4,'0');
-    $('fName').value=''; $('fPhone').value=''; $('fAddress').value=''; $('fBalance').value='0'; $('fNotes').value='';
+    $('fName').value=''; $('fPhone').value=''; $('fPhone2').value=''; $('fPhone3').value=''; $('fAddress').value=''; $('fBalance').value='0'; $('fNotes').value='';
     $('frAmount').value=''; $('fsFrom').value=''; $('fsTo').value=''; $('fsResults').innerHTML=''; this.renderReglements(); },
   addReglement(){
     if(this.editingId==null){ showToast('احفظ المورد أولا قبل تسجيل تسديد'); return; }
@@ -1322,6 +1396,7 @@ const Fournisseurs = {
   save(){
     if(!$('fName').value.trim()){ showToast('أدخل اسم المورد'); return; }
     const rec={id:this.editingId??nextId.fournisseurs, name:$('fName').value.trim(), phone:$('fPhone').value,
+      phone2:$('fPhone2').value, phone3:$('fPhone3').value,
       address:$('fAddress').value, balance:parseFloat($('fBalance').value)||0, notes:$('fNotes').value,
       reglements:[...this.reglements]};
     if(this.editingId!=null){ fournisseurs[fournisseurs.findIndex(f=>f.id===this.editingId)]=rec; showToast('تم التعديل'); }
@@ -1342,7 +1417,7 @@ const Fournisseurs = {
   load(id){
     const f=fournisseurs.find(x=>x.id===id); if(!f) return;
     this.editingId=id; $('fCode').value='FR-'+String(id).padStart(4,'0');
-    $('fName').value=f.name; $('fPhone').value=f.phone; $('fAddress').value=f.address;
+    $('fName').value=f.name; $('fPhone').value=f.phone; $('fPhone2').value=f.phone2||''; $('fPhone3').value=f.phone3||''; $('fAddress').value=f.address;
     $('fBalance').value=f.balance; $('fNotes').value=f.notes;
     this.reglements = f.reglements ? [...f.reglements] : [];
     $('frAmount').value=''; $('fsFrom').value=''; $('fsTo').value=''; $('fsResults').innerHTML=''; this.renderReglements();
@@ -1368,10 +1443,11 @@ const Ventes = {
   fillClient(){ const c=clients.find(x=>x.id==$('vClient').value); $('vPhone').value=c?c.phone:''; },
   fillArticle(){
     const a=articles.find(x=>x.id==$('viArticle').value);
-    if(!a){ $('viPrice').value=''; this.calcLine(); return; }
+    if(!a){ $('viPrice').value=''; $('viStockHint').textContent=''; this.calcLine(); return; }
     const c=clients.find(x=>x.id==$('vClient').value);
     const sp = c && c.specialPrices ? c.specialPrices.find(s=>s.name===a.name) : null;
     $('viPrice').value = (sp ? sp.price : a.price).toFixed(3);
+    $('viStockHint').textContent = 'الكمية المتوفرة بالمخزون: ' + a.stock;
     if(sp) showToast('تم تطبيق السعر الخاص لهذا الحريف');
     this.calcLine();
   },
@@ -1389,7 +1465,7 @@ const Ventes = {
     } else {
       this.lines.push({name,price,qty,total:price*qty});
     }
-    $('viArticle').value=''; $('viManualName').value=''; $('viPrice').value=''; $('viQty').value=1; $('viTotal').value='';
+    $('viArticle').value=''; $('viManualName').value=''; $('viPrice').value=''; $('viQty').value=1; $('viTotal').value=''; $('viStockHint').textContent='';
     this.renderLines();
     this.refreshArticleOptions();
   },
@@ -1414,7 +1490,7 @@ const Ventes = {
     $('vDate').value=new Date().toISOString().slice(0,10);
     $('vClient').value=''; $('vPhone').value='';
     $('vPayment').selectedIndex=0;
-    $('viArticle').value=''; $('viManualName').value=''; $('viPrice').value=''; $('viQty').value=1; $('viTotal').value='';
+    $('viArticle').value=''; $('viManualName').value=''; $('viPrice').value=''; $('viQty').value=1; $('viTotal').value=''; $('viStockHint').textContent='';
     $('vrAmount').value=''; $('vrBody').innerHTML=''; $('vAccountSummary').innerHTML='';
     this.renderLines(); this.refreshArticleOptions();
   },
@@ -1442,8 +1518,16 @@ const Ventes = {
       const client = clients.find(c=>c.name===clientName);
       if(client) client.balance += rec.total;
       ventes.push(rec); nextId.ventes++; showToast('تم حفظ المبيعات');
+      if(rec.payment==='نقدا'){
+        rec.reglements.push({date:rec.date, amount:rec.total});
+        if(client){
+          client.balance -= rec.total;
+          client.reglements = client.reglements || [];
+          client.reglements.push({date:rec.date, amount:rec.total});
+        }
+        caisse.push({id:nextId.caisse++, date:rec.date, type:'in', amount:rec.total, description:'بيع نقدي '+rec.num, source:'reglement_vente', sourceId:rec.id+'-'+rec.reglements.length});
+      }
     }
-    Caisse.addAuto('in', rec.total, rec.date, 'بيع '+rec.num, 'vente', rec.id);
     Clients.render();
     this.editingId = rec.id;
     this.renderAccountSummary(rec);
@@ -1543,7 +1627,7 @@ const Ventes = {
       const paid = (rec.reglements||[]).reduce((a,r)=>a+r.amount,0);
       if(client) client.balance -= (rec.total - paid);
     }
-    Caisse.removeAuto('vente', this.editingId);
+    Caisse.removeAllForInvoice('reglement_vente', this.editingId);
     ventes=ventes.filter(v=>v.id!==this.editingId); showToast('تم الحذف'); Clients.render(); this.render(); closeSheet();
   },
   load(id){
@@ -1576,7 +1660,12 @@ const Ventes = {
 const Achats = {
   editingId:null, lines:[],
   fillSupplier(){ const s=fournisseurs.find(x=>x.id==$('pSupplier').value); $('pPhone').value=s?s.phone:''; $('pAddress').value=s?s.address:''; },
-  fillArticle(){ const a=articles.find(x=>x.id==$('piArticle').value); $('piPrice').value=a?(a.costPrice||a.price).toFixed(3):''; this.calcLine(); },
+  fillArticle(){
+    const a=articles.find(x=>x.id==$('piArticle').value);
+    $('piPrice').value=a?(a.costPrice||a.price).toFixed(3):'';
+    $('piStockHint').textContent = a ? ('الكمية المتوفرة بالمخزون: ' + a.stock) : '';
+    this.calcLine();
+  },
   calcLine(){ const p=parseFloat($('piPrice').value)||0,q=parseFloat($('piQty').value)||0; $('piTotal').value=(p*q).toFixed(3); },
   addLine(){
     const sel=$('piArticle');
@@ -1591,7 +1680,7 @@ const Achats = {
     } else {
       this.lines.push({name,price,qty,total:price*qty});
     }
-    $('piArticle').value=''; $('piManualName').value=''; $('piPrice').value=''; $('piQty').value=1; $('piTotal').value='';
+    $('piArticle').value=''; $('piManualName').value=''; $('piPrice').value=''; $('piQty').value=1; $('piTotal').value=''; $('piStockHint').textContent='';
     this.renderLines();
     this.refreshArticleOptions();
   },
@@ -1616,7 +1705,7 @@ const Achats = {
     $('pDate').value=new Date().toISOString().slice(0,10);
     $('pSupplier').value=''; $('pPhone').value=''; $('pAddress').value='';
     $('pPayment').selectedIndex=0;
-    $('piArticle').value=''; $('piManualName').value=''; $('piPrice').value=''; $('piQty').value=1; $('piTotal').value='';
+    $('piArticle').value=''; $('piManualName').value=''; $('piPrice').value=''; $('piQty').value=1; $('piTotal').value=''; $('piStockHint').textContent='';
     $('arAmount').value=''; $('arBody').innerHTML=''; $('pAccountSummary').innerHTML='';
     this.renderLines(); this.refreshArticleOptions();
   },
@@ -1646,8 +1735,16 @@ const Achats = {
       const supplier = fournisseurs.find(f=>f.name===supplierName);
       if(supplier) supplier.balance += rec.total;
       achats.push(rec); nextId.achats++; showToast('تم حفظ المشتريات');
+      if(rec.payment==='نقدا'){
+        rec.reglements.push({date:rec.date, amount:rec.total});
+        if(supplier){
+          supplier.balance -= rec.total;
+          supplier.reglements = supplier.reglements || [];
+          supplier.reglements.push({date:rec.date, amount:rec.total});
+        }
+        caisse.push({id:nextId.caisse++, date:rec.date, type:'out', amount:rec.total, description:'شراء نقدي '+rec.num, source:'reglement_achat', sourceId:rec.id+'-'+rec.reglements.length});
+      }
     }
-    Caisse.addAuto('out', rec.total, rec.date, 'شراء '+rec.num, 'achat', rec.id);
     Fournisseurs.render();
     this.editingId = rec.id;
     this.renderAccountSummary(rec);
@@ -1747,7 +1844,7 @@ const Achats = {
       const paid = (rec.reglements||[]).reduce((a,r)=>a+r.amount,0);
       if(supplier) supplier.balance -= (rec.total - paid);
     }
-    Caisse.removeAuto('achat', this.editingId);
+    Caisse.removeAllForInvoice('reglement_achat', this.editingId);
     achats=achats.filter(p=>p.id!==this.editingId); showToast('تم الحذف'); Fournisseurs.render(); this.render(); closeSheet();
   },
   load(id){
@@ -1822,6 +1919,9 @@ const Caisse = {
   removeAuto(source, sourceId){
     caisse = caisse.filter(k=>!(k.source===source && k.sourceId===sourceId));
   },
+  removeAllForInvoice(reglementSource, invoiceId){
+    caisse = caisse.filter(k=> String(k.sourceId).split('-')[0] !== String(invoiceId) || k.source!==reglementSource);
+  },
   render(){
     saveState();
     const balance = caisse.reduce((a,k)=>a+(k.type==='in'?k.amount:-k.amount),0);
@@ -1839,8 +1939,65 @@ const Caisse = {
   }
 };
 
+// ===================== QUICK REGLEMENT (standalone, not tied to a specific invoice/card) =====================
+const QuickReglement = {
+  open(){
+    $('qrType').value = 'client';
+    $('qrAmount').value = '';
+    this.refreshTargets();
+    openSheet('quickreglement');
+  },
+  refreshTargets(){
+    const type = $('qrType').value;
+    const sel = $('qrTarget');
+    if(type==='client'){
+      sel.innerHTML = '<option value="">-- اختر --</option>' + clients.map(c=>`<option value="${c.id}">${c.name} (${c.balance.toFixed(3)} د.ت)</option>`).join('');
+    } else {
+      sel.innerHTML = '<option value="">-- اختر --</option>' + fournisseurs.map(f=>`<option value="${f.id}">${f.name} (${f.balance.toFixed(3)} د.ت)</option>`).join('');
+    }
+    $('qrBalanceHint').textContent = '';
+  },
+  showHint(){
+    const type = $('qrType').value;
+    const targetId = $('qrTarget').value;
+    if(!targetId){ $('qrBalanceHint').textContent=''; return; }
+    if(type==='client'){
+      const c = clients.find(x=>x.id==targetId);
+      $('qrBalanceHint').textContent = c ? ('الرصيد الحالي: '+c.balance.toFixed(3)+' د.ت') : '';
+    } else {
+      const f = fournisseurs.find(x=>x.id==targetId);
+      $('qrBalanceHint').textContent = f ? ('الرصيد الحالي: '+f.balance.toFixed(3)+' د.ت') : '';
+    }
+  },
+  save(){
+    const type = $('qrType').value;
+    const targetId = $('qrTarget').value;
+    const amount = parseFloat($('qrAmount').value)||0;
+    if(!targetId){ showToast('اختر عميلا أو موردا'); return; }
+    if(amount<=0){ showToast('أدخل مبلغا صحيحا'); return; }
+    const date = new Date().toISOString().slice(0,10);
+    if(type==='client'){
+      const c = clients.find(x=>x.id==targetId); if(!c) return;
+      c.balance -= amount;
+      c.reglements = c.reglements || [];
+      c.reglements.push({date, amount});
+      caisse.push({id:nextId.caisse++, date, type:'in', amount, description:'تسديد من '+c.name, source:'reglement_client', sourceId:c.id+'-'+c.reglements.length});
+      Clients.render();
+    } else {
+      const f = fournisseurs.find(x=>x.id==targetId); if(!f) return;
+      f.balance -= amount;
+      f.reglements = f.reglements || [];
+      f.reglements.push({date, amount});
+      caisse.push({id:nextId.caisse++, date, type:'out', amount, description:'تسديد لـ '+f.name, source:'reglement_fournisseur', sourceId:f.id+'-'+f.reglements.length});
+      Fournisseurs.render();
+    }
+    Caisse.render();
+    showToast('تم تسجيل التسديد بنجاح');
+    Reglements.render();
+    closeSheet();
+  }
+};
 
-// ===================== REGLEMENTS (registre consolidé) =====================
 const Reglements = {
   render(){
     saveState();
