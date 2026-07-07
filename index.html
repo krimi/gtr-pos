@@ -296,6 +296,19 @@
   </div>
 </div>
 
+<!-- Pending approval overlay -->
+<div class="login-overlay" id="pendingOverlay">
+  <div class="login-box">
+    <div class="login-logo">⏳ GTR POS</div>
+    <div class="login-sub">حسابك قيد المراجعة</div>
+    <p style="font-size:13px; color:var(--muted); line-height:1.8; margin:14px 0;">
+      طلب حسابك انبعت للموافقة. باش تنجم تستعمل التطبيق، لازم صاحب النظام يوافق عليك أولا.
+      رح تنجم تدخل تلقائيًا لحظة الموافقة (جرب تسجل الدخول مرة أخرى بعد شوية).
+    </p>
+    <button class="login-btn secondary" onclick="doLogout()">🚪 تسجيل الخروج</button>
+  </div>
+</div>
+
 
 <div class="phone">
   <div class="appbar">
@@ -366,6 +379,14 @@
       <div id="reglementsList"></div>
     </div>
 
+    <!-- ADMIN: ACCOUNT APPROVALS -->
+    <div class="section" id="sec-approvals">
+      <div class="section-title" data-i18n="pendingApprovalsTitle">حسابات بانتظار الموافقة</div>
+      <div id="pendingApprovalsList"></div>
+      <div class="section-title" style="margin-top:14px;" data-i18n="approvedAccountsTitle">حسابات موافق عليها</div>
+      <div id="approvedAccountsList"></div>
+    </div>
+
     <!-- FOURNISSEURS -->
     <div class="section" id="sec-fournisseurs">
       <input class="search-box" id="fSearch" data-i18n-ph="searchFournisseurs" placeholder="🔍 بحث بالاسم أو الهاتف..." oninput="Fournisseurs.render()">
@@ -397,6 +418,7 @@
     <div class="tab-item" data-section="articles"><span class="ic">📦</span><span data-i18n="tabArticles">أصناف</span></div>
     <div class="tab-item" data-section="caisse"><span class="ic">💰</span><span data-i18n="tabCaisse">الكاسة</span></div>
     <div class="tab-item" data-section="reglements"><span class="ic">🧾</span><span data-i18n="tabReglements">التسديدات</span></div>
+    <div class="tab-item" data-section="approvals" id="tabApprovals" style="display:none;"><span class="ic">👤</span><span data-i18n="tabApprovals">الحسابات</span></div>
   </div>
 
   <!-- ===== Sheets (forms) ===== -->
@@ -716,15 +738,46 @@ function doLogout(){
   closeSheet();
 }
 
+const ADMIN_EMAIL = 'krimi.neji@gmail.com';
+
 auth.onAuthStateChanged(function(user){
   if(user){
     currentUser = user;
-    $('loginOverlay').classList.remove('show');
     const emailDisplay = document.getElementById('accountEmailDisplay');
     if(emailDisplay) emailDisplay.textContent = user.email || '';
-    loadStateFromFirestore(user.uid).then(()=>{ initAll(); });
+
+    if(user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()){
+      // Admin: always approved, show approvals tab
+      $('loginOverlay').classList.remove('show');
+      $('pendingOverlay').classList.remove('show');
+      $('tabApprovals').style.display = '';
+      loadStateFromFirestore(user.uid).then(()=>{ initAll(); });
+      return;
+    }
+
+    const approvalRef = db.collection('approvals').doc(user.uid);
+    approvalRef.get().then(doc=>{
+      if(!doc.exists){
+        approvalRef.set({ email:user.email||'', requestedAt:new Date().toISOString(), approved:false });
+        $('loginOverlay').classList.remove('show');
+        $('pendingOverlay').classList.add('show');
+      } else if(doc.data().approved===true){
+        $('loginOverlay').classList.remove('show');
+        $('pendingOverlay').classList.remove('show');
+        $('tabApprovals').style.display = 'none';
+        loadStateFromFirestore(user.uid).then(()=>{ initAll(); });
+      } else {
+        $('loginOverlay').classList.remove('show');
+        $('pendingOverlay').classList.add('show');
+      }
+    }).catch(e=>{
+      console.error('Approval check error', e);
+      $('loginOverlay').classList.remove('show');
+      $('pendingOverlay').classList.add('show');
+    });
   } else {
     currentUser = null;
+    $('pendingOverlay').classList.remove('show');
     $('loginOverlay').classList.add('show');
   }
 });
@@ -744,9 +797,10 @@ function badgeStatus(status){
 // ---- i18n ----
 const translations = {
   ar: {
-    tabTitles: {rapports:'لوحة القيادة', clients:'العملاء', articles:'الأصناف', fournisseurs:'الموردين', ventes:'المبيعات', achats:'المشتريات', caisse:'الكاسة', reglements:'التسديدات'},
+    tabTitles: {rapports:'لوحة القيادة', clients:'العملاء', articles:'الأصناف', fournisseurs:'الموردين', ventes:'المبيعات', achats:'المشتريات', caisse:'الكاسة', reglements:'التسديدات', approvals:'الحسابات'},
     appSub:'GTR POS',
-    tabHome:'الرئيسية', tabVentes:'مبيعات', tabAchats:'مشتريات', tabClients:'عملاء', tabFournisseurs:'موردين', tabArticles:'أصناف', tabCaisse:'الكاسة', tabReglements:'التسديدات',
+    tabHome:'الرئيسية', tabVentes:'مبيعات', tabAchats:'مشتريات', tabClients:'عملاء', tabFournisseurs:'موردين', tabArticles:'أصناف', tabCaisse:'الكاسة', tabReglements:'التسديدات', tabApprovals:'الحسابات',
+    pendingApprovalsTitle:'حسابات بانتظار الموافقة', approvedAccountsTitle:'حسابات موافق عليها', approveBtn:'✅ موافقة', revokeBtn:'🚫 إلغاء الموافقة',
     kpiVentes:'مبيعات (د.ت)', kpiAchats:'مشتريات (د.ت)', kpiClients:'العملاء', kpiFournisseurs:'الموردين', lowStockTitle:'⚠️ مخزون منخفض', caisseBalanceLbl:'الرصيد الحالي',
     statsTitle:'📊 إحصائيات', kpiNbVentes:'عدد فواتير البيع', kpiNbAchats:'عدد فواتير الشراء', kpiCaisseSolde:'رصيد الكاسة', kpiSoldesClients:'مجموع أرصدة العملاء',
     searchClients:'🔍 بحث بالاسم أو الهاتف...', searchArticles:'🔍 بحث باسم الصنف...', searchFournisseurs:'🔍 بحث بالاسم أو الهاتف...',
@@ -789,9 +843,10 @@ const translations = {
     langBtn:'FR'
   },
   fr: {
-    tabTitles: {rapports:'Tableau de bord', clients:'Clients', articles:'Articles', fournisseurs:'Fournisseurs', ventes:'Ventes', achats:'Achats', caisse:'Caisse', reglements:'Règlements'},
+    tabTitles: {rapports:'Tableau de bord', clients:'Clients', articles:'Articles', fournisseurs:'Fournisseurs', ventes:'Ventes', achats:'Achats', caisse:'Caisse', reglements:'Règlements', approvals:'Comptes'},
     appSub:'GTR POS',
-    tabHome:'Accueil', tabVentes:'Ventes', tabAchats:'Achats', tabClients:'Clients', tabFournisseurs:'Fournisseurs', tabArticles:'Articles', tabCaisse:'Caisse', tabReglements:'Règlements',
+    tabHome:'Accueil', tabVentes:'Ventes', tabAchats:'Achats', tabClients:'Clients', tabFournisseurs:'Fournisseurs', tabArticles:'Articles', tabCaisse:'Caisse', tabReglements:'Règlements', tabApprovals:'Comptes',
+    pendingApprovalsTitle:'Comptes en attente', approvedAccountsTitle:'Comptes approuvés', approveBtn:'✅ Approuver', revokeBtn:'🚫 Révoquer',
     kpiVentes:'Ventes (TND)', kpiAchats:'Achats (TND)', kpiClients:'Clients', kpiFournisseurs:'Fournisseurs', lowStockTitle:'⚠️ Stock faible', caisseBalanceLbl:'Solde actuel',
     statsTitle:'📊 Statistiques', kpiNbVentes:'Nombre de ventes', kpiNbAchats:"Nombre d'achats", kpiCaisseSolde:'Solde de caisse', kpiSoldesClients:'Total des soldes clients',
     searchClients:'🔍 Rechercher par nom ou téléphone...', searchArticles:'🔍 Rechercher un article...', searchFournisseurs:'🔍 Rechercher par nom ou téléphone...',
@@ -866,6 +921,7 @@ tabs.forEach(t=>{
     if(currentSection==='rapports') Rapports.render();
     if(currentSection==='caisse') Caisse.render();
     if(currentSection==='reglements') Reglements.render();
+    if(currentSection==='approvals') Approvals.render();
   });
 });
 $('langBtn').addEventListener('click', ()=>{
@@ -1973,6 +2029,53 @@ const Caisse = {
 };
 
 // ===================== QUICK REGLEMENT (standalone, not tied to a specific invoice/card) =====================
+// ===================== APPROVALS (admin only) =====================
+const Approvals = {
+  render(){
+    if(!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()){
+      $('pendingApprovalsList').innerHTML = '<div class="empty-msg">هذا القسم لصاحب النظام فقط</div>';
+      $('approvedAccountsList').innerHTML = '';
+      return;
+    }
+    db.collection('approvals').get().then(snap=>{
+      const pendingList = $('pendingApprovalsList'); pendingList.innerHTML='';
+      const approvedList = $('approvedAccountsList'); approvedList.innerHTML='';
+      let pendingCount = 0, approvedCount = 0;
+      snap.forEach(doc=>{
+        const data = doc.data();
+        const uid = doc.id;
+        const d = document.createElement('div'); d.className='row-card';
+        if(data.approved){
+          approvedCount++;
+          d.innerHTML = `<div class="main-info"><div class="name">${data.email||uid}</div><div class="meta">${(data.requestedAt||'').slice(0,10)}</div></div>`;
+          const btn = document.createElement('button'); btn.className='del-row'; btn.textContent='إلغاء';
+          btn.onclick = ()=>Approvals.setApproved(uid, false);
+          d.querySelector('.main-info').after(btn);
+          approvedList.appendChild(d);
+        } else {
+          pendingCount++;
+          d.innerHTML = `<div class="main-info"><div class="name">${data.email||uid}</div><div class="meta">${(data.requestedAt||'').slice(0,10)}</div></div>`;
+          const btn = document.createElement('button'); btn.className='del-row'; btn.style.background='var(--success)'; btn.textContent='موافقة';
+          btn.onclick = ()=>Approvals.setApproved(uid, true);
+          d.querySelector('.main-info').after(btn);
+          pendingList.appendChild(d);
+        }
+      });
+      if(pendingCount===0) pendingList.innerHTML = '<div class="empty-msg">لا توجد طلبات بانتظار الموافقة</div>';
+      if(approvedCount===0) approvedList.innerHTML = '<div class="empty-msg">لا توجد حسابات موافق عليها بعد</div>';
+    }).catch(e=>{
+      console.error(e);
+      $('pendingApprovalsList').innerHTML = '<div class="empty-msg">تعذر تحميل القائمة</div>';
+    });
+  },
+  setApproved(uid, value){
+    db.collection('approvals').doc(uid).update({approved:value}).then(()=>{
+      showToast(value ? 'تمت الموافقة على الحساب' : 'تم إلغاء الموافقة');
+      this.render();
+    }).catch(e=>{ console.error(e); showToast('حدث خطأ'); });
+  }
+};
+
 const QuickReglement = {
   open(){
     $('qrType').value = 'client';
