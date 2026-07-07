@@ -456,6 +456,8 @@
       </div>
       <button class="btn outline small" onclick="Clients.queryStatement()" data-i18n="query">🔍 استعلام</button>
       <div id="csResults"></div>
+      <div class="section-title" style="margin-top:10px;" data-i18n="clientAccountSummaryTitle">ملخص الحساب</div>
+      <div id="cAccountSummary"></div>
     </div>
   </div>
 
@@ -635,9 +637,8 @@
         </div>
       </div>
       <div class="field"><label data-i18n="companyAddress">العنوان</label><input id="cpyAddress"></div>
-      <div class="field"><label data-i18n="companyPhone1">هاتف 1</label><input id="cpyPhone1"></div>
-      <div class="field"><label data-i18n="companyPhone2">هاتف 2</label><input id="cpyPhone2"></div>
-      <div class="field"><label data-i18n="companyPhone3">هاتف 3</label><input id="cpyPhone3"></div>
+      <div class="field"><label data-i18n="companyPhone1">الهاتف</label><input id="cpyPhone1"></div>
+      <div class="field"><label data-i18n="companyTaxId">رقم بطاقة التعريف الجبائية</label><input id="cpyTaxId"></div>
       <button class="btn save" onclick="CompanyInfo.save()" data-i18n="save">💾 حفظ</button>
       <div class="section-title" style="margin-top:12px;" data-i18n="uiScaleTitle">حجم النص والمربعات</div>
       <div style="display:flex; gap:8px; margin-bottom:8px;">
@@ -648,6 +649,7 @@
       </div>
       <div class="section-title" style="margin-top:12px;" data-i18n="backupTitle">النسخ الاحتياطي</div>
       <button class="btn outline small" onclick="exportBackup()" data-i18n="exportBackup">⬇️ تصدير نسخة احتياطية</button>
+      <button class="btn outline small" onclick="exportBackupToDrive()" data-i18n="exportBackupDrive">☁️ تصدير إلى Google Drive</button>
       <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importBackupFile(this)">
       <button class="btn outline small" onclick="document.getElementById('importFileInput').click()" data-i18n="importBackup">⬆️ استيراد نسخة احتياطية</button>
       <div style="font-size:11px; color:var(--muted); margin-top:6px;" data-i18n="pwaHint">💡 لتثبيت التطبيق على هاتفك: افتح القائمة ⋮ في المتصفح واختر "إضافة إلى الشاشة الرئيسية"</div>
@@ -824,6 +826,7 @@ const translations = {
     quickReglementWho:'النوع', quickReglementClient:'تسديد من عميل', quickReglementFournisseur:'تسديد لمورد',
     quickReglementTarget:'الاسم', quickReglementSave:'💾 تسجيل التسديد',
     statementTitle:'كشف حساب', fromDate:'من', toDate:'إلى', query:'🔍 استعلام',
+    clientAccountSummaryTitle:'ملخص الحساب', openingBalance:'حساب البداية', totalInvoices:'مجموع الفواتير', totalPayments:'مجموع مبالغ التسديدات', finalBalance:'الحساب (الرصيد النهائي)',
     accountSummaryTitle:'وضعية الحساب', invoiceTotal:'مبلغ الفاتورة', paidOnInvoice:'المدفوع من الفاتورة', remainingInvoice:'الباقي من الفاتورة', totalAccountBalance:'المتخلد بالذمة (الرصيد الكلي)',
     shareWhatsapp:'📱 إرسال الفاتورة عبر واتساب',
     invoiceHeaderVente:'فاتورة بيع', invoiceHeaderAchat:'فاتورة شراء', invDate:'التاريخ', invClient:'العميل', invSupplier:'المورد',
@@ -831,13 +834,13 @@ const translations = {
     printInvoice:'🖨️ طباعة الفاتورة', companySheetTitle:'بيانات المؤسسة', companyName:'اسم المؤسسة', companyAddress:'العنوان',
     companyLogo:'الشعار (Logo)', chooseLogo:'اختر صورة', removeLogo:'✕',
     uiScaleTitle:'حجم النص والمربعات', uiScaleSmall:'صغير', uiScaleMedium:'عادي', uiScaleLarge:'كبير', uiScaleXLarge:'أكبر',
-    companyPhone1:'هاتف 1', companyPhone2:'هاتف 2', companyPhone3:'هاتف 3',
+    companyPhone1:'الهاتف', companyTaxId:'رقم بطاقة التعريف الجبائية',
     invPurchaseInvoice:'فاتورة مشتريات', invSaleInvoice:'فاتورة مبيعات', invPaymentMethod:'الدفع', invNum:'رقم الفاتورة', invDateField:'تاريخها',
     invSupplierName:'اسم المورد', invClientName:'اسم العميل', invSupplierAddr:'عنوان المورد', invClientAddr:'عنوان العميل',
     invSupplierPhone:'تلفون المورد', invClientPhone:'تلفون العميل', invItemNum:'#', invItemName:'اسم المنتج', invItemPrice:'السعر', invItemQty:'الكمية', invItemTotal:'الإجمالي',
     invAmountWords:'المبلغ بالحروف', invPrevBalance:'سابقكم', invInvoiceTotal:'إجمالي الفاتورة', invAmountPaid:'المبلغ المدفوع', invCurrentBalance:'حاليالكم',
     invOnly:'فقط', invDinar:'دينار', invMillime:'مليم', invNoMore:'لا غير',
-    backupTitle:'النسخ الاحتياطي', exportBackup:'⬇️ تصدير نسخة احتياطية', importBackup:'⬆️ استيراد نسخة احتياطية',
+    backupTitle:'النسخ الاحتياطي', exportBackup:'⬇️ تصدير نسخة احتياطية', importBackup:'⬆️ استيراد نسخة احتياطية', exportBackupDrive:'☁️ تصدير إلى Google Drive',
     pwaHint:'💡 لتثبيت التطبيق على هاتفك: افتح القائمة ⋮ في المتصفح واختر "إضافة إلى الشاشة الرئيسية"',
     accountTitle:'الحساب', logout:'🚪 تسجيل الخروج',
     langBtn:'FR'
@@ -870,6 +873,7 @@ const translations = {
     quickReglementWho:'Type', quickReglementClient:'Règlement client', quickReglementFournisseur:'Règlement fournisseur',
     quickReglementTarget:'Nom', quickReglementSave:'💾 Enregistrer le règlement',
     statementTitle:'Relevé de compte', fromDate:'Du', toDate:'Au', query:'🔍 Rechercher',
+    clientAccountSummaryTitle:'Résumé du compte', openingBalance:'Solde initial', totalInvoices:'Total des factures', totalPayments:'Total des règlements', finalBalance:'Solde final',
     accountSummaryTitle:'État du compte', invoiceTotal:'Montant de la facture', paidOnInvoice:'Payé sur la facture', remainingInvoice:'Reste sur la facture', totalAccountBalance:'Solde total dû',
     shareWhatsapp:'📱 Envoyer la facture via WhatsApp',
     invoiceHeaderVente:'Facture de vente', invoiceHeaderAchat:"Facture d'achat", invDate:'Date', invClient:'Client', invSupplier:'Fournisseur',
@@ -877,13 +881,13 @@ const translations = {
     printInvoice:'🖨️ Imprimer la facture', companySheetTitle:"Infos de l'entreprise", companyName:"Nom de l'entreprise", companyAddress:'Adresse',
     companyLogo:'Logo', chooseLogo:'Choisir une image', removeLogo:'✕',
     uiScaleTitle:'Taille du texte et des champs', uiScaleSmall:'Petit', uiScaleMedium:'Normal', uiScaleLarge:'Grand', uiScaleXLarge:'Plus grand',
-    companyPhone1:'Téléphone 1', companyPhone2:'Téléphone 2', companyPhone3:'Téléphone 3',
+    companyPhone1:'Téléphone', companyTaxId:'Matricule fiscal',
     invPurchaseInvoice:"Facture d'achat", invSaleInvoice:'Facture de vente', invPaymentMethod:'Paiement', invNum:'N° de facture', invDateField:'Date',
     invSupplierName:'Nom du fournisseur', invClientName:'Nom du client', invSupplierAddr:'Adresse du fournisseur', invClientAddr:'Adresse du client',
     invSupplierPhone:'Téléphone fournisseur', invClientPhone:'Téléphone client', invItemNum:'#', invItemName:'Produit', invItemPrice:'Prix', invItemQty:'Qté', invItemTotal:'Total',
     invAmountWords:'Montant en lettres', invPrevBalance:'Solde précédent', invInvoiceTotal:'Total facture', invAmountPaid:'Montant payé', invCurrentBalance:'Solde actuel',
     invOnly:'Uniquement', invDinar:'dinars', invMillime:'millimes', invNoMore:'',
-    backupTitle:'Sauvegarde', exportBackup:'⬇️ Exporter une sauvegarde', importBackup:'⬆️ Importer une sauvegarde',
+    backupTitle:'Sauvegarde', exportBackup:'⬇️ Exporter une sauvegarde', importBackup:'⬆️ Importer une sauvegarde', exportBackupDrive:'☁️ Exporter vers Google Drive',
     pwaHint:'💡 Pour installer l\'app sur votre téléphone : menu ⋮ du navigateur puis "Ajouter à l\'écran d\'accueil"',
     accountTitle:'Compte', logout:'🚪 Se déconnecter',
     langBtn:'ع'
@@ -1005,16 +1009,19 @@ function loadStateFromFirestore(uid){
   return db.collection('users').doc(uid).get().then(doc=>{
     if(doc.exists){
       const data = doc.data();
-      if(data.clients) clients = data.clients;
-      if(data.articles) articles = data.articles;
-      if(data.fournisseurs) fournisseurs = data.fournisseurs;
-      if(data.ventes) ventes = data.ventes;
-      if(data.achats) achats = data.achats;
-      if(data.caisse) caisse = data.caisse;
-      if(data.nextId) nextId = data.nextId;
-      if(data.companyInfo) companyInfo = data.companyInfo;
+      clients = data.clients || [];
+      articles = data.articles || [];
+      fournisseurs = data.fournisseurs || [];
+      ventes = data.ventes || [];
+      achats = data.achats || [];
+      caisse = data.caisse || [];
+      nextId = data.nextId || {clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1};
+      companyInfo = data.companyInfo || {name:'GTR POS', address:'', phone1:'', taxId:'', logo:''};
     } else {
-      // First time for this account: seed Firestore with current default data
+      // First time for this account: start completely empty (no demo/seed data)
+      clients = []; articles = []; fournisseurs = []; ventes = []; achats = []; caisse = [];
+      nextId = {clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1};
+      companyInfo = {name:'GTR POS', address:'', phone1:'', taxId:'', logo:''};
       const data = { clients, articles, fournisseurs, ventes, achats, caisse, nextId, companyInfo };
       db.collection('users').doc(uid).set(data).catch(e=>console.error(e));
     }
@@ -1033,6 +1040,51 @@ function exportBackup(){
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
   showToast('تم تصدير النسخة الاحتياطية');
+}
+function exportBackupToDrive(){
+  if(!currentUser){ showToast('يجب تسجيل الدخول أولا'); return; }
+  const provider = new firebase.auth.GoogleAuthProvider();
+  provider.addScope('https://www.googleapis.com/auth/drive.file');
+  showToast('جاري فتح نافذة Google للسماح بالرفع...');
+
+  const uploadWithToken = (accessToken)=>{
+    if(!accessToken){ showToast('تعذر الحصول على إذن الوصول لـ Google Drive'); return; }
+    const data = { clients, articles, fournisseurs, ventes, achats, caisse, nextId, companyInfo, exportedAt: new Date().toISOString() };
+    const fileName = 'gtrpos_backup_'+new Date().toISOString().slice(0,10)+'.json';
+    const metadata = { name: fileName, mimeType: 'application/json' };
+    const boundary = '-------gtrpos314159';
+    const delimiter = "\r\n--"+boundary+"\r\n";
+    const closeDelim = "\r\n--"+boundary+"--";
+    const multipartBody =
+      delimiter + 'Content-Type: application/json\r\n\r\n' + JSON.stringify(metadata) +
+      delimiter + 'Content-Type: application/json\r\n\r\n' + JSON.stringify(data, null, 2) +
+      closeDelim;
+    fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer '+accessToken, 'Content-Type': 'multipart/related; boundary='+boundary },
+      body: multipartBody
+    }).then(res=>res.json()).then(json=>{
+      if(json.id){ showToast('تم رفع النسخة الاحتياطية إلى Google Drive بنجاح'); }
+      else { showToast('حدث خطأ أثناء الرفع'); console.error(json); }
+    }).catch(e=>{ console.error(e); showToast('حدث خطأ أثناء الرفع لـ Google Drive'); });
+  };
+
+  // Safe flow: link Google to the CURRENT account (keeps same uid/session).
+  // If already linked, fall back to reauthenticating with it instead.
+  currentUser.linkWithPopup(provider).then(result=>{
+    const credential = firebase.auth.GoogleAuthProvider.credentialFromResult(result);
+    uploadWithToken(credential.accessToken);
+  }).catch(err=>{
+    if(err.code === 'auth/credential-already-in-use' || err.code === 'auth/provider-already-linked' || err.code === 'auth/email-already-in-use'){
+      currentUser.reauthenticateWithPopup(provider).then(result=>{
+        const credential = firebase.auth.GoogleAuthProvider.credentialFromResult(result);
+        uploadWithToken(credential.accessToken);
+      }).catch(e=>{ console.error(e); showToast('تعذر الحصول على إذن Google Drive'); });
+    } else {
+      console.error(err);
+      showToast('تعذر الحصول على إذن Google Drive');
+    }
+  });
 }
 function importBackupFile(input){
   const file = input.files[0]; if(!file) return;
@@ -1063,14 +1115,13 @@ function refreshClientSelect(){
 function refreshSupplierSelect(){
   $('pSupplier').innerHTML = '<option value="">-- اختر --</option>' + fournisseurs.map(f=>`<option value="${f.id}">${f.name}</option>`).join('');
 }
-let companyInfo = {name:'GTR POS', address:'', phone1:'', phone2:'', phone3:'', logo:''};
+let companyInfo = {name:'GTR POS', address:'', phone1:'', taxId:'', logo:''};
 const CompanyInfo = {
   load(){
     $('cpyName').value = companyInfo.name;
     $('cpyAddress').value = companyInfo.address;
-    $('cpyPhone1').value = companyInfo.phone1;
-    $('cpyPhone2').value = companyInfo.phone2;
-    $('cpyPhone3').value = companyInfo.phone3;
+    $('cpyPhone1').value = companyInfo.phone1 || '';
+    $('cpyTaxId').value = companyInfo.taxId || '';
     this.updateLogoPreview();
   },
   updateLogoPreview(){
@@ -1101,8 +1152,7 @@ const CompanyInfo = {
       name: $('cpyName').value.trim() || 'GTR POS',
       address: $('cpyAddress').value.trim(),
       phone1: $('cpyPhone1').value.trim(),
-      phone2: $('cpyPhone2').value.trim(),
-      phone3: $('cpyPhone3').value.trim(),
+      taxId: $('cpyTaxId').value.trim(),
       logo: companyInfo.logo || ''
     };
     saveState();
@@ -1190,7 +1240,8 @@ function buildInvoiceHtml(opts){
       <div class="inv-company">
         ${c.name}<br>
         ${c.address||''}<br>
-        ${[c.phone1,c.phone2,c.phone3].filter(Boolean).join('<br>')}
+        ${c.phone1||''}
+        ${c.taxId ? '<br>M.F: '+c.taxId : ''}
       </div>
     </div>
     <div class="inv-title">${opts.title}</div>
@@ -1256,7 +1307,7 @@ const Clients = {
   editingId:null, specialPrices:[], reglements:[],
   reset(){ this.editingId=null; this.specialPrices=[]; this.reglements=[]; $('cCode').value='CL-'+String(nextId.clients).padStart(4,'0');
     $('cName').value=''; $('cPhone').value=''; $('cPhone2').value=''; $('cPhone3').value=''; $('cAddress').value=''; $('cBalance').value='0'; $('cNotes').value='';
-    $('cpArticle').value=''; $('cpPrice').value=''; $('crAmount').value=''; $('csFrom').value=''; $('csTo').value=''; $('csResults').innerHTML='';
+    $('cpArticle').value=''; $('cpPrice').value=''; $('crAmount').value=''; $('csFrom').value=''; $('csTo').value=''; $('csResults').innerHTML=''; $('cAccountSummary').innerHTML='';
     this.renderSpecialPrices(); this.renderReglements(); },
   addSpecialPrice(){
     const sel=$('cpArticle'); const name=sel.options[sel.selectedIndex]?.textContent||'';
@@ -1290,6 +1341,7 @@ const Clients = {
     $('cBalance').value = c.balance.toFixed(3);
     $('crAmount').value='';
     this.renderReglements();
+    this.renderAccountSummary(c);
     showToast('تم تسجيل التسديد');
     this.render();
   },
@@ -1329,12 +1381,19 @@ const Clients = {
   },
   save(){
     if(!$('cName').value.trim()){ showToast('أدخل اسم العميل'); return; }
+    const enteredBalance = parseFloat($('cBalance').value)||0;
     const rec={id:this.editingId??nextId.clients, name:$('cName').value.trim(), phone:$('cPhone').value,
       phone2:$('cPhone2').value, phone3:$('cPhone3').value,
-      address:$('cAddress').value, balance:parseFloat($('cBalance').value)||0, notes:$('cNotes').value,
+      address:$('cAddress').value, balance:enteredBalance, notes:$('cNotes').value,
       specialPrices:[...this.specialPrices], reglements:[...this.reglements]};
-    if(this.editingId!=null){ clients[clients.findIndex(c=>c.id===this.editingId)]=rec; showToast('تم التعديل'); }
-    else{ clients.push(rec); nextId.clients++; showToast('تم الحفظ'); }
+    if(this.editingId!=null){
+      const old = clients.find(c=>c.id===this.editingId);
+      rec.openingBalance = old ? (old.openingBalance ?? 0) : enteredBalance;
+      clients[clients.findIndex(c=>c.id===this.editingId)]=rec; showToast('تم التعديل');
+    } else {
+      rec.openingBalance = enteredBalance;
+      clients.push(rec); nextId.clients++; showToast('تم الحفظ');
+    }
     refreshClientSelect(); this.render(); closeSheet();
   },
   edit(){
@@ -1357,7 +1416,27 @@ const Clients = {
     this.reglements = c.reglements ? [...c.reglements] : [];
     $('cpArticle').value=''; $('cpPrice').value=''; $('crAmount').value=''; $('csFrom').value=''; $('csTo').value=''; $('csResults').innerHTML='';
     this.renderSpecialPrices(); this.renderReglements();
+    this.renderAccountSummary(c);
     openSheet('clients');
+  },
+  renderAccountSummary(c){
+    const t = translations[currentLang];
+    const totalInvoices = ventes.filter(v=>v.client===c.name).reduce((a,v)=>a+v.total,0);
+    const totalPayments = (c.reglements||[]).reduce((a,r)=>a+r.amount,0);
+    const opening = c.openingBalance ?? 0;
+    const box = $('cAccountSummary'); box.innerHTML='';
+    const rows = [
+      [t.openingBalance, opening],
+      [t.totalInvoices, totalInvoices],
+      [t.totalPayments, totalPayments],
+      [t.finalBalance, c.balance]
+    ];
+    rows.forEach(([label,val],idx)=>{
+      const div=document.createElement('div'); div.className='totals-mini'; div.style.justifyContent='space-between';
+      if(idx===rows.length-1) div.style.fontWeight='800';
+      div.innerHTML=`<span>${label}</span><span>${val.toFixed(3)} د.ت</span>`;
+      box.appendChild(div);
+    });
   },
   render(){
     saveState();
@@ -1996,6 +2075,10 @@ const Caisse = {
   },
   load(id){
     const k=caisse.find(x=>x.id===id); if(!k) return;
+    if(k.source && k.source!=='manual'){
+      showToast('هذه الحركة مرتبطة بفاتورة، عدّل الفاتورة نفسها بدل هذه الحركة');
+      return;
+    }
     this.editingId=id; $('ksDate').value=k.date; $('ksType').value=k.type;
     $('ksAmount').value=k.amount; $('ksDesc').value=k.description;
     openSheet('caisse');
