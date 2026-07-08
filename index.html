@@ -363,6 +363,15 @@
       <div id="caisseList"></div>
     </div>
 
+    <!-- EXPENSES -->
+    <div class="section" id="sec-expenses">
+      <button class="btn" style="background:linear-gradient(180deg,#e46b74,var(--danger));" onclick="Expenses.openNew()" data-i18n="addExpenseBtn">+ إضافة مصروف</button>
+      <div class="kpi-row" style="grid-template-columns:1fr;">
+        <div class="kpi-card warn"><div class="val" id="expensesTotal">0.000 د.ت</div><div class="lbl" data-i18n="expensesTotalLbl">مجموع المصاريف</div></div>
+      </div>
+      <div id="expensesList"></div>
+    </div>
+
     <!-- REGLEMENTS -->
     <div class="section" id="sec-reglements">
       <button class="btn" style="background:linear-gradient(180deg,#4dbf8c,var(--success));" onclick="QuickReglement.open()" data-i18n="quickReglementBtn">+ تسجيل تسديد سريع</button>
@@ -417,6 +426,7 @@
     <div class="tab-item" data-section="fournisseurs"><span class="ic">🤝</span><span data-i18n="tabFournisseurs">موردين</span></div>
     <div class="tab-item" data-section="articles"><span class="ic">📦</span><span data-i18n="tabArticles">أصناف</span></div>
     <div class="tab-item" data-section="caisse"><span class="ic">💰</span><span data-i18n="tabCaisse">الكاسة</span></div>
+    <div class="tab-item" data-section="expenses"><span class="ic">💸</span><span data-i18n="tabExpenses">مصاريف</span></div>
     <div class="tab-item" data-section="reglements"><span class="ic">🧾</span><span data-i18n="tabReglements">التسديدات</span></div>
     <div class="tab-item" data-section="approvals" id="tabApprovals" style="display:none;"><span class="ic">👤</span><span data-i18n="tabApprovals">الحسابات</span></div>
   </div>
@@ -437,10 +447,6 @@
       <div class="field"><label data-i18n="address">العنوان</label><input id="cAddress"></div>
       <div class="field"><label data-i18n="balance">الرصيد (د.ت)</label><input id="cBalance" type="number" step="0.001" value="0"></div>
       <div class="field"><label data-i18n="notes">ملاحظات</label><input id="cNotes"></div>
-      <div class="section-title" style="margin-top:4px;" data-i18n="reglementTitle">تسديد</div>
-      <div class="field"><label data-i18n="reglementAmount">مبلغ التسديد (د.ت)</label><input id="crAmount" type="number" step="0.001"></div>
-      <button class="btn outline small" onclick="Clients.addReglement()" data-i18n="addReglement">+ تسجيل تسديد</button>
-      <table class="items-mini"><thead><tr><th data-i18n="date">التاريخ</th><th data-i18n="amount">المبلغ (د.ت)</th></tr></thead><tbody id="crBody"></tbody></table>
       <div class="section-title" style="margin-top:4px;" data-i18n="specialPricesTitle">أسعار خاصة بهذا الحريف</div>
       <div class="field"><label data-i18n="article">الصنف</label><select id="cpArticle"><option value="">-- اختر --</option></select></div>
       <div class="field"><label data-i18n="specialPrice">السعر الخاص (د.ت)</label><input id="cpPrice" type="number" step="0.001"></div>
@@ -474,6 +480,8 @@
       <button class="btn save" onclick="Articles.save()" data-i18n="save">💾 حفظ</button>
       <button class="btn edit" onclick="Articles.edit()" data-i18n="edit">✏️ تعديل</button>
       <button class="btn del" onclick="Articles.remove()" data-i18n="delete">🗑 حذف</button>
+      <div class="section-title" style="margin-top:10px;" data-i18n="articleStatsTitle">إحصائيات الصنف</div>
+      <div id="articleStats"></div>
     </div>
   </div>
 
@@ -493,6 +501,29 @@
     </div>
   </div>
 
+  <!-- Expense sheet -->
+  <div class="sheet" id="sheet-expenses">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><h3 data-i18n="expenseSheetTitle">مصروف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
+    <div class="sheet-body">
+      <div class="field"><label data-i18n="date">التاريخ</label><input id="exDate" type="date"></div>
+      <div class="field"><label data-i18n="expenseCategory">الفئة</label>
+        <select id="exCategory">
+          <option data-i18n="expenseRent">كراء</option>
+          <option data-i18n="expenseSalary">أجور</option>
+          <option data-i18n="expenseUtilities">فواتير (كهرباء/ماء/انترنت)</option>
+          <option data-i18n="expenseTransport">نقل</option>
+          <option data-i18n="expenseMaintenance">صيانة</option>
+          <option data-i18n="expenseOther">أخرى</option>
+        </select>
+      </div>
+      <div class="field"><label data-i18n="amount">المبلغ (د.ت)</label><input id="exAmount" type="number" step="0.001"></div>
+      <div class="field"><label data-i18n="description">البيان</label><input id="exDesc"></div>
+      <button class="btn save" onclick="Expenses.save()" data-i18n="save">💾 حفظ</button>
+      <button class="btn del" onclick="Expenses.remove()" data-i18n="delete">🗑 حذف</button>
+    </div>
+  </div>
+
   <!-- Quick règlement sheet -->
   <div class="sheet" id="sheet-quickreglement">
     <div class="sheet-handle"></div>
@@ -507,6 +538,9 @@
       <div class="field"><label data-i18n="quickReglementTarget">الاسم</label><select id="qrTarget" onchange="QuickReglement.showHint()"><option value="">-- اختر --</option></select></div>
       <div style="font-size:12.5px; color:var(--muted); margin:-6px 0 10px;" id="qrBalanceHint"></div>
       <div class="field"><label data-i18n="reglementAmount">مبلغ التسديد (د.ت)</label><input id="qrAmount" type="number" step="0.001"></div>
+      <div class="field"><label data-i18n="reglementMethod">نوع التسديد</label>
+        <select id="qrMethod"><option data-i18n="payCash">نقدا</option><option data-i18n="payCheck">شيك</option><option data-i18n="payTraite">كمبيالة</option><option data-i18n="payTransfer">تحويل بنكي</option></select>
+      </div>
       <button class="btn save" onclick="QuickReglement.save()" data-i18n="quickReglementSave">💾 تسجيل التسديد</button>
     </div>
   </div>
@@ -524,10 +558,6 @@
       <div class="field"><label data-i18n="address">العنوان</label><input id="fAddress"></div>
       <div class="field"><label data-i18n="balance">الرصيد (د.ت)</label><input id="fBalance" type="number" step="0.001" value="0"></div>
       <div class="field"><label data-i18n="notes">ملاحظات</label><input id="fNotes"></div>
-      <div class="section-title" style="margin-top:4px;" data-i18n="reglementTitle">تسديد</div>
-      <div class="field"><label data-i18n="reglementAmount">مبلغ التسديد (د.ت)</label><input id="frAmount" type="number" step="0.001"></div>
-      <button class="btn outline small" onclick="Fournisseurs.addReglement()" data-i18n="addReglement">+ تسجيل تسديد</button>
-      <table class="items-mini"><thead><tr><th data-i18n="date">التاريخ</th><th data-i18n="amount">المبلغ (د.ت)</th></tr></thead><tbody id="frBody"></tbody></table>
       <button class="btn save" onclick="Fournisseurs.save()" data-i18n="save">💾 حفظ</button>
       <button class="btn edit" onclick="Fournisseurs.edit()" data-i18n="edit">✏️ تعديل</button>
       <button class="btn del" onclick="Fournisseurs.remove()" data-i18n="delete">🗑 حذف</button>
@@ -552,7 +582,7 @@
       </div>
       <div class="field"><label data-i18n="client">العميل</label><select id="vClient" onchange="Ventes.fillClient()"><option value="">-- اختر --</option></select></div>
       <div class="field"><label data-i18n="clientPhone">هاتف العميل</label><input id="vPhone" readonly></div>
-      <div class="field"><label data-i18n="paymentMethod">طريقة الدفع</label><select id="vPayment"><option data-i18n="payCash">نقدا</option><option data-i18n="payCheck">شيك</option><option data-i18n="payTransfer">تحويل بنكي</option><option data-i18n="payCredit">آجل</option></select></div>
+      <div class="field"><label data-i18n="paymentMethod">طريقة الدفع</label><select id="vPayment"><option data-i18n="payCash">نقدا</option><option data-i18n="payCheck">شيك</option><option data-i18n="payTraite">كمبيالة</option><option data-i18n="payTransfer">تحويل بنكي</option><option data-i18n="payCredit" selected>آجل</option></select></div>
       <div class="section-title" style="margin-top:4px;" data-i18n="addArticleTitle">إضافة صنف</div>
       <div class="field"><label data-i18n="article">الصنف</label><select id="viArticle" onchange="Ventes.fillArticle()"><option value="">-- اختر --</option></select></div>
       <div id="viStockHint" style="font-size:11.5px; color:var(--muted); margin:-6px 0 8px 2px;"></div>
@@ -570,6 +600,9 @@
       <button class="btn del" onclick="Ventes.remove()" data-i18n="delete">🗑 حذف</button>
       <div class="section-title" style="margin-top:10px;" data-i18n="reglementTitle">تسديد</div>
       <div class="field"><label data-i18n="reglementAmount">مبلغ التسديد (د.ت)</label><input id="vrAmount" type="number" step="0.001"></div>
+      <div class="field"><label data-i18n="reglementMethod">نوع التسديد</label>
+        <select id="vrMethod"><option data-i18n="payCash">نقدا</option><option data-i18n="payCheck">شيك</option><option data-i18n="payTraite">كمبيالة</option><option data-i18n="payTransfer">تحويل بنكي</option></select>
+      </div>
       <button class="btn outline small" onclick="Ventes.addReglement()" data-i18n="addReglement">+ تسجيل تسديد</button>
       <table class="items-mini"><thead><tr><th data-i18n="date">التاريخ</th><th data-i18n="amount">المبلغ (د.ت)</th></tr></thead><tbody id="vrBody"></tbody></table>
       <div class="section-title" style="margin-top:10px;" data-i18n="accountSummaryTitle">وضعية حساب الحريف</div>
@@ -593,7 +626,7 @@
         <div class="field"><label data-i18n="fournisseurPhone">هاتف المورد</label><input id="pPhone" readonly></div>
         <div class="field"><label data-i18n="fournisseurAddress">عنوان المورد</label><input id="pAddress" readonly></div>
       </div>
-      <div class="field"><label data-i18n="paymentMethod">طريقة الدفع</label><select id="pPayment"><option data-i18n="payCash">نقدا</option><option data-i18n="payCheck">شيك</option><option data-i18n="payTransfer">تحويل بنكي</option><option data-i18n="payCredit">آجل</option></select></div>
+      <div class="field"><label data-i18n="paymentMethod">طريقة الدفع</label><select id="pPayment"><option data-i18n="payCash">نقدا</option><option data-i18n="payCheck">شيك</option><option data-i18n="payTraite">كمبيالة</option><option data-i18n="payTransfer">تحويل بنكي</option><option data-i18n="payCredit" selected>آجل</option></select></div>
       <div class="section-title" style="margin-top:4px;" data-i18n="addArticleTitle">إضافة صنف</div>
       <div class="field"><label data-i18n="article">الصنف</label><select id="piArticle" onchange="Achats.fillArticle()"><option value="">-- اختر --</option></select></div>
       <div id="piStockHint" style="font-size:11.5px; color:var(--muted); margin:-6px 0 8px 2px;"></div>
@@ -611,6 +644,9 @@
       <button class="btn del" onclick="Achats.remove()" data-i18n="delete">🗑 حذف</button>
       <div class="section-title" style="margin-top:10px;" data-i18n="reglementTitle">تسديد</div>
       <div class="field"><label data-i18n="reglementAmount">مبلغ التسديد (د.ت)</label><input id="arAmount" type="number" step="0.001"></div>
+      <div class="field"><label data-i18n="reglementMethod">نوع التسديد</label>
+        <select id="arMethod"><option data-i18n="payCash">نقدا</option><option data-i18n="payCheck">شيك</option><option data-i18n="payTraite">كمبيالة</option><option data-i18n="payTransfer">تحويل بنكي</option></select>
+      </div>
       <button class="btn outline small" onclick="Achats.addReglement()" data-i18n="addReglement">+ تسجيل تسديد</button>
       <table class="items-mini"><thead><tr><th data-i18n="date">التاريخ</th><th data-i18n="amount">المبلغ (د.ت)</th></tr></thead><tbody id="arBody"></tbody></table>
       <div class="section-title" style="margin-top:10px;" data-i18n="accountSummaryTitle">وضعية حساب المورد</div>
@@ -799,9 +835,11 @@ function badgeStatus(status){
 // ---- i18n ----
 const translations = {
   ar: {
-    tabTitles: {rapports:'لوحة القيادة', clients:'العملاء', articles:'الأصناف', fournisseurs:'الموردين', ventes:'المبيعات', achats:'المشتريات', caisse:'الكاسة', reglements:'التسديدات', approvals:'الحسابات'},
+    tabTitles: {rapports:'لوحة القيادة', clients:'العملاء', articles:'الأصناف', fournisseurs:'الموردين', ventes:'المبيعات', achats:'المشتريات', caisse:'الكاسة', expenses:'مصاريف', reglements:'التسديدات', approvals:'الحسابات'},
     appSub:'GTR POS',
-    tabHome:'الرئيسية', tabVentes:'مبيعات', tabAchats:'مشتريات', tabClients:'عملاء', tabFournisseurs:'موردين', tabArticles:'أصناف', tabCaisse:'الكاسة', tabReglements:'التسديدات', tabApprovals:'الحسابات',
+    tabHome:'الرئيسية', tabVentes:'مبيعات', tabAchats:'مشتريات', tabClients:'عملاء', tabFournisseurs:'موردين', tabArticles:'أصناف', tabCaisse:'الكاسة', tabExpenses:'مصاريف', tabReglements:'التسديدات', tabApprovals:'الحسابات',
+    addExpenseBtn:'+ إضافة مصروف', expensesTotalLbl:'مجموع المصاريف', expenseSheetTitle:'مصروف', expenseCategory:'الفئة',
+    expenseRent:'كراء', expenseSalary:'أجور', expenseUtilities:'فواتير (كهرباء/ماء/انترنت)', expenseTransport:'نقل', expenseMaintenance:'صيانة', expenseOther:'أخرى',
     pendingApprovalsTitle:'حسابات بانتظار الموافقة', approvedAccountsTitle:'حسابات موافق عليها', approveBtn:'✅ موافقة', revokeBtn:'🚫 إلغاء الموافقة',
     kpiVentes:'مبيعات (د.ت)', kpiAchats:'مشتريات (د.ت)', kpiClients:'العملاء', kpiFournisseurs:'الموردين', lowStockTitle:'⚠️ مخزون منخفض', caisseBalanceLbl:'الرصيد الحالي',
     statsTitle:'📊 إحصائيات', kpiNbVentes:'عدد فواتير البيع', kpiNbAchats:'عدد فواتير الشراء', kpiCaisseSolde:'رصيد الكاسة', kpiSoldesClients:'مجموع أرصدة العملاء',
@@ -811,13 +849,14 @@ const translations = {
     specialPricesTitle:'أسعار خاصة بهذا الحريف', article:'الصنف', specialPrice:'السعر الخاص (د.ت)', addSpecialPrice:'+ إضافة سعر خاص', specialPriceShort:'السعر الخاص',
     save:'💾 حفظ', edit:'✏️ تعديل', delete:'🗑 حذف',
     articleSheetTitle:'بيانات الصنف', articleCode:'رمز الصنف', articleName:'اسم الصنف', salePrice:'سعر البيع العادي (د.ت)', costPrice:'سعر الشراء (د.ت)', stockQty:'الكمية بالمخزون',
+    articleStatsTitle:'إحصائيات الصنف', statQtySold:'الكمية المباعة', statRevenue:'إجمالي المبيعات', statQtyBought:'الكمية المشتراة', statSpent:'إجمالي المشتريات', topSellingTitle:'📊 الأصناف الأكثر مبيعا',
     caisseSheetTitle:'حركة الكاسة', date:'التاريخ', type:'النوع', typeIn:'دخول (+)', typeOut:'خروج (-)', amount:'المبلغ (د.ت)', description:'البيان',
     fournisseurSheetTitle:'بيانات المورد', fournisseurCode:'رمز المورد', fournisseurName:'اسم المورد',
     venteSheetTitle:'عملية بيع', venteNum:'رقم المبيعات', client:'العميل', clientPhone:'هاتف العميل', paymentMethod:'طريقة الدفع',
-    payCash:'نقدا', payCheck:'شيك', payTransfer:'تحويل بنكي', payCredit:'آجل', addArticleTitle:'إضافة صنف', price:'السعر (د.ت)', qty:'الكمية', total:'الإجمالي (د.ت)',
+    payCash:'نقدا', payCheck:'شيك', payTraite:'كمبيالة', payTransfer:'تحويل بنكي', payCredit:'آجل', addArticleTitle:'إضافة صنف', price:'السعر (د.ت)', qty:'الكمية', total:'الإجمالي (د.ت)',
     addToTable:'+ إضافة للجدول', priceShort:'سعر', totalShort:'مجموع', grandTotal:'المجموع: ', saveVente:'💾 حفظ عملية البيع',
     achatSheetTitle:'عملية شراء', achatNum:'رقم المشتريات', fournisseur:'المورد', fournisseurPhone:'هاتف المورد', fournisseurAddress:'عنوان المورد', saveAchat:'💾 حفظ عملية الشراء',
-    manualName:'أو اسم يدوي', reglementTitle:'تسديد', reglementAmount:'مبلغ التسديد (د.ت)', addReglement:'+ تسجيل تسديد', reglementHistory:'سجل التسديدات',
+    manualName:'أو اسم يدوي', reglementTitle:'تسديد', reglementAmount:'مبلغ التسديد (د.ت)', reglementMethod:'نوع التسديد', addReglement:'+ تسجيل تسديد', reglementHistory:'سجل التسديدات',
     reglFromClients:'تسديدات من العملاء', reglToFournisseurs:'تسديدات للموردين', searchReglements:'🔍 بحث بالاسم...',
     quickReglementBtn:'+ تسجيل تسديد سريع', quickReglementTitle:'تسجيل تسديد سريع', quickReglementWho:'النوع',
     quickReglementClient:'تسديد من عميل', quickReglementFournisseur:'تسديد لمورد', quickReglementTarget:'الاسم', quickReglementSave:'💾 تسجيل التسديد',
@@ -846,9 +885,11 @@ const translations = {
     langBtn:'FR'
   },
   fr: {
-    tabTitles: {rapports:'Tableau de bord', clients:'Clients', articles:'Articles', fournisseurs:'Fournisseurs', ventes:'Ventes', achats:'Achats', caisse:'Caisse', reglements:'Règlements', approvals:'Comptes'},
+    tabTitles: {rapports:'Tableau de bord', clients:'Clients', articles:'Articles', fournisseurs:'Fournisseurs', ventes:'Ventes', achats:'Achats', caisse:'Caisse', expenses:'Dépenses', reglements:'Règlements', approvals:'Comptes'},
     appSub:'GTR POS',
-    tabHome:'Accueil', tabVentes:'Ventes', tabAchats:'Achats', tabClients:'Clients', tabFournisseurs:'Fournisseurs', tabArticles:'Articles', tabCaisse:'Caisse', tabReglements:'Règlements', tabApprovals:'Comptes',
+    tabHome:'Accueil', tabVentes:'Ventes', tabAchats:'Achats', tabClients:'Clients', tabFournisseurs:'Fournisseurs', tabArticles:'Articles', tabCaisse:'Caisse', tabExpenses:'Dépenses', tabReglements:'Règlements', tabApprovals:'Comptes',
+    addExpenseBtn:'+ Ajouter une dépense', expensesTotalLbl:'Total des dépenses', expenseSheetTitle:'Dépense', expenseCategory:'Catégorie',
+    expenseRent:'Loyer', expenseSalary:'Salaires', expenseUtilities:'Factures (électricité/eau/internet)', expenseTransport:'Transport', expenseMaintenance:'Entretien', expenseOther:'Autre',
     pendingApprovalsTitle:'Comptes en attente', approvedAccountsTitle:'Comptes approuvés', approveBtn:'✅ Approuver', revokeBtn:'🚫 Révoquer',
     kpiVentes:'Ventes (TND)', kpiAchats:'Achats (TND)', kpiClients:'Clients', kpiFournisseurs:'Fournisseurs', lowStockTitle:'⚠️ Stock faible', caisseBalanceLbl:'Solde actuel',
     statsTitle:'📊 Statistiques', kpiNbVentes:'Nombre de ventes', kpiNbAchats:"Nombre d'achats", kpiCaisseSolde:'Solde de caisse', kpiSoldesClients:'Total des soldes clients',
@@ -858,13 +899,14 @@ const translations = {
     specialPricesTitle:'Prix spéciaux pour ce client', article:'Article', specialPrice:'Prix spécial (TND)', addSpecialPrice:'+ Ajouter un prix spécial', specialPriceShort:'Prix spécial',
     save:'💾 Enregistrer', edit:'✏️ Modifier', delete:'🗑 Supprimer',
     articleSheetTitle:'Fiche article', articleCode:'Code article', articleName:"Nom de l'article", salePrice:'Prix de vente normal (TND)', costPrice:"Prix d'achat (TND)", stockQty:'Quantité en stock',
+    articleStatsTitle:"Statistiques de l'article", statQtySold:'Quantité vendue', statRevenue:'Total des ventes', statQtyBought:'Quantité achetée', statSpent:'Total des achats', topSellingTitle:'📊 Articles les plus vendus',
     caisseSheetTitle:'Mouvement de caisse', date:'Date', type:'Type', typeIn:'Entrée (+)', typeOut:'Sortie (-)', amount:'Montant (TND)', description:'Description',
     fournisseurSheetTitle:'Fiche fournisseur', fournisseurCode:'Code fournisseur', fournisseurName:'Nom du fournisseur',
     venteSheetTitle:'Vente', venteNum:'N° de vente', client:'Client', clientPhone:'Téléphone du client', paymentMethod:'Mode de paiement',
-    payCash:'Espèces', payCheck:'Chèque', payTransfer:'Virement bancaire', payCredit:'Crédit', addArticleTitle:'Ajouter un article', price:'Prix (TND)', qty:'Quantité', total:'Total (TND)',
+    payCash:'Espèces', payCheck:'Chèque', payTraite:'Traite', payTransfer:'Virement bancaire', payCredit:'Crédit', addArticleTitle:'Ajouter un article', price:'Prix (TND)', qty:'Quantité', total:'Total (TND)',
     addToTable:'+ Ajouter à la liste', priceShort:'Prix', totalShort:'Total', grandTotal:'Total : ', saveVente:'💾 Enregistrer la vente',
     achatSheetTitle:'Achat', achatNum:"N° d'achat", fournisseur:'Fournisseur', fournisseurPhone:'Téléphone du fournisseur', fournisseurAddress:'Adresse du fournisseur', saveAchat:"💾 Enregistrer l'achat",
-    manualName:'Ou nom manuel', reglementTitle:'Règlement', reglementAmount:'Montant du règlement (TND)', addReglement:'+ Enregistrer un règlement', reglementHistory:'Historique des règlements',
+    manualName:'Ou nom manuel', reglementTitle:'Règlement', reglementAmount:'Montant du règlement (TND)', reglementMethod:'Type de règlement', addReglement:'+ Enregistrer un règlement', reglementHistory:'Historique des règlements',
     reglFromClients:'Règlements des clients', reglToFournisseurs:'Règlements aux fournisseurs', searchReglements:'🔍 Rechercher par nom...',
     quickReglementBtn:'+ Règlement rapide', quickReglementTitle:'Règlement rapide', quickReglementWho:'Type',
     quickReglementClient:'Règlement client', quickReglementFournisseur:'Règlement fournisseur', quickReglementTarget:'Nom', quickReglementSave:'💾 Enregistrer le règlement',
@@ -924,6 +966,7 @@ tabs.forEach(t=>{
     $('pageTitle').textContent = translations[currentLang].tabTitles[currentSection];
     if(currentSection==='rapports') Rapports.render();
     if(currentSection==='caisse') Caisse.render();
+    if(currentSection==='expenses') Expenses.render();
     if(currentSection==='reglements') Reglements.render();
     if(currentSection==='approvals') Approvals.render();
   });
@@ -947,7 +990,8 @@ $('overlay').addEventListener('click', closeSheet);
 $('fabBtn').addEventListener('click', ()=>{
   if(currentSection==='rapports'){ showToast('اختر قسما لإضافة عنصر جديد'); return; }
   const resetMap = {clients:()=>Clients.reset(), articles:()=>Articles.reset(),
-    fournisseurs:()=>Fournisseurs.reset(), ventes:()=>Ventes.reset(), achats:()=>Achats.reset(), caisse:()=>Caisse.reset()};
+    fournisseurs:()=>Fournisseurs.reset(), ventes:()=>Ventes.reset(), achats:()=>Achats.reset(), caisse:()=>Caisse.reset(), expenses:()=>Expenses.reset()};
+  if(!resetMap[currentSection]){ showToast('استعمل الزر المخصص في هذا القسم'); return; }
   resetMap[currentSection]();
   openSheet(currentSection);
 });
@@ -970,20 +1014,21 @@ let articles = [
 let ventes = [];
 let achats = [];
 let caisse = [];
-let nextId = {clients:3, articles:5, fournisseurs:3, ventes:1, achats:1, caisse:1};
+let expenses = [];
+let nextId = {clients:3, articles:5, fournisseurs:3, ventes:1, achats:1, caisse:1, expenses:1};
 
 // ===================== PERSISTENCE (Firestore + localStorage cache) =====================
 const STORAGE_KEY = 'gtrpos_data_v1';
 let saveTimer = null;
 function saveState(){
   try{
-    const data = { clients, articles, fournisseurs, ventes, achats, caisse, nextId, companyInfo };
+    const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, nextId, companyInfo };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   }catch(e){ /* storage unavailable, ignore silently */ }
   if(currentUser){
     clearTimeout(saveTimer);
     saveTimer = setTimeout(()=>{
-      const data = { clients, articles, fournisseurs, ventes, achats, caisse, nextId, companyInfo };
+      const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, nextId, companyInfo };
       db.collection('users').doc(currentUser.uid).set(data)
         .catch(e=>{ console.error('Firestore save error', e); });
     }, 1200);
@@ -1000,6 +1045,7 @@ function loadState(){
     if(data.ventes) ventes = data.ventes;
     if(data.achats) achats = data.achats;
     if(data.caisse) caisse = data.caisse;
+    if(data.expenses) expenses = data.expenses;
     if(data.nextId) nextId = data.nextId;
     if(data.companyInfo) companyInfo = data.companyInfo;
     return true;
@@ -1015,14 +1061,15 @@ function loadStateFromFirestore(uid){
       ventes = data.ventes || [];
       achats = data.achats || [];
       caisse = data.caisse || [];
-      nextId = data.nextId || {clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1};
+      expenses = data.expenses || [];
+      nextId = data.nextId || {clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1, expenses:1};
       companyInfo = data.companyInfo || {name:'GTR POS', address:'', phone1:'', taxId:'', logo:''};
     } else {
       // First time for this account: start completely empty (no demo/seed data)
-      clients = []; articles = []; fournisseurs = []; ventes = []; achats = []; caisse = [];
-      nextId = {clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1};
+      clients = []; articles = []; fournisseurs = []; ventes = []; achats = []; caisse = []; expenses = [];
+      nextId = {clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1, expenses:1};
       companyInfo = {name:'GTR POS', address:'', phone1:'', taxId:'', logo:''};
-      const data = { clients, articles, fournisseurs, ventes, achats, caisse, nextId, companyInfo };
+      const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, nextId, companyInfo };
       db.collection('users').doc(uid).set(data).catch(e=>console.error(e));
     }
   }).catch(e=>{
@@ -1031,7 +1078,7 @@ function loadStateFromFirestore(uid){
   });
 }
 function exportBackup(){
-  const data = { clients, articles, fournisseurs, ventes, achats, caisse, nextId, companyInfo, exportedAt: new Date().toISOString() };
+  const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, nextId, companyInfo, exportedAt: new Date().toISOString() };
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1049,7 +1096,7 @@ function exportBackupToDrive(){
 
   const uploadWithToken = (accessToken)=>{
     if(!accessToken){ showToast('تعذر الحصول على إذن الوصول لـ Google Drive'); return; }
-    const data = { clients, articles, fournisseurs, ventes, achats, caisse, nextId, companyInfo, exportedAt: new Date().toISOString() };
+    const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, nextId, companyInfo, exportedAt: new Date().toISOString() };
     const fileName = 'gtrpos_backup_'+new Date().toISOString().slice(0,10)+'.json';
     const metadata = { name: fileName, mimeType: 'application/json' };
     const boundary = '-------gtrpos314159';
@@ -1098,6 +1145,7 @@ function importBackupFile(input){
       if(data.ventes) ventes = data.ventes;
       if(data.achats) achats = data.achats;
       if(data.caisse) caisse = data.caisse;
+    if(data.expenses) expenses = data.expenses;
       if(data.nextId) nextId = data.nextId;
       if(data.companyInfo) companyInfo = data.companyInfo;
       saveState();
@@ -1307,8 +1355,8 @@ const Clients = {
   editingId:null, specialPrices:[], reglements:[],
   reset(){ this.editingId=null; this.specialPrices=[]; this.reglements=[]; $('cCode').value='CL-'+String(nextId.clients).padStart(4,'0');
     $('cName').value=''; $('cPhone').value=''; $('cPhone2').value=''; $('cPhone3').value=''; $('cAddress').value=''; $('cBalance').value='0'; $('cNotes').value='';
-    $('cpArticle').value=''; $('cpPrice').value=''; $('crAmount').value=''; $('csFrom').value=''; $('csTo').value=''; $('csResults').innerHTML=''; $('cAccountSummary').innerHTML='';
-    this.renderSpecialPrices(); this.renderReglements(); },
+    $('cpArticle').value=''; $('cpPrice').value=''; $('csFrom').value=''; $('csTo').value=''; $('csResults').innerHTML=''; $('cAccountSummary').innerHTML='';
+    this.renderSpecialPrices(); },
   addSpecialPrice(){
     const sel=$('cpArticle'); const name=sel.options[sel.selectedIndex]?.textContent||'';
     const price=parseFloat($('cpPrice').value)||0;
@@ -1324,32 +1372,6 @@ const Clients = {
     this.specialPrices.forEach((sp,idx)=>{
       const tr=document.createElement('tr');
       tr.innerHTML=`<td>${sp.name}</td><td>${sp.price.toFixed(3)}</td><td><button class="del-row" onclick="Clients.removeSpecialPrice(${idx})">✕</button></td>`;
-      body.appendChild(tr);
-    });
-  },
-  addReglement(){
-    if(this.editingId==null){ showToast('احفظ العميل أولا قبل تسجيل تسديد'); return; }
-    const amount=parseFloat($('crAmount').value)||0;
-    if(amount<=0){ showToast('أدخل مبلغا صحيحا'); return; }
-    const c = clients.find(x=>x.id===this.editingId); if(!c) return;
-    c.balance -= amount;
-    c.reglements = c.reglements || [];
-    const date = new Date().toISOString().slice(0,10);
-    c.reglements.push({date, amount});
-    caisse.push({id:nextId.caisse++, date, type:'in', amount, description:'تسديد من '+c.name, source:'reglement_client', sourceId:c.id+'-'+c.reglements.length});
-    this.reglements = [...c.reglements];
-    $('cBalance').value = c.balance.toFixed(3);
-    $('crAmount').value='';
-    this.renderReglements();
-    this.renderAccountSummary(c);
-    showToast('تم تسجيل التسديد');
-    this.render();
-  },
-  renderReglements(){
-    const body=$('crBody'); body.innerHTML='';
-    this.reglements.slice().reverse().forEach(r=>{
-      const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${r.date}</td><td>${r.amount.toFixed(3)}</td>`;
       body.appendChild(tr);
     });
   },
@@ -1414,8 +1436,8 @@ const Clients = {
     $('cBalance').value=c.balance; $('cNotes').value=c.notes;
     this.specialPrices = c.specialPrices ? [...c.specialPrices] : [];
     this.reglements = c.reglements ? [...c.reglements] : [];
-    $('cpArticle').value=''; $('cpPrice').value=''; $('crAmount').value=''; $('csFrom').value=''; $('csTo').value=''; $('csResults').innerHTML='';
-    this.renderSpecialPrices(); this.renderReglements();
+    $('cpArticle').value=''; $('cpPrice').value=''; $('csFrom').value=''; $('csTo').value=''; $('csResults').innerHTML='';
+    this.renderSpecialPrices();
     this.renderAccountSummary(c);
     openSheet('clients');
   },
@@ -1482,7 +1504,26 @@ const Articles = {
     this.editingId=id; $('aCode').value='ART-'+String(id).padStart(4,'0');
     $('aName').value=a.name; $('aPrice').value=a.price;
     $('aCostPrice').value=a.costPrice||''; $('aStock').value=a.stock;
+    this.renderStats(a);
     openSheet('articles');
+  },
+  renderStats(a){
+    const t = translations[currentLang];
+    let qtySold=0, revenue=0, qtyBought=0, spent=0;
+    ventes.forEach(v=>{ v.lines.forEach(l=>{ if(l.name===a.name){ qtySold+=l.qty; revenue+=l.total; } }); });
+    achats.forEach(p=>{ p.lines.forEach(l=>{ if(l.name===a.name){ qtyBought+=l.qty; spent+=l.total; } }); });
+    const box=$('articleStats'); box.innerHTML='';
+    const rows = [
+      [t.statQtySold, qtySold, false],
+      [t.statRevenue, revenue, true],
+      [t.statQtyBought, qtyBought, false],
+      [t.statSpent, spent, true]
+    ];
+    rows.forEach(([label,val,isMoney])=>{
+      const div=document.createElement('div'); div.className='totals-mini'; div.style.justifyContent='space-between';
+      div.innerHTML=`<span>${label}</span><span>${isMoney? val.toFixed(3)+' د.ت' : val}</span>`;
+      box.appendChild(div);
+    });
   },
   render(){
     saveState();
@@ -1503,32 +1544,7 @@ const Fournisseurs = {
   editingId:null, reglements:[],
   reset(){ this.editingId=null; this.reglements=[]; $('fCode').value='FR-'+String(nextId.fournisseurs).padStart(4,'0');
     $('fName').value=''; $('fPhone').value=''; $('fPhone2').value=''; $('fPhone3').value=''; $('fAddress').value=''; $('fBalance').value='0'; $('fNotes').value='';
-    $('frAmount').value=''; $('fsFrom').value=''; $('fsTo').value=''; $('fsResults').innerHTML=''; this.renderReglements(); },
-  addReglement(){
-    if(this.editingId==null){ showToast('احفظ المورد أولا قبل تسجيل تسديد'); return; }
-    const amount=parseFloat($('frAmount').value)||0;
-    if(amount<=0){ showToast('أدخل مبلغا صحيحا'); return; }
-    const f = fournisseurs.find(x=>x.id===this.editingId); if(!f) return;
-    f.balance -= amount;
-    f.reglements = f.reglements || [];
-    const date = new Date().toISOString().slice(0,10);
-    f.reglements.push({date, amount});
-    caisse.push({id:nextId.caisse++, date, type:'out', amount, description:'تسديد لـ '+f.name, source:'reglement_fournisseur', sourceId:f.id+'-'+f.reglements.length});
-    this.reglements = [...f.reglements];
-    $('fBalance').value = f.balance.toFixed(3);
-    $('frAmount').value='';
-    this.renderReglements();
-    showToast('تم تسجيل التسديد');
-    this.render();
-  },
-  renderReglements(){
-    const body=$('frBody'); body.innerHTML='';
-    this.reglements.slice().reverse().forEach(r=>{
-      const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${r.date}</td><td>${r.amount.toFixed(3)}</td>`;
-      body.appendChild(tr);
-    });
-  },
+    $('fsFrom').value=''; $('fsTo').value=''; $('fsResults').innerHTML=''; },
   queryStatement(){
     if(this.editingId==null){ showToast('اختر موردا أولا'); return; }
     const f = fournisseurs.find(x=>x.id===this.editingId); if(!f) return;
@@ -1582,7 +1598,7 @@ const Fournisseurs = {
     $('fName').value=f.name; $('fPhone').value=f.phone; $('fPhone2').value=f.phone2||''; $('fPhone3').value=f.phone3||''; $('fAddress').value=f.address;
     $('fBalance').value=f.balance; $('fNotes').value=f.notes;
     this.reglements = f.reglements ? [...f.reglements] : [];
-    $('frAmount').value=''; $('fsFrom').value=''; $('fsTo').value=''; $('fsResults').innerHTML=''; this.renderReglements();
+    $('fsFrom').value=''; $('fsTo').value=''; $('fsResults').innerHTML='';
     openSheet('fournisseurs');
   },
   render(){
@@ -1651,7 +1667,7 @@ const Ventes = {
     $('vNum').value='VTE-'+String(nextId.ventes).padStart(4,'0');
     $('vDate').value=new Date().toISOString().slice(0,10);
     $('vClient').value=''; $('vPhone').value='';
-    $('vPayment').selectedIndex=0;
+    $('vPayment').value='آجل';
     $('viArticle').value=''; $('viManualName').value=''; $('viPrice').value=''; $('viQty').value=1; $('viTotal').value=''; $('viStockHint').textContent='';
     $('vrAmount').value=''; $('vrBody').innerHTML=''; $('vAccountSummary').innerHTML='';
     this.renderLines(); this.refreshArticleOptions();
@@ -1705,17 +1721,18 @@ const Ventes = {
     if(this.editingId==null){ showToast('احفظ الفاتورة أولا قبل تسجيل تسديد'); return; }
     const amount=parseFloat($('vrAmount').value)||0;
     if(amount<=0){ showToast('أدخل مبلغا صحيحا'); return; }
+    const method = $('vrMethod').options[$('vrMethod').selectedIndex].textContent;
     const rec = ventes.find(v=>v.id===this.editingId); if(!rec) return;
     rec.reglements = rec.reglements || [];
     const date = new Date().toISOString().slice(0,10);
-    rec.reglements.push({date, amount});
+    rec.reglements.push({date, amount, method});
     const client = clients.find(c=>c.name===rec.client);
     if(client){
       client.balance -= amount;
       client.reglements = client.reglements || [];
-      client.reglements.push({date, amount});
+      client.reglements.push({date, amount, method});
     }
-    caisse.push({id:nextId.caisse++, date, type:'in', amount, description:'تسديد فاتورة '+rec.num, source:'reglement_vente', sourceId:rec.id+'-'+rec.reglements.length});
+    caisse.push({id:nextId.caisse++, date, type:'in', amount, description:'تسديد فاتورة '+rec.num+' ('+method+')', source:'reglement_vente', sourceId:rec.id+'-'+rec.reglements.length});
     $('vrAmount').value='';
     this.renderReglementsSheet(rec.reglements);
     this.renderAccountSummary(rec);
@@ -1870,7 +1887,7 @@ const Achats = {
     $('pNum').value='ACH-'+String(nextId.achats).padStart(4,'0');
     $('pDate').value=new Date().toISOString().slice(0,10);
     $('pSupplier').value=''; $('pPhone').value=''; $('pAddress').value='';
-    $('pPayment').selectedIndex=0;
+    $('pPayment').value='آجل';
     $('piArticle').value=''; $('piManualName').value=''; $('piPrice').value=''; $('piQty').value=1; $('piTotal').value=''; $('piStockHint').textContent='';
     $('arAmount').value=''; $('arBody').innerHTML=''; $('pAccountSummary').innerHTML='';
     this.renderLines(); this.refreshArticleOptions();
@@ -1924,17 +1941,18 @@ const Achats = {
     if(this.editingId==null){ showToast('احفظ الفاتورة أولا قبل تسجيل تسديد'); return; }
     const amount=parseFloat($('arAmount').value)||0;
     if(amount<=0){ showToast('أدخل مبلغا صحيحا'); return; }
+    const method = $('arMethod').options[$('arMethod').selectedIndex].textContent;
     const rec = achats.find(p=>p.id===this.editingId); if(!rec) return;
     rec.reglements = rec.reglements || [];
     const date = new Date().toISOString().slice(0,10);
-    rec.reglements.push({date, amount});
+    rec.reglements.push({date, amount, method});
     const supplier = fournisseurs.find(f=>f.name===rec.supplier);
     if(supplier){
       supplier.balance -= amount;
       supplier.reglements = supplier.reglements || [];
-      supplier.reglements.push({date, amount});
+      supplier.reglements.push({date, amount, method});
     }
-    caisse.push({id:nextId.caisse++, date, type:'out', amount, description:'تسديد فاتورة '+rec.num, source:'reglement_achat', sourceId:rec.id+'-'+rec.reglements.length});
+    caisse.push({id:nextId.caisse++, date, type:'out', amount, description:'تسديد فاتورة '+rec.num+' ('+method+')', source:'reglement_achat', sourceId:rec.id+'-'+rec.reglements.length});
     $('arAmount').value='';
     this.renderReglementsSheet(rec.reglements);
     this.renderAccountSummary(rec);
@@ -2111,6 +2129,73 @@ const Caisse = {
   }
 };
 
+// ===================== EXPENSES =====================
+const Expenses = {
+  editingId:null,
+  reset(){
+    this.editingId=null;
+    $('exDate').value=new Date().toISOString().slice(0,10);
+    $('exCategory').selectedIndex=0; $('exAmount').value=''; $('exDesc').value='';
+  },
+  openNew(){
+    this.reset();
+    openSheet('expenses');
+  },
+  save(){
+    const amount=parseFloat($('exAmount').value)||0;
+    if(amount<=0){ showToast('أدخل مبلغا صحيحا'); return; }
+    const category = $('exCategory').options[$('exCategory').selectedIndex].textContent;
+    const rec={id:this.editingId??nextId.expenses, date:$('exDate').value, category, amount, description:$('exDesc').value||'-'};
+    if(this.editingId!=null){
+      expenses[expenses.findIndex(e=>e.id===this.editingId)]=rec;
+      Caisse.addAuto('out', rec.amount, rec.date, 'مصروف: '+rec.category+(rec.description!=='-'?' - '+rec.description:''), 'expense', rec.id);
+      showToast('تم التعديل');
+    } else {
+      expenses.push(rec); nextId.expenses++;
+      caisse.push({id:nextId.caisse++, date:rec.date, type:'out', amount:rec.amount, description:'مصروف: '+rec.category+(rec.description!=='-'?' - '+rec.description:''), source:'expense', sourceId:rec.id});
+      showToast('تم الحفظ');
+    }
+    this.render();
+    Caisse.render();
+    closeSheet();
+  },
+  edit(){
+    if(this.editingId==null){ showToast('اختر مصروفا لتعديله'); return; }
+    this.save();
+  },
+  remove(){
+    if(this.editingId==null){ showToast('اختر مصروفا لحذفه'); return; }
+    expenses = expenses.filter(e=>e.id!==this.editingId);
+    Caisse.removeAuto('expense', this.editingId);
+    showToast('تم الحذف');
+    this.render();
+    Caisse.render();
+    closeSheet();
+  },
+  load(id){
+    const e = expenses.find(x=>x.id===id); if(!e) return;
+    this.editingId=id;
+    $('exDate').value=e.date;
+    const opt = [...$('exCategory').options].find(o=>o.textContent===e.category);
+    if(opt) $('exCategory').value=opt.value; else $('exCategory').selectedIndex=$('exCategory').options.length-1;
+    $('exAmount').value=e.amount; $('exDesc').value=e.description==='-'?'':e.description;
+    openSheet('expenses');
+  },
+  render(){
+    saveState();
+    const total = expenses.reduce((a,e)=>a+e.amount,0);
+    $('expensesTotal').textContent = total.toFixed(3)+' د.ت';
+    const list = $('expensesList'); list.innerHTML='';
+    const sorted = expenses.slice().sort((a,b)=>(a.date<b.date?1:-1));
+    if(!sorted.length){ list.innerHTML='<div class="empty-msg">لا توجد مصاريف بعد</div>'; return; }
+    sorted.forEach(e=>{
+      const d=document.createElement('div'); d.className='row-card'; d.onclick=()=>Expenses.load(e.id);
+      d.innerHTML=`<div class="main-info"><div class="name">${e.category}${e.description!=='-'?' - '+e.description:''}</div><div class="meta">${e.date}</div></div><div class="amount" style="color:var(--danger);">-${e.amount.toFixed(3)} د.ت</div>`;
+      list.appendChild(d);
+    });
+  }
+};
+
 // ===================== QUICK REGLEMENT (standalone, not tied to a specific invoice/card) =====================
 // ===================== APPROVALS (admin only) =====================
 const Approvals = {
@@ -2192,6 +2277,7 @@ const QuickReglement = {
     const type = $('qrType').value;
     const targetId = $('qrTarget').value;
     const amount = parseFloat($('qrAmount').value)||0;
+    const method = $('qrMethod').options[$('qrMethod').selectedIndex].textContent;
     if(!targetId){ showToast('اختر عميلا أو موردا'); return; }
     if(amount<=0){ showToast('أدخل مبلغا صحيحا'); return; }
     const date = new Date().toISOString().slice(0,10);
@@ -2199,15 +2285,15 @@ const QuickReglement = {
       const c = clients.find(x=>x.id==targetId); if(!c) return;
       c.balance -= amount;
       c.reglements = c.reglements || [];
-      c.reglements.push({date, amount});
-      caisse.push({id:nextId.caisse++, date, type:'in', amount, description:'تسديد من '+c.name, source:'reglement_client', sourceId:c.id+'-'+c.reglements.length});
+      c.reglements.push({date, amount, method});
+      caisse.push({id:nextId.caisse++, date, type:'in', amount, description:'تسديد من '+c.name+' ('+method+')', source:'reglement_client', sourceId:c.id+'-'+c.reglements.length});
       Clients.render();
     } else {
       const f = fournisseurs.find(x=>x.id==targetId); if(!f) return;
       f.balance -= amount;
       f.reglements = f.reglements || [];
-      f.reglements.push({date, amount});
-      caisse.push({id:nextId.caisse++, date, type:'out', amount, description:'تسديد لـ '+f.name, source:'reglement_fournisseur', sourceId:f.id+'-'+f.reglements.length});
+      f.reglements.push({date, amount, method});
+      caisse.push({id:nextId.caisse++, date, type:'out', amount, description:'تسديد لـ '+f.name+' ('+method+')', source:'reglement_fournisseur', sourceId:f.id+'-'+f.reglements.length});
       Fournisseurs.render();
     }
     Caisse.render();
