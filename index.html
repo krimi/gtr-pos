@@ -1015,20 +1015,31 @@ let ventes = [];
 let achats = [];
 let caisse = [];
 let expenses = [];
-let nextId = {clients:3, articles:5, fournisseurs:3, ventes:1, achats:1, caisse:1, expenses:1};
+let stockMovements = [];
+function getStock(articleName){
+  return stockMovements.filter(m=>m.articleName===articleName)
+    .reduce((a,m)=> a + (m.type==='in' ? m.qty : -m.qty), 0);
+}
+function addStockMovement(articleName, qty, type, source, sourceId, date, description){
+  stockMovements.push({ id: nextId.stockMovements++, articleName, qty, type, source, sourceId, date, description });
+}
+function removeStockMovements(source, sourceId){
+  stockMovements = stockMovements.filter(m => !(m.source===source && m.sourceId===sourceId));
+}
+let nextId = {clients:3, articles:5, fournisseurs:3, ventes:1, achats:1, caisse:1, expenses:1, stockMovements:1};
 
 // ===================== PERSISTENCE (Firestore + localStorage cache) =====================
 const STORAGE_KEY = 'gtrpos_data_v1';
 let saveTimer = null;
 function saveState(){
   try{
-    const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, nextId, companyInfo };
+    const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   }catch(e){ /* storage unavailable, ignore silently */ }
   if(currentUser){
     clearTimeout(saveTimer);
     saveTimer = setTimeout(()=>{
-      const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, nextId, companyInfo };
+      const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo };
       db.collection('users').doc(currentUser.uid).set(data)
         .catch(e=>{ console.error('Firestore save error', e); });
     }, 1200);
@@ -1046,6 +1057,7 @@ function loadState(){
     if(data.achats) achats = data.achats;
     if(data.caisse) caisse = data.caisse;
     if(data.expenses) expenses = data.expenses;
+    if(data.stockMovements) stockMovements = data.stockMovements;
     if(data.nextId) nextId = data.nextId;
     if(data.companyInfo) companyInfo = data.companyInfo;
     return true;
@@ -1062,14 +1074,15 @@ function loadStateFromFirestore(uid){
       achats = data.achats || [];
       caisse = data.caisse || [];
       expenses = data.expenses || [];
-      nextId = data.nextId || {clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1, expenses:1};
+      stockMovements = data.stockMovements || [];
+      nextId = data.nextId || {clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1, expenses:1, stockMovements:1};
       companyInfo = data.companyInfo || {name:'GTR POS', address:'', phone1:'', taxId:'', logo:''};
     } else {
       // First time for this account: start completely empty (no demo/seed data)
-      clients = []; articles = []; fournisseurs = []; ventes = []; achats = []; caisse = []; expenses = [];
-      nextId = {clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1, expenses:1};
+      clients = []; articles = []; fournisseurs = []; ventes = []; achats = []; caisse = []; expenses = []; stockMovements = [];
+      nextId = {clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1, expenses:1, stockMovements:1};
       companyInfo = {name:'GTR POS', address:'', phone1:'', taxId:'', logo:''};
-      const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, nextId, companyInfo };
+      const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo };
       db.collection('users').doc(uid).set(data).catch(e=>console.error(e));
     }
   }).catch(e=>{
@@ -1078,7 +1091,7 @@ function loadStateFromFirestore(uid){
   });
 }
 function exportBackup(){
-  const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, nextId, companyInfo, exportedAt: new Date().toISOString() };
+  const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo, exportedAt: new Date().toISOString() };
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1096,7 +1109,7 @@ function exportBackupToDrive(){
 
   const uploadWithToken = (accessToken)=>{
     if(!accessToken){ showToast('تعذر الحصول على إذن الوصول لـ Google Drive'); return; }
-    const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, nextId, companyInfo, exportedAt: new Date().toISOString() };
+    const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo, exportedAt: new Date().toISOString() };
     const fileName = 'gtrpos_backup_'+new Date().toISOString().slice(0,10)+'.json';
     const metadata = { name: fileName, mimeType: 'application/json' };
     const boundary = '-------gtrpos314159';
@@ -1146,6 +1159,7 @@ function importBackupFile(input){
       if(data.achats) achats = data.achats;
       if(data.caisse) caisse = data.caisse;
     if(data.expenses) expenses = data.expenses;
+    if(data.stockMovements) stockMovements = data.stockMovements;
       if(data.nextId) nextId = data.nextId;
       if(data.companyInfo) companyInfo = data.companyInfo;
       saveState();
@@ -1481,10 +1495,28 @@ const Articles = {
     $('aName').value=''; $('aPrice').value=''; $('aCostPrice').value=''; $('aStock').value='0'; },
   save(){
     if(!$('aName').value.trim()){ showToast('أدخل اسم الصنف'); return; }
+    const enteredStock = parseInt($('aStock').value)||0;
     const rec={id:this.editingId??nextId.articles, name:$('aName').value.trim(),
-      price:parseFloat($('aPrice').value)||0, costPrice:parseFloat($('aCostPrice').value)||0, stock:parseInt($('aStock').value)||0};
-    if(this.editingId!=null){ articles[articles.findIndex(a=>a.id===this.editingId)]=rec; showToast('تم التعديل'); }
-    else{ articles.push(rec); nextId.articles++; showToast('تم الحفظ'); }
+      price:parseFloat($('aPrice').value)||0, costPrice:parseFloat($('aCostPrice').value)||0};
+    if(this.editingId!=null){
+      const old = articles.find(a=>a.id===this.editingId);
+      const currentStock = getStock(old.name);
+      if(old.name !== rec.name){
+        // renamed: retag existing movements to the new name so history stays linked
+        stockMovements.forEach(m=>{ if(m.articleName===old.name) m.articleName=rec.name; });
+      }
+      const diff = enteredStock - currentStock;
+      if(diff !== 0){
+        addStockMovement(rec.name, Math.abs(diff), diff>0?'in':'out', 'adjustment', rec.id, new Date().toISOString().slice(0,10), 'تسوية يدوية للمخزون');
+      }
+      articles[articles.findIndex(a=>a.id===this.editingId)]=rec; showToast('تم التعديل');
+    } else {
+      articles.push(rec); nextId.articles++;
+      if(enteredStock !== 0){
+        addStockMovement(rec.name, Math.abs(enteredStock), enteredStock>0?'in':'out', 'initial', rec.id, new Date().toISOString().slice(0,10), 'رصيد افتتاحي');
+      }
+      showToast('تم الحفظ');
+    }
     refreshArticleSelects(); this.render(); closeSheet();
   },
   edit(){
@@ -1496,6 +1528,7 @@ const Articles = {
     const a = articles.find(x=>x.id===this.editingId);
     const used = a && (ventes.some(v=>v.lines.some(l=>l.name===a.name)) || achats.some(p=>p.lines.some(l=>l.name===a.name)));
     if(used){ showToast('لا يمكن حذف صنف تمت به عملية بيع أو شراء'); return; }
+    if(a) stockMovements = stockMovements.filter(m=>m.articleName!==a.name);
     articles=articles.filter(x=>x.id!==this.editingId); refreshArticleSelects();
     showToast('تم الحذف'); this.render(); closeSheet();
   },
@@ -1503,7 +1536,7 @@ const Articles = {
     const a=articles.find(x=>x.id===id); if(!a) return;
     this.editingId=id; $('aCode').value='ART-'+String(id).padStart(4,'0');
     $('aName').value=a.name; $('aPrice').value=a.price;
-    $('aCostPrice').value=a.costPrice||''; $('aStock').value=a.stock;
+    $('aCostPrice').value=a.costPrice||''; $('aStock').value=getStock(a.name);
     this.renderStats(a);
     openSheet('articles');
   },
@@ -1533,7 +1566,7 @@ const Articles = {
     if(!filtered.length){ list.innerHTML='<div class="empty-msg">لا توجد أصناف</div>'; return; }
     filtered.forEach(a=>{
       const d=document.createElement('div'); d.className='row-card'; d.onclick=()=>Articles.load(a.id);
-      d.innerHTML=`<div class="main-info"><div class="name">${a.name}</div><div class="meta">مخزون: ${a.stock} · شراء: ${(a.costPrice||0).toFixed(3)}</div></div><div class="amount">${a.price.toFixed(3)} د.ت</div>`;
+      d.innerHTML=`<div class="main-info"><div class="name">${a.name}</div><div class="meta">مخزون: ${getStock(a.name)} · شراء: ${(a.costPrice||0).toFixed(3)}</div></div><div class="amount">${a.price.toFixed(3)} د.ت</div>`;
       list.appendChild(d);
     });
   }
@@ -1625,7 +1658,7 @@ const Ventes = {
     const c=clients.find(x=>x.id==$('vClient').value);
     const sp = c && c.specialPrices ? c.specialPrices.find(s=>s.name===a.name) : null;
     $('viPrice').value = (sp ? sp.price : a.price).toFixed(3);
-    $('viStockHint').textContent = 'الكمية المتوفرة بالمخزون: ' + a.stock;
+    $('viStockHint').textContent = 'الكمية المتوفرة بالمخزون: ' + getStock(a.name);
     if(sp) showToast('تم تطبيق السعر الخاص لهذا الحريف');
     this.calcLine();
   },
@@ -1691,11 +1724,14 @@ const Ventes = {
         if(oldClient) oldClient.balance -= oldRec.total;
         if(newClient) newClient.balance += rec.total;
       }
+      removeStockMovements('vente', rec.id);
+      rec.lines.forEach(l=>{ addStockMovement(l.name, l.qty, 'out', 'vente', rec.id, rec.date, 'بيع '+rec.num); });
+      Articles.render(); refreshArticleSelects();
       ventes[ventes.findIndex(v=>v.id===this.editingId)]=rec; showToast('تم تعديل المبيعات');
     } else {
       const client = clients.find(c=>c.name===clientName);
       if(client) client.balance += rec.total;
-      rec.lines.forEach(l=>{ const art=articles.find(a=>a.name===l.name); if(art) art.stock-=l.qty; });
+      rec.lines.forEach(l=>{ addStockMovement(l.name, l.qty, 'out', 'vente', rec.id, rec.date, 'بيع '+rec.num); });
       Articles.render(); refreshArticleSelects();
       ventes.push(rec); nextId.ventes++; showToast('تم حفظ المبيعات');
       if(rec.payment==='نقدا'){
@@ -1807,7 +1843,7 @@ const Ventes = {
       const client = clients.find(c=>c.name===rec.client);
       const paid = (rec.reglements||[]).reduce((a,r)=>a+r.amount,0);
       if(client) client.balance -= (rec.total - paid);
-      rec.lines.forEach(l=>{ const art=articles.find(a=>a.name===l.name); if(art) art.stock+=l.qty; });
+      removeStockMovements('vente', rec.id);
       Articles.render(); refreshArticleSelects();
     }
     Caisse.removeAllForInvoice('reglement_vente', this.editingId);
@@ -1846,7 +1882,7 @@ const Achats = {
   fillArticle(){
     const a=articles.find(x=>x.id==$('piArticle').value);
     $('piPrice').value=a?(a.costPrice||a.price).toFixed(3):'';
-    $('piStockHint').textContent = a ? ('الكمية المتوفرة بالمخزون: ' + a.stock) : '';
+    $('piStockHint').textContent = a ? ('الكمية المتوفرة بالمخزون: ' + getStock(a.name)) : '';
     this.calcLine();
   },
   calcLine(){ const p=parseFloat($('piPrice').value)||0,q=parseFloat($('piQty').value)||0; $('piTotal').value=(p*q).toFixed(3); },
@@ -1911,9 +1947,12 @@ const Achats = {
         if(oldSupplier) oldSupplier.balance -= oldRec.total;
         if(newSupplier) newSupplier.balance += rec.total;
       }
+      removeStockMovements('achat', rec.id);
+      rec.lines.forEach(l=>{ addStockMovement(l.name, l.qty, 'in', 'achat', rec.id, rec.date, 'شراء '+rec.num); });
+      Articles.render(); refreshArticleSelects();
       achats[achats.findIndex(p=>p.id===this.editingId)]=rec; showToast('تم تعديل المشتريات');
     } else {
-      rec.lines.forEach(l=>{ const art=articles.find(a=>a.name===l.name); if(art) art.stock+=l.qty; });
+      rec.lines.forEach(l=>{ addStockMovement(l.name, l.qty, 'in', 'achat', rec.id, rec.date, 'شراء '+rec.num); });
       Articles.render(); refreshArticleSelects();
       const supplier = fournisseurs.find(f=>f.name===supplierName);
       if(supplier) supplier.balance += rec.total;
@@ -2027,7 +2066,7 @@ const Achats = {
       const supplier = fournisseurs.find(f=>f.name===rec.supplier);
       const paid = (rec.reglements||[]).reduce((a,r)=>a+r.amount,0);
       if(supplier) supplier.balance -= (rec.total - paid);
-      rec.lines.forEach(l=>{ const art=articles.find(a=>a.name===l.name); if(art) art.stock-=l.qty; });
+      removeStockMovements('achat', rec.id);
       Articles.render(); refreshArticleSelects();
     }
     Caisse.removeAllForInvoice('reglement_achat', this.editingId);
@@ -2360,11 +2399,11 @@ const Rapports = {
     $('kpiCaisseSolde').textContent = caisse.reduce((a,k)=>a+(k.type==='in'?k.amount:-k.amount),0).toFixed(3);
     $('kpiSoldesClients').textContent = clients.reduce((a,c)=>a+c.balance,0).toFixed(3);
     const list=$('lowStockList'); list.innerHTML='';
-    const low = articles.filter(a=>a.stock<10);
+    const low = articles.filter(a=>getStock(a.name)<10);
     if(!low.length){ list.innerHTML='<div class="empty-msg">لا توجد أصناف بمخزون منخفض</div>'; return; }
     low.forEach(a=>{
       const d=document.createElement('div'); d.className='row-card';
-      d.innerHTML=`<div class="main-info"><div class="name">${a.name}</div><div class="meta">الكمية: ${a.stock}</div></div><span class="badge ${a.stock<5?'low':'ok2'}">${a.stock<5?'منخفض جدا':'منخفض'}</span>`;
+      d.innerHTML=`<div class="main-info"><div class="name">${a.name}</div><div class="meta">الكمية: ${getStock(a.name)}</div></div><span class="badge ${getStock(a.name)<5?'low':'ok2'}">${getStock(a.name)<5?'منخفض جدا':'منخفض'}</span>`;
       list.appendChild(d);
     });
   }
