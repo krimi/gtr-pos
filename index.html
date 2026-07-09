@@ -988,6 +988,10 @@ function openSheet(name){
 function closeSheet(){
   document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('show'));
   $('overlay').classList.remove('show');
+  // Flush any pending save to Firestore immediately when a form sheet closes
+  // (after add/edit/delete), instead of waiting for the debounce timer.
+  // This prevents data loss if the user reloads the page right after saving.
+  flushStateNow();
 }
 $('overlay').addEventListener('click', closeSheet);
 
