@@ -1042,13 +1042,22 @@ function saveState(){
   }catch(e){ /* storage unavailable, ignore silently */ }
   if(currentUser){
     clearTimeout(saveTimer);
-    saveTimer = setTimeout(()=>{
-      const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo };
-      db.collection('users').doc(currentUser.uid).set(data)
-        .catch(e=>{ console.error('Firestore save error', e); });
-    }, 1200);
+    saveTimer = setTimeout(()=>{ flushStateNow(); }, 1200);
   }
 }
+function flushStateNow(){
+  clearTimeout(saveTimer);
+  if(!currentUser) return;
+  const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo };
+  db.collection('users').doc(currentUser.uid).set(data)
+    .catch(e=>{ console.error('Firestore save error', e); });
+}
+// Make sure any pending debounced save is flushed immediately when the app
+// is closed, backgrounded, or the tab loses focus, so recent changes are
+// never lost due to the debounce delay.
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') flushStateNow(); });
+window.addEventListener('pagehide', flushStateNow);
+window.addEventListener('beforeunload', flushStateNow);
 function loadState(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
