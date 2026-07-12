@@ -798,7 +798,8 @@ auth.onAuthStateChanged(function(user){
     const approvalRef = db.collection('approvals').doc(user.uid);
     approvalRef.get().then(doc=>{
       if(!doc.exists){
-        approvalRef.set({ email:user.email||'', requestedAt:new Date().toISOString(), approved:false });
+        approvalRef.set({ email:user.email||'', requestedAt:new Date().toISOString(), approved:false })
+          .catch(e=>{ console.error('Approval request creation failed', e); showToast('تعذر إرسال طلب الموافقة، تحقق من قواعد الأمان في Firestore'); });
         $('loginOverlay').classList.remove('show');
         $('pendingOverlay').classList.add('show');
       } else if(doc.data().approved===true){
