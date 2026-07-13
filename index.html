@@ -60,13 +60,7 @@
   .sheet-footer .btn{flex:1; min-width:70px; margin:0; padding:8px 6px; font-size:13px;}
   .field{margin-bottom:8px;}
   .field label{display:block; font-size:11px; font-weight:700; color:var(--text); margin-bottom:2px;}
-  /* الحقول صغيرة الحجم */
-  .field input, .field select{
-    width:100%; padding:4px 8px;
-    border:1px solid var(--border); border-radius:6px;
-    font-family:'Cairo',sans-serif; font-size:13px;
-    background:#f9fafc; height:32px;
-  }
+  .field input, .field select{width:100%; padding:4px 8px; border:1px solid var(--border); border-radius:6px; font-family:'Cairo',sans-serif; font-size:13px; background:#f9fafc; height:32px;}
   .field input:focus, .field select:focus{outline:none; border-color:var(--blue-accent);}
   .field-row{display:grid; grid-template-columns:1fr 1fr; gap:6px;}
   table.items-mini{width:100%; border-collapse:collapse; font-size:11px; margin-bottom:6px;}
@@ -147,7 +141,7 @@
 <!-- Login overlay -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-box">
-    <div class="login-logo">GTR POS <span style="font-size:13px; opacity:.6; font-weight:400;">v0.3.0</span></div>
+    <div class="login-logo">GTR POS <span style="font-size:13px; opacity:.6; font-weight:400;">v0.3.1</span></div>
     <div class="login-sub" id="loginModeLabel">تسجيل الدخول لحسابك</div>
     <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="email">
     <input type="password" id="loginPassword" placeholder="كلمة السر" autocomplete="current-password">
@@ -173,7 +167,7 @@
 <!-- Phone -->
 <div class="phone">
   <div class="appbar">
-    <div><div class="title" id="pageTitle">لوحة القيادة</div><div class="sub" onclick="openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">v0.3.0</span></div></div>
+    <div><div class="title" id="pageTitle">لوحة القيادة</div><div class="sub" onclick="openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">v0.3.1</span></div></div>
     <div style="display:flex; gap:6px;"><button class="menu-btn" onclick="openSheet('company')">⚙️</button><button class="menu-btn" id="langBtn" style="font-size:12px;">FR</button></div>
   </div>
   <div class="content">
@@ -223,202 +217,123 @@
   </div>
   <div class="sheet-overlay" id="overlay"></div>
   <!-- Client sheet -->
-  <div class="sheet" id="sheet-clients">
-    <div class="sheet-handle"></div>
-    <div class="sheet-header"><h3>بيانات العميل</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
-    <div class="sheet-body">
-      <div class="field"><label>رمز العميل</label><input id="cCode" readonly></div>
-      <div class="field"><label>اسم العميل</label><input id="cName"></div>
-      <div class="field"><label>الهاتف 1</label><input id="cPhone"></div>
-      <div class="field"><label>الهاتف 2</label><input id="cPhone2"></div>
-      <div class="field"><label>الهاتف 3</label><input id="cPhone3"></div>
-      <div class="field"><label>العنوان</label><input id="cAddress"></div>
-      <div class="field"><label>الرصيد (د.ت)</label><input id="cBalance" type="number" step="0.001" value="0"></div>
-      <div class="field"><label>ملاحظات</label><input id="cNotes"></div>
-      <div class="section-title">أسعار خاصة</div>
-      <div class="field"><label>الصنف</label><select id="cpArticle"><option value="">-- اختر --</option></select></div>
-      <div class="field"><label>السعر الخاص (د.ت)</label><input id="cpPrice" type="number" step="0.001"></div>
-      <button class="btn outline small" onclick="Clients.addSpecialPrice()">+ إضافة سعر خاص</button>
-      <table class="items-mini"><thead><tr><th>الصنف</th><th>السعر الخاص</th><th></th></tr></thead><tbody id="cpBody"></tbody></table>
-    </div>
-    <div class="sheet-footer">
-      <button class="btn save" onclick="Clients.save()">💾 حفظ</button>
-      <button class="btn edit" onclick="Clients.edit()">✏️ تعديل</button>
-      <button class="btn del" onclick="Clients.remove()">🗑 حذف</button>
-    </div>
-  </div>
-  <!-- Article sheet -->
-  <div class="sheet" id="sheet-articles">
-    <div class="sheet-handle"></div>
-    <div class="sheet-header"><h3>بيانات الصنف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
-    <div class="sheet-body">
-      <div class="field"><label>رمز الصنف</label><input id="aCode" readonly></div>
-      <div class="field"><label>اسم الصنف</label><input id="aName"></div>
-      <div class="field"><label>سعر البيع (د.ت)</label><input id="aPrice" type="number" step="0.001"></div>
-      <div class="field"><label>سعر الشراء (د.ت)</label><input id="aCostPrice" type="number" step="0.001"></div>
-      <div class="field"><label>الكمية بالمخزون</label><input id="aStock" type="number" value="0"></div>
-    </div>
-    <div class="sheet-footer">
-      <button class="btn save" onclick="Articles.save()">💾 حفظ</button>
-      <button class="btn edit" onclick="Articles.edit()">✏️ تعديل</button>
-      <button class="btn del" onclick="Articles.remove()">🗑 حذف</button>
-    </div>
-  </div>
-  <!-- Caisse sheet -->
-  <div class="sheet" id="sheet-caisse">
-    <div class="sheet-handle"></div>
-    <div class="sheet-header"><h3>حركة الكاسة</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
-    <div class="sheet-body">
-      <div class="field"><label>التاريخ</label><input id="ksDate" type="date"></div>
-      <div class="field"><label>النوع</label><select id="ksType"><option value="in">دخول (+)</option><option value="out">خروج (-)</option></select></div>
-      <div class="field"><label>المبلغ (د.ت)</label><input id="ksAmount" type="number" step="0.001"></div>
-      <div class="field"><label>البيان</label><input id="ksDesc"></div>
-    </div>
-    <div class="sheet-footer">
-      <button class="btn save" onclick="Caisse.save()">💾 حفظ</button>
-      <button class="btn del" onclick="Caisse.remove()">🗑 حذف</button>
-    </div>
-  </div>
-  <!-- Expenses sheet -->
-  <div class="sheet" id="sheet-expenses">
-    <div class="sheet-handle"></div>
-    <div class="sheet-header"><h3>مصروف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
-    <div class="sheet-body">
-      <div class="field"><label>التاريخ</label><input id="exDate" type="date"></div>
-      <div class="field"><label>الفئة</label><select id="exCategory"><option>كراء</option><option>أجور</option><option>فواتير</option><option>نقل</option><option>صيانة</option><option>أخرى</option></select></div>
-      <div class="field"><label>المبلغ (د.ت)</label><input id="exAmount" type="number" step="0.001"></div>
-      <div class="field"><label>البيان</label><input id="exDesc"></div>
-    </div>
-    <div class="sheet-footer">
-      <button class="btn save" onclick="Expenses.save()">💾 حفظ</button>
-      <button class="btn edit" onclick="Expenses.edit()">✏️ تعديل</button>
-      <button class="btn del" onclick="Expenses.remove()">🗑 حذف</button>
-    </div>
-  </div>
-  <!-- Quick reglement -->
-  <div class="sheet" id="sheet-quickreglement">
-    <div class="sheet-handle"></div>
-    <div class="sheet-header"><h3>تسجيل تسديد سريع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
-    <div class="sheet-body">
-      <div class="field"><label>النوع</label><select id="qrType" onchange="QuickReglement.refreshTargets()"><option value="client">تسديد من عميل</option><option value="fournisseur">تسديد لمورد</option></select></div>
-      <div class="field"><label>الاسم</label><select id="qrTarget" onchange="QuickReglement.showHint()"><option value="">-- اختر --</option></select></div>
-      <div style="font-size:11px; color:var(--muted); margin:-2px 0 6px;" id="qrBalanceHint"></div>
-      <div class="field"><label>مبلغ التسديد (د.ت)</label><input id="qrAmount" type="number" step="0.001"></div>
-      <div class="field"><label>نوع التسديد</label><select id="qrMethod"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option></select></div>
-    </div>
-    <div class="sheet-footer"><button class="btn save" onclick="QuickReglement.save()">💾 تسجيل التسديد</button></div>
-  </div>
-  <!-- Fournisseur sheet -->
-  <div class="sheet" id="sheet-fournisseurs">
-    <div class="sheet-handle"></div>
-    <div class="sheet-header"><h3>بيانات المورد</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
-    <div class="sheet-body">
-      <div class="field"><label>رمز المورد</label><input id="fCode" readonly></div>
-      <div class="field"><label>اسم المورد</label><input id="fName"></div>
-      <div class="field"><label>الهاتف 1</label><input id="fPhone"></div>
-      <div class="field"><label>الهاتف 2</label><input id="fPhone2"></div>
-      <div class="field"><label>الهاتف 3</label><input id="fPhone3"></div>
-      <div class="field"><label>العنوان</label><input id="fAddress"></div>
-      <div class="field"><label>الرصيد (د.ت)</label><input id="fBalance" type="number" step="0.001" value="0"></div>
-      <div class="field"><label>ملاحظات</label><input id="fNotes"></div>
-    </div>
-    <div class="sheet-footer">
-      <button class="btn save" onclick="Fournisseurs.save()">💾 حفظ</button>
-      <button class="btn edit" onclick="Fournisseurs.edit()">✏️ تعديل</button>
-      <button class="btn del" onclick="Fournisseurs.remove()">🗑 حذف</button>
-    </div>
-  </div>
-  <!-- Vente sheet -->
-  <div class="sheet" id="sheet-ventes">
-    <div class="sheet-handle"></div>
-    <div class="sheet-header"><h3>عملية بيع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
-    <div class="sheet-body">
-      <div class="field-row"><div class="field"><label>رقم المبيعات</label><input id="vNum" readonly></div><div class="field"><label>التاريخ</label><input id="vDate" type="date"></div></div>
-      <div class="field"><label>العميل</label><select id="vClient" onchange="Ventes.fillClient()"><option value="">-- اختر --</option></select></div>
-      <div class="field"><label>هاتف العميل</label><input id="vPhone" readonly></div>
-      <div class="field"><label>طريقة الدفع</label><select id="vPayment"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option><option selected>آجل</option></select></div>
-      <div class="section-title">إضافة صنف</div>
-      <div class="field"><label>الصنف</label><select id="viArticle" onchange="Ventes.fillArticle()"><option value="">-- اختر --</option></select></div>
-      <div id="viStockHint" style="font-size:10px; color:var(--muted); margin:-2px 0 4px;"></div>
-      <div class="field"><label>أو اسم يدوي</label><input id="viManualName" placeholder="صنف غير موجود"></div>
-      <div class="field-row"><div class="field"><label>السعر (د.ت)</label><input id="viPrice" type="number" step="0.001" oninput="Ventes.calcLine()"></div><div class="field"><label>الكمية</label><input id="viQty" type="number" min="1" value="1" oninput="Ventes.calcLine()"></div></div>
-      <div class="field"><label>الإجمالي (د.ت)</label><input id="viTotal" readonly></div>
-      <button class="btn outline small" onclick="Ventes.addLine()">+ إضافة للجدول</button>
-      <table class="items-mini"><thead><tr><th>الصنف</th><th>سعر</th><th>كمية</th><th>مجموع</th><th></th></tr></thead><tbody id="vLinesBody"></tbody></table>
-      <div class="totals-mini" style="justify-content:flex-end;"><span>المجموع: </span><span id="vGrand">0.000</span> د.ت</div>
-      <div class="section-title">تسديد</div>
-      <div class="field"><label>مبلغ التسديد (د.ت)</label><input id="vrAmount" type="number" step="0.001"></div>
-      <div class="field"><label>نوع التسديد</label><select id="vrMethod"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option></select></div>
-      <button class="btn outline small" onclick="Ventes.addReglement()">+ تسجيل تسديد</button>
-      <table class="items-mini"><thead><tr><th>التاريخ</th><th>الطريقة</th><th>المبلغ (د.ت)</th><th></th></tr></thead><tbody id="vrBody"></tbody></table>
-      <div class="section-title">وضعية الحساب</div>
-      <div id="vAccountSummary"></div>
-      <button class="btn" style="background:linear-gradient(180deg,#3ddc84,#25d366);" onclick="Ventes.shareWhatsapp()">📱 واتساب</button>
-      <button class="btn outline small" onclick="Ventes.printInvoice()">🖨️ طباعة</button>
-    </div>
-    <div class="sheet-footer">
-      <button class="btn save" onclick="Ventes.save()">💾 حفظ</button>
-      <button class="btn edit" onclick="Ventes.edit()">✏️ تعديل</button>
-      <button class="btn del" onclick="Ventes.remove()">🗑 حذف</button>
-    </div>
-  </div>
-  <!-- Achat sheet -->
-  <div class="sheet" id="sheet-achats">
-    <div class="sheet-handle"></div>
-    <div class="sheet-header"><h3>عملية شراء</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
-    <div class="sheet-body">
-      <div class="field-row"><div class="field"><label>رقم المشتريات</label><input id="pNum" readonly></div><div class="field"><label>التاريخ</label><input id="pDate" type="date"></div></div>
-      <div class="field"><label>المورد</label><select id="pSupplier" onchange="Achats.fillSupplier()"><option value="">-- اختر --</option></select></div>
-      <div class="field-row"><div class="field"><label>هاتف المورد</label><input id="pPhone" readonly></div><div class="field"><label>عنوان المورد</label><input id="pAddress" readonly></div></div>
-      <div class="field"><label>طريقة الدفع</label><select id="pPayment"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option><option selected>آجل</option></select></div>
-      <div class="section-title">إضافة صنف</div>
-      <div class="field"><label>الصنف</label><select id="piArticle" onchange="Achats.fillArticle()"><option value="">-- اختر --</option></select></div>
-      <div id="piStockHint" style="font-size:10px; color:var(--muted); margin:-2px 0 4px;"></div>
-      <div class="field"><label>أو اسم يدوي</label><input id="piManualName" placeholder="صنف غير موجود"></div>
-      <div class="field-row"><div class="field"><label>السعر (د.ت)</label><input id="piPrice" type="number" step="0.001" oninput="Achats.calcLine()"></div><div class="field"><label>الكمية</label><input id="piQty" type="number" min="1" value="1" oninput="Achats.calcLine()"></div></div>
-      <div class="field"><label>الإجمالي (د.ت)</label><input id="piTotal" readonly></div>
-      <button class="btn outline small" onclick="Achats.addLine()">+ إضافة للجدول</button>
-      <table class="items-mini"><thead><tr><th>الصنف</th><th>سعر</th><th>كمية</th><th>مجموع</th><th></th></tr></thead><tbody id="pLinesBody"></tbody></table>
-      <div class="totals-mini" style="justify-content:flex-end;"><span>المجموع: </span><span id="pGrand">0.000</span> د.ت</div>
-      <div class="section-title">تسديد</div>
-      <div class="field"><label>مبلغ التسديد (د.ت)</label><input id="arAmount" type="number" step="0.001"></div>
-      <div class="field"><label>نوع التسديد</label><select id="arMethod"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option></select></div>
-      <button class="btn outline small" onclick="Achats.addReglement()">+ تسجيل تسديد</button>
-      <table class="items-mini"><thead><tr><th>التاريخ</th><th>الطريقة</th><th>المبلغ (د.ت)</th><th></th></tr></thead><tbody id="arBody"></tbody></table>
-      <div class="section-title">وضعية الحساب</div>
-      <div id="pAccountSummary"></div>
-      <button class="btn" style="background:linear-gradient(180deg,#3ddc84,#25d366);" onclick="Achats.shareWhatsapp()">📱 واتساب</button>
-      <button class="btn outline small" onclick="Achats.printInvoice()">🖨️ طباعة</button>
-    </div>
-    <div class="sheet-footer">
-      <button class="btn save" onclick="Achats.save()">💾 حفظ</button>
-      <button class="btn edit" onclick="Achats.edit()">✏️ تعديل</button>
-      <button class="btn del" onclick="Achats.remove()">🗑 حذف</button>
-    </div>
-  </div>
-  <!-- Company sheet -->
-  <div class="sheet" id="sheet-company">
-    <div class="sheet-handle"></div>
-    <div class="sheet-header"><h3>بيانات المؤسسة</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
-    <div class="sheet-body">
-      <div class="field"><label>اسم المؤسسة</label><input id="cpyName"></div>
-      <div class="field"><label>الشعار</label><div style="display:flex;gap:6px;align-items:center;"><img id="cpyLogoPreview" style="width:36px;height:36px;border-radius:6px;display:none;background:#eee;"><input type="file" id="cpyLogoInput" accept="image/*" style="display:none;" onchange="CompanyInfo.handleLogoUpload(this)"><button class="btn outline small" style="margin:0;" onclick="document.getElementById('cpyLogoInput').click()">اختر صورة</button><button class="btn del small" style="margin:0;flex:none;padding:2px 10px;" onclick="CompanyInfo.removeLogo()">✕</button></div></div>
-      <div class="field"><label>العنوان</label><input id="cpyAddress"></div>
-      <div class="field"><label>الهاتف</label><input id="cpyPhone1"></div>
-      <div class="field"><label>الرقم الجبائي</label><input id="cpyTaxId"></div>
-      <button class="btn save" onclick="CompanyInfo.save()">💾 حفظ</button>
-      <div class="section-title">حجم النص</div>
-      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;"><button class="btn outline small" style="margin:0;flex:1;" onclick="UiScale.set(0.85)">صغير</button><button class="btn outline small" style="margin:0;flex:1;" onclick="UiScale.set(1)">عادي</button><button class="btn outline small" style="margin:0;flex:1;" onclick="UiScale.set(1.15)">كبير</button><button class="btn outline small" style="margin:0;flex:1;" onclick="UiScale.set(1.3)">أكبر</button></div>
-      <div class="section-title">النسخ الاحتياطي</div>
-      <button class="btn outline small" onclick="exportBackup()">⬇️ تصدير</button>
-      <button class="btn outline small" onclick="exportBackupToDrive()">☁️ Google Drive</button>
-      <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importBackupFile(this)"><button class="btn outline small" onclick="document.getElementById('importFileInput').click()">⬆️ استيراد</button>
-      <div style="font-size:10px;color:var(--muted);margin-top:6px;">💡 لتثبيت التطبيق: ⋮ في المتصفح ← إضافة إلى الشاشة الرئيسية</div>
-      <div class="section-title">الحساب</div>
-      <div id="accountEmailDisplay" style="font-size:12px;color:var(--muted);margin-bottom:4px;"></div>
-      <button class="btn del" onclick="doLogout()">🚪 تسجيل الخروج</button>
-    </div>
-  </div>
+  <div class="sheet" id="sheet-clients"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات العميل</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
+    <div class="field"><label>رمز العميل</label><input id="cCode" readonly></div>
+    <div class="field"><label>اسم العميل</label><input id="cName"></div>
+    <div class="field"><label>الهاتف 1</label><input id="cPhone"></div>
+    <div class="field"><label>الهاتف 2</label><input id="cPhone2"></div>
+    <div class="field"><label>الهاتف 3</label><input id="cPhone3"></div>
+    <div class="field"><label>العنوان</label><input id="cAddress"></div>
+    <div class="field"><label>الرصيد (د.ت)</label><input id="cBalance" type="number" step="0.001" value="0"></div>
+    <div class="field"><label>ملاحظات</label><input id="cNotes"></div>
+    <div class="section-title">أسعار خاصة</div>
+    <div class="field"><label>الصنف</label><select id="cpArticle"><option value="">-- اختر --</option></select></div>
+    <div class="field"><label>السعر الخاص (د.ت)</label><input id="cpPrice" type="number" step="0.001"></div>
+    <button class="btn outline small" onclick="Clients.addSpecialPrice()">+ إضافة سعر خاص</button>
+    <table class="items-mini"><thead><tr><th>الصنف</th><th>السعر الخاص</th><th></th></tr></thead><tbody id="cpBody"></tbody></table>
+  </div><div class="sheet-footer"><button class="btn save" onclick="Clients.save()">💾 حفظ</button><button class="btn edit" onclick="Clients.edit()">✏️ تعديل</button><button class="btn del" onclick="Clients.remove()">🗑 حذف</button></div></div>
+  <!-- Article sheet --><div class="sheet" id="sheet-articles"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات الصنف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
+    <div class="field"><label>رمز الصنف</label><input id="aCode" readonly></div>
+    <div class="field"><label>اسم الصنف</label><input id="aName"></div>
+    <div class="field"><label>سعر البيع (د.ت)</label><input id="aPrice" type="number" step="0.001"></div>
+    <div class="field"><label>سعر الشراء (د.ت)</label><input id="aCostPrice" type="number" step="0.001"></div>
+    <div class="field"><label>الكمية بالمخزون</label><input id="aStock" type="number" value="0"></div>
+  </div><div class="sheet-footer"><button class="btn save" onclick="Articles.save()">💾 حفظ</button><button class="btn edit" onclick="Articles.edit()">✏️ تعديل</button><button class="btn del" onclick="Articles.remove()">🗑 حذف</button></div></div>
+  <!-- Caisse sheet --><div class="sheet" id="sheet-caisse"><div class="sheet-handle"></div><div class="sheet-header"><h3>حركة الكاسة</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
+    <div class="field"><label>التاريخ</label><input id="ksDate" type="date"></div>
+    <div class="field"><label>النوع</label><select id="ksType"><option value="in">دخول (+)</option><option value="out">خروج (-)</option></select></div>
+    <div class="field"><label>المبلغ (د.ت)</label><input id="ksAmount" type="number" step="0.001"></div>
+    <div class="field"><label>البيان</label><input id="ksDesc"></div>
+  </div><div class="sheet-footer"><button class="btn save" onclick="Caisse.save()">💾 حفظ</button><button class="btn del" onclick="Caisse.remove()">🗑 حذف</button></div></div>
+  <!-- Expenses sheet --><div class="sheet" id="sheet-expenses"><div class="sheet-handle"></div><div class="sheet-header"><h3>مصروف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
+    <div class="field"><label>التاريخ</label><input id="exDate" type="date"></div>
+    <div class="field"><label>الفئة</label><select id="exCategory"><option>كراء</option><option>أجور</option><option>فواتير</option><option>نقل</option><option>صيانة</option><option>أخرى</option></select></div>
+    <div class="field"><label>المبلغ (د.ت)</label><input id="exAmount" type="number" step="0.001"></div>
+    <div class="field"><label>البيان</label><input id="exDesc"></div>
+  </div><div class="sheet-footer"><button class="btn save" onclick="Expenses.save()">💾 حفظ</button><button class="btn edit" onclick="Expenses.edit()">✏️ تعديل</button><button class="btn del" onclick="Expenses.remove()">🗑 حذف</button></div></div>
+  <!-- Quick reglement --><div class="sheet" id="sheet-quickreglement"><div class="sheet-handle"></div><div class="sheet-header"><h3>تسجيل تسديد سريع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
+    <div class="field"><label>النوع</label><select id="qrType" onchange="QuickReglement.refreshTargets()"><option value="client">تسديد من عميل</option><option value="fournisseur">تسديد لمورد</option></select></div>
+    <div class="field"><label>الاسم</label><select id="qrTarget" onchange="QuickReglement.showHint()"><option value="">-- اختر --</option></select></div>
+    <div style="font-size:11px; color:var(--muted); margin:-2px 0 6px;" id="qrBalanceHint"></div>
+    <div class="field"><label>مبلغ التسديد (د.ت)</label><input id="qrAmount" type="number" step="0.001"></div>
+    <div class="field"><label>نوع التسديد</label><select id="qrMethod"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option></select></div>
+  </div><div class="sheet-footer"><button class="btn save" onclick="QuickReglement.save()">💾 تسجيل التسديد</button></div></div>
+  <!-- Fournisseur sheet --><div class="sheet" id="sheet-fournisseurs"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات المورد</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
+    <div class="field"><label>رمز المورد</label><input id="fCode" readonly></div>
+    <div class="field"><label>اسم المورد</label><input id="fName"></div>
+    <div class="field"><label>الهاتف 1</label><input id="fPhone"></div>
+    <div class="field"><label>الهاتف 2</label><input id="fPhone2"></div>
+    <div class="field"><label>الهاتف 3</label><input id="fPhone3"></div>
+    <div class="field"><label>العنوان</label><input id="fAddress"></div>
+    <div class="field"><label>الرصيد (د.ت)</label><input id="fBalance" type="number" step="0.001" value="0"></div>
+    <div class="field"><label>ملاحظات</label><input id="fNotes"></div>
+  </div><div class="sheet-footer"><button class="btn save" onclick="Fournisseurs.save()">💾 حفظ</button><button class="btn edit" onclick="Fournisseurs.edit()">✏️ تعديل</button><button class="btn del" onclick="Fournisseurs.remove()">🗑 حذف</button></div></div>
+  <!-- Vente sheet --><div class="sheet" id="sheet-ventes"><div class="sheet-handle"></div><div class="sheet-header"><h3>عملية بيع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
+    <div class="field-row"><div class="field"><label>رقم المبيعات</label><input id="vNum" readonly></div><div class="field"><label>التاريخ</label><input id="vDate" type="date"></div></div>
+    <div class="field"><label>العميل</label><select id="vClient" onchange="Ventes.fillClient()"><option value="">-- اختر --</option></select></div>
+    <div class="field"><label>هاتف العميل</label><input id="vPhone" readonly></div>
+    <div class="field"><label>طريقة الدفع</label><select id="vPayment"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option><option selected>آجل</option></select></div>
+    <div class="section-title">إضافة صنف</div>
+    <div class="field"><label>الصنف</label><select id="viArticle" onchange="Ventes.fillArticle()"><option value="">-- اختر --</option></select></div>
+    <div id="viStockHint" style="font-size:10px; color:var(--muted); margin:-2px 0 4px;"></div>
+    <div class="field"><label>أو اسم يدوي</label><input id="viManualName" placeholder="صنف غير موجود"></div>
+    <div class="field-row"><div class="field"><label>السعر (د.ت)</label><input id="viPrice" type="number" step="0.001" oninput="Ventes.calcLine()"></div><div class="field"><label>الكمية</label><input id="viQty" type="number" min="1" value="1" oninput="Ventes.calcLine()"></div></div>
+    <div class="field"><label>الإجمالي (د.ت)</label><input id="viTotal" readonly></div>
+    <button class="btn outline small" onclick="Ventes.addLine()">+ إضافة للجدول</button>
+    <table class="items-mini"><thead><tr><th>الصنف</th><th>سعر</th><th>كمية</th><th>مجموع</th><th></th></tr></thead><tbody id="vLinesBody"></tbody></table>
+    <div class="totals-mini" style="justify-content:flex-end;"><span>المجموع: </span><span id="vGrand">0.000</span> د.ت</div>
+    <div class="section-title">تسديد</div>
+    <div class="field"><label>مبلغ التسديد (د.ت)</label><input id="vrAmount" type="number" step="0.001"></div>
+    <div class="field"><label>نوع التسديد</label><select id="vrMethod"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option></select></div>
+    <button class="btn outline small" onclick="Ventes.addReglement()">+ تسجيل تسديد</button>
+    <table class="items-mini"><thead><tr><th>التاريخ</th><th>الطريقة</th><th>المبلغ (د.ت)</th><th></th></tr></thead><tbody id="vrBody"></tbody></table>
+    <div class="section-title">وضعية الحساب</div>
+    <div id="vAccountSummary"></div>
+    <button class="btn" style="background:linear-gradient(180deg,#3ddc84,#25d366);" onclick="Ventes.shareWhatsapp()">📱 واتساب</button>
+    <button class="btn outline small" onclick="Ventes.printInvoice()">🖨️ طباعة</button>
+  </div><div class="sheet-footer"><button class="btn save" onclick="Ventes.save()">💾 حفظ</button><button class="btn edit" onclick="Ventes.edit()">✏️ تعديل</button><button class="btn del" onclick="Ventes.remove()">🗑 حذف</button></div></div>
+  <!-- Achat sheet --><div class="sheet" id="sheet-achats"><div class="sheet-handle"></div><div class="sheet-header"><h3>عملية شراء</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
+    <div class="field-row"><div class="field"><label>رقم المشتريات</label><input id="pNum" readonly></div><div class="field"><label>التاريخ</label><input id="pDate" type="date"></div></div>
+    <div class="field"><label>المورد</label><select id="pSupplier" onchange="Achats.fillSupplier()"><option value="">-- اختر --</option></select></div>
+    <div class="field-row"><div class="field"><label>هاتف المورد</label><input id="pPhone" readonly></div><div class="field"><label>عنوان المورد</label><input id="pAddress" readonly></div></div>
+    <div class="field"><label>طريقة الدفع</label><select id="pPayment"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option><option selected>آجل</option></select></div>
+    <div class="section-title">إضافة صنف</div>
+    <div class="field"><label>الصنف</label><select id="piArticle" onchange="Achats.fillArticle()"><option value="">-- اختر --</option></select></div>
+    <div id="piStockHint" style="font-size:10px; color:var(--muted); margin:-2px 0 4px;"></div>
+    <div class="field"><label>أو اسم يدوي</label><input id="piManualName" placeholder="صنف غير موجود"></div>
+    <div class="field-row"><div class="field"><label>السعر (د.ت)</label><input id="piPrice" type="number" step="0.001" oninput="Achats.calcLine()"></div><div class="field"><label>الكمية</label><input id="piQty" type="number" min="1" value="1" oninput="Achats.calcLine()"></div></div>
+    <div class="field"><label>الإجمالي (د.ت)</label><input id="piTotal" readonly></div>
+    <button class="btn outline small" onclick="Achats.addLine()">+ إضافة للجدول</button>
+    <table class="items-mini"><thead><tr><th>الصنف</th><th>سعر</th><th>كمية</th><th>مجموع</th><th></th></tr></thead><tbody id="pLinesBody"></tbody></table>
+    <div class="totals-mini" style="justify-content:flex-end;"><span>المجموع: </span><span id="pGrand">0.000</span> د.ت</div>
+    <div class="section-title">تسديد</div>
+    <div class="field"><label>مبلغ التسديد (د.ت)</label><input id="arAmount" type="number" step="0.001"></div>
+    <div class="field"><label>نوع التسديد</label><select id="arMethod"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option></select></div>
+    <button class="btn outline small" onclick="Achats.addReglement()">+ تسجيل تسديد</button>
+    <table class="items-mini"><thead><tr><th>التاريخ</th><th>الطريقة</th><th>المبلغ (د.ت)</th><th></th></tr></thead><tbody id="arBody"></tbody></table>
+    <div class="section-title">وضعية الحساب</div>
+    <div id="pAccountSummary"></div>
+    <button class="btn" style="background:linear-gradient(180deg,#3ddc84,#25d366);" onclick="Achats.shareWhatsapp()">📱 واتساب</button>
+    <button class="btn outline small" onclick="Achats.printInvoice()">🖨️ طباعة</button>
+  </div><div class="sheet-footer"><button class="btn save" onclick="Achats.save()">💾 حفظ</button><button class="btn edit" onclick="Achats.edit()">✏️ تعديل</button><button class="btn del" onclick="Achats.remove()">🗑 حذف</button></div></div>
+  <!-- Company sheet --><div class="sheet" id="sheet-company"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات المؤسسة</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
+    <div class="field"><label>اسم المؤسسة</label><input id="cpyName"></div>
+    <div class="field"><label>الشعار</label><div style="display:flex;gap:6px;align-items:center;"><img id="cpyLogoPreview" style="width:36px;height:36px;border-radius:6px;display:none;background:#eee;"><input type="file" id="cpyLogoInput" accept="image/*" style="display:none;" onchange="CompanyInfo.handleLogoUpload(this)"><button class="btn outline small" style="margin:0;" onclick="document.getElementById('cpyLogoInput').click()">اختر صورة</button><button class="btn del small" style="margin:0;flex:none;padding:2px 10px;" onclick="CompanyInfo.removeLogo()">✕</button></div></div>
+    <div class="field"><label>العنوان</label><input id="cpyAddress"></div>
+    <div class="field"><label>الهاتف</label><input id="cpyPhone1"></div>
+    <div class="field"><label>الرقم الجبائي</label><input id="cpyTaxId"></div>
+    <button class="btn save" onclick="CompanyInfo.save()">💾 حفظ</button>
+    <div class="section-title">حجم النص</div>
+    <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;"><button class="btn outline small" style="margin:0;flex:1;" onclick="UiScale.set(0.85)">صغير</button><button class="btn outline small" style="margin:0;flex:1;" onclick="UiScale.set(1)">عادي</button><button class="btn outline small" style="margin:0;flex:1;" onclick="UiScale.set(1.15)">كبير</button><button class="btn outline small" style="margin:0;flex:1;" onclick="UiScale.set(1.3)">أكبر</button></div>
+    <div class="section-title">النسخ الاحتياطي</div>
+    <button class="btn outline small" onclick="exportBackup()">⬇️ تصدير</button>
+    <button class="btn outline small" onclick="exportBackupToDrive()">☁️ Google Drive</button>
+    <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importBackupFile(this)"><button class="btn outline small" onclick="document.getElementById('importFileInput').click()">⬆️ استيراد</button>
+    <div style="font-size:10px;color:var(--muted);margin-top:6px;">💡 لتثبيت التطبيق: ⋮ في المتصفح ← إضافة إلى الشاشة الرئيسية</div>
+    <div class="section-title">الحساب</div>
+    <div id="accountEmailDisplay" style="font-size:12px;color:var(--muted);margin-bottom:4px;"></div>
+    <button class="btn del" onclick="doLogout()">🚪 تسجيل الخروج</button>
+  </div></div>
   <div class="toast" id="toast"></div>
 </div>
 <!-- Print overlay -->
@@ -688,18 +603,205 @@ const Achats = {
   render() { const q = $('pSearch').value.trim().toLowerCase(); const list = $('achatsList'); list.innerHTML = ''; const filtered = achats.filter(p => !q || p.num.toLowerCase().includes(q) || p.supplier.toLowerCase().includes(q)).reverse(); if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا توجد عمليات شراء</div>'; return; } filtered.forEach(p => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => Achats.load(p.id); d.innerHTML = `<div class="main-info"><div class="name">${p.num}</div><div class="meta">${p.supplier} - ${p.date}</div></div><div class="amount">${p.total.toFixed(3)} د.ت</div>`; list.appendChild(d); }); }
 };
 
-// ===== CAISSE =====
+// ===== CAISSE (FIXED) =====
 const Caisse = {
   editingId: null,
   reset() { this.editingId = null; $('ksDate').value = new Date().toISOString().slice(0, 10); $('ksType').value = 'in'; $('ksAmount').value = ''; $('ksDesc').value = ''; },
-  save() { const amount = parseFloat($('ksAmount').value) || 0; if (amount <= 0) { showToast('أدخل مبلغا صحيحا'); return; } const rec = { id: this.editingId || nextId.caisse++, date: $('ksDate').value, type: $('ksType').value, amount, description: $('ksDesc').value || '-', source: 'manual' }; if (this.editingId) { const idx = caisse.findIndex(k => k.id === this.editingId); if (idx !== -1) { rec.source = caisse[idx].source; rec.sourceId = caisse[idx].sourceId; caisse[idx] = rec; } } else caisse.push(rec); saveState(); this.render(); closeSheet(); showToast('تم الحفظ'); },
-  edit() { if (this.editingId == null) { showToast('اختر حركة لتعديلها'); return; } this.save(); },
-  remove() { if (this.editingId == null) { showToast('اختر حركة لحذفها'); return; } caisse = caisse.filter(x => x.id !== this.editingId); saveState(); this.render(); closeSheet(); showToast('تم الحذف'); },
-  load(id) { const k = caisse.find(x => x.id === id); if (!k) return; this.editingId = id; $('ksDate').value = k.date; $('ksType').value = k.type; $('ksAmount').value = k.amount; $('ksDesc').value = k.description; openSheet('caisse'); },
-  addAuto(type, amount, date, desc, source, sourceId) { const existing = caisse.find(k => k.source === source && k.sourceId === sourceId); if (existing) { existing.type = type; existing.amount = amount; existing.date = date; existing.description = desc; } else caisse.push({ id: nextId.caisse++, date, type, amount, description: desc, source, sourceId }); saveState(); },
-  removeAuto(source, sourceId) { caisse = caisse.filter(k => !(k.source === source && k.sourceId === sourceId)); saveState(); },
-  removeAllForInvoice(reglementSource, invoiceId) { const prefix = reglementSource + '-' + invoiceId + '-'; caisse = caisse.filter(k => { if (k.source !== reglementSource) return true; if (k.sourceId && k.sourceId.startsWith(prefix)) return false; return true; }); saveState(); },
-  render() { const balance = caisse.reduce((a, k) => a + (k.type === 'in' ? k.amount : -k.amount), 0); const bal = $('caisseBalance'); if (bal) bal.textContent = balance.toFixed(3) + ' د.ت'; const list = $('caisseList'); if (!list) return; list.innerHTML = ''; const sorted = caisse.slice().sort((a, b) => (a.date < b.date ? 1 : -1)); if (!sorted.length) { list.innerHTML = '<div class="empty-msg">لا توجد حركات</div>'; return; } sorted.forEach(k => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => Caisse.load(k.id); const sign = k.type === 'in' ? '+' : '-'; const color = k.type === 'in' ? 'var(--success)' : 'var(--danger)'; d.innerHTML = `<div class="main-info"><div class="name">${k.description}</div><div class="meta">${k.date}</div></div><div class="amount" style="color:${color};">${sign}${k.amount.toFixed(3)} د.ت</div>`; list.appendChild(d); }); }
+  save() {
+    const amount = parseFloat($('ksAmount').value) || 0;
+    if (amount <= 0) { showToast('أدخل مبلغا صحيحا'); return; }
+    const date = $('ksDate').value;
+    const type = $('ksType').value;
+    const desc = $('ksDesc').value || '-';
+    
+    // إذا كان تعديلاً
+    if (this.editingId) {
+      const oldEntry = caisse.find(k => k.id === this.editingId);
+      if (!oldEntry) { showToast('الحركة غير موجودة'); return; }
+      const oldAmount = oldEntry.amount;
+      const delta = type === oldEntry.type ? amount - oldAmount : (type === 'in' ? amount + oldAmount : -(amount + oldAmount));
+      
+      // تحديث الكيان المرتبط
+      this._updateLinkedEntity(oldEntry.source, oldEntry.sourceId, delta, oldEntry);
+      
+      // تحديث الحركة نفسها
+      const idx = caisse.findIndex(k => k.id === this.editingId);
+      if (idx !== -1) {
+        caisse[idx] = { ...oldEntry, date, type, amount, description: desc };
+      }
+      showToast('تم التعديل');
+    } else {
+      // إضافة جديدة (يدوية)
+      const rec = { id: nextId.caisse++, date, type, amount, description: desc, source: 'manual' };
+      caisse.push(rec);
+      showToast('تم الحفظ');
+    }
+    saveState();
+    this.render();
+    closeSheet();
+  },
+  remove() {
+    if (this.editingId == null) { showToast('اختر حركة لحذفها'); return; }
+    const entry = caisse.find(k => k.id === this.editingId);
+    if (!entry) { showToast('الحركة غير موجودة'); return; }
+    
+    // عكس تأثير الحركة على الكيان المرتبط (إذا كان مرتبطاً)
+    if (entry.source && entry.source !== 'manual') {
+      const delta = entry.type === 'in' ? -entry.amount : entry.amount; // عكس الإشارة
+      this._updateLinkedEntity(entry.source, entry.sourceId, delta, entry);
+    }
+    
+    caisse = caisse.filter(k => k.id !== this.editingId);
+    saveState();
+    this.render();
+    closeSheet();
+    showToast('تم الحذف');
+  },
+  
+  // دوال مساعدة لتحديث العملاء/الموردين
+  _updateLinkedEntity(source, sourceId, delta, entry) {
+    if (source === 'reglement_vente') {
+      // استخراج رقم الفاتورة من sourceId: vente-{id}-{regId}
+      const parts = sourceId.split('-');
+      if (parts.length >= 3) {
+        const venteId = parseInt(parts[1]);
+        const vente = ventes.find(v => v.id === venteId);
+        if (vente) {
+          const client = clients.find(c => c.name === vente.client);
+          if (client) {
+            client.balance += delta;
+            // تحديث التسديد في سجل العميل
+            const regId = parseInt(parts[2]);
+            const regEntry = client.reglements?.find(r => r.id === regId);
+            if (regEntry && entry) {
+              regEntry.amount = entry.amount;
+              regEntry.date = entry.date;
+              regEntry.method = entry.method || regEntry.method;
+            }
+          }
+        }
+      }
+    } else if (source === 'reglement_achat') {
+      const parts = sourceId.split('-');
+      if (parts.length >= 3) {
+        const achatId = parseInt(parts[1]);
+        const achat = achats.find(a => a.id === achatId);
+        if (achat) {
+          const supplier = fournisseurs.find(f => f.name === achat.supplier);
+          if (supplier) {
+            supplier.balance += delta;
+            const regId = parseInt(parts[2]);
+            const regEntry = supplier.reglements?.find(r => r.id === regId);
+            if (regEntry && entry) {
+              regEntry.amount = entry.amount;
+              regEntry.date = entry.date;
+              regEntry.method = entry.method || regEntry.method;
+            }
+          }
+        }
+      }
+    } else if (source === 'reglement_client') {
+      // sourceId قد يكون quick-{timestamp} أو يحتوي على id العميل
+      // نبحث عن العميل باستخدام الوصف
+      const desc = entry.description || '';
+      const match = desc.match(/تسديد من (.+?) \(/);
+      if (match) {
+        const clientName = match[1];
+        const client = clients.find(c => c.name === clientName);
+        if (client) {
+          client.balance += delta;
+          // تحديث آخر تسديد في سجل العميل
+          const regs = client.reglements || [];
+          if (regs.length > 0) {
+            const last = regs[regs.length - 1];
+            if (last && entry) {
+              last.amount = entry.amount;
+              last.date = entry.date;
+              last.method = entry.method || last.method;
+            }
+          }
+        }
+      }
+    } else if (source === 'reglement_fournisseur') {
+      const desc = entry.description || '';
+      const match = desc.match(/تسديد لـ (.+?) \(/);
+      if (match) {
+        const supplierName = match[1];
+        const supplier = fournisseurs.find(f => f.name === supplierName);
+        if (supplier) {
+          supplier.balance += delta;
+          const regs = supplier.reglements || [];
+          if (regs.length > 0) {
+            const last = regs[regs.length - 1];
+            if (last && entry) {
+              last.amount = entry.amount;
+              last.date = entry.date;
+              last.method = entry.method || last.method;
+            }
+          }
+        }
+      }
+    }
+    // تحديث الـ UI
+    Clients.render();
+    Fournisseurs.render();
+    Reglements.render();
+  },
+  
+  load(id) {
+    const k = caisse.find(x => x.id === id);
+    if (!k) { showToast('الحركة غير موجودة'); return; }
+    this.editingId = id;
+    $('ksDate').value = k.date;
+    $('ksType').value = k.type;
+    $('ksAmount').value = k.amount;
+    $('ksDesc').value = k.description;
+    openSheet('caisse');
+  },
+  addAuto(type, amount, date, desc, source, sourceId) {
+    const existing = caisse.find(k => k.source === source && k.sourceId === sourceId);
+    if (existing) {
+      existing.type = type;
+      existing.amount = amount;
+      existing.date = date;
+      existing.description = desc;
+    } else {
+      caisse.push({ id: nextId.caisse++, date, type, amount, description: desc, source, sourceId });
+    }
+    saveState();
+  },
+  removeAuto(source, sourceId) {
+    caisse = caisse.filter(k => !(k.source === source && k.sourceId === sourceId));
+    saveState();
+  },
+  removeAllForInvoice(reglementSource, invoiceId) {
+    const prefix = reglementSource + '-' + invoiceId + '-';
+    caisse = caisse.filter(k => {
+      if (k.source !== reglementSource) return true;
+      if (k.sourceId && k.sourceId.startsWith(prefix)) return false;
+      return true;
+    });
+    saveState();
+  },
+  render() {
+    const balance = caisse.reduce((a, k) => a + (k.type === 'in' ? k.amount : -k.amount), 0);
+    const bal = $('caisseBalance');
+    if (bal) bal.textContent = balance.toFixed(3) + ' د.ت';
+    const list = $('caisseList');
+    if (!list) return;
+    list.innerHTML = '';
+    const sorted = caisse.slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+    if (!sorted.length) { list.innerHTML = '<div class="empty-msg">لا توجد حركات</div>'; return; }
+    sorted.forEach(k => {
+      const d = document.createElement('div');
+      d.className = 'row-card';
+      d.onclick = () => Caisse.load(k.id);
+      const sign = k.type === 'in' ? '+' : '-';
+      const color = k.type === 'in' ? 'var(--success)' : 'var(--danger)';
+      d.innerHTML = `<div class="main-info"><div class="name">${k.description}</div><div class="meta">${k.date}</div></div><div class="amount" style="color:${color};">${sign}${k.amount.toFixed(3)} د.ت</div>`;
+      list.appendChild(d);
+    });
+  }
 };
 
 // ===== EXPENSES =====
