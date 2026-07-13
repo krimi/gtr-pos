@@ -281,7 +281,7 @@
 <!-- Login overlay -->
 <div class="login-overlay show" id="loginOverlay">
   <div class="login-box">
-    <div class="login-logo">GTR POS <span style="font-size:14px; opacity:.6; font-weight:400;">v0.1.2</span></div>
+    <div class="login-logo">GTR POS <span style="font-size:14px; opacity:.6; font-weight:400;">v0.1.3</span></div>
     <div class="login-sub" id="loginModeLabel">تسجيل الدخول لحسابك</div>
     <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="email">
     <input type="password" id="loginPassword" placeholder="كلمة السر" autocomplete="current-password">
@@ -315,7 +315,7 @@
   <div class="appbar">
     <div>
       <div class="title" id="pageTitle">لوحة القيادة</div>
-      <div class="sub" id="pageSub" onclick="openSheet('company')" style="cursor:pointer;">GTR POS <span style="opacity:.7; font-weight:400;">v0.1.2</span></div>
+      <div class="sub" id="pageSub" onclick="openSheet('company')" style="cursor:pointer;">GTR POS <span style="opacity:.7; font-weight:400;">v0.1.3</span></div>
     </div>
     <div style="display:flex; gap:8px;">
       <button class="menu-btn" onclick="openSheet('company')" title="الإعدادات">⚙️</button>
@@ -1047,8 +1047,6 @@ function saveState(){
       .catch(e=>{ console.error('Firestore save error', e); });
   }
 }
-// Kept as a safety net: flushes immediately if a save is ever pending (no-op now that
-// saveState() writes right away, but harmless to keep for the exit-event listeners below).
 function flushStateNow(){
   if(!currentUser) return;
   const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo };
@@ -1091,11 +1089,6 @@ function loadStateFromFirestore(uid){
       nextId = data.nextId || {clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1, expenses:1, stockMovements:1, reglements:1};
       companyInfo = data.companyInfo || {name:'GTR POS', address:'', phone1:'', taxId:'', logo:''};
     } else {
-      // No Firestore doc found. This could genuinely be a brand-new account,
-      // OR it could mean a previous save never reached Firestore (network issue,
-      // closed app too fast, etc.) while data already exists safely in this
-      // browser's localStorage. To avoid ever erasing real data, we check
-      // localStorage FIRST and only start empty if it's truly empty too.
       const hadLocalData = loadState();
       if(!hadLocalData){
         clients = []; articles = []; fournisseurs = []; ventes = []; achats = []; caisse = []; expenses = []; stockMovements = [];
@@ -1149,8 +1142,6 @@ function exportBackupToDrive(){
     }).catch(e=>{ console.error(e); showToast('حدث خطأ أثناء الرفع لـ Google Drive'); });
   };
 
-  // Safe flow: link Google to the CURRENT account (keeps same uid/session).
-  // If already linked, fall back to reauthenticating with it instead.
   currentUser.linkWithPopup(provider).then(result=>{
     const credential = firebase.auth.GoogleAuthProvider.credentialFromResult(result);
     uploadWithToken(credential.accessToken);
@@ -1178,8 +1169,8 @@ function importBackupFile(input){
       if(data.ventes) ventes = data.ventes;
       if(data.achats) achats = data.achats;
       if(data.caisse) caisse = data.caisse;
-    if(data.expenses) expenses = data.expenses;
-    if(data.stockMovements) stockMovements = data.stockMovements;
+      if(data.expenses) expenses = data.expenses;
+      if(data.stockMovements) stockMovements = data.stockMovements;
       if(data.nextId) nextId = data.nextId;
       if(data.companyInfo) companyInfo = data.companyInfo;
       saveState();
@@ -1523,7 +1514,6 @@ const Articles = {
       const old = articles.find(a=>a.id===this.editingId);
       const currentStock = getStock(old.name);
       if(old.name !== rec.name){
-        // renamed: retag existing movements to the new name so history stays linked
         stockMovements.forEach(m=>{ if(m.articleName===old.name) m.articleName=rec.name; });
       }
       const diff = enteredStock - currentStock;
@@ -1673,7 +1663,7 @@ const Fournisseurs = {
 
 // ===================== VENTES =====================
 const Ventes = {
-  editingId:null, lines:[],
+  editingId:null, lines:[], editingReglementId:null,
   fillClient(){ const c=clients.find(x=>x.id==$('vClient').value); $('vPhone').value=c?c.phone:''; },
   fillArticle(){
     const a=articles.find(x=>x.id==$('viArticle').value);
@@ -1719,7 +1709,7 @@ const Ventes = {
     $('vGrand').textContent=sum.toFixed(3);
   },
   reset(){
-    this.editingId=null; this.lines=[];
+    this.editingId=null; this.lines=[]; this.editingReglementId=null;
     $('vNum').value='VTE-'+String(nextId.ventes).padStart(4,'0');
     $('vDate').value=new Date().toISOString().slice(0,10);
     $('vClient').value=''; $('vPhone').value='';
@@ -1758,13 +1748,15 @@ const Ventes = {
       Articles.render(); refreshArticleSelects();
       ventes.push(rec); nextId.ventes++; showToast('تم حفظ المبيعات');
       if(rec.payment==='نقدا'){
-        rec.reglements.push({date:rec.date, amount:rec.total});
+        const reglementId = nextId.reglements++;
+        rec.reglements.push({id:reglementId, date:rec.date, amount:rec.total, method:'نقدا'});
         if(client){
           client.balance -= rec.total;
           client.reglements = client.reglements || [];
-          client.reglements.push({date:rec.date, amount:rec.total});
+          client.reglements.push({id:reglementId, date:rec.date, amount:rec.total, method:'نقدا'});
         }
-        caisse.push({id:nextId.caisse++, date:rec.date, type:'in', amount:rec.total, description:'بيع نقدي '+rec.num, source:'reglement_vente', sourceId:rec.id+'-'+rec.reglements.length});
+        const sourceId = 'vente-'+rec.id+'-'+reglementId;
+        caisse.push({id:nextId.caisse++, date:rec.date, type:'in', amount:rec.total, description:'بيع نقدي '+rec.num, source:'reglement_vente', sourceId});
       }
     }
     Clients.render();
@@ -1777,7 +1769,6 @@ const Ventes = {
     if(this.editingId==null){ showToast('اختر عملية بيع لتعديلها'); return; }
     this.save();
   },
-  editingReglementId: null,
   addReglement(){
     if(this.editingId==null){ showToast('احفظ الفاتورة أولا قبل تسجيل تسديد'); return; }
     const amount=parseFloat($('vrAmount').value)||0;
@@ -1797,7 +1788,8 @@ const Ventes = {
           const centry = (client.reglements||[]).find(r=>r.id===this.editingReglementId);
           if(centry){ centry.amount=amount; centry.method=method; centry.date=date; }
         }
-        Caisse.addAuto('in', amount, date, 'تسديد فاتورة '+rec.num+' ('+method+')', 'reglement_vente', 'regl-'+this.editingReglementId);
+        const sourceId = 'vente-'+rec.id+'-'+this.editingReglementId;
+        Caisse.addAuto('in', amount, date, 'تسديد فاتورة '+rec.num+' ('+method+')', 'reglement_vente', sourceId);
         showToast('تم تحديث التسديد');
       }
       this.editingReglementId = null;
@@ -1809,7 +1801,8 @@ const Ventes = {
         client.reglements = client.reglements || [];
         client.reglements.push({id:reglementId, date, amount, method});
       }
-      caisse.push({id:nextId.caisse++, date, type:'in', amount, description:'تسديد فاتورة '+rec.num+' ('+method+')', source:'reglement_vente', sourceId:'regl-'+reglementId});
+      const sourceId = 'vente-'+rec.id+'-'+reglementId;
+      caisse.push({id:nextId.caisse++, date, type:'in', amount, description:'تسديد فاتورة '+rec.num+' ('+method+')', source:'reglement_vente', sourceId});
       showToast('تم تسجيل التسديد');
     }
     $('vrAmount').value='';
@@ -1839,7 +1832,8 @@ const Ventes = {
       client.balance += amount;
       client.reglements = (client.reglements||[]).filter(r=>r.id!==reglementId);
     }
-    Caisse.removeAuto('reglement_vente', 'regl-'+reglementId);
+    const sourceId = 'vente-'+rec.id+'-'+reglementId;
+    Caisse.removeAuto('reglement_vente', sourceId);
     if(this.editingReglementId===reglementId){ this.editingReglementId=null; $('vrAmount').value=''; }
     this.renderReglementsSheet(rec.reglements);
     this.renderAccountSummary(rec);
@@ -1932,7 +1926,8 @@ const Ventes = {
     this.fillClient();
     $('vPayment').value=r.payment;
     this.lines=[...r.lines]; this.renderLines(); this.refreshArticleOptions();
-    $('vrAmount').value=''; this.renderReglementsSheet(r.reglements);
+    $('vrAmount').value=''; this.editingReglementId=null;
+    this.renderReglementsSheet(r.reglements);
     this.renderAccountSummary(r);
     openSheet('ventes');
   },
@@ -1951,7 +1946,7 @@ const Ventes = {
 
 // ===================== ACHATS =====================
 const Achats = {
-  editingId:null, lines:[],
+  editingId:null, lines:[], editingReglementId:null,
   fillSupplier(){ const s=fournisseurs.find(x=>x.id==$('pSupplier').value); $('pPhone').value=s?s.phone:''; $('pAddress').value=s?s.address:''; },
   fillArticle(){
     const a=articles.find(x=>x.id==$('piArticle').value);
@@ -1993,7 +1988,7 @@ const Achats = {
     $('pGrand').textContent=sum.toFixed(3);
   },
   reset(){
-    this.editingId=null; this.lines=[];
+    this.editingId=null; this.lines=[]; this.editingReglementId=null;
     $('pNum').value='ACH-'+String(nextId.achats).padStart(4,'0');
     $('pDate').value=new Date().toISOString().slice(0,10);
     $('pSupplier').value=''; $('pPhone').value=''; $('pAddress').value='';
@@ -2032,13 +2027,15 @@ const Achats = {
       if(supplier) supplier.balance += rec.total;
       achats.push(rec); nextId.achats++; showToast('تم حفظ المشتريات');
       if(rec.payment==='نقدا'){
-        rec.reglements.push({date:rec.date, amount:rec.total});
+        const reglementId = nextId.reglements++;
+        rec.reglements.push({id:reglementId, date:rec.date, amount:rec.total, method:'نقدا'});
         if(supplier){
           supplier.balance -= rec.total;
           supplier.reglements = supplier.reglements || [];
-          supplier.reglements.push({date:rec.date, amount:rec.total});
+          supplier.reglements.push({id:reglementId, date:rec.date, amount:rec.total, method:'نقدا'});
         }
-        caisse.push({id:nextId.caisse++, date:rec.date, type:'out', amount:rec.total, description:'شراء نقدي '+rec.num, source:'reglement_achat', sourceId:rec.id+'-'+rec.reglements.length});
+        const sourceId = 'achat-'+rec.id+'-'+reglementId;
+        caisse.push({id:nextId.caisse++, date:rec.date, type:'out', amount:rec.total, description:'شراء نقدي '+rec.num, source:'reglement_achat', sourceId});
       }
     }
     Fournisseurs.render();
@@ -2051,7 +2048,6 @@ const Achats = {
     if(this.editingId==null){ showToast('اختر عملية شراء لتعديلها'); return; }
     this.save();
   },
-  editingReglementId: null,
   addReglement(){
     if(this.editingId==null){ showToast('احفظ الفاتورة أولا قبل تسجيل تسديد'); return; }
     const amount=parseFloat($('arAmount').value)||0;
@@ -2071,7 +2067,8 @@ const Achats = {
           const sentry = (supplier.reglements||[]).find(r=>r.id===this.editingReglementId);
           if(sentry){ sentry.amount=amount; sentry.method=method; sentry.date=date; }
         }
-        Caisse.addAuto('out', amount, date, 'تسديد فاتورة '+rec.num+' ('+method+')', 'reglement_achat', 'regl-'+this.editingReglementId);
+        const sourceId = 'achat-'+rec.id+'-'+this.editingReglementId;
+        Caisse.addAuto('out', amount, date, 'تسديد فاتورة '+rec.num+' ('+method+')', 'reglement_achat', sourceId);
         showToast('تم تحديث التسديد');
       }
       this.editingReglementId = null;
@@ -2083,7 +2080,8 @@ const Achats = {
         supplier.reglements = supplier.reglements || [];
         supplier.reglements.push({id:reglementId, date, amount, method});
       }
-      caisse.push({id:nextId.caisse++, date, type:'out', amount, description:'تسديد فاتورة '+rec.num+' ('+method+')', source:'reglement_achat', sourceId:'regl-'+reglementId});
+      const sourceId = 'achat-'+rec.id+'-'+reglementId;
+      caisse.push({id:nextId.caisse++, date, type:'out', amount, description:'تسديد فاتورة '+rec.num+' ('+method+')', source:'reglement_achat', sourceId});
       showToast('تم تسجيل التسديد');
     }
     $('arAmount').value='';
@@ -2113,7 +2111,8 @@ const Achats = {
       supplier.balance -= amount;
       supplier.reglements = (supplier.reglements||[]).filter(r=>r.id!==reglementId);
     }
-    Caisse.removeAuto('reglement_achat', 'regl-'+reglementId);
+    const sourceId = 'achat-'+rec.id+'-'+reglementId;
+    Caisse.removeAuto('reglement_achat', sourceId);
     if(this.editingReglementId===reglementId){ this.editingReglementId=null; $('arAmount').value=''; }
     this.renderReglementsSheet(rec.reglements);
     this.renderAccountSummary(rec);
@@ -2179,7 +2178,9 @@ const Achats = {
     const body=$('arBody'); body.innerHTML='';
     (reglements||[]).slice().reverse().forEach(r=>{
       const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${r.date}</td><td>${r.amount.toFixed(3)}</td>`;
+      tr.style.cursor='pointer';
+      tr.innerHTML=`<td>${r.date}</td><td>${r.method||''}</td><td>${r.amount.toFixed(3)}</td><td><button class="del-row" onclick="event.stopPropagation(); Achats.removeReglement(${r.id})">✕</button></td>`;
+      tr.onclick = ()=>Achats.loadReglementForEdit(r.id);
       body.appendChild(tr);
     });
   },
@@ -2204,7 +2205,8 @@ const Achats = {
     this.fillSupplier();
     $('pPayment').value=r.payment;
     this.lines=[...r.lines]; this.renderLines(); this.refreshArticleOptions();
-    $('arAmount').value=''; this.renderReglementsSheet(r.reglements);
+    $('arAmount').value=''; this.editingReglementId=null;
+    this.renderReglementsSheet(r.reglements);
     this.renderAccountSummary(r);
     openSheet('achats');
   },
@@ -2222,6 +2224,27 @@ const Achats = {
 };
 
 // ===================== RAPPORTS =====================
+const Rapports = {
+  render(){
+    $('kpiVentes').textContent = ventes.reduce((a,v)=>a+v.total,0).toFixed(3);
+    $('kpiAchats').textContent = achats.reduce((a,p)=>a+p.total,0).toFixed(3);
+    $('kpiClients').textContent = clients.length;
+    $('kpiFournisseurs').textContent = fournisseurs.length;
+    $('kpiNbVentes').textContent = ventes.length;
+    $('kpiNbAchats').textContent = achats.length;
+    $('kpiCaisseSolde').textContent = caisse.reduce((a,k)=>a+(k.type==='in'?k.amount:-k.amount),0).toFixed(3);
+    $('kpiSoldesClients').textContent = clients.reduce((a,c)=>a+c.balance,0).toFixed(3);
+    const list=$('lowStockList'); list.innerHTML='';
+    const low = articles.filter(a=>getStock(a.name)<10);
+    if(!low.length){ list.innerHTML='<div class="empty-msg">لا توجد أصناف بمخزون منخفض</div>'; return; }
+    low.forEach(a=>{
+      const d=document.createElement('div'); d.className='row-card';
+      d.innerHTML=`<div class="main-info"><div class="name">${a.name}</div><div class="meta">الكمية: ${getStock(a.name)}</div></div><span class="badge ${getStock(a.name)<5?'low':'ok2'}">${getStock(a.name)<5?'منخفض جدا':'منخفض'}</span>`;
+      list.appendChild(d);
+    });
+  }
+};
+
 // ===================== CAISSE =====================
 const Caisse = {
   editingId:null,
@@ -2274,7 +2297,11 @@ const Caisse = {
     caisse = caisse.filter(k=>!(k.source===source && k.sourceId===sourceId));
   },
   removeAllForInvoice(reglementSource, invoiceId){
-    caisse = caisse.filter(k=> String(k.sourceId).split('-')[0] !== String(invoiceId) || k.source!==reglementSource);
+    caisse = caisse.filter(k=>{
+      if(k.source !== reglementSource) return true;
+      if(k.sourceId && k.sourceId.startsWith(reglementSource+'-'+invoiceId+'-')) return false;
+      return true;
+    });
   },
   render(){
     const balance = caisse.reduce((a,k)=>a+(k.type==='in'?k.amount:-k.amount),0);
@@ -2360,8 +2387,114 @@ const Expenses = {
   }
 };
 
-// ===================== QUICK REGLEMENT (standalone, not tied to a specific invoice/card) =====================
-// ===================== APPROVALS (admin only) =====================
+// ===================== QUICK REGLEMENT =====================
+const QuickReglement = {
+  open(){
+    $('qrType').value = 'client';
+    $('qrAmount').value = '';
+    this.refreshTargets();
+    openSheet('quickreglement');
+  },
+  refreshTargets(){
+    const type = $('qrType').value;
+    const sel = $('qrTarget');
+    if(type==='client'){
+      sel.innerHTML = '<option value="">-- اختر --</option>' + clients.map(c=>`<option value="${c.id}">${c.name} (${c.balance.toFixed(3)} د.ت)</option>`).join('');
+    } else {
+      sel.innerHTML = '<option value="">-- اختر --</option>' + fournisseurs.map(f=>`<option value="${f.id}">${f.name} (${f.balance.toFixed(3)} د.ت)</option>`).join('');
+    }
+    $('qrBalanceHint').textContent = '';
+  },
+  showHint(){
+    const type = $('qrType').value;
+    const targetId = $('qrTarget').value;
+    if(!targetId){ $('qrBalanceHint').textContent=''; return; }
+    if(type==='client'){
+      const c = clients.find(x=>x.id==targetId);
+      $('qrBalanceHint').textContent = c ? ('الرصيد الحالي: '+c.balance.toFixed(3)+' د.ت') : '';
+    } else {
+      const f = fournisseurs.find(x=>x.id==targetId);
+      $('qrBalanceHint').textContent = f ? ('الرصيد الحالي: '+f.balance.toFixed(3)+' د.ت') : '';
+    }
+  },
+  save(){
+    const type = $('qrType').value;
+    const targetId = $('qrTarget').value;
+    const amount = parseFloat($('qrAmount').value)||0;
+    const method = $('qrMethod').options[$('qrMethod').selectedIndex].textContent;
+    if(!targetId){ showToast('اختر عميلا أو موردا'); return; }
+    if(amount<=0){ showToast('أدخل مبلغا صحيحا'); return; }
+    const date = new Date().toISOString().slice(0,10);
+    const sourceId = 'quick-'+Date.now();
+    if(type==='client'){
+      const c = clients.find(x=>x.id==targetId); if(!c) return;
+      c.balance -= amount;
+      c.reglements = c.reglements || [];
+      c.reglements.push({date, amount, method});
+      caisse.push({id:nextId.caisse++, date, type:'in', amount, description:'تسديد من '+c.name+' ('+method+')', source:'reglement_client', sourceId});
+      Clients.render();
+    } else {
+      const f = fournisseurs.find(x=>x.id==targetId); if(!f) return;
+      f.balance -= amount;
+      f.reglements = f.reglements || [];
+      f.reglements.push({date, amount, method});
+      caisse.push({id:nextId.caisse++, date, type:'out', amount, description:'تسديد لـ '+f.name+' ('+method+')', source:'reglement_fournisseur', sourceId});
+      Fournisseurs.render();
+    }
+    Caisse.render();
+    showToast('تم تسجيل التسديد بنجاح');
+    Reglements.render();
+    saveState();
+    closeSheet();
+  }
+};
+
+// ===================== REGLEMENTS =====================
+const Reglements = {
+  render(){
+    this.renderBalances();
+    const q=$('rgSearch').value.trim().toLowerCase();
+    let all = [];
+    clients.forEach(c=>{ (c.reglements||[]).forEach(r=>all.push({date:r.date, amount:r.amount, name:c.name, kind:'client'})); });
+    fournisseurs.forEach(f=>{ (f.reglements||[]).forEach(r=>all.push({date:r.date, amount:r.amount, name:f.name, kind:'fournisseur'})); });
+    const totalClients = all.filter(r=>r.kind==='client').reduce((a,r)=>a+r.amount,0);
+    const totalFournisseurs = all.filter(r=>r.kind==='fournisseur').reduce((a,r)=>a+r.amount,0);
+    $('reglTotalClients').textContent = totalClients.toFixed(3);
+    $('reglTotalFournisseurs').textContent = totalFournisseurs.toFixed(3);
+    all = all.filter(r=>!q||r.name.toLowerCase().includes(q)).sort((a,b)=>(a.date<b.date?1:-1));
+    const list=$('reglementsList'); list.innerHTML='';
+    if(!all.length){ list.innerHTML='<div class="empty-msg">لا توجد تسديدات بعد</div>'; return; }
+    all.forEach(r=>{
+      const d=document.createElement('div'); d.className='row-card';
+      const label = r.kind==='client' ? (currentLang==='ar'?'من ':'de ') : (currentLang==='ar'?'إلى ':'à ');
+      const color = r.kind==='client' ? 'var(--success)' : 'var(--danger)';
+      d.innerHTML=`<div class="main-info"><div class="name">${label}${r.name}</div><div class="meta">${r.date}</div></div><div class="amount" style="color:${color};">${r.amount.toFixed(3)} د.ت</div>`;
+      list.appendChild(d);
+    });
+  },
+  renderBalances(){
+    const cList = $('balancesClientsList'); cList.innerHTML='';
+    const withBalance = clients.filter(c=>Math.abs(c.balance)>0.0009);
+    if(!withBalance.length){ cList.innerHTML='<div class="empty-msg">لا توجد أرصدة معلقة</div>'; }
+    withBalance.slice().sort((a,b)=>b.balance-a.balance).forEach(c=>{
+      const d=document.createElement('div'); d.className='row-card'; d.onclick=()=>Clients.load(c.id);
+      const color = c.balance>0 ? 'var(--danger)' : 'var(--success)';
+      d.innerHTML=`<div class="main-info"><div class="name">${c.name}</div></div><div class="amount" style="color:${color};">${c.balance.toFixed(3)} د.ت</div>`;
+      cList.appendChild(d);
+    });
+    const fList = $('balancesFournisseursList'); fList.innerHTML='';
+    const fWithBalance = fournisseurs.filter(f=>Math.abs(f.balance)>0.0009);
+    if(!fWithBalance.length){ fList.innerHTML='<div class="empty-msg">لا توجد أرصدة معلقة</div>'; }
+    fWithBalance.slice().sort((a,b)=>b.balance-a.balance).forEach(f=>{
+      const d=document.createElement('div'); d.className='row-card'; d.onclick=()=>Fournisseurs.load(f.id);
+      const color = f.balance>0 ? 'var(--danger)' : 'var(--success)';
+      d.innerHTML=`<div class="main-info"><div class="name">${f.name}</div></div><div class="amount" style="color:${color};">${f.balance.toFixed(3)} د.ت</div>`;
+      fList.appendChild(d);
+    });
+  }
+};
+
+// ===================== APPROVALS =====================
 const Approvals = {
   render(){
     if(!currentUser || currentUser.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()){
@@ -2408,131 +2541,6 @@ const Approvals = {
   }
 };
 
-const QuickReglement = {
-  open(){
-    $('qrType').value = 'client';
-    $('qrAmount').value = '';
-    this.refreshTargets();
-    openSheet('quickreglement');
-  },
-  refreshTargets(){
-    const type = $('qrType').value;
-    const sel = $('qrTarget');
-    if(type==='client'){
-      sel.innerHTML = '<option value="">-- اختر --</option>' + clients.map(c=>`<option value="${c.id}">${c.name} (${c.balance.toFixed(3)} د.ت)</option>`).join('');
-    } else {
-      sel.innerHTML = '<option value="">-- اختر --</option>' + fournisseurs.map(f=>`<option value="${f.id}">${f.name} (${f.balance.toFixed(3)} د.ت)</option>`).join('');
-    }
-    $('qrBalanceHint').textContent = '';
-  },
-  showHint(){
-    const type = $('qrType').value;
-    const targetId = $('qrTarget').value;
-    if(!targetId){ $('qrBalanceHint').textContent=''; return; }
-    if(type==='client'){
-      const c = clients.find(x=>x.id==targetId);
-      $('qrBalanceHint').textContent = c ? ('الرصيد الحالي: '+c.balance.toFixed(3)+' د.ت') : '';
-    } else {
-      const f = fournisseurs.find(x=>x.id==targetId);
-      $('qrBalanceHint').textContent = f ? ('الرصيد الحالي: '+f.balance.toFixed(3)+' د.ت') : '';
-    }
-  },
-  save(){
-    const type = $('qrType').value;
-    const targetId = $('qrTarget').value;
-    const amount = parseFloat($('qrAmount').value)||0;
-    const method = $('qrMethod').options[$('qrMethod').selectedIndex].textContent;
-    if(!targetId){ showToast('اختر عميلا أو موردا'); return; }
-    if(amount<=0){ showToast('أدخل مبلغا صحيحا'); return; }
-    const date = new Date().toISOString().slice(0,10);
-    if(type==='client'){
-      const c = clients.find(x=>x.id==targetId); if(!c) return;
-      c.balance -= amount;
-      c.reglements = c.reglements || [];
-      c.reglements.push({date, amount, method});
-      caisse.push({id:nextId.caisse++, date, type:'in', amount, description:'تسديد من '+c.name+' ('+method+')', source:'reglement_client', sourceId:c.id+'-'+c.reglements.length});
-      Clients.render();
-    } else {
-      const f = fournisseurs.find(x=>x.id==targetId); if(!f) return;
-      f.balance -= amount;
-      f.reglements = f.reglements || [];
-      f.reglements.push({date, amount, method});
-      caisse.push({id:nextId.caisse++, date, type:'out', amount, description:'تسديد لـ '+f.name+' ('+method+')', source:'reglement_fournisseur', sourceId:f.id+'-'+f.reglements.length});
-      Fournisseurs.render();
-    }
-    Caisse.render();
-    showToast('تم تسجيل التسديد بنجاح');
-    Reglements.render();
-    saveState();
-    closeSheet();
-  }
-};
-
-const Reglements = {
-  render(){
-    this.renderBalances();
-    const q=$('rgSearch').value.trim().toLowerCase();
-    let all = [];
-    clients.forEach(c=>{ (c.reglements||[]).forEach(r=>all.push({date:r.date, amount:r.amount, name:c.name, kind:'client'})); });
-    fournisseurs.forEach(f=>{ (f.reglements||[]).forEach(r=>all.push({date:r.date, amount:r.amount, name:f.name, kind:'fournisseur'})); });
-    const totalClients = all.filter(r=>r.kind==='client').reduce((a,r)=>a+r.amount,0);
-    const totalFournisseurs = all.filter(r=>r.kind==='fournisseur').reduce((a,r)=>a+r.amount,0);
-    $('reglTotalClients').textContent = totalClients.toFixed(3);
-    $('reglTotalFournisseurs').textContent = totalFournisseurs.toFixed(3);
-    all = all.filter(r=>!q||r.name.toLowerCase().includes(q)).sort((a,b)=>(a.date<b.date?1:-1));
-    const list=$('reglementsList'); list.innerHTML='';
-    if(!all.length){ list.innerHTML='<div class="empty-msg">لا توجد تسديدات بعد</div>'; return; }
-    all.forEach(r=>{
-      const d=document.createElement('div'); d.className='row-card';
-      const label = r.kind==='client' ? (currentLang==='ar'?'من ':'de ') : (currentLang==='ar'?'إلى ':'à ');
-      const color = r.kind==='client' ? 'var(--success)' : 'var(--danger)';
-      d.innerHTML=`<div class="main-info"><div class="name">${label}${r.name}</div><div class="meta">${r.date}</div></div><div class="amount" style="color:${color};">${r.amount.toFixed(3)} د.ت</div>`;
-      list.appendChild(d);
-    });
-  },
-  renderBalances(){
-    const cList = $('balancesClientsList'); cList.innerHTML='';
-    const withBalance = clients.filter(c=>Math.abs(c.balance)>0.0009);
-    if(!withBalance.length){ cList.innerHTML='<div class="empty-msg">لا توجد أرصدة معلقة</div>'; }
-    withBalance.slice().sort((a,b)=>b.balance-a.balance).forEach(c=>{
-      const d=document.createElement('div'); d.className='row-card'; d.onclick=()=>Clients.load(c.id);
-      const color = c.balance>0 ? 'var(--danger)' : 'var(--success)';
-      d.innerHTML=`<div class="main-info"><div class="name">${c.name}</div></div><div class="amount" style="color:${color};">${c.balance.toFixed(3)} د.ت</div>`;
-      cList.appendChild(d);
-    });
-    const fList = $('balancesFournisseursList'); fList.innerHTML='';
-    const fWithBalance = fournisseurs.filter(f=>Math.abs(f.balance)>0.0009);
-    if(!fWithBalance.length){ fList.innerHTML='<div class="empty-msg">لا توجد أرصدة معلقة</div>'; }
-    fWithBalance.slice().sort((a,b)=>b.balance-a.balance).forEach(f=>{
-      const d=document.createElement('div'); d.className='row-card'; d.onclick=()=>Fournisseurs.load(f.id);
-      const color = f.balance>0 ? 'var(--danger)' : 'var(--success)';
-      d.innerHTML=`<div class="main-info"><div class="name">${f.name}</div></div><div class="amount" style="color:${color};">${f.balance.toFixed(3)} د.ت</div>`;
-      fList.appendChild(d);
-    });
-  }
-};
-
-const Rapports = {
-  render(){
-    $('kpiVentes').textContent = ventes.reduce((a,v)=>a+v.total,0).toFixed(3);
-    $('kpiAchats').textContent = achats.reduce((a,p)=>a+p.total,0).toFixed(3);
-    $('kpiClients').textContent = clients.length;
-    $('kpiFournisseurs').textContent = fournisseurs.length;
-    $('kpiNbVentes').textContent = ventes.length;
-    $('kpiNbAchats').textContent = achats.length;
-    $('kpiCaisseSolde').textContent = caisse.reduce((a,k)=>a+(k.type==='in'?k.amount:-k.amount),0).toFixed(3);
-    $('kpiSoldesClients').textContent = clients.reduce((a,c)=>a+c.balance,0).toFixed(3);
-    const list=$('lowStockList'); list.innerHTML='';
-    const low = articles.filter(a=>getStock(a.name)<10);
-    if(!low.length){ list.innerHTML='<div class="empty-msg">لا توجد أصناف بمخزون منخفض</div>'; return; }
-    low.forEach(a=>{
-      const d=document.createElement('div'); d.className='row-card';
-      d.innerHTML=`<div class="main-info"><div class="name">${a.name}</div><div class="meta">الكمية: ${getStock(a.name)}</div></div><span class="badge ${getStock(a.name)<5?'low':'ok2'}">${getStock(a.name)<5?'منخفض جدا':'منخفض'}</span>`;
-      list.appendChild(d);
-    });
-  }
-};
-
 // ===================== INIT =====================
 function initAll(){
   refreshClientSelect(); refreshSupplierSelect(); refreshArticleSelects();
@@ -2541,7 +2549,7 @@ function initAll(){
   Rapports.render();
   applyLanguage(currentLang);
 }
-// initAll() is now triggered by auth.onAuthStateChanged() once the user is signed in
+// initAll() is triggered by auth.onAuthStateChanged()
 </script>
 
 </body>
