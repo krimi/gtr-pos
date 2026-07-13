@@ -37,7 +37,6 @@
     justify-content:center;
     min-height:100vh;
   }
-  /* Phone frame */
   .phone{
     width:100%;
     max-width:420px;
@@ -53,8 +52,6 @@
   @media(min-width:440px){
     .phone{border-radius:36px; height:900px; margin:20px 0;}
   }
-
-  /* Top app bar */
   .appbar{
     background:var(--navy);
     color:#fff;
@@ -72,14 +69,10 @@
     appearance:none;-webkit-appearance:none;border:none;outline:none;cursor:pointer;
     color:#fff;padding:0;line-height:1;font-family:'Cairo',sans-serif;font-weight:800;flex-shrink:0;
   }
-
-  /* Content */
   .content{flex:1; overflow-y:auto; padding:14px 14px 90px; -webkit-overflow-scrolling:touch;}
   .section{display:none;}
   .section.active{display:block; animation:fadeIn .18s ease;}
   @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
-
-  /* KPI cards (dashboard) */
   .kpi-row{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;}
   .kpi-card{
     background:var(--panel); border:1px solid var(--border); border-radius:14px;
@@ -90,10 +83,7 @@
   .kpi-card.gold{border-top-color:var(--gold);}
   .kpi-card .val{font-size:19px; font-weight:800; color:var(--navy);}
   .kpi-card .lbl{font-size:10.5px; color:var(--muted); margin-top:3px; font-weight:700;}
-
   .section-title{font-size:14px; font-weight:800; color:var(--navy); margin:14px 0 8px;}
-
-  /* Card list items (mobile rows instead of wide tables) */
   .row-card{
     background:var(--panel); border:1px solid var(--border); border-radius:12px;
     padding:12px 14px; margin-bottom:9px; display:flex; justify-content:space-between; align-items:center;
@@ -110,13 +100,10 @@
   .badge.low{background:var(--danger);}
   .badge.ok2{background:var(--success);}
   .empty-msg{text-align:center; color:var(--muted); font-size:12.5px; padding:20px 0;}
-
   .search-box{
     width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:12px;
     font-family:'Cairo',sans-serif; font-size:13px; margin-bottom:10px; background:#fff;
   }
-
-  /* Form panel (slide-up sheet) */
   .sheet-overlay{
     position:absolute; inset:0; background:rgba(10,14,30,.5); display:none; z-index:20;
   }
@@ -136,7 +123,6 @@
   .sheet-header h3{margin:0; font-size:15px; color:var(--navy); font-weight:800;}
   .sheet-close{width:30px;height:30px;border-radius:50%;background:#f0f2f8;border:none;font-size:15px;cursor:pointer;}
   .sheet-body{padding:14px 18px; overflow-y:auto;}
-
   .field{margin-bottom:12px;}
   .field label{display:block; font-size:12px; font-weight:700; color:var(--text); margin-bottom:5px;}
   .field input, .field select{
@@ -146,13 +132,11 @@
   .field input:focus, .field select:focus{outline:none; border-color:var(--blue-accent); background:#fff;}
   .field input[readonly]{color:var(--muted);}
   .field-row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-
   table.items-mini{width:100%; border-collapse:collapse; font-size:12px; margin-bottom:8px;}
   table.items-mini th{background:var(--navy); color:#fff; padding:6px; font-weight:700; border-radius:4px 4px 0 0;}
   table.items-mini td{padding:6px; border-top:1px solid var(--border); text-align:center; background:#fafbfd;}
   .del-row{background:var(--danger); color:#fff; border:none; border-radius:5px; padding:3px 8px; font-size:11px; cursor:pointer;}
   .totals-mini{display:flex; justify-content:space-between; font-size:12.5px; font-weight:700; color:var(--navy); margin:6px 0 12px; padding:0 2px;}
-
   .btn{
     width:100%; padding:12px; border:none; border-radius:12px; font-family:'Cairo',sans-serif;
     font-size:14px; font-weight:700; color:#fff; cursor:pointer; margin-bottom:9px;
@@ -165,16 +149,12 @@
   .btn.outline{background:#fff; color:var(--navy); border:1.5px solid var(--navy); box-shadow:none;}
   .btn-row{display:flex; gap:8px;}
   .btn-row .btn{margin-bottom:0;}
-
-  /* FAB */
   .fab{
     position:absolute; bottom:78px; left:18px; width:54px; height:54px; border-radius:50%;
     background:linear-gradient(180deg,var(--blue-light),var(--blue-accent));
     color:#fff; font-size:26px; border:none; box-shadow:0 6px 18px rgba(59,91,219,.5);
     display:flex; align-items:center; justify-content:center; z-index:15; cursor:pointer;
   }
-
-  /* Bottom tab bar */
   .tabbar{
     position:absolute; bottom:0; left:0; right:0; background:#fff;
     border-top:1px solid var(--border); display:flex; overflow-x:auto;
@@ -186,7 +166,6 @@
   }
   .tab-item .ic{font-size:19px;}
   .tab-item.active{color:var(--blue-accent);}
-
   .toast{
     position:absolute; top:76px; left:50%; transform:translateX(-50%) translateY(-15px);
     background:var(--navy-dark); color:#fff; padding:10px 20px; border-radius:20px;
@@ -194,8 +173,6 @@
     max-width:88%; text-overflow:ellipsis; overflow:hidden;
   }
   .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
-
-  /* Print invoice modal */
   .print-overlay{
     position:fixed; inset:0; background:#525659; z-index:200; display:none;
     overflow-y:auto; padding:14px;
@@ -236,7 +213,6 @@
   .inv-summary td.label{text-align:right; width:40%;}
   .inv-summary tr.highlight td{background:#fbdcc9;}
   .inv-summary tr.total td.value{color:#c0392b; font-weight:800;}
-
   @media print{
     body *{visibility:hidden;}
     .print-overlay, .print-overlay *{visibility:visible;}
@@ -244,8 +220,6 @@
     .print-actions{display:none;}
     .invoice-doc{max-width:100%;}
   }
-
-  /* Login screen */
   .login-overlay{
     position:fixed; inset:0; background:linear-gradient(160deg,#3a4a63,#8a97a8);
     z-index:300; display:none; align-items:center; justify-content:center; padding:20px;
@@ -278,10 +252,9 @@
 </head>
 <body>
 
-<!-- Login overlay -->
 <div class="login-overlay show" id="loginOverlay">
   <div class="login-box">
-    <div class="login-logo">GTR POS <span style="font-size:14px; opacity:.6; font-weight:400;">v0.1.3</span></div>
+    <div class="login-logo">GTR POS <span style="font-size:14px; opacity:.6; font-weight:400;">v0.1.8</span></div>
     <div class="login-sub" id="loginModeLabel">تسجيل الدخول لحسابك</div>
     <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="email">
     <input type="password" id="loginPassword" placeholder="كلمة السر" autocomplete="current-password">
@@ -297,7 +270,6 @@
   </div>
 </div>
 
-<!-- Pending approval overlay -->
 <div class="login-overlay" id="pendingOverlay">
   <div class="login-box">
     <div class="login-logo">⏳ GTR POS</div>
@@ -315,7 +287,7 @@
   <div class="appbar">
     <div>
       <div class="title" id="pageTitle">لوحة القيادة</div>
-      <div class="sub" id="pageSub" onclick="openSheet('company')" style="cursor:pointer;">GTR POS <span style="opacity:.7; font-weight:400;">v0.1.3</span></div>
+      <div class="sub" id="pageSub" onclick="openSheet('company')" style="cursor:pointer;">GTR POS <span style="opacity:.7; font-weight:400;">v0.1.8</span></div>
     </div>
     <div style="display:flex; gap:8px;">
       <button class="menu-btn" onclick="openSheet('company')" title="الإعدادات">⚙️</button>
@@ -324,8 +296,6 @@
   </div>
 
   <div class="content">
-
-    <!-- DASHBOARD -->
     <div class="section active" id="sec-rapports">
       <div class="kpi-row">
         <div class="kpi-card ok"><div class="val" id="kpiVentes">0.000</div><div class="lbl" data-i18n="kpiVentes">مبيعات (د.ت)</div></div>
@@ -344,19 +314,16 @@
       <div id="lowStockList"></div>
     </div>
 
-    <!-- CLIENTS -->
     <div class="section" id="sec-clients">
       <input class="search-box" id="cSearch" data-i18n-ph="searchClients" placeholder="🔍 بحث بالاسم أو الهاتف..." oninput="Clients.render()">
       <div id="clientsList"></div>
     </div>
 
-    <!-- ARTICLES -->
     <div class="section" id="sec-articles">
       <input class="search-box" id="aSearch" data-i18n-ph="searchArticles" placeholder="🔍 بحث باسم الصنف..." oninput="Articles.render()">
       <div id="articlesList"></div>
     </div>
 
-    <!-- CAISSE -->
     <div class="section" id="sec-caisse">
       <div class="kpi-row" style="grid-template-columns:1fr;">
         <div class="kpi-card ok"><div class="val" id="caisseBalance">0.000 د.ت</div><div class="lbl" data-i18n="caisseBalanceLbl">الرصيد الحالي</div></div>
@@ -364,7 +331,6 @@
       <div id="caisseList"></div>
     </div>
 
-    <!-- EXPENSES -->
     <div class="section" id="sec-expenses">
       <button class="btn" style="background:linear-gradient(180deg,#e46b74,var(--danger));" onclick="Expenses.openNew()" data-i18n="addExpenseBtn">+ إضافة مصروف</button>
       <div class="kpi-row" style="grid-template-columns:1fr;">
@@ -373,7 +339,6 @@
       <div id="expensesList"></div>
     </div>
 
-    <!-- REGLEMENTS -->
     <div class="section" id="sec-reglements">
       <button class="btn" style="background:linear-gradient(180deg,#4dbf8c,var(--success));" onclick="QuickReglement.open()" data-i18n="quickReglementBtn">+ تسجيل تسديد سريع</button>
       <div class="kpi-row">
@@ -389,7 +354,6 @@
       <div id="reglementsList"></div>
     </div>
 
-    <!-- ADMIN: ACCOUNT APPROVALS -->
     <div class="section" id="sec-approvals">
       <div class="section-title" data-i18n="pendingApprovalsTitle">حسابات بانتظار الموافقة</div>
       <div id="pendingApprovalsList"></div>
@@ -397,19 +361,16 @@
       <div id="approvedAccountsList"></div>
     </div>
 
-    <!-- FOURNISSEURS -->
     <div class="section" id="sec-fournisseurs">
       <input class="search-box" id="fSearch" data-i18n-ph="searchFournisseurs" placeholder="🔍 بحث بالاسم أو الهاتف..." oninput="Fournisseurs.render()">
       <div id="fournisseursList"></div>
     </div>
 
-    <!-- VENTES -->
     <div class="section" id="sec-ventes">
       <input class="search-box" id="vSearch" data-i18n-ph="searchVentes" placeholder="🔍 بحث برقم المبيعات أو العميل..." oninput="Ventes.render()">
       <div id="ventesList"></div>
     </div>
 
-    <!-- ACHATS -->
     <div class="section" id="sec-achats">
       <input class="search-box" id="pSearch" data-i18n-ph="searchAchats" placeholder="🔍 بحث برقم المشتريات أو المورد..." oninput="Achats.render()">
       <div id="achatsList"></div>
@@ -432,10 +393,8 @@
     <div class="tab-item" data-section="approvals" id="tabApprovals" style="display:none;"><span class="ic">👤</span><span data-i18n="tabApprovals">الحسابات</span></div>
   </div>
 
-  <!-- ===== Sheets (forms) ===== -->
   <div class="sheet-overlay" id="overlay"></div>
 
-  <!-- Client sheet -->
   <div class="sheet" id="sheet-clients">
     <div class="sheet-handle"></div>
     <div class="sheet-header"><h3 data-i18n="clientSheetTitle">بيانات العميل</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
@@ -468,7 +427,6 @@
     </div>
   </div>
 
-  <!-- Article sheet -->
   <div class="sheet" id="sheet-articles">
     <div class="sheet-handle"></div>
     <div class="sheet-header"><h3 data-i18n="articleSheetTitle">بيانات الصنف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
@@ -486,7 +444,6 @@
     </div>
   </div>
 
-  <!-- Caisse sheet -->
   <div class="sheet" id="sheet-caisse">
     <div class="sheet-handle"></div>
     <div class="sheet-header"><h3 data-i18n="caisseSheetTitle">حركة الكاسة</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
@@ -502,7 +459,6 @@
     </div>
   </div>
 
-  <!-- Expense sheet -->
   <div class="sheet" id="sheet-expenses">
     <div class="sheet-handle"></div>
     <div class="sheet-header"><h3 data-i18n="expenseSheetTitle">مصروف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
@@ -526,7 +482,6 @@
     </div>
   </div>
 
-  <!-- Quick règlement sheet -->
   <div class="sheet" id="sheet-quickreglement">
     <div class="sheet-handle"></div>
     <div class="sheet-header"><h3 data-i18n="quickReglementTitle">تسجيل تسديد سريع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
@@ -547,7 +502,6 @@
     </div>
   </div>
 
-  <!-- Fournisseur sheet -->
   <div class="sheet" id="sheet-fournisseurs">
     <div class="sheet-handle"></div>
     <div class="sheet-header"><h3 data-i18n="fournisseurSheetTitle">بيانات المورد</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
@@ -573,7 +527,6 @@
     </div>
   </div>
 
-  <!-- Vente sheet -->
   <div class="sheet" id="sheet-ventes">
     <div class="sheet-handle"></div>
     <div class="sheet-header"><h3 data-i18n="venteSheetTitle">عملية بيع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
@@ -614,7 +567,6 @@
     </div>
   </div>
 
-  <!-- Achat sheet -->
   <div class="sheet" id="sheet-achats">
     <div class="sheet-handle"></div>
     <div class="sheet-header"><h3 data-i18n="achatSheetTitle">عملية شراء</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
@@ -660,7 +612,6 @@
 
   <div class="toast" id="toast"></div>
 
-  <!-- Company settings sheet -->
   <div class="sheet" id="sheet-company">
     <div class="sheet-handle"></div>
     <div class="sheet-header"><h3 data-i18n="companySheetTitle">بيانات المؤسسة</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
@@ -698,7 +649,6 @@
   </div>
 </div>
 
-<!-- Print invoice overlay -->
 <div class="print-overlay" id="printOverlay">
   <div class="print-actions">
     <button class="btn-close" onclick="closePrintOverlay()">✕ إغلاق</button>
@@ -787,7 +737,6 @@ auth.onAuthStateChanged(function(user){
     if(emailDisplay) emailDisplay.textContent = user.email || '';
 
     if(user.email && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()){
-      // Admin: always approved, show approvals tab
       $('loginOverlay').classList.remove('show');
       $('pendingOverlay').classList.remove('show');
       $('tabApprovals').style.display = '';
@@ -1035,7 +984,6 @@ let nextId = {clients:3, articles:5, fournisseurs:3, ventes:1, achats:1, caisse:
 
 // ===================== PERSISTENCE (Firestore + localStorage cache) =====================
 const STORAGE_KEY = 'gtrpos_data_v1';
-let saveTimer = null;
 function saveState(){
   try{
     const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo };
@@ -1074,35 +1022,42 @@ function loadState(){
     return true;
   }catch(e){ return false; }
 }
+
 function loadStateFromFirestore(uid){
-  return db.collection('users').doc(uid).get().then(doc=>{
-    if(doc.exists){
-      const data = doc.data();
-      clients = data.clients || [];
-      articles = data.articles || [];
-      fournisseurs = data.fournisseurs || [];
-      ventes = data.ventes || [];
-      achats = data.achats || [];
-      caisse = data.caisse || [];
-      expenses = data.expenses || [];
-      stockMovements = data.stockMovements || [];
-      nextId = data.nextId || {clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1, expenses:1, stockMovements:1, reglements:1};
-      companyInfo = data.companyInfo || {name:'GTR POS', address:'', phone1:'', taxId:'', logo:''};
-    } else {
-      const hadLocalData = loadState();
-      if(!hadLocalData){
-        clients = []; articles = []; fournisseurs = []; ventes = []; achats = []; caisse = []; expenses = []; stockMovements = [];
-        nextId = {clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1, expenses:1, stockMovements:1, reglements:1};
-        companyInfo = {name:'GTR POS', address:'', phone1:'', taxId:'', logo:''};
+  return new Promise((resolve, reject) => {
+    db.collection('users').doc(uid).get().then(doc=>{
+      if(doc.exists){
+        const data = doc.data();
+        clients = data.clients || [];
+        articles = data.articles || [];
+        fournisseurs = data.fournisseurs || [];
+        ventes = data.ventes || [];
+        achats = data.achats || [];
+        caisse = data.caisse || [];
+        expenses = data.expenses || [];
+        stockMovements = data.stockMovements || [];
+        nextId = data.nextId || {clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1, expenses:1, stockMovements:1, reglements:1};
+        companyInfo = data.companyInfo || {name:'GTR POS', address:'', phone1:'', taxId:'', logo:''};
+        saveState();
+        resolve();
+      } else {
+        const hasLocal = loadState();
+        if(!hasLocal){
+          // keep default data (already set)
+        }
+        const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo };
+        db.collection('users').doc(uid).set(data).catch(e=>console.error(e));
+        saveState();
+        resolve();
       }
-      const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo };
-      db.collection('users').doc(uid).set(data).catch(e=>console.error(e));
-    }
-  }).catch(e=>{
-    console.error('Firestore load error, falling back to local cache', e);
-    loadState();
+    }).catch(e=>{
+      console.error('Firestore load error, using local cache', e);
+      loadState();
+      resolve();
+    });
   });
 }
+
 function exportBackup(){
   const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo, exportedAt: new Date().toISOString() };
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
@@ -2251,7 +2206,9 @@ const Caisse = {
   reset(){
     this.editingId=null;
     $('ksDate').value=new Date().toISOString().slice(0,10);
-    $('ksType').value='in'; $('ksAmount').value=''; $('ksDesc').value='';
+    $('ksType').value='in';
+    $('ksAmount').value='';
+    $('ksDesc').value='';
   },
   save(){
     const amount=parseFloat($('ksAmount').value)||0;
@@ -2260,11 +2217,23 @@ const Caisse = {
       amount, description:$('ksDesc').value||'-', source:'manual'};
     if(this.editingId!=null){
       const idx=caisse.findIndex(k=>k.id===this.editingId);
-      rec.source = caisse[idx].source; rec.sourceId = caisse[idx].sourceId;
-      caisse[idx]=rec; showToast('تم التعديل');
-    } else { caisse.push(rec); nextId.caisse++; showToast('تم الحفظ'); }
+      if(idx!==-1){
+        rec.source = caisse[idx].source;
+        rec.sourceId = caisse[idx].sourceId;
+        caisse[idx]=rec;
+        showToast('تم التعديل');
+      } else {
+        showToast('الحركة غير موجودة');
+        return;
+      }
+    } else {
+      caisse.push(rec);
+      nextId.caisse++;
+      showToast('تم الحفظ');
+    }
     saveState();
-    this.render(); closeSheet();
+    this.render();
+    closeSheet();
   },
   edit(){
     if(this.editingId==null){ showToast('اختر حركة لتعديلها'); return; }
@@ -2273,44 +2242,69 @@ const Caisse = {
   remove(){
     if(this.editingId==null){ showToast('اختر حركة لحذفها'); return; }
     const k = caisse.find(x=>x.id===this.editingId);
-    if(k && k.source!=='manual'){ showToast('هذه الحركة مرتبطة بفاتورة، احذف الفاتورة نفسها'); return; }
+    if(k && k.source!=='manual'){
+      showToast('هذه الحركة مرتبطة بفاتورة، احذف الفاتورة نفسها');
+      return;
+    }
     caisse=caisse.filter(x=>x.id!==this.editingId);
     saveState();
-    showToast('تم الحذف'); this.render(); closeSheet();
+    showToast('تم الحذف');
+    this.render();
+    closeSheet();
   },
   load(id){
-    const k=caisse.find(x=>x.id===id); if(!k) return;
+    const k=caisse.find(x=>x.id===id);
+    if(!k){ showToast('الحركة غير موجودة'); return; }
     if(k.source && k.source!=='manual'){
       showToast('هذه الحركة مرتبطة بفاتورة، عدّل الفاتورة نفسها بدل هذه الحركة');
       return;
     }
-    this.editingId=id; $('ksDate').value=k.date; $('ksType').value=k.type;
-    $('ksAmount').value=k.amount; $('ksDesc').value=k.description;
+    this.editingId=id;
+    $('ksDate').value=k.date;
+    $('ksType').value=k.type;
+    $('ksAmount').value=k.amount;
+    $('ksDesc').value=k.description;
     openSheet('caisse');
   },
   addAuto(type, amount, date, description, source, sourceId){
     const existing = caisse.find(k=>k.source===source && k.sourceId===sourceId);
-    if(existing){ existing.type=type; existing.amount=amount; existing.date=date; existing.description=description; }
-    else { caisse.push({id:nextId.caisse++, date, type, amount, description, source, sourceId}); }
+    if(existing){
+      existing.type=type;
+      existing.amount=amount;
+      existing.date=date;
+      existing.description=description;
+    } else {
+      caisse.push({id:nextId.caisse++, date, type, amount, description, source, sourceId});
+    }
+    saveState();
   },
   removeAuto(source, sourceId){
     caisse = caisse.filter(k=>!(k.source===source && k.sourceId===sourceId));
+    saveState();
   },
   removeAllForInvoice(reglementSource, invoiceId){
+    const prefix = reglementSource+'-'+invoiceId+'-';
     caisse = caisse.filter(k=>{
       if(k.source !== reglementSource) return true;
-      if(k.sourceId && k.sourceId.startsWith(reglementSource+'-'+invoiceId+'-')) return false;
+      if(k.sourceId && k.sourceId.startsWith(prefix)) return false;
       return true;
     });
+    saveState();
   },
   render(){
     const balance = caisse.reduce((a,k)=>a+(k.type==='in'?k.amount:-k.amount),0);
     $('caisseBalance').textContent = balance.toFixed(3)+' د.ت';
-    const list=$('caisseList'); list.innerHTML='';
+    const list=$('caisseList');
+    list.innerHTML='';
     const sorted = caisse.slice().sort((a,b)=>(a.date<b.date?1:-1));
-    if(!sorted.length){ list.innerHTML='<div class="empty-msg">لا توجد حركات بعد</div>'; return; }
+    if(!sorted.length){
+      list.innerHTML='<div class="empty-msg">لا توجد حركات بعد</div>';
+      return;
+    }
     sorted.forEach(k=>{
-      const d=document.createElement('div'); d.className='row-card'; d.onclick=()=>Caisse.load(k.id);
+      const d=document.createElement('div');
+      d.className='row-card';
+      d.onclick=()=>Caisse.load(k.id);
       const sign = k.type==='in'?'+':'-';
       const color = k.type==='in'?'var(--success)':'var(--danger)';
       d.innerHTML=`<div class="main-info"><div class="name">${k.description}</div><div class="meta">${k.date}</div></div><div class="amount" style="color:${color};">${sign}${k.amount.toFixed(3)} د.ت</div>`;
@@ -2325,7 +2319,9 @@ const Expenses = {
   reset(){
     this.editingId=null;
     $('exDate').value=new Date().toISOString().slice(0,10);
-    $('exCategory').selectedIndex=0; $('exAmount').value=''; $('exDesc').value='';
+    $('exCategory').selectedIndex=0;
+    $('exAmount').value='';
+    $('exDesc').value='';
   },
   openNew(){
     this.reset();
@@ -2341,7 +2337,8 @@ const Expenses = {
       Caisse.addAuto('out', rec.amount, rec.date, 'مصروف: '+rec.category+(rec.description!=='-'?' - '+rec.description:''), 'expense', rec.id);
       showToast('تم التعديل');
     } else {
-      expenses.push(rec); nextId.expenses++;
+      expenses.push(rec);
+      nextId.expenses++;
       caisse.push({id:nextId.caisse++, date:rec.date, type:'out', amount:rec.amount, description:'مصروف: '+rec.category+(rec.description!=='-'?' - '+rec.description:''), source:'expense', sourceId:rec.id});
       showToast('تم الحفظ');
     }
@@ -2365,22 +2362,31 @@ const Expenses = {
     closeSheet();
   },
   load(id){
-    const e = expenses.find(x=>x.id===id); if(!e) return;
+    const e = expenses.find(x=>x.id===id);
+    if(!e) return;
     this.editingId=id;
     $('exDate').value=e.date;
     const opt = [...$('exCategory').options].find(o=>o.textContent===e.category);
-    if(opt) $('exCategory').value=opt.value; else $('exCategory').selectedIndex=$('exCategory').options.length-1;
-    $('exAmount').value=e.amount; $('exDesc').value=e.description==='-'?'':e.description;
+    if(opt) $('exCategory').value=opt.value;
+    else $('exCategory').selectedIndex=$('exCategory').options.length-1;
+    $('exAmount').value=e.amount;
+    $('exDesc').value=e.description==='-'?'':e.description;
     openSheet('expenses');
   },
   render(){
     const total = expenses.reduce((a,e)=>a+e.amount,0);
     $('expensesTotal').textContent = total.toFixed(3)+' د.ت';
-    const list = $('expensesList'); list.innerHTML='';
+    const list = $('expensesList');
+    list.innerHTML='';
     const sorted = expenses.slice().sort((a,b)=>(a.date<b.date?1:-1));
-    if(!sorted.length){ list.innerHTML='<div class="empty-msg">لا توجد مصاريف بعد</div>'; return; }
+    if(!sorted.length){
+      list.innerHTML='<div class="empty-msg">لا توجد مصاريف بعد</div>';
+      return;
+    }
     sorted.forEach(e=>{
-      const d=document.createElement('div'); d.className='row-card'; d.onclick=()=>Expenses.load(e.id);
+      const d=document.createElement('div');
+      d.className='row-card';
+      d.onclick=()=>Expenses.load(e.id);
       d.innerHTML=`<div class="main-info"><div class="name">${e.category}${e.description!=='-'?' - '+e.description:''}</div><div class="meta">${e.date}</div></div><div class="amount" style="color:var(--danger);">-${e.amount.toFixed(3)} د.ت</div>`;
       list.appendChild(d);
     });
@@ -2427,14 +2433,16 @@ const QuickReglement = {
     const date = new Date().toISOString().slice(0,10);
     const sourceId = 'quick-'+Date.now();
     if(type==='client'){
-      const c = clients.find(x=>x.id==targetId); if(!c) return;
+      const c = clients.find(x=>x.id==targetId);
+      if(!c) return;
       c.balance -= amount;
       c.reglements = c.reglements || [];
       c.reglements.push({date, amount, method});
       caisse.push({id:nextId.caisse++, date, type:'in', amount, description:'تسديد من '+c.name+' ('+method+')', source:'reglement_client', sourceId});
       Clients.render();
     } else {
-      const f = fournisseurs.find(x=>x.id==targetId); if(!f) return;
+      const f = fournisseurs.find(x=>x.id==targetId);
+      if(!f) return;
       f.balance -= amount;
       f.reglements = f.reglements || [];
       f.reglements.push({date, amount, method});
@@ -2462,10 +2470,15 @@ const Reglements = {
     $('reglTotalClients').textContent = totalClients.toFixed(3);
     $('reglTotalFournisseurs').textContent = totalFournisseurs.toFixed(3);
     all = all.filter(r=>!q||r.name.toLowerCase().includes(q)).sort((a,b)=>(a.date<b.date?1:-1));
-    const list=$('reglementsList'); list.innerHTML='';
-    if(!all.length){ list.innerHTML='<div class="empty-msg">لا توجد تسديدات بعد</div>'; return; }
+    const list=$('reglementsList');
+    list.innerHTML='';
+    if(!all.length){
+      list.innerHTML='<div class="empty-msg">لا توجد تسديدات بعد</div>';
+      return;
+    }
     all.forEach(r=>{
-      const d=document.createElement('div'); d.className='row-card';
+      const d=document.createElement('div');
+      d.className='row-card';
       const label = r.kind==='client' ? (currentLang==='ar'?'من ':'de ') : (currentLang==='ar'?'إلى ':'à ');
       const color = r.kind==='client' ? 'var(--success)' : 'var(--danger)';
       d.innerHTML=`<div class="main-info"><div class="name">${label}${r.name}</div><div class="meta">${r.date}</div></div><div class="amount" style="color:${color};">${r.amount.toFixed(3)} د.ت</div>`;
@@ -2473,20 +2486,30 @@ const Reglements = {
     });
   },
   renderBalances(){
-    const cList = $('balancesClientsList'); cList.innerHTML='';
+    const cList = $('balancesClientsList');
+    cList.innerHTML='';
     const withBalance = clients.filter(c=>Math.abs(c.balance)>0.0009);
-    if(!withBalance.length){ cList.innerHTML='<div class="empty-msg">لا توجد أرصدة معلقة</div>'; }
+    if(!withBalance.length){
+      cList.innerHTML='<div class="empty-msg">لا توجد أرصدة معلقة</div>';
+    }
     withBalance.slice().sort((a,b)=>b.balance-a.balance).forEach(c=>{
-      const d=document.createElement('div'); d.className='row-card'; d.onclick=()=>Clients.load(c.id);
+      const d=document.createElement('div');
+      d.className='row-card';
+      d.onclick=()=>Clients.load(c.id);
       const color = c.balance>0 ? 'var(--danger)' : 'var(--success)';
       d.innerHTML=`<div class="main-info"><div class="name">${c.name}</div></div><div class="amount" style="color:${color};">${c.balance.toFixed(3)} د.ت</div>`;
       cList.appendChild(d);
     });
-    const fList = $('balancesFournisseursList'); fList.innerHTML='';
+    const fList = $('balancesFournisseursList');
+    fList.innerHTML='';
     const fWithBalance = fournisseurs.filter(f=>Math.abs(f.balance)>0.0009);
-    if(!fWithBalance.length){ fList.innerHTML='<div class="empty-msg">لا توجد أرصدة معلقة</div>'; }
+    if(!fWithBalance.length){
+      fList.innerHTML='<div class="empty-msg">لا توجد أرصدة معلقة</div>';
+    }
     fWithBalance.slice().sort((a,b)=>b.balance-a.balance).forEach(f=>{
-      const d=document.createElement('div'); d.className='row-card'; d.onclick=()=>Fournisseurs.load(f.id);
+      const d=document.createElement('div');
+      d.className='row-card';
+      d.onclick=()=>Fournisseurs.load(f.id);
       const color = f.balance>0 ? 'var(--danger)' : 'var(--success)';
       d.innerHTML=`<div class="main-info"><div class="name">${f.name}</div></div><div class="amount" style="color:${color};">${f.balance.toFixed(3)} د.ت</div>`;
       fList.appendChild(d);
@@ -2503,24 +2526,32 @@ const Approvals = {
       return;
     }
     db.collection('approvals').get().then(snap=>{
-      const pendingList = $('pendingApprovalsList'); pendingList.innerHTML='';
-      const approvedList = $('approvedAccountsList'); approvedList.innerHTML='';
+      const pendingList = $('pendingApprovalsList');
+      pendingList.innerHTML='';
+      const approvedList = $('approvedAccountsList');
+      approvedList.innerHTML='';
       let pendingCount = 0, approvedCount = 0;
       snap.forEach(doc=>{
         const data = doc.data();
         const uid = doc.id;
-        const d = document.createElement('div'); d.className='row-card';
+        const d = document.createElement('div');
+        d.className='row-card';
         if(data.approved){
           approvedCount++;
           d.innerHTML = `<div class="main-info"><div class="name">${data.email||uid}</div><div class="meta">${(data.requestedAt||'').slice(0,10)}</div></div>`;
-          const btn = document.createElement('button'); btn.className='del-row'; btn.textContent='إلغاء';
+          const btn = document.createElement('button');
+          btn.className='del-row';
+          btn.textContent='إلغاء';
           btn.onclick = ()=>Approvals.setApproved(uid, false);
           d.querySelector('.main-info').after(btn);
           approvedList.appendChild(d);
         } else {
           pendingCount++;
           d.innerHTML = `<div class="main-info"><div class="name">${data.email||uid}</div><div class="meta">${(data.requestedAt||'').slice(0,10)}</div></div>`;
-          const btn = document.createElement('button'); btn.className='del-row'; btn.style.background='var(--success)'; btn.textContent='موافقة';
+          const btn = document.createElement('button');
+          btn.className='del-row';
+          btn.style.background='var(--success)';
+          btn.textContent='موافقة';
           btn.onclick = ()=>Approvals.setApproved(uid, true);
           d.querySelector('.main-info').after(btn);
           pendingList.appendChild(d);
@@ -2543,14 +2574,19 @@ const Approvals = {
 
 // ===================== INIT =====================
 function initAll(){
-  refreshClientSelect(); refreshSupplierSelect(); refreshArticleSelects();
-  Clients.render(); Articles.render(); Fournisseurs.render(); Ventes.render(); Achats.render();
-  Caisse.reset(); Caisse.render();
+  refreshClientSelect();
+  refreshSupplierSelect();
+  refreshArticleSelects();
+  Clients.render();
+  Articles.render();
+  Fournisseurs.render();
+  Ventes.render();
+  Achats.render();
+  Caisse.reset();
+  Caisse.render();
   Rapports.render();
   applyLanguage(currentLang);
 }
-// initAll() is triggered by auth.onAuthStateChanged()
 </script>
-
 </body>
 </html>
