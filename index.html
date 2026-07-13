@@ -281,7 +281,7 @@
 <!-- Login overlay -->
 <div class="login-overlay show" id="loginOverlay">
   <div class="login-box">
-    <div class="login-logo">GTR POS</div>
+    <div class="login-logo">GTR POS <span style="font-size:14px; opacity:.6; font-weight:400;">v0.1.2</span></div>
     <div class="login-sub" id="loginModeLabel">تسجيل الدخول لحسابك</div>
     <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="email">
     <input type="password" id="loginPassword" placeholder="كلمة السر" autocomplete="current-password">
@@ -315,7 +315,7 @@
   <div class="appbar">
     <div>
       <div class="title" id="pageTitle">لوحة القيادة</div>
-      <div class="sub" id="pageSub" data-i18n="appSub" onclick="openSheet('company')" style="cursor:pointer;">GTR POS</div>
+      <div class="sub" id="pageSub" onclick="openSheet('company')" style="cursor:pointer;">GTR POS <span style="opacity:.7; font-weight:400;">v0.1.2</span></div>
     </div>
     <div style="display:flex; gap:8px;">
       <button class="menu-btn" onclick="openSheet('company')" title="الإعدادات">⚙️</button>
@@ -1091,10 +1091,17 @@ function loadStateFromFirestore(uid){
       nextId = data.nextId || {clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1, expenses:1, stockMovements:1, reglements:1};
       companyInfo = data.companyInfo || {name:'GTR POS', address:'', phone1:'', taxId:'', logo:''};
     } else {
-      // First time for this account: start completely empty (no demo/seed data)
-      clients = []; articles = []; fournisseurs = []; ventes = []; achats = []; caisse = []; expenses = []; stockMovements = [];
-      nextId = {clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1, expenses:1, stockMovements:1, reglements:1};
-      companyInfo = {name:'GTR POS', address:'', phone1:'', taxId:'', logo:''};
+      // No Firestore doc found. This could genuinely be a brand-new account,
+      // OR it could mean a previous save never reached Firestore (network issue,
+      // closed app too fast, etc.) while data already exists safely in this
+      // browser's localStorage. To avoid ever erasing real data, we check
+      // localStorage FIRST and only start empty if it's truly empty too.
+      const hadLocalData = loadState();
+      if(!hadLocalData){
+        clients = []; articles = []; fournisseurs = []; ventes = []; achats = []; caisse = []; expenses = []; stockMovements = [];
+        nextId = {clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1, expenses:1, stockMovements:1, reglements:1};
+        companyInfo = {name:'GTR POS', address:'', phone1:'', taxId:'', logo:''};
+      }
       const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo };
       db.collection('users').doc(uid).set(data).catch(e=>console.error(e));
     }
