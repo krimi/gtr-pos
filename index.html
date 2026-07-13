@@ -254,7 +254,7 @@
 
 <div class="login-overlay show" id="loginOverlay">
   <div class="login-box">
-    <div class="login-logo">GTR POS <span style="font-size:14px; opacity:.6; font-weight:400;">v0.1.5</span></div>
+    <div class="login-logo">GTR POS <span style="font-size:14px; opacity:.6; font-weight:400;">v0.1.6</span></div>
     <div class="login-sub" id="loginModeLabel">تسجيل الدخول لحسابك</div>
     <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="email">
     <input type="password" id="loginPassword" placeholder="كلمة السر" autocomplete="current-password">
@@ -287,7 +287,7 @@
   <div class="appbar">
     <div>
       <div class="title" id="pageTitle">لوحة القيادة</div>
-      <div class="sub" id="pageSub" onclick="openSheet('company')" style="cursor:pointer;">GTR POS <span style="opacity:.7; font-weight:400;">v0.1.5</span></div>
+      <div class="sub" id="pageSub" onclick="openSheet('company')" style="cursor:pointer;">GTR POS <span style="opacity:.7; font-weight:400;">v0.1.6</span></div>
     </div>
     <div style="display:flex; gap:8px;">
       <button class="menu-btn" onclick="openSheet('company')" title="الإعدادات">⚙️</button>
@@ -1024,7 +1024,7 @@ function loadState(){
 }
 
 function loadStateFromFirestore(uid){
-  // First try to load from Firestore, then fallback to localStorage if needed.
+  // First try to load from Firestore
   return db.collection('users').doc(uid).get().then(doc=>{
     if(doc.exists){
       const data = doc.data();
@@ -1038,24 +1038,22 @@ function loadStateFromFirestore(uid){
       stockMovements = data.stockMovements || [];
       nextId = data.nextId || {clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1, expenses:1, stockMovements:1, reglements:1};
       companyInfo = data.companyInfo || {name:'GTR POS', address:'', phone1:'', taxId:'', logo:''};
-      // Save to localStorage as a cache
+      // Update localStorage with cloud data
       saveState();
     } else {
-      // No Firestore doc: try to load from localStorage, else use defaults
+      // No Firestore doc: try localStorage, then default
       const hasLocal = loadState();
       if(!hasLocal){
-        // Set defaults (already defined above)
-        // But ensure we don't lose data if arrays were empty but we had local data
+        // Keep default data (already set)
       }
-      // Push whatever we have to Firestore
+      // Save whatever we have to Firestore
       const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo };
       db.collection('users').doc(uid).set(data).catch(e=>console.error(e));
       saveState();
     }
   }).catch(e=>{
     console.error('Firestore load error, using local cache', e);
-    // If Firestore fails, load from localStorage if available
-    loadState();
+    loadState(); // fallback to localStorage
   });
 }
 
@@ -1636,4 +1634,62 @@ const Ventes = {
     const sel=$('viArticle');
     const manualName = $('viManualName').value.trim();
     const name = sel.value ? sel.options[sel.selectedIndex].textContent : manualName;
-    const price=parseFloat($('vi
+    const price=parseFloat($('viPrice').value)||0, qty=parseFloat($('viQty').value)||0;
+    if(!name||price<=0||qty<=0){ showToast('أدخل اسم الصنف والسعر والكمية'); return; }
+    const existing = this.lines.find(l=>l.name===name);
+    if(existing){
+      existing.qty += qty; existing.price = price; existing.total = existing.price*existing.qty;
+      showToast('الصنف موجود مسبقا، تم تحديث الكمية');
+    } else {
+      this.lines.push({name,price,qty,total:price*qty});
+    }
+    $('viArticle').value=''; $('viManualName').value=''; $('viPrice').value=''; $('viQty').value=1; $('viTotal').value=''; $('viStockHint').textContent='';
+    this.renderLines();
+    this.refreshArticleOptions();
+  },
+  removeLine(idx){ this.lines.splice(idx,1); this.renderLines(); this.refreshArticleOptions(); },
+  refreshArticleOptions(){
+    const used = this.lines.map(l=>l.name);
+    const avail = articles.filter(a=>!used.includes(a.name));
+    $('viArticle').innerHTML = '<option value="">-- اختر --</option>' + avail.map(a=>`<option value="${a.id}">${a.name}</option>`).join('');
+  },
+  renderLines(){
+    const body=$('vLinesBody'); body.innerHTML=''; let sum=0;
+    this.lines.forEach((l,idx)=>{ sum+=l.total;
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td><td><button class="del-row" onclick="Ventes.removeLine(${idx})">✕</button></td>`;
+      body.appendChild(tr);
+    });
+    $('vGrand').textContent=sum.toFixed(3);
+  },
+  reset(){
+    this.editingId=null; this.lines=[]; this.editingReglementId=null;
+    $('vNum').value='VTE-'+String(nextId.ventes).padStart(4,'0');
+    $('vDate').value=new Date().toISOString().slice(0,10);
+    $('vClient').value=''; $('vPhone').value='';
+    $('vPayment').value='آجل';
+    $('viArticle').value=''; $('viManualName').value=''; $('viPrice').value=''; $('viQty').value=1; $('viTotal').value=''; $('viStockHint').textContent='';
+    $('vrAmount').value=''; $('vrBody').innerHTML=''; $('vAccountSummary').innerHTML='';
+    this.renderLines(); this.refreshArticleOptions();
+  },
+  save(){
+    if(!$('vClient').value){ showToast('اختر العميل'); return; }
+    if(this.lines.length===0){ showToast('أضف صنفا واحدا على الأقل'); return; }
+    const clientName=$('vClient').options[$('vClient').selectedIndex].textContent;
+    const sum=this.lines.reduce((a,l)=>a+l.total,0);
+    const oldRec = this.editingId!=null ? ventes.find(v=>v.id===this.editingId) : null;
+    const existingReglements = oldRec ? (oldRec.reglements||[]) : [];
+    const rec={id:this.editingId??nextId.ventes, num:$('vNum').value, date:$('vDate').value, client:clientName,
+      payment:$('vPayment').value,
+      lines:[...this.lines], total:sum, reglements:existingReglements};
+    if(oldRec){
+      const oldClient = clients.find(c=>c.name===oldRec.client);
+      const newClient = clients.find(c=>c.name===clientName);
+      if(oldRec.client===clientName){
+        if(newClient) newClient.balance += (rec.total - oldRec.total);
+      } else {
+        if(oldClient) oldClient.balance -= oldRec.total;
+        if(newClient) newClient.balance += rec.total;
+      }
+      removeStockMovements('vente', rec.id);
+      rec.lines.forEach(l=>{ addStockMovement(l.name, l.qty, 'out', 'vente', rec
