@@ -254,7 +254,7 @@
 
 <div class="login-overlay show" id="loginOverlay">
   <div class="login-box">
-    <div class="login-logo">GTR POS <span style="font-size:14px; opacity:.6; font-weight:400;">v0.1.8</span></div>
+    <div class="login-logo">GTR POS <span style="font-size:14px; opacity:.6; font-weight:400;">v0.2.1</span></div>
     <div class="login-sub" id="loginModeLabel">تسجيل الدخول لحسابك</div>
     <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="email">
     <input type="password" id="loginPassword" placeholder="كلمة السر" autocomplete="current-password">
@@ -287,7 +287,7 @@
   <div class="appbar">
     <div>
       <div class="title" id="pageTitle">لوحة القيادة</div>
-      <div class="sub" id="pageSub" onclick="openSheet('company')" style="cursor:pointer;">GTR POS <span style="opacity:.7; font-weight:400;">v0.1.8</span></div>
+      <div class="sub" id="pageSub" onclick="openSheet('company')" style="cursor:pointer;">GTR POS <span style="opacity:.7; font-weight:400;">v0.2.1</span></div>
     </div>
     <div style="display:flex; gap:8px;">
       <button class="menu-btn" onclick="openSheet('company')" title="الإعدادات">⚙️</button>
@@ -309,6 +309,11 @@
         <div class="kpi-card"><div class="val" id="kpiNbAchats">0</div><div class="lbl" data-i18n="kpiNbAchats">عدد فواتير الشراء</div></div>
         <div class="kpi-card ok"><div class="val" id="kpiCaisseSolde">0.000</div><div class="lbl" data-i18n="kpiCaisseSolde">رصيد الكاسة</div></div>
         <div class="kpi-card warn"><div class="val" id="kpiSoldesClients">0.000</div><div class="lbl" data-i18n="kpiSoldesClients">مجموع أرصدة العملاء</div></div>
+      </div>
+      <!-- صف جديد لعرض مجموع أرصدة الموردين ومجموع المصاريف -->
+      <div class="kpi-row">
+        <div class="kpi-card gold"><div class="val" id="kpiSoldesFournisseurs">0.000</div><div class="lbl">مجموع أرصدة الموردين (د.ت)</div></div>
+        <div class="kpi-card warn"><div class="val" id="kpiTotalExpenses">0.000</div><div class="lbl">مجموع المصاريف (د.ت)</div></div>
       </div>
       <div class="section-title" data-i18n="lowStockTitle">⚠️ مخزون منخفض</div>
       <div id="lowStockList"></div>
@@ -2189,6 +2194,15 @@ const Rapports = {
     $('kpiNbAchats').textContent = achats.length;
     $('kpiCaisseSolde').textContent = caisse.reduce((a,k)=>a+(k.type==='in'?k.amount:-k.amount),0).toFixed(3);
     $('kpiSoldesClients').textContent = clients.reduce((a,c)=>a+c.balance,0).toFixed(3);
+    
+    // مجموع أرصدة الموردين
+    const totalFournisseursBalance = fournisseurs.reduce((a,f)=>a+f.balance,0);
+    $('kpiSoldesFournisseurs').textContent = totalFournisseursBalance.toFixed(3);
+    
+    // مجموع المصاريف
+    const totalExpenses = expenses.reduce((a,e)=>a+e.amount,0);
+    $('kpiTotalExpenses').textContent = totalExpenses.toFixed(3);
+    
     const list=$('lowStockList'); list.innerHTML='';
     const low = articles.filter(a=>getStock(a.name)<10);
     if(!low.length){ list.innerHTML='<div class="empty-msg">لا توجد أصناف بمخزون منخفض</div>'; return; }
