@@ -21,23 +21,23 @@
   }
   .phone{width:100%; height:100vh; background:var(--bg); display:flex; flex-direction:column; position:relative; overflow:hidden;}
   @media(min-width:768px){.phone{max-width:600px; height:95vh; margin:20px auto; border-radius:36px;}}
-  .appbar{background:var(--navy); color:#fff; padding:14px 16px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;}
+  .appbar{background:var(--navy); color:#fff; padding:12px 14px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;}
   .appbar .title{font-size:17px; font-weight:800;}
   .appbar .sub{font-size:11px; color:#b9c2e6; cursor:pointer;}
-  .appbar .menu-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:18px;cursor:pointer;}
-  .content{flex:1; overflow-y:auto; padding:12px 12px 80px; -webkit-overflow-scrolling:touch;}
+  .appbar .menu-btn{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:16px;cursor:pointer;}
+  .content{flex:1; overflow-y:auto; padding:10px 10px 70px; -webkit-overflow-scrolling:touch;}
   .section{display:none;}
   .section.active{display:block; animation:fadeIn .2s;}
   @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
   .kpi-row{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;}
-  .kpi-card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:12px; text-align:center; border-top:4px solid var(--blue-accent);}
+  .kpi-card{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:10px; text-align:center; border-top:3px solid var(--blue-accent);}
   .kpi-card.warn{border-top-color:var(--danger);}
   .kpi-card.ok{border-top-color:var(--success);}
   .kpi-card.gold{border-top-color:var(--gold);}
   .kpi-card .val{font-size:18px; font-weight:800; color:var(--navy);}
   .kpi-card .lbl{font-size:10px; color:var(--muted); margin-top:2px; font-weight:600;}
   .section-title{font-size:14px; font-weight:800; color:var(--navy); margin:12px 0 6px;}
-  .row-card{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;}
+  .row-card{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:8px 10px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;}
   .row-card .name{font-size:13px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .row-card .meta{font-size:11px; color:var(--muted);}
   .row-card .amount{font-size:13px; font-weight:800; flex-shrink:0;}
@@ -45,41 +45,47 @@
   .badge.paid{background:var(--success);}
   .badge.pending{background:var(--gold);}
   .badge.low{background:var(--danger);}
-  .empty-msg{text-align:center; color:var(--muted); font-size:12px; padding:20px 0;}
-  .search-box{width:100%; padding:8px 12px; border:1px solid var(--border); border-radius:10px; font-family:'Cairo',sans-serif; font-size:13px; margin-bottom:8px; background:#fff;}
+  .empty-msg{text-align:center; color:var(--muted); font-size:12px; padding:16px 0;}
+  .search-box{width:100%; padding:6px 10px; border:1px solid var(--border); border-radius:8px; font-family:'Cairo',sans-serif; font-size:13px; margin-bottom:8px; background:#fff;}
   .sheet-overlay{position:absolute; inset:0; background:rgba(0,0,0,.4); display:none; z-index:20;}
   .sheet-overlay.show{display:block;}
-  .sheet{position:absolute; left:0; right:0; bottom:0; max-height:92%; background:#fff; border-radius:16px 16px 0 0; z-index:21; transform:translateY(100%); transition:transform .25s; display:flex; flex-direction:column;}
+  .sheet{position:absolute; left:0; right:0; bottom:0; max-height:94%; background:#fff; border-radius:16px 16px 0 0; z-index:21; transform:translateY(100%); transition:transform .25s; display:flex; flex-direction:column;}
   .sheet.show{transform:translateY(0);}
   .sheet-handle{width:36px; height:4px; background:#ccc; border-radius:2px; margin:8px auto 4px;}
-  .sheet-header{display:flex; justify-content:space-between; align-items:center; padding:6px 16px 10px; border-bottom:1px solid var(--border); flex-shrink:0;}
+  .sheet-header{display:flex; justify-content:space-between; align-items:center; padding:6px 14px 8px; border-bottom:1px solid var(--border); flex-shrink:0;}
   .sheet-header h3{font-size:15px; font-weight:800; color:var(--navy); margin:0;}
   .sheet-close{width:28px;height:28px;border-radius:50%;background:#f0f2f8;border:none;font-size:14px;cursor:pointer;}
-  .sheet-body{padding:12px 16px; overflow-y:auto; flex:1;}
-  .sheet-footer{padding:8px 16px 14px; background:#fff; border-top:1px solid var(--border); display:flex; flex-wrap:wrap; gap:6px; flex-shrink:0; position:sticky; bottom:0; z-index:2;}
-  .sheet-footer .btn{flex:1; min-width:70px; margin:0; padding:8px 6px; font-size:12px;}
-  .field{margin-bottom:10px;}
-  .field label{display:block; font-size:11px; font-weight:700; color:var(--text); margin-bottom:3px;}
-  .field input,.field select{width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:8px; font-family:'Cairo',sans-serif; font-size:13px; background:#f9fafc;}
-  .field input:focus,.field select:focus{outline:none; border-color:var(--blue-accent);}
-  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .sheet-body{padding:10px 14px; overflow-y:auto; flex:1;}
+  .sheet-footer{padding:8px 14px 12px; background:#fff; border-top:1px solid var(--border); display:flex; flex-wrap:wrap; gap:6px; flex-shrink:0; position:sticky; bottom:0; z-index:2;}
+  .sheet-footer .btn{flex:1; min-width:70px; margin:0; padding:8px 6px; font-size:13px;}
+  .field{margin-bottom:8px;}
+  .field label{display:block; font-size:11px; font-weight:700; color:var(--text); margin-bottom:2px;}
+  /* الحقول صغيرة الحجم */
+  .field input, .field select{
+    width:100%; padding:4px 8px;
+    border:1px solid var(--border); border-radius:6px;
+    font-family:'Cairo',sans-serif; font-size:13px;
+    background:#f9fafc; height:32px;
+  }
+  .field input:focus, .field select:focus{outline:none; border-color:var(--blue-accent);}
+  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:6px;}
   table.items-mini{width:100%; border-collapse:collapse; font-size:11px; margin-bottom:6px;}
   table.items-mini th{background:var(--navy); color:#fff; padding:4px; font-weight:700;}
   table.items-mini td{padding:4px; border-top:1px solid var(--border); text-align:center; background:#fafbfd;}
   .del-row{background:var(--danger); color:#fff; border:none; border-radius:4px; padding:2px 6px; font-size:10px; cursor:pointer;}
   .totals-mini{display:flex; justify-content:space-between; font-size:12px; font-weight:700; color:var(--navy); margin:4px 0 8px;}
-  .btn{width:100%; padding:10px; border:none; border-radius:10px; font-family:'Cairo',sans-serif; font-size:13px; font-weight:700; color:#fff; cursor:pointer; margin-bottom:6px; background:linear-gradient(180deg,var(--blue-light),var(--blue-accent));}
-  .btn.small{padding:6px; font-size:11px; margin-bottom:4px;}
+  .btn{width:100%; padding:10px; border:none; border-radius:8px; font-family:'Cairo',sans-serif; font-size:14px; font-weight:700; color:#fff; cursor:pointer; margin-bottom:6px; background:linear-gradient(180deg,var(--blue-light),var(--blue-accent));}
+  .btn.small{padding:4px 10px; font-size:12px; margin-bottom:4px;}
   .btn.save{background:linear-gradient(180deg,#4dbf8c,var(--success));}
   .btn.edit{background:linear-gradient(180deg,#e0b84e,var(--gold));}
   .btn.del{background:linear-gradient(180deg,#e46b74,var(--danger));}
   .btn.outline{background:#fff; color:var(--navy); border:1.5px solid var(--navy);}
-  .fab{position:absolute; bottom:72px; left:14px; width:50px; height:50px; border-radius:50%; background:linear-gradient(180deg,var(--blue-light),var(--blue-accent)); color:#fff; font-size:24px; border:none; box-shadow:0 4px 14px rgba(59,91,219,.4); z-index:15; cursor:pointer; display:flex; align-items:center; justify-content:center;}
+  .fab{position:absolute; bottom:70px; left:12px; width:48px; height:48px; border-radius:50%; background:linear-gradient(180deg,var(--blue-light),var(--blue-accent)); color:#fff; font-size:24px; border:none; box-shadow:0 4px 12px rgba(59,91,219,.4); z-index:15; cursor:pointer; display:flex; align-items:center; justify-content:center;}
   .tabbar{position:absolute; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--border); display:flex; overflow-x:auto; padding:4px 0; z-index:10;}
-  .tab-item{flex:0 0 auto; min-width:56px; display:flex; flex-direction:column; align-items:center; padding:4px 6px; color:var(--muted); font-size:9px; font-weight:700; cursor:pointer;}
-  .tab-item .ic{font-size:18px;}
+  .tab-item{flex:0 0 auto; min-width:52px; display:flex; flex-direction:column; align-items:center; padding:3px 4px; color:var(--muted); font-size:9px; font-weight:700; cursor:pointer;}
+  .tab-item .ic{font-size:17px;}
   .tab-item.active{color:var(--blue-accent);}
-  .toast{position:absolute; top:70px; left:50%; transform:translateX(-50%) translateY(-10px); background:var(--navy); color:#fff; padding:8px 18px; border-radius:16px; font-size:12px; font-weight:700; opacity:0; pointer-events:none; transition:.25s; z-index:250; white-space:nowrap; max-width:90%;}
+  .toast{position:absolute; top:70px; left:50%; transform:translateX(-50%) translateY(-10px); background:var(--navy); color:#fff; padding:6px 16px; border-radius:14px; font-size:12px; font-weight:700; opacity:0; pointer-events:none; transition:.25s; z-index:250; white-space:nowrap; max-width:90%;}
   .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
   .print-overlay{position:fixed; inset:0; background:#525659; z-index:200; display:none; overflow-y:auto; padding:10px;}
   .print-overlay.show{display:block;}
@@ -89,31 +95,31 @@
   .print-actions .btn-print{background:#25d366; color:#fff;}
   .print-actions .paper-selector{display:flex; align-items:center; gap:4px; color:#fff; font-size:12px; background:rgba(255,255,255,.12); padding:4px 10px; border-radius:6px;}
   .print-actions .paper-selector select{padding:2px 6px; border-radius:4px; border:none; font-family:'Cairo',sans-serif; font-size:12px;}
-  .invoice-doc{background:#fff; color:#111; border-radius:6px; padding:16px; font-family:'Cairo',sans-serif; direction:rtl; margin:0 auto; font-size:12px; transition:.2s;}
-  .invoice-doc.paper-80{max-width:80mm; font-size:10px; padding:10px;}
-  .invoice-doc.paper-56{max-width:56mm; font-size:8px; padding:6px;}
-  .invoice-doc.paper-a4{max-width:650px; font-size:12px; padding:16px;}
-  .inv-top{display:flex; justify-content:space-between; font-size:11px;}
+  .invoice-doc{background:#fff; color:#111; border-radius:6px; padding:12px; font-family:'Cairo',sans-serif; direction:rtl; margin:0 auto; font-size:11px; transition:.2s;}
+  .invoice-doc.paper-80{max-width:80mm; font-size:9px; padding:8px;}
+  .invoice-doc.paper-56{max-width:56mm; font-size:7px; padding:5px;}
+  .invoice-doc.paper-a4{max-width:650px; font-size:11px; padding:12px;}
+  .inv-top{display:flex; justify-content:space-between; font-size:10px;}
   .inv-datetime{direction:ltr; text-align:left;}
   .inv-company{color:#1a4fd6; font-weight:700; text-align:right;}
-  .inv-title{text-align:center; font-size:16px; font-weight:800; margin:6px 0;}
-  .inv-meta{font-size:12px; line-height:1.8; margin:6px 0;}
-  .inv-partybar{display:flex; border:1px solid #999; font-size:11px; margin-bottom:6px;}
-  .inv-partybar > div{flex:1; padding:4px 6px; border-left:1px solid #999; text-align:center;}
+  .inv-title{text-align:center; font-size:14px; font-weight:800; margin:4px 0;}
+  .inv-meta{font-size:11px; line-height:1.6; margin:4px 0;}
+  .inv-partybar{display:flex; border:1px solid #999; font-size:10px; margin-bottom:4px;}
+  .inv-partybar > div{flex:1; padding:3px 4px; border-left:1px solid #999; text-align:center;}
   .inv-partybar > div:last-child{border-left:none;}
-  table.inv-items{width:100%; border-collapse:collapse; font-size:11px;}
-  table.inv-items th{background:#e8e8e8; border:1px solid #999; padding:4px;}
-  table.inv-items td{border:1px solid #999; padding:3px 4px; text-align:center;}
+  table.inv-items{width:100%; border-collapse:collapse; font-size:10px;}
+  table.inv-items th{background:#e8e8e8; border:1px solid #999; padding:3px;}
+  table.inv-items td{border:1px solid #999; padding:2px 3px; text-align:center;}
   .inv-totalrow td{background:#d9ede2; font-weight:700;}
-  .inv-summary{width:100%; border-collapse:collapse; font-size:12px; margin-top:0;}
-  .inv-summary td{border:1px solid #999; padding:4px 6px;}
+  .inv-summary{width:100%; border-collapse:collapse; font-size:11px; margin-top:0;}
+  .inv-summary td{border:1px solid #999; padding:3px 4px;}
   .inv-summary td.label{text-align:right; width:40%;}
   .inv-summary tr.highlight td{background:#fbdcc9;}
   .inv-summary tr.total td.value{color:#c0392b; font-weight:800;}
   @media print{
-    .invoice-doc.paper-80{max-width:80mm; font-size:9px; padding:4px;}
-    .invoice-doc.paper-56{max-width:56mm; font-size:7px; padding:3px;}
-    .invoice-doc.paper-a4{max-width:100%; font-size:11px;}
+    .invoice-doc.paper-80{max-width:80mm; font-size:8px; padding:3px;}
+    .invoice-doc.paper-56{max-width:56mm; font-size:6px; padding:2px;}
+    .invoice-doc.paper-a4{max-width:100%; font-size:10px;}
     body *{visibility:hidden;}
     .print-overlay,.print-overlay *{visibility:visible;}
     .print-overlay{position:absolute; inset:0; background:#fff; padding:0;}
@@ -125,7 +131,7 @@
   .login-box{background:#fff; border-radius:16px; padding:28px 20px; width:100%; max-width:360px; box-shadow:0 20px 60px rgba(0,0,0,.4); text-align:center;}
   .login-logo{font-size:22px; font-weight:800; color:var(--navy);}
   .login-sub{font-size:12px; color:var(--muted); margin-bottom:16px;}
-  .login-box input{width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; margin-bottom:8px; background:#f9fafc;}
+  .login-box input{width:100%; padding:8px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; margin-bottom:8px; background:#f9fafc;}
   .login-box input:focus{outline:none; border-color:var(--blue-accent);}
   .login-btn{width:100%; padding:10px; border:none; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer; margin-bottom:6px; background:linear-gradient(180deg,var(--blue-light),var(--blue-accent)); color:#fff;}
   .login-btn.secondary{background:#fff; color:var(--navy); border:1.5px solid var(--navy);}
@@ -138,9 +144,10 @@
 </style>
 </head>
 <body>
+<!-- Login overlay -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-box">
-    <div class="login-logo">GTR POS <span style="font-size:13px; opacity:.6; font-weight:400;">v0.2.8</span></div>
+    <div class="login-logo">GTR POS <span style="font-size:13px; opacity:.6; font-weight:400;">v0.3.0</span></div>
     <div class="login-sub" id="loginModeLabel">تسجيل الدخول لحسابك</div>
     <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="email">
     <input type="password" id="loginPassword" placeholder="كلمة السر" autocomplete="current-password">
@@ -163,9 +170,10 @@
     <button class="login-btn secondary" onclick="doLogout()">🚪 تسجيل الخروج</button>
   </div>
 </div>
+<!-- Phone -->
 <div class="phone">
   <div class="appbar">
-    <div><div class="title" id="pageTitle">لوحة القيادة</div><div class="sub" onclick="openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">v0.2.8</span></div></div>
+    <div><div class="title" id="pageTitle">لوحة القيادة</div><div class="sub" onclick="openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">v0.3.0</span></div></div>
     <div style="display:flex; gap:6px;"><button class="menu-btn" onclick="openSheet('company')">⚙️</button><button class="menu-btn" id="langBtn" style="font-size:12px;">FR</button></div>
   </div>
   <div class="content">
@@ -215,25 +223,205 @@
   </div>
   <div class="sheet-overlay" id="overlay"></div>
   <!-- Client sheet -->
-  <div class="sheet" id="sheet-clients"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات العميل</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field"><label>رمز العميل</label><input id="cCode" readonly></div><div class="field"><label>اسم العميل</label><input id="cName"></div><div class="field"><label>الهاتف 1</label><input id="cPhone"></div><div class="field"><label>الهاتف 2</label><input id="cPhone2"></div><div class="field"><label>الهاتف 3</label><input id="cPhone3"></div><div class="field"><label>العنوان</label><input id="cAddress"></div><div class="field"><label>الرصيد (د.ت)</label><input id="cBalance" type="number" step="0.001" value="0"></div><div class="field"><label>ملاحظات</label><input id="cNotes"></div><div class="section-title">أسعار خاصة</div><div class="field"><label>الصنف</label><select id="cpArticle"><option value="">-- اختر --</option></select></div><div class="field"><label>السعر الخاص (د.ت)</label><input id="cpPrice" type="number" step="0.001"></div><button class="btn outline small" onclick="Clients.addSpecialPrice()">+ إضافة سعر خاص</button><table class="items-mini"><thead><tr><th>الصنف</th><th>السعر الخاص</th><th></th></tr></thead><tbody id="cpBody"></tbody></table><button class="btn save" onclick="Clients.save()">💾 حفظ</button></div><div class="sheet-footer"><button class="btn edit" onclick="Clients.edit()">✏️ تعديل</button><button class="btn del" onclick="Clients.remove()">🗑 حذف</button></div></div>
+  <div class="sheet" id="sheet-clients">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><h3>بيانات العميل</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
+    <div class="sheet-body">
+      <div class="field"><label>رمز العميل</label><input id="cCode" readonly></div>
+      <div class="field"><label>اسم العميل</label><input id="cName"></div>
+      <div class="field"><label>الهاتف 1</label><input id="cPhone"></div>
+      <div class="field"><label>الهاتف 2</label><input id="cPhone2"></div>
+      <div class="field"><label>الهاتف 3</label><input id="cPhone3"></div>
+      <div class="field"><label>العنوان</label><input id="cAddress"></div>
+      <div class="field"><label>الرصيد (د.ت)</label><input id="cBalance" type="number" step="0.001" value="0"></div>
+      <div class="field"><label>ملاحظات</label><input id="cNotes"></div>
+      <div class="section-title">أسعار خاصة</div>
+      <div class="field"><label>الصنف</label><select id="cpArticle"><option value="">-- اختر --</option></select></div>
+      <div class="field"><label>السعر الخاص (د.ت)</label><input id="cpPrice" type="number" step="0.001"></div>
+      <button class="btn outline small" onclick="Clients.addSpecialPrice()">+ إضافة سعر خاص</button>
+      <table class="items-mini"><thead><tr><th>الصنف</th><th>السعر الخاص</th><th></th></tr></thead><tbody id="cpBody"></tbody></table>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn save" onclick="Clients.save()">💾 حفظ</button>
+      <button class="btn edit" onclick="Clients.edit()">✏️ تعديل</button>
+      <button class="btn del" onclick="Clients.remove()">🗑 حذف</button>
+    </div>
+  </div>
   <!-- Article sheet -->
-  <div class="sheet" id="sheet-articles"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات الصنف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field"><label>رمز الصنف</label><input id="aCode" readonly></div><div class="field"><label>اسم الصنف</label><input id="aName"></div><div class="field"><label>سعر البيع (د.ت)</label><input id="aPrice" type="number" step="0.001"></div><div class="field"><label>سعر الشراء (د.ت)</label><input id="aCostPrice" type="number" step="0.001"></div><div class="field"><label>الكمية بالمخزون</label><input id="aStock" type="number" value="0"></div><button class="btn save" onclick="Articles.save()">💾 حفظ</button></div><div class="sheet-footer"><button class="btn edit" onclick="Articles.edit()">✏️ تعديل</button><button class="btn del" onclick="Articles.remove()">🗑 حذف</button></div></div>
+  <div class="sheet" id="sheet-articles">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><h3>بيانات الصنف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
+    <div class="sheet-body">
+      <div class="field"><label>رمز الصنف</label><input id="aCode" readonly></div>
+      <div class="field"><label>اسم الصنف</label><input id="aName"></div>
+      <div class="field"><label>سعر البيع (د.ت)</label><input id="aPrice" type="number" step="0.001"></div>
+      <div class="field"><label>سعر الشراء (د.ت)</label><input id="aCostPrice" type="number" step="0.001"></div>
+      <div class="field"><label>الكمية بالمخزون</label><input id="aStock" type="number" value="0"></div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn save" onclick="Articles.save()">💾 حفظ</button>
+      <button class="btn edit" onclick="Articles.edit()">✏️ تعديل</button>
+      <button class="btn del" onclick="Articles.remove()">🗑 حذف</button>
+    </div>
+  </div>
   <!-- Caisse sheet -->
-  <div class="sheet" id="sheet-caisse"><div class="sheet-handle"></div><div class="sheet-header"><h3>حركة الكاسة</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field"><label>التاريخ</label><input id="ksDate" type="date"></div><div class="field"><label>النوع</label><select id="ksType"><option value="in">دخول (+)</option><option value="out">خروج (-)</option></select></div><div class="field"><label>المبلغ (د.ت)</label><input id="ksAmount" type="number" step="0.001"></div><div class="field"><label>البيان</label><input id="ksDesc"></div><button class="btn save" onclick="Caisse.save()">💾 حفظ</button></div><div class="sheet-footer"><button class="btn del" onclick="Caisse.remove()">🗑 حذف</button></div></div>
+  <div class="sheet" id="sheet-caisse">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><h3>حركة الكاسة</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
+    <div class="sheet-body">
+      <div class="field"><label>التاريخ</label><input id="ksDate" type="date"></div>
+      <div class="field"><label>النوع</label><select id="ksType"><option value="in">دخول (+)</option><option value="out">خروج (-)</option></select></div>
+      <div class="field"><label>المبلغ (د.ت)</label><input id="ksAmount" type="number" step="0.001"></div>
+      <div class="field"><label>البيان</label><input id="ksDesc"></div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn save" onclick="Caisse.save()">💾 حفظ</button>
+      <button class="btn del" onclick="Caisse.remove()">🗑 حذف</button>
+    </div>
+  </div>
   <!-- Expenses sheet -->
-  <div class="sheet" id="sheet-expenses"><div class="sheet-handle"></div><div class="sheet-header"><h3>مصروف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field"><label>التاريخ</label><input id="exDate" type="date"></div><div class="field"><label>الفئة</label><select id="exCategory"><option>كراء</option><option>أجور</option><option>فواتير</option><option>نقل</option><option>صيانة</option><option>أخرى</option></select></div><div class="field"><label>المبلغ (د.ت)</label><input id="exAmount" type="number" step="0.001"></div><div class="field"><label>البيان</label><input id="exDesc"></div><button class="btn save" onclick="Expenses.save()">💾 حفظ</button></div><div class="sheet-footer"><button class="btn edit" onclick="Expenses.edit()">✏️ تعديل</button><button class="btn del" onclick="Expenses.remove()">🗑 حذف</button></div></div>
+  <div class="sheet" id="sheet-expenses">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><h3>مصروف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
+    <div class="sheet-body">
+      <div class="field"><label>التاريخ</label><input id="exDate" type="date"></div>
+      <div class="field"><label>الفئة</label><select id="exCategory"><option>كراء</option><option>أجور</option><option>فواتير</option><option>نقل</option><option>صيانة</option><option>أخرى</option></select></div>
+      <div class="field"><label>المبلغ (د.ت)</label><input id="exAmount" type="number" step="0.001"></div>
+      <div class="field"><label>البيان</label><input id="exDesc"></div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn save" onclick="Expenses.save()">💾 حفظ</button>
+      <button class="btn edit" onclick="Expenses.edit()">✏️ تعديل</button>
+      <button class="btn del" onclick="Expenses.remove()">🗑 حذف</button>
+    </div>
+  </div>
   <!-- Quick reglement -->
-  <div class="sheet" id="sheet-quickreglement"><div class="sheet-handle"></div><div class="sheet-header"><h3>تسجيل تسديد سريع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field"><label>النوع</label><select id="qrType" onchange="QuickReglement.refreshTargets()"><option value="client">تسديد من عميل</option><option value="fournisseur">تسديد لمورد</option></select></div><div class="field"><label>الاسم</label><select id="qrTarget" onchange="QuickReglement.showHint()"><option value="">-- اختر --</option></select></div><div style="font-size:11px; color:var(--muted); margin:-4px 0 8px;" id="qrBalanceHint"></div><div class="field"><label>مبلغ التسديد (د.ت)</label><input id="qrAmount" type="number" step="0.001"></div><div class="field"><label>نوع التسديد</label><select id="qrMethod"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option></select></div><button class="btn save" onclick="QuickReglement.save()">💾 تسجيل التسديد</button></div></div>
+  <div class="sheet" id="sheet-quickreglement">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><h3>تسجيل تسديد سريع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
+    <div class="sheet-body">
+      <div class="field"><label>النوع</label><select id="qrType" onchange="QuickReglement.refreshTargets()"><option value="client">تسديد من عميل</option><option value="fournisseur">تسديد لمورد</option></select></div>
+      <div class="field"><label>الاسم</label><select id="qrTarget" onchange="QuickReglement.showHint()"><option value="">-- اختر --</option></select></div>
+      <div style="font-size:11px; color:var(--muted); margin:-2px 0 6px;" id="qrBalanceHint"></div>
+      <div class="field"><label>مبلغ التسديد (د.ت)</label><input id="qrAmount" type="number" step="0.001"></div>
+      <div class="field"><label>نوع التسديد</label><select id="qrMethod"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option></select></div>
+    </div>
+    <div class="sheet-footer"><button class="btn save" onclick="QuickReglement.save()">💾 تسجيل التسديد</button></div>
+  </div>
   <!-- Fournisseur sheet -->
-  <div class="sheet" id="sheet-fournisseurs"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات المورد</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field"><label>رمز المورد</label><input id="fCode" readonly></div><div class="field"><label>اسم المورد</label><input id="fName"></div><div class="field"><label>الهاتف 1</label><input id="fPhone"></div><div class="field"><label>الهاتف 2</label><input id="fPhone2"></div><div class="field"><label>الهاتف 3</label><input id="fPhone3"></div><div class="field"><label>العنوان</label><input id="fAddress"></div><div class="field"><label>الرصيد (د.ت)</label><input id="fBalance" type="number" step="0.001" value="0"></div><div class="field"><label>ملاحظات</label><input id="fNotes"></div><button class="btn save" onclick="Fournisseurs.save()">💾 حفظ</button></div><div class="sheet-footer"><button class="btn edit" onclick="Fournisseurs.edit()">✏️ تعديل</button><button class="btn del" onclick="Fournisseurs.remove()">🗑 حذف</button></div></div>
+  <div class="sheet" id="sheet-fournisseurs">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><h3>بيانات المورد</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
+    <div class="sheet-body">
+      <div class="field"><label>رمز المورد</label><input id="fCode" readonly></div>
+      <div class="field"><label>اسم المورد</label><input id="fName"></div>
+      <div class="field"><label>الهاتف 1</label><input id="fPhone"></div>
+      <div class="field"><label>الهاتف 2</label><input id="fPhone2"></div>
+      <div class="field"><label>الهاتف 3</label><input id="fPhone3"></div>
+      <div class="field"><label>العنوان</label><input id="fAddress"></div>
+      <div class="field"><label>الرصيد (د.ت)</label><input id="fBalance" type="number" step="0.001" value="0"></div>
+      <div class="field"><label>ملاحظات</label><input id="fNotes"></div>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn save" onclick="Fournisseurs.save()">💾 حفظ</button>
+      <button class="btn edit" onclick="Fournisseurs.edit()">✏️ تعديل</button>
+      <button class="btn del" onclick="Fournisseurs.remove()">🗑 حذف</button>
+    </div>
+  </div>
   <!-- Vente sheet -->
-  <div class="sheet" id="sheet-ventes"><div class="sheet-handle"></div><div class="sheet-header"><h3>عملية بيع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field-row"><div class="field"><label>رقم المبيعات</label><input id="vNum" readonly></div><div class="field"><label>التاريخ</label><input id="vDate" type="date"></div></div><div class="field"><label>العميل</label><select id="vClient" onchange="Ventes.fillClient()"><option value="">-- اختر --</option></select></div><div class="field"><label>هاتف العميل</label><input id="vPhone" readonly></div><div class="field"><label>طريقة الدفع</label><select id="vPayment"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option><option selected>آجل</option></select></div><div class="section-title">إضافة صنف</div><div class="field"><label>الصنف</label><select id="viArticle" onchange="Ventes.fillArticle()"><option value="">-- اختر --</option></select></div><div id="viStockHint" style="font-size:10px; color:var(--muted); margin:-4px 0 6px;"></div><div class="field"><label>أو اسم يدوي</label><input id="viManualName" placeholder="صنف غير موجود"></div><div class="field-row"><div class="field"><label>السعر (د.ت)</label><input id="viPrice" type="number" step="0.001" oninput="Ventes.calcLine()"></div><div class="field"><label>الكمية</label><input id="viQty" type="number" min="1" value="1" oninput="Ventes.calcLine()"></div></div><div class="field"><label>الإجمالي (د.ت)</label><input id="viTotal" readonly></div><button class="btn outline small" onclick="Ventes.addLine()">+ إضافة للجدول</button><table class="items-mini"><thead><tr><th>الصنف</th><th>سعر</th><th>كمية</th><th>مجموع</th><th></th></tr></thead><tbody id="vLinesBody"></tbody></table><div class="totals-mini" style="justify-content:flex-end;"><span>المجموع: </span><span id="vGrand">0.000</span> د.ت</div><div class="section-title">تسديد</div><div class="field"><label>مبلغ التسديد (د.ت)</label><input id="vrAmount" type="number" step="0.001"></div><div class="field"><label>نوع التسديد</label><select id="vrMethod"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option></select></div><button class="btn outline small" onclick="Ventes.addReglement()">+ تسجيل تسديد</button><table class="items-mini"><thead><tr><th>التاريخ</th><th>الطريقة</th><th>المبلغ (د.ت)</th><th></th></tr></thead><tbody id="vrBody"></tbody></table><div class="section-title">وضعية الحساب</div><div id="vAccountSummary"></div><button class="btn" style="background:linear-gradient(180deg,#3ddc84,#25d366);" onclick="Ventes.shareWhatsapp()">📱 واتساب</button><button class="btn outline small" onclick="Ventes.printInvoice()">🖨️ طباعة</button></div><div class="sheet-footer"><button class="btn save" onclick="Ventes.save()">💾 حفظ</button><button class="btn edit" onclick="Ventes.edit()">✏️ تعديل</button><button class="btn del" onclick="Ventes.remove()">🗑 حذف</button></div></div>
+  <div class="sheet" id="sheet-ventes">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><h3>عملية بيع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
+    <div class="sheet-body">
+      <div class="field-row"><div class="field"><label>رقم المبيعات</label><input id="vNum" readonly></div><div class="field"><label>التاريخ</label><input id="vDate" type="date"></div></div>
+      <div class="field"><label>العميل</label><select id="vClient" onchange="Ventes.fillClient()"><option value="">-- اختر --</option></select></div>
+      <div class="field"><label>هاتف العميل</label><input id="vPhone" readonly></div>
+      <div class="field"><label>طريقة الدفع</label><select id="vPayment"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option><option selected>آجل</option></select></div>
+      <div class="section-title">إضافة صنف</div>
+      <div class="field"><label>الصنف</label><select id="viArticle" onchange="Ventes.fillArticle()"><option value="">-- اختر --</option></select></div>
+      <div id="viStockHint" style="font-size:10px; color:var(--muted); margin:-2px 0 4px;"></div>
+      <div class="field"><label>أو اسم يدوي</label><input id="viManualName" placeholder="صنف غير موجود"></div>
+      <div class="field-row"><div class="field"><label>السعر (د.ت)</label><input id="viPrice" type="number" step="0.001" oninput="Ventes.calcLine()"></div><div class="field"><label>الكمية</label><input id="viQty" type="number" min="1" value="1" oninput="Ventes.calcLine()"></div></div>
+      <div class="field"><label>الإجمالي (د.ت)</label><input id="viTotal" readonly></div>
+      <button class="btn outline small" onclick="Ventes.addLine()">+ إضافة للجدول</button>
+      <table class="items-mini"><thead><tr><th>الصنف</th><th>سعر</th><th>كمية</th><th>مجموع</th><th></th></tr></thead><tbody id="vLinesBody"></tbody></table>
+      <div class="totals-mini" style="justify-content:flex-end;"><span>المجموع: </span><span id="vGrand">0.000</span> د.ت</div>
+      <div class="section-title">تسديد</div>
+      <div class="field"><label>مبلغ التسديد (د.ت)</label><input id="vrAmount" type="number" step="0.001"></div>
+      <div class="field"><label>نوع التسديد</label><select id="vrMethod"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option></select></div>
+      <button class="btn outline small" onclick="Ventes.addReglement()">+ تسجيل تسديد</button>
+      <table class="items-mini"><thead><tr><th>التاريخ</th><th>الطريقة</th><th>المبلغ (د.ت)</th><th></th></tr></thead><tbody id="vrBody"></tbody></table>
+      <div class="section-title">وضعية الحساب</div>
+      <div id="vAccountSummary"></div>
+      <button class="btn" style="background:linear-gradient(180deg,#3ddc84,#25d366);" onclick="Ventes.shareWhatsapp()">📱 واتساب</button>
+      <button class="btn outline small" onclick="Ventes.printInvoice()">🖨️ طباعة</button>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn save" onclick="Ventes.save()">💾 حفظ</button>
+      <button class="btn edit" onclick="Ventes.edit()">✏️ تعديل</button>
+      <button class="btn del" onclick="Ventes.remove()">🗑 حذف</button>
+    </div>
+  </div>
   <!-- Achat sheet -->
-  <div class="sheet" id="sheet-achats"><div class="sheet-handle"></div><div class="sheet-header"><h3>عملية شراء</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field-row"><div class="field"><label>رقم المشتريات</label><input id="pNum" readonly></div><div class="field"><label>التاريخ</label><input id="pDate" type="date"></div></div><div class="field"><label>المورد</label><select id="pSupplier" onchange="Achats.fillSupplier()"><option value="">-- اختر --</option></select></div><div class="field-row"><div class="field"><label>هاتف المورد</label><input id="pPhone" readonly></div><div class="field"><label>عنوان المورد</label><input id="pAddress" readonly></div></div><div class="field"><label>طريقة الدفع</label><select id="pPayment"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option><option selected>آجل</option></select></div><div class="section-title">إضافة صنف</div><div class="field"><label>الصنف</label><select id="piArticle" onchange="Achats.fillArticle()"><option value="">-- اختر --</option></select></div><div id="piStockHint" style="font-size:10px; color:var(--muted); margin:-4px 0 6px;"></div><div class="field"><label>أو اسم يدوي</label><input id="piManualName" placeholder="صنف غير موجود"></div><div class="field-row"><div class="field"><label>السعر (د.ت)</label><input id="piPrice" type="number" step="0.001" oninput="Achats.calcLine()"></div><div class="field"><label>الكمية</label><input id="piQty" type="number" min="1" value="1" oninput="Achats.calcLine()"></div></div><div class="field"><label>الإجمالي (د.ت)</label><input id="piTotal" readonly></div><button class="btn outline small" onclick="Achats.addLine()">+ إضافة للجدول</button><table class="items-mini"><thead><tr><th>الصنف</th><th>سعر</th><th>كمية</th><th>مجموع</th><th></th></tr></thead><tbody id="pLinesBody"></tbody></table><div class="totals-mini" style="justify-content:flex-end;"><span>المجموع: </span><span id="pGrand">0.000</span> د.ت</div><div class="section-title">تسديد</div><div class="field"><label>مبلغ التسديد (د.ت)</label><input id="arAmount" type="number" step="0.001"></div><div class="field"><label>نوع التسديد</label><select id="arMethod"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option></select></div><button class="btn outline small" onclick="Achats.addReglement()">+ تسجيل تسديد</button><table class="items-mini"><thead><tr><th>التاريخ</th><th>الطريقة</th><th>المبلغ (د.ت)</th><th></th></tr></thead><tbody id="arBody"></tbody></table><div class="section-title">وضعية الحساب</div><div id="pAccountSummary"></div><button class="btn" style="background:linear-gradient(180deg,#3ddc84,#25d366);" onclick="Achats.shareWhatsapp()">📱 واتساب</button><button class="btn outline small" onclick="Achats.printInvoice()">🖨️ طباعة</button></div><div class="sheet-footer"><button class="btn save" onclick="Achats.save()">💾 حفظ</button><button class="btn edit" onclick="Achats.edit()">✏️ تعديل</button><button class="btn del" onclick="Achats.remove()">🗑 حذف</button></div></div>
+  <div class="sheet" id="sheet-achats">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><h3>عملية شراء</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
+    <div class="sheet-body">
+      <div class="field-row"><div class="field"><label>رقم المشتريات</label><input id="pNum" readonly></div><div class="field"><label>التاريخ</label><input id="pDate" type="date"></div></div>
+      <div class="field"><label>المورد</label><select id="pSupplier" onchange="Achats.fillSupplier()"><option value="">-- اختر --</option></select></div>
+      <div class="field-row"><div class="field"><label>هاتف المورد</label><input id="pPhone" readonly></div><div class="field"><label>عنوان المورد</label><input id="pAddress" readonly></div></div>
+      <div class="field"><label>طريقة الدفع</label><select id="pPayment"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option><option selected>آجل</option></select></div>
+      <div class="section-title">إضافة صنف</div>
+      <div class="field"><label>الصنف</label><select id="piArticle" onchange="Achats.fillArticle()"><option value="">-- اختر --</option></select></div>
+      <div id="piStockHint" style="font-size:10px; color:var(--muted); margin:-2px 0 4px;"></div>
+      <div class="field"><label>أو اسم يدوي</label><input id="piManualName" placeholder="صنف غير موجود"></div>
+      <div class="field-row"><div class="field"><label>السعر (د.ت)</label><input id="piPrice" type="number" step="0.001" oninput="Achats.calcLine()"></div><div class="field"><label>الكمية</label><input id="piQty" type="number" min="1" value="1" oninput="Achats.calcLine()"></div></div>
+      <div class="field"><label>الإجمالي (د.ت)</label><input id="piTotal" readonly></div>
+      <button class="btn outline small" onclick="Achats.addLine()">+ إضافة للجدول</button>
+      <table class="items-mini"><thead><tr><th>الصنف</th><th>سعر</th><th>كمية</th><th>مجموع</th><th></th></tr></thead><tbody id="pLinesBody"></tbody></table>
+      <div class="totals-mini" style="justify-content:flex-end;"><span>المجموع: </span><span id="pGrand">0.000</span> د.ت</div>
+      <div class="section-title">تسديد</div>
+      <div class="field"><label>مبلغ التسديد (د.ت)</label><input id="arAmount" type="number" step="0.001"></div>
+      <div class="field"><label>نوع التسديد</label><select id="arMethod"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option></select></div>
+      <button class="btn outline small" onclick="Achats.addReglement()">+ تسجيل تسديد</button>
+      <table class="items-mini"><thead><tr><th>التاريخ</th><th>الطريقة</th><th>المبلغ (د.ت)</th><th></th></tr></thead><tbody id="arBody"></tbody></table>
+      <div class="section-title">وضعية الحساب</div>
+      <div id="pAccountSummary"></div>
+      <button class="btn" style="background:linear-gradient(180deg,#3ddc84,#25d366);" onclick="Achats.shareWhatsapp()">📱 واتساب</button>
+      <button class="btn outline small" onclick="Achats.printInvoice()">🖨️ طباعة</button>
+    </div>
+    <div class="sheet-footer">
+      <button class="btn save" onclick="Achats.save()">💾 حفظ</button>
+      <button class="btn edit" onclick="Achats.edit()">✏️ تعديل</button>
+      <button class="btn del" onclick="Achats.remove()">🗑 حذف</button>
+    </div>
+  </div>
   <!-- Company sheet -->
-  <div class="sheet" id="sheet-company"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات المؤسسة</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field"><label>اسم المؤسسة</label><input id="cpyName"></div><div class="field"><label>الشعار</label><div style="display:flex;gap:6px;align-items:center;"><img id="cpyLogoPreview" style="width:40px;height:40px;border-radius:6px;display:none;background:#eee;"><input type="file" id="cpyLogoInput" accept="image/*" style="display:none;" onchange="CompanyInfo.handleLogoUpload(this)"><button class="btn outline small" style="margin:0;" onclick="document.getElementById('cpyLogoInput').click()">اختر صورة</button><button class="btn del small" style="margin:0;flex:none;padding:4px 10px;" onclick="CompanyInfo.removeLogo()">✕</button></div></div><div class="field"><label>العنوان</label><input id="cpyAddress"></div><div class="field"><label>الهاتف</label><input id="cpyPhone1"></div><div class="field"><label>الرقم الجبائي</label><input id="cpyTaxId"></div><button class="btn save" onclick="CompanyInfo.save()">💾 حفظ</button><div class="section-title">حجم النص</div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;"><button class="btn outline small" style="margin:0;flex:1;" onclick="UiScale.set(0.85)">صغير</button><button class="btn outline small" style="margin:0;flex:1;" onclick="UiScale.set(1)">عادي</button><button class="btn outline small" style="margin:0;flex:1;" onclick="UiScale.set(1.15)">كبير</button><button class="btn outline small" style="margin:0;flex:1;" onclick="UiScale.set(1.3)">أكبر</button></div><div class="section-title">النسخ الاحتياطي</div><button class="btn outline small" onclick="exportBackup()">⬇️ تصدير</button><button class="btn outline small" onclick="exportBackupToDrive()">☁️ Google Drive</button><input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importBackupFile(this)"><button class="btn outline small" onclick="document.getElementById('importFileInput').click()">⬆️ استيراد</button><div style="font-size:10px;color:var(--muted);margin-top:4px;">💡 لتثبيت التطبيق: ⋮ في المتصفح ← إضافة إلى الشاشة الرئيسية</div><div class="section-title">الحساب</div><div id="accountEmailDisplay" style="font-size:12px;color:var(--muted);margin-bottom:4px;"></div><button class="btn del" onclick="doLogout()">🚪 تسجيل الخروج</button></div></div>
+  <div class="sheet" id="sheet-company">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header"><h3>بيانات المؤسسة</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
+    <div class="sheet-body">
+      <div class="field"><label>اسم المؤسسة</label><input id="cpyName"></div>
+      <div class="field"><label>الشعار</label><div style="display:flex;gap:6px;align-items:center;"><img id="cpyLogoPreview" style="width:36px;height:36px;border-radius:6px;display:none;background:#eee;"><input type="file" id="cpyLogoInput" accept="image/*" style="display:none;" onchange="CompanyInfo.handleLogoUpload(this)"><button class="btn outline small" style="margin:0;" onclick="document.getElementById('cpyLogoInput').click()">اختر صورة</button><button class="btn del small" style="margin:0;flex:none;padding:2px 10px;" onclick="CompanyInfo.removeLogo()">✕</button></div></div>
+      <div class="field"><label>العنوان</label><input id="cpyAddress"></div>
+      <div class="field"><label>الهاتف</label><input id="cpyPhone1"></div>
+      <div class="field"><label>الرقم الجبائي</label><input id="cpyTaxId"></div>
+      <button class="btn save" onclick="CompanyInfo.save()">💾 حفظ</button>
+      <div class="section-title">حجم النص</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;"><button class="btn outline small" style="margin:0;flex:1;" onclick="UiScale.set(0.85)">صغير</button><button class="btn outline small" style="margin:0;flex:1;" onclick="UiScale.set(1)">عادي</button><button class="btn outline small" style="margin:0;flex:1;" onclick="UiScale.set(1.15)">كبير</button><button class="btn outline small" style="margin:0;flex:1;" onclick="UiScale.set(1.3)">أكبر</button></div>
+      <div class="section-title">النسخ الاحتياطي</div>
+      <button class="btn outline small" onclick="exportBackup()">⬇️ تصدير</button>
+      <button class="btn outline small" onclick="exportBackupToDrive()">☁️ Google Drive</button>
+      <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importBackupFile(this)"><button class="btn outline small" onclick="document.getElementById('importFileInput').click()">⬆️ استيراد</button>
+      <div style="font-size:10px;color:var(--muted);margin-top:6px;">💡 لتثبيت التطبيق: ⋮ في المتصفح ← إضافة إلى الشاشة الرئيسية</div>
+      <div class="section-title">الحساب</div>
+      <div id="accountEmailDisplay" style="font-size:12px;color:var(--muted);margin-bottom:4px;"></div>
+      <button class="btn del" onclick="doLogout()">🚪 تسجيل الخروج</button>
+    </div>
+  </div>
   <div class="toast" id="toast"></div>
 </div>
+<!-- Print overlay -->
 <div class="print-overlay" id="printOverlay">
   <div class="print-actions">
     <div class="paper-selector"><span>📄 حجم الورق:</span><select id="paperSizeSelect"><option value="a4">عادي</option><option value="80" selected>80mm</option><option value="56">56mm</option></select></div>
@@ -466,7 +654,7 @@ const Ventes = {
   addReglement() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const amount = parseFloat($('vrAmount').value) || 0; if (amount <= 0) { showToast('أدخل مبلغا'); return; } const method = $('vrMethod').options[$('vrMethod').selectedIndex].textContent; const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const client = clients.find(c => c.name === rec.client); const date = new Date().toISOString().slice(0, 10); if (this.editingReglementId) { const entry = rec.reglements.find(r => r.id === this.editingReglementId); if (entry) { const old = entry.amount; entry.amount = amount; entry.method = method; entry.date = date; if (client) { client.balance += old - amount; const ce = client.reglements.find(r => r.id === this.editingReglementId); if (ce) { ce.amount = amount; ce.method = method; ce.date = date; } } Caisse.addAuto('in', amount, date, 'تسديد فاتورة ' + rec.num + ' (' + method + ')', 'reglement_vente', 'vente-' + rec.id + '-' + this.editingReglementId); showToast('تم التحديث'); } this.editingReglementId = null; } else { const rId = nextId.reglements++; rec.reglements.push({ id: rId, date, amount, method }); if (client) { client.balance -= amount; client.reglements = client.reglements || []; client.reglements.push({ id: rId, date, amount, method }); } caisse.push({ id: nextId.caisse++, date, type: 'in', amount, description: 'تسديد فاتورة ' + rec.num + ' (' + method + ')', source: 'reglement_vente', sourceId: 'vente-' + rec.id + '-' + rId }); showToast('تم التسديد'); } $('vrAmount').value = ''; this.renderReglementsSheet(rec.reglements); this.renderAccountSummary(rec); saveState(); if (client) Clients.render(); Caisse.render(); },
   loadReglementForEdit(id) { const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const entry = rec.reglements.find(r => r.id === id); if (!entry) return; $('vrAmount').value = entry.amount; const opt = [...$('vrMethod').options].find(o => o.textContent === entry.method); if (opt) $('vrMethod').value = opt.value; this.editingReglementId = id; showToast('عدل القيمة ثم اضغط + تسجيل'); },
   removeReglement(id) { const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const idx = rec.reglements.findIndex(r => r.id === id); if (idx === -1) return; const amount = rec.reglements[idx].amount; rec.reglements.splice(idx, 1); const client = clients.find(c => c.name === rec.client); if (client) { client.balance += amount; client.reglements = client.reglements.filter(r => r.id !== id); } Caisse.removeAuto('reglement_vente', 'vente-' + rec.id + '-' + id); if (this.editingReglementId === id) { this.editingReglementId = null; $('vrAmount').value = ''; } this.renderReglementsSheet(rec.reglements); this.renderAccountSummary(rec); saveState(); showToast('تم حذف التسديد'); if (client) Clients.render(); Caisse.render(); },
-  renderReglementsSheet(regs) { const b = $('vrBody'); b.innerHTML = ''; (regs || []).slice().reverse().forEach(r => { b.innerHTML += `<tr><td>${r.date}</td><td>${r.method || ''}</td><td>${r.amount.toFixed(3)}</td><td><button class="del-row" onclick="event.stopPropagation(); Ventes.removeReglement(${r.id})">✕</button></td><tr>`; }); },
+  renderReglementsSheet(regs) { const b = $('vrBody'); b.innerHTML = ''; (regs || []).slice().reverse().forEach(r => { b.innerHTML += `<tr><td>${r.date}</td><td>${r.method || ''}</td><td>${r.amount.toFixed(3)}</td><td><button class="del-row" onclick="event.stopPropagation(); Ventes.removeReglement(${r.id})">✕</button></td></tr>`; }); },
   renderAccountSummary(rec) { const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); const b = $('vAccountSummary'); b.innerHTML = `<div class="totals-mini"><span>مبلغ الفاتورة</span><span>${rec.total.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>المدفوع</span><span>${paid.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>الباقي</span><span>${(rec.total - paid).toFixed(3)} د.ت</span></div><div class="totals-mini"><span>الرصيد الكلي</span><span>${client ? client.balance.toFixed(3) : '0.000'} د.ت</span></div>`; },
   shareWhatsapp() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); let text = `*فاتورة ${rec.num}*\nالتاريخ: ${rec.date}\nالعميل: ${rec.client}\n`; rec.lines.forEach(l => { text += `${l.name}  x${l.qty}  ${l.total.toFixed(3)} د.ت\n`; }); text += `\nالمجموع: ${rec.total.toFixed(3)} د.ت\nالمدفوع: ${paid.toFixed(3)} د.ت\nالباقي: ${(rec.total - paid).toFixed(3)} د.ت`; const phone = client ? client.phone.replace(/\D/g, '') : ''; const url = 'https://wa.me/' + (phone ? '216' + phone : '') + '?text=' + encodeURIComponent(text); window.open(url, '_blank'); },
   printInvoice() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); _invoiceData = { title: 'فاتورة بيع', payment: rec.payment, num: rec.num, date: rec.date, partyLabel: 'العميل', partyName: rec.client, partyAddr: client ? client.address : '', partyPhone: client ? client.phone : '', lines: rec.lines, total: rec.total, paid, prevBalance: client ? client.balance - (rec.total - paid) : 0, currentBalance: client ? client.balance : rec.total - paid }; renderInvoice(); $('printOverlay').classList.add('show'); },
@@ -619,9 +807,7 @@ auth.onAuthStateChanged(user => {
 });
 
 // ===== INITIAL LOAD =====
-// Load from local cache first to show data quickly
 loadState();
-// The auth state will trigger full load later.
 </script>
 </body>
 </html>
