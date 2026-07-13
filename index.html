@@ -254,7 +254,7 @@
 
 <div class="login-overlay show" id="loginOverlay">
   <div class="login-box">
-    <div class="login-logo">GTR POS <span style="font-size:14px; opacity:.6; font-weight:400;">v0.1.6</span></div>
+    <div class="login-logo">GTR POS <span style="font-size:14px; opacity:.6; font-weight:400;">v0.1.7</span></div>
     <div class="login-sub" id="loginModeLabel">تسجيل الدخول لحسابك</div>
     <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="email">
     <input type="password" id="loginPassword" placeholder="كلمة السر" autocomplete="current-password">
@@ -287,7 +287,7 @@
   <div class="appbar">
     <div>
       <div class="title" id="pageTitle">لوحة القيادة</div>
-      <div class="sub" id="pageSub" onclick="openSheet('company')" style="cursor:pointer;">GTR POS <span style="opacity:.7; font-weight:400;">v0.1.6</span></div>
+      <div class="sub" id="pageSub" onclick="openSheet('company')" style="cursor:pointer;">GTR POS <span style="opacity:.7; font-weight:400;">v0.1.7</span></div>
     </div>
     <div style="display:flex; gap:8px;">
       <button class="menu-btn" onclick="openSheet('company')" title="الإعدادات">⚙️</button>
@@ -1024,36 +1024,38 @@ function loadState(){
 }
 
 function loadStateFromFirestore(uid){
-  // First try to load from Firestore
-  return db.collection('users').doc(uid).get().then(doc=>{
-    if(doc.exists){
-      const data = doc.data();
-      clients = data.clients || [];
-      articles = data.articles || [];
-      fournisseurs = data.fournisseurs || [];
-      ventes = data.ventes || [];
-      achats = data.achats || [];
-      caisse = data.caisse || [];
-      expenses = data.expenses || [];
-      stockMovements = data.stockMovements || [];
-      nextId = data.nextId || {clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1, expenses:1, stockMovements:1, reglements:1};
-      companyInfo = data.companyInfo || {name:'GTR POS', address:'', phone1:'', taxId:'', logo:''};
-      // Update localStorage with cloud data
-      saveState();
-    } else {
-      // No Firestore doc: try localStorage, then default
-      const hasLocal = loadState();
-      if(!hasLocal){
-        // Keep default data (already set)
+  return new Promise((resolve, reject) => {
+    db.collection('users').doc(uid).get().then(doc=>{
+      if(doc.exists){
+        const data = doc.data();
+        clients = data.clients || [];
+        articles = data.articles || [];
+        fournisseurs = data.fournisseurs || [];
+        ventes = data.ventes || [];
+        achats = data.achats || [];
+        caisse = data.caisse || [];
+        expenses = data.expenses || [];
+        stockMovements = data.stockMovements || [];
+        nextId = data.nextId || {clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1, expenses:1, stockMovements:1, reglements:1};
+        companyInfo = data.companyInfo || {name:'GTR POS', address:'', phone1:'', taxId:'', logo:''};
+        saveState();
+        resolve();
+      } else {
+        // No doc: use local data or defaults
+        const hasLocal = loadState();
+        if(!hasLocal){
+          // keep default data (already set)
+        }
+        const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo };
+        db.collection('users').doc(uid).set(data).catch(e=>console.error(e));
+        saveState();
+        resolve();
       }
-      // Save whatever we have to Firestore
-      const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo };
-      db.collection('users').doc(uid).set(data).catch(e=>console.error(e));
-      saveState();
-    }
-  }).catch(e=>{
-    console.error('Firestore load error, using local cache', e);
-    loadState(); // fallback to localStorage
+    }).catch(e=>{
+      console.error('Firestore load error, using local cache', e);
+      loadState(); // fallback to localStorage
+      resolve(); // still resolve to allow app to start
+    });
   });
 }
 
@@ -1692,4 +1694,21 @@ const Ventes = {
         if(newClient) newClient.balance += rec.total;
       }
       removeStockMovements('vente', rec.id);
-      rec.lines.forEach(l=>{ addStockMovement(l.name, l.qty, 'out', 'vente', rec
+      rec.lines.forEach(l=>{ addStockMovement(l.name, l.qty, 'out', 'vente', rec.id, rec.date, 'بيع '+rec.num); });
+      Articles.render(); refreshArticleSelects();
+      ventes[ventes.findIndex(v=>v.id===this.editingId)]=rec; showToast('تم تعديل المبيعات');
+    } else {
+      const client = clients.find(c=>c.name===clientName);
+      if(client) client.balance += rec.total;
+      rec.lines.forEach(l=>{ addStockMovement(l.name, l.qty, 'out', 'vente', rec.id, rec.date, 'بيع '+rec.num); });
+      Articles.render(); refreshArticleSelects();
+      ventes.push(rec); nextId.ventes++; showToast('تم حفظ المبيعات');
+      if(rec.payment==='نقدا'){
+        const reglementId = nextId.reglements++;
+        rec.reglements.push({id:reglementId, date:rec.date, amount:rec.total, method:'نقدا'});
+        if(client){
+          client.balance -= rec.total;
+          client.reglements = client.reglements || [];
+          client.reglements.push({id:reglementId, date:rec.date, amount:rec.total, method:'نقدا'});
+        }
+        const sourceId = 'vente-'+rec.id+
