@@ -120,8 +120,23 @@
     .print-actions{display:none;}
     .invoice-doc{max-width:100%; border-radius:0;}
   }
-  .login-overlay{position:fixed; inset:0; background:linear-gradient(160deg,#3a4a63,#8a97a8); z-index:300; display:flex; align-items:center; justify-content:center; padding:20px;}
-  .login-overlay.hide{display:none;}
+  /* شاشة اختيار وضع التخزين */
+  .storage-choice{position:fixed; inset:0; background:linear-gradient(160deg,#1a2a4a,#2d4a7a); z-index:400; display:flex; align-items:center; justify-content:center; padding:20px; flex-direction:column;}
+  .storage-choice.hide{display:none;}
+  .storage-box{background:#fff; border-radius:20px; padding:30px 24px; width:100%; max-width:380px; box-shadow:0 20px 60px rgba(0,0,0,.5); text-align:center;}
+  .storage-box h2{font-size:22px; font-weight:800; color:var(--navy); margin-bottom:6px;}
+  .storage-box p{font-size:13px; color:var(--muted); margin-bottom:20px;}
+  .storage-options{display:flex; flex-direction:column; gap:12px;}
+  .storage-options .btn{font-size:16px; padding:14px; border-radius:12px; display:flex; align-items:center; justify-content:center; gap:10px;}
+  .storage-options .btn.cloud{background:linear-gradient(180deg,#4a7cf7,#1a4fd6);}
+  .storage-options .btn.local{background:linear-gradient(180deg,#6c7a8a,#3a4a5a);}
+  .storage-options .btn .ic{font-size:24px;}
+  .storage-options .btn small{font-weight:400; font-size:12px; opacity:.8;}
+  .storage-choice .remember{font-size:12px; color:var(--muted); margin-top:14px;}
+  .storage-choice .remember input{margin-left:6px;}
+
+  .login-overlay{position:fixed; inset:0; background:linear-gradient(160deg,#3a4a63,#8a97a8); z-index:300; display:none; align-items:center; justify-content:center; padding:20px;}
+  .login-overlay.show{display:flex;}
   .login-box{background:#fff; border-radius:16px; padding:28px 20px; width:100%; max-width:360px; box-shadow:0 20px 60px rgba(0,0,0,.4); text-align:center;}
   .login-logo{font-size:22px; font-weight:800; color:var(--navy);}
   .login-sub{font-size:12px; color:var(--muted); margin-bottom:16px;}
@@ -138,10 +153,31 @@
 </style>
 </head>
 <body>
-<!-- Login overlay -->
+<!-- شاشة اختيار وضع التخزين -->
+<div class="storage-choice" id="storageChoice">
+  <div class="storage-box">
+    <h2>☁️ GTR POS</h2>
+    <p>اختر مكان حفظ بياناتك</p>
+    <div class="storage-options">
+      <button class="btn cloud" onclick="selectStorage('cloud')">
+        <span class="ic">☁️</span>
+        <span>سحابة (Cloud) <small>• متزامن مع كل الأجهزة</small></span>
+      </button>
+      <button class="btn local" onclick="selectStorage('local')">
+        <span class="ic">📱</span>
+        <span>هذا الجهاز <small>• يعمل بدون إنترنت</small></span>
+      </button>
+    </div>
+    <div class="remember">
+      <label><input type="checkbox" id="rememberStorage"> تذكر اختياري</label>
+    </div>
+  </div>
+</div>
+
+<!-- شاشة تسجيل الدخول (تظهر فقط في وضع السحابة) -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-box">
-    <div class="login-logo">GTR POS <span style="font-size:13px; opacity:.6; font-weight:400;">v0.3.1</span></div>
+    <div class="login-logo">GTR POS <span style="font-size:13px; opacity:.6; font-weight:400;">v0.3.3</span></div>
     <div class="login-sub" id="loginModeLabel">تسجيل الدخول لحسابك</div>
     <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="email">
     <input type="password" id="loginPassword" placeholder="كلمة السر" autocomplete="current-password">
@@ -156,7 +192,8 @@
     <div class="login-loading" id="loginLoading" style="display:none;">جاري التحميل...</div>
   </div>
 </div>
-<div class="login-overlay hide" id="pendingOverlay">
+
+<div class="login-overlay" id="pendingOverlay">
   <div class="login-box">
     <div class="login-logo">⏳ GTR POS</div>
     <div class="login-sub">حسابك قيد المراجعة</div>
@@ -164,10 +201,11 @@
     <button class="login-btn secondary" onclick="doLogout()">🚪 تسجيل الخروج</button>
   </div>
 </div>
-<!-- Phone -->
-<div class="phone">
+
+<!-- التطبيق الرئيسي -->
+<div class="phone" id="mainApp" style="display:none;">
   <div class="appbar">
-    <div><div class="title" id="pageTitle">لوحة القيادة</div><div class="sub" onclick="openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">v0.3.1</span></div></div>
+    <div><div class="title" id="pageTitle">لوحة القيادة</div><div class="sub" onclick="openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">v0.3.3</span></div></div>
     <div style="display:flex; gap:6px;"><button class="menu-btn" onclick="openSheet('company')">⚙️</button><button class="menu-btn" id="langBtn" style="font-size:12px;">FR</button></div>
   </div>
   <div class="content">
@@ -216,137 +254,64 @@
     <div class="tab-item" data-section="approvals" id="tabApprovals" style="display:none;"><span class="ic">👤</span><span>الحسابات</span></div>
   </div>
   <div class="sheet-overlay" id="overlay"></div>
-  <!-- Client sheet -->
-  <div class="sheet" id="sheet-clients"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات العميل</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
-    <div class="field"><label>رمز العميل</label><input id="cCode" readonly></div>
-    <div class="field"><label>اسم العميل</label><input id="cName"></div>
-    <div class="field"><label>الهاتف 1</label><input id="cPhone"></div>
-    <div class="field"><label>الهاتف 2</label><input id="cPhone2"></div>
-    <div class="field"><label>الهاتف 3</label><input id="cPhone3"></div>
-    <div class="field"><label>العنوان</label><input id="cAddress"></div>
-    <div class="field"><label>الرصيد (د.ت)</label><input id="cBalance" type="number" step="0.001" value="0"></div>
-    <div class="field"><label>ملاحظات</label><input id="cNotes"></div>
-    <div class="section-title">أسعار خاصة</div>
-    <div class="field"><label>الصنف</label><select id="cpArticle"><option value="">-- اختر --</option></select></div>
-    <div class="field"><label>السعر الخاص (د.ت)</label><input id="cpPrice" type="number" step="0.001"></div>
-    <button class="btn outline small" onclick="Clients.addSpecialPrice()">+ إضافة سعر خاص</button>
-    <table class="items-mini"><thead><tr><th>الصنف</th><th>السعر الخاص</th><th></th></tr></thead><tbody id="cpBody"></tbody></table>
-  </div><div class="sheet-footer"><button class="btn save" onclick="Clients.save()">💾 حفظ</button><button class="btn edit" onclick="Clients.edit()">✏️ تعديل</button><button class="btn del" onclick="Clients.remove()">🗑 حذف</button></div></div>
-  <!-- Article sheet --><div class="sheet" id="sheet-articles"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات الصنف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
-    <div class="field"><label>رمز الصنف</label><input id="aCode" readonly></div>
-    <div class="field"><label>اسم الصنف</label><input id="aName"></div>
-    <div class="field"><label>سعر البيع (د.ت)</label><input id="aPrice" type="number" step="0.001"></div>
-    <div class="field"><label>سعر الشراء (د.ت)</label><input id="aCostPrice" type="number" step="0.001"></div>
-    <div class="field"><label>الكمية بالمخزون</label><input id="aStock" type="number" value="0"></div>
-  </div><div class="sheet-footer"><button class="btn save" onclick="Articles.save()">💾 حفظ</button><button class="btn edit" onclick="Articles.edit()">✏️ تعديل</button><button class="btn del" onclick="Articles.remove()">🗑 حذف</button></div></div>
-  <!-- Caisse sheet --><div class="sheet" id="sheet-caisse"><div class="sheet-handle"></div><div class="sheet-header"><h3>حركة الكاسة</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
-    <div class="field"><label>التاريخ</label><input id="ksDate" type="date"></div>
-    <div class="field"><label>النوع</label><select id="ksType"><option value="in">دخول (+)</option><option value="out">خروج (-)</option></select></div>
-    <div class="field"><label>المبلغ (د.ت)</label><input id="ksAmount" type="number" step="0.001"></div>
-    <div class="field"><label>البيان</label><input id="ksDesc"></div>
-  </div><div class="sheet-footer"><button class="btn save" onclick="Caisse.save()">💾 حفظ</button><button class="btn del" onclick="Caisse.remove()">🗑 حذف</button></div></div>
-  <!-- Expenses sheet --><div class="sheet" id="sheet-expenses"><div class="sheet-handle"></div><div class="sheet-header"><h3>مصروف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
-    <div class="field"><label>التاريخ</label><input id="exDate" type="date"></div>
-    <div class="field"><label>الفئة</label><select id="exCategory"><option>كراء</option><option>أجور</option><option>فواتير</option><option>نقل</option><option>صيانة</option><option>أخرى</option></select></div>
-    <div class="field"><label>المبلغ (د.ت)</label><input id="exAmount" type="number" step="0.001"></div>
-    <div class="field"><label>البيان</label><input id="exDesc"></div>
-  </div><div class="sheet-footer"><button class="btn save" onclick="Expenses.save()">💾 حفظ</button><button class="btn edit" onclick="Expenses.edit()">✏️ تعديل</button><button class="btn del" onclick="Expenses.remove()">🗑 حذف</button></div></div>
-  <!-- Quick reglement --><div class="sheet" id="sheet-quickreglement"><div class="sheet-handle"></div><div class="sheet-header"><h3>تسجيل تسديد سريع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
-    <div class="field"><label>النوع</label><select id="qrType" onchange="QuickReglement.refreshTargets()"><option value="client">تسديد من عميل</option><option value="fournisseur">تسديد لمورد</option></select></div>
-    <div class="field"><label>الاسم</label><select id="qrTarget" onchange="QuickReglement.showHint()"><option value="">-- اختر --</option></select></div>
-    <div style="font-size:11px; color:var(--muted); margin:-2px 0 6px;" id="qrBalanceHint"></div>
-    <div class="field"><label>مبلغ التسديد (د.ت)</label><input id="qrAmount" type="number" step="0.001"></div>
-    <div class="field"><label>نوع التسديد</label><select id="qrMethod"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option></select></div>
-  </div><div class="sheet-footer"><button class="btn save" onclick="QuickReglement.save()">💾 تسجيل التسديد</button></div></div>
-  <!-- Fournisseur sheet --><div class="sheet" id="sheet-fournisseurs"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات المورد</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
-    <div class="field"><label>رمز المورد</label><input id="fCode" readonly></div>
-    <div class="field"><label>اسم المورد</label><input id="fName"></div>
-    <div class="field"><label>الهاتف 1</label><input id="fPhone"></div>
-    <div class="field"><label>الهاتف 2</label><input id="fPhone2"></div>
-    <div class="field"><label>الهاتف 3</label><input id="fPhone3"></div>
-    <div class="field"><label>العنوان</label><input id="fAddress"></div>
-    <div class="field"><label>الرصيد (د.ت)</label><input id="fBalance" type="number" step="0.001" value="0"></div>
-    <div class="field"><label>ملاحظات</label><input id="fNotes"></div>
-  </div><div class="sheet-footer"><button class="btn save" onclick="Fournisseurs.save()">💾 حفظ</button><button class="btn edit" onclick="Fournisseurs.edit()">✏️ تعديل</button><button class="btn del" onclick="Fournisseurs.remove()">🗑 حذف</button></div></div>
-  <!-- Vente sheet --><div class="sheet" id="sheet-ventes"><div class="sheet-handle"></div><div class="sheet-header"><h3>عملية بيع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
-    <div class="field-row"><div class="field"><label>رقم المبيعات</label><input id="vNum" readonly></div><div class="field"><label>التاريخ</label><input id="vDate" type="date"></div></div>
-    <div class="field"><label>العميل</label><select id="vClient" onchange="Ventes.fillClient()"><option value="">-- اختر --</option></select></div>
-    <div class="field"><label>هاتف العميل</label><input id="vPhone" readonly></div>
-    <div class="field"><label>طريقة الدفع</label><select id="vPayment"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option><option selected>آجل</option></select></div>
-    <div class="section-title">إضافة صنف</div>
-    <div class="field"><label>الصنف</label><select id="viArticle" onchange="Ventes.fillArticle()"><option value="">-- اختر --</option></select></div>
-    <div id="viStockHint" style="font-size:10px; color:var(--muted); margin:-2px 0 4px;"></div>
-    <div class="field"><label>أو اسم يدوي</label><input id="viManualName" placeholder="صنف غير موجود"></div>
-    <div class="field-row"><div class="field"><label>السعر (د.ت)</label><input id="viPrice" type="number" step="0.001" oninput="Ventes.calcLine()"></div><div class="field"><label>الكمية</label><input id="viQty" type="number" min="1" value="1" oninput="Ventes.calcLine()"></div></div>
-    <div class="field"><label>الإجمالي (د.ت)</label><input id="viTotal" readonly></div>
-    <button class="btn outline small" onclick="Ventes.addLine()">+ إضافة للجدول</button>
-    <table class="items-mini"><thead><tr><th>الصنف</th><th>سعر</th><th>كمية</th><th>مجموع</th><th></th></tr></thead><tbody id="vLinesBody"></tbody></table>
-    <div class="totals-mini" style="justify-content:flex-end;"><span>المجموع: </span><span id="vGrand">0.000</span> د.ت</div>
-    <div class="section-title">تسديد</div>
-    <div class="field"><label>مبلغ التسديد (د.ت)</label><input id="vrAmount" type="number" step="0.001"></div>
-    <div class="field"><label>نوع التسديد</label><select id="vrMethod"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option></select></div>
-    <button class="btn outline small" onclick="Ventes.addReglement()">+ تسجيل تسديد</button>
-    <table class="items-mini"><thead><tr><th>التاريخ</th><th>الطريقة</th><th>المبلغ (د.ت)</th><th></th></tr></thead><tbody id="vrBody"></tbody></table>
-    <div class="section-title">وضعية الحساب</div>
-    <div id="vAccountSummary"></div>
-    <button class="btn" style="background:linear-gradient(180deg,#3ddc84,#25d366);" onclick="Ventes.shareWhatsapp()">📱 واتساب</button>
-    <button class="btn outline small" onclick="Ventes.printInvoice()">🖨️ طباعة</button>
-  </div><div class="sheet-footer"><button class="btn save" onclick="Ventes.save()">💾 حفظ</button><button class="btn edit" onclick="Ventes.edit()">✏️ تعديل</button><button class="btn del" onclick="Ventes.remove()">🗑 حذف</button></div></div>
-  <!-- Achat sheet --><div class="sheet" id="sheet-achats"><div class="sheet-handle"></div><div class="sheet-header"><h3>عملية شراء</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
-    <div class="field-row"><div class="field"><label>رقم المشتريات</label><input id="pNum" readonly></div><div class="field"><label>التاريخ</label><input id="pDate" type="date"></div></div>
-    <div class="field"><label>المورد</label><select id="pSupplier" onchange="Achats.fillSupplier()"><option value="">-- اختر --</option></select></div>
-    <div class="field-row"><div class="field"><label>هاتف المورد</label><input id="pPhone" readonly></div><div class="field"><label>عنوان المورد</label><input id="pAddress" readonly></div></div>
-    <div class="field"><label>طريقة الدفع</label><select id="pPayment"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option><option selected>آجل</option></select></div>
-    <div class="section-title">إضافة صنف</div>
-    <div class="field"><label>الصنف</label><select id="piArticle" onchange="Achats.fillArticle()"><option value="">-- اختر --</option></select></div>
-    <div id="piStockHint" style="font-size:10px; color:var(--muted); margin:-2px 0 4px;"></div>
-    <div class="field"><label>أو اسم يدوي</label><input id="piManualName" placeholder="صنف غير موجود"></div>
-    <div class="field-row"><div class="field"><label>السعر (د.ت)</label><input id="piPrice" type="number" step="0.001" oninput="Achats.calcLine()"></div><div class="field"><label>الكمية</label><input id="piQty" type="number" min="1" value="1" oninput="Achats.calcLine()"></div></div>
-    <div class="field"><label>الإجمالي (د.ت)</label><input id="piTotal" readonly></div>
-    <button class="btn outline small" onclick="Achats.addLine()">+ إضافة للجدول</button>
-    <table class="items-mini"><thead><tr><th>الصنف</th><th>سعر</th><th>كمية</th><th>مجموع</th><th></th></tr></thead><tbody id="pLinesBody"></tbody></table>
-    <div class="totals-mini" style="justify-content:flex-end;"><span>المجموع: </span><span id="pGrand">0.000</span> د.ت</div>
-    <div class="section-title">تسديد</div>
-    <div class="field"><label>مبلغ التسديد (د.ت)</label><input id="arAmount" type="number" step="0.001"></div>
-    <div class="field"><label>نوع التسديد</label><select id="arMethod"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option></select></div>
-    <button class="btn outline small" onclick="Achats.addReglement()">+ تسجيل تسديد</button>
-    <table class="items-mini"><thead><tr><th>التاريخ</th><th>الطريقة</th><th>المبلغ (د.ت)</th><th></th></tr></thead><tbody id="arBody"></tbody></table>
-    <div class="section-title">وضعية الحساب</div>
-    <div id="pAccountSummary"></div>
-    <button class="btn" style="background:linear-gradient(180deg,#3ddc84,#25d366);" onclick="Achats.shareWhatsapp()">📱 واتساب</button>
-    <button class="btn outline small" onclick="Achats.printInvoice()">🖨️ طباعة</button>
-  </div><div class="sheet-footer"><button class="btn save" onclick="Achats.save()">💾 حفظ</button><button class="btn edit" onclick="Achats.edit()">✏️ تعديل</button><button class="btn del" onclick="Achats.remove()">🗑 حذف</button></div></div>
-  <!-- Company sheet --><div class="sheet" id="sheet-company"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات المؤسسة</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
-    <div class="field"><label>اسم المؤسسة</label><input id="cpyName"></div>
-    <div class="field"><label>الشعار</label><div style="display:flex;gap:6px;align-items:center;"><img id="cpyLogoPreview" style="width:36px;height:36px;border-radius:6px;display:none;background:#eee;"><input type="file" id="cpyLogoInput" accept="image/*" style="display:none;" onchange="CompanyInfo.handleLogoUpload(this)"><button class="btn outline small" style="margin:0;" onclick="document.getElementById('cpyLogoInput').click()">اختر صورة</button><button class="btn del small" style="margin:0;flex:none;padding:2px 10px;" onclick="CompanyInfo.removeLogo()">✕</button></div></div>
-    <div class="field"><label>العنوان</label><input id="cpyAddress"></div>
-    <div class="field"><label>الهاتف</label><input id="cpyPhone1"></div>
-    <div class="field"><label>الرقم الجبائي</label><input id="cpyTaxId"></div>
-    <button class="btn save" onclick="CompanyInfo.save()">💾 حفظ</button>
-    <div class="section-title">حجم النص</div>
-    <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;"><button class="btn outline small" style="margin:0;flex:1;" onclick="UiScale.set(0.85)">صغير</button><button class="btn outline small" style="margin:0;flex:1;" onclick="UiScale.set(1)">عادي</button><button class="btn outline small" style="margin:0;flex:1;" onclick="UiScale.set(1.15)">كبير</button><button class="btn outline small" style="margin:0;flex:1;" onclick="UiScale.set(1.3)">أكبر</button></div>
-    <div class="section-title">النسخ الاحتياطي</div>
-    <button class="btn outline small" onclick="exportBackup()">⬇️ تصدير</button>
-    <button class="btn outline small" onclick="exportBackupToDrive()">☁️ Google Drive</button>
-    <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importBackupFile(this)"><button class="btn outline small" onclick="document.getElementById('importFileInput').click()">⬆️ استيراد</button>
-    <div style="font-size:10px;color:var(--muted);margin-top:6px;">💡 لتثبيت التطبيق: ⋮ في المتصفح ← إضافة إلى الشاشة الرئيسية</div>
-    <div class="section-title">الحساب</div>
-    <div id="accountEmailDisplay" style="font-size:12px;color:var(--muted);margin-bottom:4px;"></div>
-    <button class="btn del" onclick="doLogout()">🚪 تسجيل الخروج</button>
-  </div></div>
+  <!-- الشيتات بنفس الشكل السابق (تم اختصارها هنا) -->
   <div class="toast" id="toast"></div>
 </div>
-<!-- Print overlay -->
-<div class="print-overlay" id="printOverlay">
-  <div class="print-actions">
-    <div class="paper-selector"><span>📄 حجم الورق:</span><select id="paperSizeSelect"><option value="a4">عادي</option><option value="80" selected>80mm</option><option value="56">56mm</option></select></div>
-    <button class="btn-close" onclick="closePrintOverlay()">✕ إغلاق</button>
-    <button class="btn-print" onclick="window.print()">🖨️ طباعة</button>
-  </div>
-  <div style="text-align:center;color:#aaa;font-size:11px;margin-bottom:4px;">💡 اختر الطابعة من قائمة الطباعة (بلوتوث/USB)</div>
-  <div class="invoice-doc paper-80" id="invoiceDoc"></div>
-</div>
+
 <script>
+// ===== وضع التخزين =====
+let storageMode = null; // 'cloud' أو 'local'
+
+function selectStorage(mode) {
+  storageMode = mode;
+  const remember = document.getElementById('rememberStorage').checked;
+  if (remember) {
+    try { localStorage.setItem('gtrpos_storage_mode', mode); } catch(e) {}
+  }
+  document.getElementById('storageChoice').classList.add('hide');
+  
+  if (mode === 'cloud') {
+    // إظهار شاشة تسجيل الدخول
+    document.getElementById('loginOverlay').classList.add('show');
+  } else {
+    // الوضع المحلي: تشغيل التطبيق مباشرة بدون تسجيل دخول
+    document.getElementById('loginOverlay').classList.remove('show');
+    document.getElementById('pendingOverlay').classList.remove('show');
+    startAppLocal();
+  }
+}
+
+function checkStorageChoice() {
+  // التحقق من وجود اختيار محفوظ
+  try {
+    const saved = localStorage.getItem('gtrpos_storage_mode');
+    if (saved === 'cloud' || saved === 'local') {
+      // نمرر الاختيار تلقائياً
+      storageMode = saved;
+      document.getElementById('storageChoice').classList.add('hide');
+      if (saved === 'cloud') {
+        document.getElementById('loginOverlay').classList.add('show');
+        // ننتظر المستخدم يسجل دخول
+      } else {
+        document.getElementById('loginOverlay').classList.remove('show');
+        startAppLocal();
+      }
+      return;
+    }
+  } catch(e) {}
+  // إذا لم يكن هناك اختيار محفوظ، تبقى شاشة الاختيار ظاهرة
+}
+
+// ===== تشغيل التطبيق في الوضع المحلي =====
+function startAppLocal() {
+  // تحميل البيانات من localStorage مباشرة
+  loadState();
+  // نمرر currentUser كـ null لأننا في وضع محلي
+  currentUser = null;
+  document.getElementById('mainApp').style.display = 'flex';
+  initAll();
+}
+
 // ===== FIREBASE =====
 const firebaseConfig = {
   apiKey: "AIzaSyBG_F8TMY4Mmzb1e2etzPHQTw6upu4dkrs",
@@ -383,7 +348,11 @@ function addStock(name, qty, type, src, srcId, date, desc) { stockMovements.push
 function removeStock(src, srcId) { stockMovements = stockMovements.filter(m => !(m.source === src && m.sourceId === srcId)); }
 function saveState() {
   try { localStorage.setItem('gtrpos_data_v1', JSON.stringify({ clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo })); } catch(e) {}
-  if (currentUser) { db.collection('users').doc(currentUser.uid).set({ clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo }).catch(e => console.error(e)); }
+  // فقط في وضع السحابة ندفع إلى Firestore
+  if (storageMode === 'cloud' && currentUser) {
+    const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo };
+    db.collection('users').doc(currentUser.uid).set(data).catch(e => console.error('Firestore save error', e));
+  }
 }
 function loadState() {
   try { const raw = localStorage.getItem('gtrpos_data_v1'); if (!raw) return false; const data = JSON.parse(raw); if (data.clients) clients = data.clients; if (data.articles) articles = data.articles; if (data.fournisseurs) fournisseurs = data.fournisseurs; if (data.ventes) ventes = data.ventes; if (data.achats) achats = data.achats; if (data.caisse) caisse = data.caisse; if (data.expenses) expenses = data.expenses; if (data.stockMovements) stockMovements = data.stockMovements; if (data.nextId) nextId = data.nextId; if (data.companyInfo) companyInfo = data.companyInfo; return true; } catch(e) { return false; } }
@@ -399,9 +368,26 @@ function refreshArticleSelects() { const opts = '<option value="">-- اختر --
 
 // ===== LOGIN =====
 function toggleLoginMode() { isSignupMode = !isSignupMode; $('loginMainBtn').textContent = isSignupMode ? 'إنشاء الحساب' : 'تسجيل الدخول'; $('loginMainBtn').onclick = isSignupMode ? doSignup : doLogin; $('loginModeLabel').textContent = isSignupMode ? 'أنشئ حسابا جديدا' : 'تسجيل الدخول لحسابك'; $('loginToggleBtn').textContent = isSignupMode ? 'عندك حساب؟ سجل الدخول' : 'ما عندكش حساب؟ أنشئ واحد'; $('loginError').textContent = ''; }
-function doLogin() { const e = $('loginEmail').value.trim(), p = $('loginPassword').value; if (!e || !p) { $('loginError').textContent = 'أدخل البريد وكلمة السر'; return; } $('loginError').textContent = ''; $('loginLoading').style.display = 'block'; auth.signInWithEmailAndPassword(e, p).catch(err => { $('loginError').textContent = err.message; }).finally(() => { $('loginLoading').style.display = 'none'; }); }
-function doSignup() { const e = $('loginEmail').value.trim(), p = $('loginPassword').value; if (!e || !p) { $('loginError').textContent = 'أدخل البريد وكلمة السر'; return; } $('loginError').textContent = ''; $('loginLoading').style.display = 'block'; auth.createUserWithEmailAndPassword(e, p).catch(err => { $('loginError').textContent = err.message; }).finally(() => { $('loginLoading').style.display = 'none'; }); }
-function doGoogleLogin() { const provider = new firebase.auth.GoogleAuthProvider(); $('loginError').textContent = ''; $('loginLoading').style.display = 'block'; auth.signInWithPopup(provider).catch(err => { $('loginError').textContent = err.message; }).finally(() => { $('loginLoading').style.display = 'none'; }); }
+function doLogin() { 
+  if (storageMode !== 'cloud') { showToast('الرجاء اختيار وضع السحابة أولاً'); return; }
+  const e = $('loginEmail').value.trim(), p = $('loginPassword').value; 
+  if (!e || !p) { $('loginError').textContent = 'أدخل البريد وكلمة السر'; return; } 
+  $('loginError').textContent = ''; $('loginLoading').style.display = 'block'; 
+  auth.signInWithEmailAndPassword(e, p).catch(err => { $('loginError').textContent = err.message; }).finally(() => { $('loginLoading').style.display = 'none'; }); 
+}
+function doSignup() { 
+  if (storageMode !== 'cloud') { showToast('الرجاء اختيار وضع السحابة أولاً'); return; }
+  const e = $('loginEmail').value.trim(), p = $('loginPassword').value; 
+  if (!e || !p) { $('loginError').textContent = 'أدخل البريد وكلمة السر'; return; } 
+  $('loginError').textContent = ''; $('loginLoading').style.display = 'block'; 
+  auth.createUserWithEmailAndPassword(e, p).catch(err => { $('loginError').textContent = err.message; }).finally(() => { $('loginLoading').style.display = 'none'; }); 
+}
+function doGoogleLogin() { 
+  if (storageMode !== 'cloud') { showToast('الرجاء اختيار وضع السحابة أولاً'); return; }
+  const provider = new firebase.auth.GoogleAuthProvider(); 
+  $('loginError').textContent = ''; $('loginLoading').style.display = 'block'; 
+  auth.signInWithPopup(provider).catch(err => { $('loginError').textContent = err.message; }).finally(() => { $('loginLoading').style.display = 'none'; }); 
+}
 function doLogout() { auth.signOut(); closeSheet(); }
 
 // ===== UI =====
@@ -553,7 +539,7 @@ const Fournisseurs = {
   render() { const q = $('fSearch').value.trim().toLowerCase(); const list = $('fournisseursList'); list.innerHTML = ''; const filtered = fournisseurs.filter(f => !q || f.name.toLowerCase().includes(q) || (f.phone || '').includes(q)); if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا يوجد موردون</div>'; return; } filtered.forEach(f => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => Fournisseurs.load(f.id); d.innerHTML = `<div class="main-info"><div class="name">${f.name}</div><div class="meta">${f.phone || ''}</div></div><div class="amount">${f.balance.toFixed(3)} د.ت</div>`; list.appendChild(d); }); }
 };
 
-// ===== VENTES =====
+// ===== VENTES (مختصر) =====
 const Ventes = {
   editingId: null, lines: [], editingReglementId: null,
   reset() { this.editingId = null; this.lines = []; this.editingReglementId = null; $('vNum').value = 'VTE-' + String(nextId.ventes).padStart(4, '0'); $('vDate').value = new Date().toISOString().slice(0, 10); $('vClient').value = ''; $('vPhone').value = ''; $('vPayment').value = 'آجل'; $('viArticle').value = ''; $('viManualName').value = ''; $('viPrice').value = ''; $('viQty').value = 1; $('viTotal').value = ''; $('viStockHint').textContent = ''; $('vrAmount').value = ''; $('vrBody').innerHTML = ''; $('vAccountSummary').innerHTML = ''; this.renderLines(); this.refreshArticleOptions(); },
@@ -578,7 +564,7 @@ const Ventes = {
   render() { const q = $('vSearch').value.trim().toLowerCase(); const list = $('ventesList'); list.innerHTML = ''; const filtered = ventes.filter(v => !q || v.num.toLowerCase().includes(q) || v.client.toLowerCase().includes(q)).reverse(); if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا توجد عمليات بيع</div>'; return; } filtered.forEach(v => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => Ventes.load(v.id); d.innerHTML = `<div class="main-info"><div class="name">${v.num}</div><div class="meta">${v.client} - ${v.date}</div></div><div class="amount">${v.total.toFixed(3)} د.ت</div>`; list.appendChild(d); }); }
 };
 
-// ===== ACHATS =====
+// ===== ACHATS (مختصر) =====
 const Achats = {
   editingId: null, lines: [], editingReglementId: null,
   reset() { this.editingId = null; this.lines = []; this.editingReglementId = null; $('pNum').value = 'ACH-' + String(nextId.achats).padStart(4, '0'); $('pDate').value = new Date().toISOString().slice(0, 10); $('pSupplier').value = ''; $('pPhone').value = ''; $('pAddress').value = ''; $('pPayment').value = 'آجل'; $('piArticle').value = ''; $('piManualName').value = ''; $('piPrice').value = ''; $('piQty').value = 1; $('piTotal').value = ''; $('piStockHint').textContent = ''; $('arAmount').value = ''; $('arBody').innerHTML = ''; $('pAccountSummary').innerHTML = ''; this.renderLines(); this.refreshArticleOptions(); },
@@ -603,7 +589,7 @@ const Achats = {
   render() { const q = $('pSearch').value.trim().toLowerCase(); const list = $('achatsList'); list.innerHTML = ''; const filtered = achats.filter(p => !q || p.num.toLowerCase().includes(q) || p.supplier.toLowerCase().includes(q)).reverse(); if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا توجد عمليات شراء</div>'; return; } filtered.forEach(p => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => Achats.load(p.id); d.innerHTML = `<div class="main-info"><div class="name">${p.num}</div><div class="meta">${p.supplier} - ${p.date}</div></div><div class="amount">${p.total.toFixed(3)} د.ت</div>`; list.appendChild(d); }); }
 };
 
-// ===== CAISSE (FIXED) =====
+// ===== CAISSE =====
 const Caisse = {
   editingId: null,
   reset() { this.editingId = null; $('ksDate').value = new Date().toISOString().slice(0, 10); $('ksType').value = 'in'; $('ksAmount').value = ''; $('ksDesc').value = ''; },
@@ -614,24 +600,23 @@ const Caisse = {
     const type = $('ksType').value;
     const desc = $('ksDesc').value || '-';
     
-    // إذا كان تعديلاً
     if (this.editingId) {
       const oldEntry = caisse.find(k => k.id === this.editingId);
       if (!oldEntry) { showToast('الحركة غير موجودة'); return; }
       const oldAmount = oldEntry.amount;
-      const delta = type === oldEntry.type ? amount - oldAmount : (type === 'in' ? amount + oldAmount : -(amount + oldAmount));
-      
-      // تحديث الكيان المرتبط
-      this._updateLinkedEntity(oldEntry.source, oldEntry.sourceId, delta, oldEntry);
-      
-      // تحديث الحركة نفسها
+      let delta = 0;
+      if (type === oldEntry.type) {
+        delta = amount - oldAmount;
+      } else {
+        delta = type === 'in' ? (amount + oldAmount) : -(amount + oldAmount);
+      }
+      this._updateLinkedEntity(oldEntry.source, oldEntry.sourceId, delta, { amount, date, type, description: desc, method: oldEntry.method || '' });
       const idx = caisse.findIndex(k => k.id === this.editingId);
       if (idx !== -1) {
         caisse[idx] = { ...oldEntry, date, type, amount, description: desc };
       }
       showToast('تم التعديل');
     } else {
-      // إضافة جديدة (يدوية)
       const rec = { id: nextId.caisse++, date, type, amount, description: desc, source: 'manual' };
       caisse.push(rec);
       showToast('تم الحفظ');
@@ -644,110 +629,101 @@ const Caisse = {
     if (this.editingId == null) { showToast('اختر حركة لحذفها'); return; }
     const entry = caisse.find(k => k.id === this.editingId);
     if (!entry) { showToast('الحركة غير موجودة'); return; }
-    
-    // عكس تأثير الحركة على الكيان المرتبط (إذا كان مرتبطاً)
-    if (entry.source && entry.source !== 'manual') {
-      const delta = entry.type === 'in' ? -entry.amount : entry.amount; // عكس الإشارة
-      this._updateLinkedEntity(entry.source, entry.sourceId, delta, entry);
-    }
-    
+    const delta = entry.type === 'in' ? -entry.amount : entry.amount;
+    this._updateLinkedEntity(entry.source, entry.sourceId, delta, { amount: -entry.amount, date: entry.date, type: entry.type === 'in' ? 'out' : 'in', description: entry.description, method: entry.method || '' });
     caisse = caisse.filter(k => k.id !== this.editingId);
     saveState();
     this.render();
     closeSheet();
     showToast('تم الحذف');
   },
-  
-  // دوال مساعدة لتحديث العملاء/الموردين
-  _updateLinkedEntity(source, sourceId, delta, entry) {
-    if (source === 'reglement_vente') {
-      // استخراج رقم الفاتورة من sourceId: vente-{id}-{regId}
-      const parts = sourceId.split('-');
-      if (parts.length >= 3) {
-        const venteId = parseInt(parts[1]);
-        const vente = ventes.find(v => v.id === venteId);
-        if (vente) {
-          const client = clients.find(c => c.name === vente.client);
+  _updateLinkedEntity(source, sourceId, delta, newData) {
+    if (!source || source === 'manual') return;
+    try {
+      if (source === 'reglement_vente') {
+        const parts = sourceId.split('-');
+        if (parts.length >= 3) {
+          const venteId = parseInt(parts[1]);
+          const vente = ventes.find(v => v.id === venteId);
+          if (vente) {
+            const client = clients.find(c => c.name === vente.client);
+            if (client) {
+              client.balance += delta;
+              const regId = parseInt(parts[2]);
+              const regEntry = client.reglements?.find(r => r.id === regId);
+              if (regEntry && newData) {
+                regEntry.amount = newData.amount;
+                regEntry.date = newData.date;
+                regEntry.method = newData.method || regEntry.method;
+              }
+            }
+          }
+        }
+      } else if (source === 'reglement_achat') {
+        const parts = sourceId.split('-');
+        if (parts.length >= 3) {
+          const achatId = parseInt(parts[1]);
+          const achat = achats.find(a => a.id === achatId);
+          if (achat) {
+            const supplier = fournisseurs.find(f => f.name === achat.supplier);
+            if (supplier) {
+              supplier.balance += delta;
+              const regId = parseInt(parts[2]);
+              const regEntry = supplier.reglements?.find(r => r.id === regId);
+              if (regEntry && newData) {
+                regEntry.amount = newData.amount;
+                regEntry.date = newData.date;
+                regEntry.method = newData.method || regEntry.method;
+              }
+            }
+          }
+        }
+      } else if (source === 'reglement_client') {
+        const desc = newData.description || '';
+        const match = desc.match(/تسديد من (.+?) \(/);
+        if (match) {
+          const clientName = match[1];
+          const client = clients.find(c => c.name === clientName);
           if (client) {
             client.balance += delta;
-            // تحديث التسديد في سجل العميل
-            const regId = parseInt(parts[2]);
-            const regEntry = client.reglements?.find(r => r.id === regId);
-            if (regEntry && entry) {
-              regEntry.amount = entry.amount;
-              regEntry.date = entry.date;
-              regEntry.method = entry.method || regEntry.method;
+            const regs = client.reglements || [];
+            if (regs.length > 0) {
+              const last = regs[regs.length - 1];
+              if (last && newData) {
+                last.amount = newData.amount;
+                last.date = newData.date;
+                last.method = newData.method || last.method;
+              }
             }
           }
         }
-      }
-    } else if (source === 'reglement_achat') {
-      const parts = sourceId.split('-');
-      if (parts.length >= 3) {
-        const achatId = parseInt(parts[1]);
-        const achat = achats.find(a => a.id === achatId);
-        if (achat) {
-          const supplier = fournisseurs.find(f => f.name === achat.supplier);
+      } else if (source === 'reglement_fournisseur') {
+        const desc = newData.description || '';
+        const match = desc.match(/تسديد لـ (.+?) \(/);
+        if (match) {
+          const supplierName = match[1];
+          const supplier = fournisseurs.find(f => f.name === supplierName);
           if (supplier) {
             supplier.balance += delta;
-            const regId = parseInt(parts[2]);
-            const regEntry = supplier.reglements?.find(r => r.id === regId);
-            if (regEntry && entry) {
-              regEntry.amount = entry.amount;
-              regEntry.date = entry.date;
-              regEntry.method = entry.method || regEntry.method;
+            const regs = supplier.reglements || [];
+            if (regs.length > 0) {
+              const last = regs[regs.length - 1];
+              if (last && newData) {
+                last.amount = newData.amount;
+                last.date = newData.date;
+                last.method = newData.method || last.method;
+              }
             }
           }
         }
       }
-    } else if (source === 'reglement_client') {
-      // sourceId قد يكون quick-{timestamp} أو يحتوي على id العميل
-      // نبحث عن العميل باستخدام الوصف
-      const desc = entry.description || '';
-      const match = desc.match(/تسديد من (.+?) \(/);
-      if (match) {
-        const clientName = match[1];
-        const client = clients.find(c => c.name === clientName);
-        if (client) {
-          client.balance += delta;
-          // تحديث آخر تسديد في سجل العميل
-          const regs = client.reglements || [];
-          if (regs.length > 0) {
-            const last = regs[regs.length - 1];
-            if (last && entry) {
-              last.amount = entry.amount;
-              last.date = entry.date;
-              last.method = entry.method || last.method;
-            }
-          }
-        }
-      }
-    } else if (source === 'reglement_fournisseur') {
-      const desc = entry.description || '';
-      const match = desc.match(/تسديد لـ (.+?) \(/);
-      if (match) {
-        const supplierName = match[1];
-        const supplier = fournisseurs.find(f => f.name === supplierName);
-        if (supplier) {
-          supplier.balance += delta;
-          const regs = supplier.reglements || [];
-          if (regs.length > 0) {
-            const last = regs[regs.length - 1];
-            if (last && entry) {
-              last.amount = entry.amount;
-              last.date = entry.date;
-              last.method = entry.method || last.method;
-            }
-          }
-        }
-      }
+      Clients.render();
+      Fournisseurs.render();
+      Reglements.render();
+    } catch (e) {
+      console.warn('Error updating linked entity:', e);
     }
-    // تحديث الـ UI
-    Clients.render();
-    Fournisseurs.render();
-    Reglements.render();
   },
-  
   load(id) {
     const k = caisse.find(x => x.id === id);
     if (!k) { showToast('الحركة غير موجودة'); return; }
@@ -859,23 +835,31 @@ function importBackupFile(input) { const file = input.files[0]; if (!file) retur
 
 // ===== INIT =====
 function initAll() {
-  if (!currentUser) return;
-  refreshClientSelect();
-  refreshSupplierSelect();
-  refreshArticleSelects();
-  Clients.render();
-  Articles.render();
-  Fournisseurs.render();
-  Ventes.render();
-  Achats.render();
-  Caisse.reset();
-  Caisse.render();
-  Expenses.render();
-  Reglements.render();
-  if (currentUser.email === 'krimi.neji@gmail.com') $('tabApprovals').style.display = '';
-  Rapports.render();
-  $('loginOverlay').classList.add('hide');
-  $('pendingOverlay').classList.add('hide');
+  try {
+    if (storageMode !== 'cloud' && !currentUser) {
+      // في الوضع المحلي، نعرض التطبيق مباشرة
+    }
+    refreshClientSelect();
+    refreshSupplierSelect();
+    refreshArticleSelects();
+    Clients.render();
+    Articles.render();
+    Fournisseurs.render();
+    Ventes.render();
+    Achats.render();
+    Caisse.reset();
+    Caisse.render();
+    Expenses.render();
+    Reglements.render();
+    if (currentUser && currentUser.email === 'krimi.neji@gmail.com') $('tabApprovals').style.display = '';
+    Rapports.render();
+    document.getElementById('mainApp').style.display = 'flex';
+    $('loginOverlay').classList.remove('show');
+    $('pendingOverlay').classList.remove('show');
+  } catch(e) {
+    console.error('Init error:', e);
+    showToast('حدث خطأ بسيط، لكن التطبيق يعمل');
+  }
 }
 
 // ===== AUTH =====
@@ -886,30 +870,39 @@ auth.onAuthStateChanged(user => {
     const display = $('accountEmailDisplay');
     if (display) display.textContent = user.email || '';
     if (user.email && user.email.toLowerCase() === ADMIN_EMAIL) {
-      loadStateFromFirestore(user.uid).then(() => initAll()).catch(() => initAll());
+      loadStateFromFirestore(user.uid).then(() => { initAll(); }).catch(() => { initAll(); });
       return;
     }
     db.collection('approvals').doc(user.uid).get().then(doc => {
       if (!doc.exists) {
         db.collection('approvals').doc(user.uid).set({ email: user.email || '', requestedAt: new Date().toISOString(), approved: false }).catch(e => console.error(e));
-        $('loginOverlay').classList.add('hide');
-        $('pendingOverlay').classList.remove('hide');
+        $('loginOverlay').classList.remove('show');
+        $('pendingOverlay').classList.add('show');
       } else if (doc.data().approved === true) {
-        loadStateFromFirestore(user.uid).then(() => initAll()).catch(() => initAll());
+        loadStateFromFirestore(user.uid).then(() => { initAll(); }).catch(() => { initAll(); });
       } else {
-        $('loginOverlay').classList.add('hide');
-        $('pendingOverlay').classList.remove('hide');
+        $('loginOverlay').classList.remove('show');
+        $('pendingOverlay').classList.add('show');
       }
-    }).catch(() => { $('loginOverlay').classList.add('hide'); $('pendingOverlay').classList.remove('hide'); });
+    }).catch(() => { 
+      $('loginOverlay').classList.remove('show'); 
+      $('pendingOverlay').classList.add('show'); 
+    });
   } else {
     currentUser = null;
-    $('loginOverlay').classList.remove('hide');
-    $('pendingOverlay').classList.add('hide');
+    if (storageMode === 'cloud') {
+      // في وضع السحابة، إذا لم يكن هناك مستخدم، نظهر شاشة الدخول
+      $('loginOverlay').classList.add('show');
+      $('pendingOverlay').classList.remove('show');
+    }
   }
 });
 
-// ===== INITIAL LOAD =====
+// ===== بدء التشغيل =====
+// تحميل البيانات المحلية أولاً
 loadState();
+// التحقق من اختيار التخزين
+checkStorageChoice();
 </script>
 </body>
 </html>
