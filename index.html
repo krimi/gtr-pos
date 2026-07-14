@@ -138,7 +138,6 @@
   .storage-selector{display:flex; gap:8px; margin:10px 0; justify-content:center;}
   .storage-selector .btn{flex:1; padding:6px; font-size:12px; margin:0; background:#eee; color:#333; border:1px solid var(--border);}
   .storage-selector .btn.active{background:var(--blue-accent); color:#fff; border-color:var(--blue-accent);}
-  /* Reports styles */
   .report-filter{display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;}
   .report-filter .field{flex:1; min-width:100px; margin-bottom:0;}
   .report-filter .field input{padding:4px 8px; height:32px;}
@@ -157,7 +156,7 @@
 <!-- Login overlay -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-box">
-    <div class="login-logo">GTR POS <span style="font-size:13px; opacity:.6; font-weight:400;">v0.3.4</span></div>
+    <div class="login-logo">GTR POS <span style="font-size:13px; opacity:.6; font-weight:400;">v0.3.6</span></div>
     <div class="login-sub" id="loginModeLabel">تسجيل الدخول لحسابك</div>
     <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="email">
     <input type="password" id="loginPassword" placeholder="كلمة السر" autocomplete="current-password">
@@ -189,7 +188,7 @@
 <!-- Phone -->
 <div class="phone">
   <div class="appbar">
-    <div><div class="title" id="pageTitle">لوحة القيادة</div><div class="sub" onclick="openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">v0.3.4</span></div></div>
+    <div><div class="title" id="pageTitle">لوحة القيادة</div><div class="sub" onclick="openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">v0.3.6</span></div></div>
     <div style="display:flex; gap:6px;"><button class="menu-btn" onclick="openSheet('company')">⚙️</button><button class="menu-btn" id="langBtn" style="font-size:12px;">FR</button></div>
   </div>
   <div class="content">
@@ -214,8 +213,6 @@
       <div class="section-title">⚠️ مخزون منخفض</div>
       <div id="lowStockList"></div>
     </div>
-    
-    <!-- ===== REPORTS SECTION ===== -->
     <div class="section" id="sec-reports">
       <div class="section-title">📋 التقارير</div>
       <div class="report-filter">
@@ -228,7 +225,6 @@
         <div class="empty-msg">اختر الفترة ثم اضغط "عرض"</div>
       </div>
     </div>
-    
     <div class="section" id="sec-clients"><input class="search-box" id="cSearch" placeholder="🔍 بحث بالاسم أو الهاتف..." oninput="Clients.render()"><div id="clientsList"></div></div>
     <div class="section" id="sec-articles"><input class="search-box" id="aSearch" placeholder="🔍 بحث باسم الصنف..." oninput="Articles.render()"><div id="articlesList"></div></div>
     <div class="section" id="sec-caisse"><div class="kpi-row" style="grid-template-columns:1fr;"><div class="kpi-card ok"><div class="val" id="caisseBalance">0.000 د.ت</div><div class="lbl">الرصيد الحالي</div></div></div><div id="caisseList"></div></div>
@@ -254,7 +250,7 @@
     <div class="tab-item" data-section="approvals" id="tabApprovals" style="display:none;"><span class="ic">👤</span><span>الحسابات</span></div>
   </div>
   <div class="sheet-overlay" id="overlay"></div>
-  <!-- Client sheet -->
+  <!-- Client sheet with tax ID field -->
   <div class="sheet" id="sheet-clients"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات العميل</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field"><label>رمز العميل</label><input id="cCode" readonly></div>
     <div class="field"><label>اسم العميل</label><input id="cName"></div>
@@ -262,6 +258,7 @@
     <div class="field"><label>الهاتف 2</label><input id="cPhone2"></div>
     <div class="field"><label>الهاتف 3</label><input id="cPhone3"></div>
     <div class="field"><label>العنوان</label><input id="cAddress"></div>
+    <div class="field"><label>البطاقة الجبائية</label><input id="cTaxId"></div>
     <div class="field"><label>الرصيد (د.ت)</label><input id="cBalance" type="number" step="0.001" value="0"></div>
     <div class="field"><label>ملاحظات</label><input id="cNotes"></div>
     <div class="section-title">أسعار خاصة</div>
@@ -270,43 +267,50 @@
     <button class="btn outline small" onclick="Clients.addSpecialPrice()">+ إضافة سعر خاص</button>
     <table class="items-mini"><thead><tr><th>الصنف</th><th>السعر الخاص</th><th></th></tr></thead><tbody id="cpBody"></tbody></table>
   </div><div class="sheet-footer"><button class="btn save" onclick="Clients.save()">💾 حفظ</button><button class="btn edit" onclick="Clients.edit()">✏️ تعديل</button><button class="btn del" onclick="Clients.remove()">🗑 حذف</button></div></div>
-  <!-- Article sheet --><div class="sheet" id="sheet-articles"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات الصنف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
+  <!-- Article sheet -->
+  <div class="sheet" id="sheet-articles"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات الصنف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field"><label>رمز الصنف</label><input id="aCode" readonly></div>
     <div class="field"><label>اسم الصنف</label><input id="aName"></div>
     <div class="field"><label>سعر البيع (د.ت)</label><input id="aPrice" type="number" step="0.001"></div>
     <div class="field"><label>سعر الشراء (د.ت)</label><input id="aCostPrice" type="number" step="0.001"></div>
     <div class="field"><label>الكمية بالمخزون</label><input id="aStock" type="number" value="0"></div>
   </div><div class="sheet-footer"><button class="btn save" onclick="Articles.save()">💾 حفظ</button><button class="btn edit" onclick="Articles.edit()">✏️ تعديل</button><button class="btn del" onclick="Articles.remove()">🗑 حذف</button></div></div>
-  <!-- Caisse sheet --><div class="sheet" id="sheet-caisse"><div class="sheet-handle"></div><div class="sheet-header"><h3>حركة الكاسة</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
+  <!-- Caisse sheet -->
+  <div class="sheet" id="sheet-caisse"><div class="sheet-handle"></div><div class="sheet-header"><h3>حركة الكاسة</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field"><label>التاريخ</label><input id="ksDate" type="date"></div>
     <div class="field"><label>النوع</label><select id="ksType"><option value="in">دخول (+)</option><option value="out">خروج (-)</option></select></div>
     <div class="field"><label>المبلغ (د.ت)</label><input id="ksAmount" type="number" step="0.001"></div>
     <div class="field"><label>البيان</label><input id="ksDesc"></div>
   </div><div class="sheet-footer"><button class="btn save" onclick="Caisse.save()">💾 حفظ</button><button class="btn del" onclick="Caisse.remove()">🗑 حذف</button></div></div>
-  <!-- Expenses sheet --><div class="sheet" id="sheet-expenses"><div class="sheet-handle"></div><div class="sheet-header"><h3>مصروف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
+  <!-- Expenses sheet -->
+  <div class="sheet" id="sheet-expenses"><div class="sheet-handle"></div><div class="sheet-header"><h3>مصروف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field"><label>التاريخ</label><input id="exDate" type="date"></div>
     <div class="field"><label>الفئة</label><select id="exCategory"><option>كراء</option><option>أجور</option><option>فواتير</option><option>نقل</option><option>صيانة</option><option>أخرى</option></select></div>
     <div class="field"><label>المبلغ (د.ت)</label><input id="exAmount" type="number" step="0.001"></div>
     <div class="field"><label>البيان</label><input id="exDesc"></div>
   </div><div class="sheet-footer"><button class="btn save" onclick="Expenses.save()">💾 حفظ</button><button class="btn edit" onclick="Expenses.edit()">✏️ تعديل</button><button class="btn del" onclick="Expenses.remove()">🗑 حذف</button></div></div>
-  <!-- Quick reglement --><div class="sheet" id="sheet-quickreglement"><div class="sheet-handle"></div><div class="sheet-header"><h3>تسجيل تسديد سريع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
+  <!-- Quick reglement -->
+  <div class="sheet" id="sheet-quickreglement"><div class="sheet-handle"></div><div class="sheet-header"><h3>تسجيل تسديد سريع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field"><label>النوع</label><select id="qrType" onchange="QuickReglement.refreshTargets()"><option value="client">تسديد من عميل</option><option value="fournisseur">تسديد لمورد</option></select></div>
     <div class="field"><label>الاسم</label><select id="qrTarget" onchange="QuickReglement.showHint()"><option value="">-- اختر --</option></select></div>
     <div style="font-size:11px; color:var(--muted); margin:-2px 0 6px;" id="qrBalanceHint"></div>
     <div class="field"><label>مبلغ التسديد (د.ت)</label><input id="qrAmount" type="number" step="0.001"></div>
     <div class="field"><label>نوع التسديد</label><select id="qrMethod"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option></select></div>
   </div><div class="sheet-footer"><button class="btn save" onclick="QuickReglement.save()">💾 تسجيل التسديد</button></div></div>
-  <!-- Fournisseur sheet --><div class="sheet" id="sheet-fournisseurs"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات المورد</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
+  <!-- Fournisseur sheet with tax ID field -->
+  <div class="sheet" id="sheet-fournisseurs"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات المورد</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field"><label>رمز المورد</label><input id="fCode" readonly></div>
     <div class="field"><label>اسم المورد</label><input id="fName"></div>
     <div class="field"><label>الهاتف 1</label><input id="fPhone"></div>
     <div class="field"><label>الهاتف 2</label><input id="fPhone2"></div>
     <div class="field"><label>الهاتف 3</label><input id="fPhone3"></div>
     <div class="field"><label>العنوان</label><input id="fAddress"></div>
+    <div class="field"><label>البطاقة الجبائية</label><input id="fTaxId"></div>
     <div class="field"><label>الرصيد (د.ت)</label><input id="fBalance" type="number" step="0.001" value="0"></div>
     <div class="field"><label>ملاحظات</label><input id="fNotes"></div>
   </div><div class="sheet-footer"><button class="btn save" onclick="Fournisseurs.save()">💾 حفظ</button><button class="btn edit" onclick="Fournisseurs.edit()">✏️ تعديل</button><button class="btn del" onclick="Fournisseurs.remove()">🗑 حذف</button></div></div>
-  <!-- Vente sheet --><div class="sheet" id="sheet-ventes"><div class="sheet-handle"></div><div class="sheet-header"><h3>عملية بيع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
+  <!-- Vente sheet -->
+  <div class="sheet" id="sheet-ventes"><div class="sheet-handle"></div><div class="sheet-header"><h3>عملية بيع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field-row"><div class="field"><label>رقم المبيعات</label><input id="vNum" readonly></div><div class="field"><label>التاريخ</label><input id="vDate" type="date"></div></div>
     <div class="field"><label>العميل</label><select id="vClient" onchange="Ventes.fillClient()"><option value="">-- اختر --</option></select></div>
     <div class="field"><label>هاتف العميل</label><input id="vPhone" readonly></div>
@@ -330,7 +334,8 @@
     <button class="btn" style="background:linear-gradient(180deg,#3ddc84,#25d366);" onclick="Ventes.shareWhatsapp()">📱 واتساب</button>
     <button class="btn outline small" onclick="Ventes.printInvoice()">🖨️ طباعة</button>
   </div><div class="sheet-footer"><button class="btn save" onclick="Ventes.save()">💾 حفظ</button><button class="btn edit" onclick="Ventes.edit()">✏️ تعديل</button><button class="btn del" onclick="Ventes.remove()">🗑 حذف</button></div></div>
-  <!-- Achat sheet --><div class="sheet" id="sheet-achats"><div class="sheet-handle"></div><div class="sheet-header"><h3>عملية شراء</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
+  <!-- Achat sheet -->
+  <div class="sheet" id="sheet-achats"><div class="sheet-handle"></div><div class="sheet-header"><h3>عملية شراء</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field-row"><div class="field"><label>رقم المشتريات</label><input id="pNum" readonly></div><div class="field"><label>التاريخ</label><input id="pDate" type="date"></div></div>
     <div class="field"><label>المورد</label><select id="pSupplier" onchange="Achats.fillSupplier()"><option value="">-- اختر --</option></select></div>
     <div class="field-row"><div class="field"><label>هاتف المورد</label><input id="pPhone" readonly></div><div class="field"><label>عنوان المورد</label><input id="pAddress" readonly></div></div>
@@ -354,7 +359,8 @@
     <button class="btn" style="background:linear-gradient(180deg,#3ddc84,#25d366);" onclick="Achats.shareWhatsapp()">📱 واتساب</button>
     <button class="btn outline small" onclick="Achats.printInvoice()">🖨️ طباعة</button>
   </div><div class="sheet-footer"><button class="btn save" onclick="Achats.save()">💾 حفظ</button><button class="btn edit" onclick="Achats.edit()">✏️ تعديل</button><button class="btn del" onclick="Achats.remove()">🗑 حذف</button></div></div>
-  <!-- Company sheet --><div class="sheet" id="sheet-company"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات المؤسسة</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
+  <!-- Company sheet -->
+  <div class="sheet" id="sheet-company"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات المؤسسة</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field"><label>اسم المؤسسة</label><input id="cpyName"></div>
     <div class="field"><label>الشعار</label><div style="display:flex;gap:6px;align-items:center;"><img id="cpyLogoPreview" style="width:36px;height:36px;border-radius:6px;display:none;background:#eee;"><input type="file" id="cpyLogoInput" accept="image/*" style="display:none;" onchange="CompanyInfo.handleLogoUpload(this)"><button class="btn outline small" style="margin:0;" onclick="document.getElementById('cpyLogoInput').click()">اختر صورة</button><button class="btn del small" style="margin:0;flex:none;padding:2px 10px;" onclick="CompanyInfo.removeLogo()">✕</button></div></div>
     <div class="field"><label>العنوان</label><input id="cpyAddress"></div>
@@ -596,20 +602,18 @@ const Reports = {
     const from = $('reportFrom').value;
     const to = $('reportTo').value;
     if (!from || !to) { showToast('حدد فترة زمنية'); return; }
-    
-    const inRange = (date) => {
-      if (!date) return false;
-      return date >= from && date <= to;
-    };
-    
+    const inRange = (date) => { if (!date) return false; return date >= from && date <= to; };
     const filteredVentes = ventes.filter(v => inRange(v.date));
     const filteredAchats = achats.filter(a => inRange(a.date));
     const filteredExpenses = expenses.filter(e => inRange(e.date));
-    
     const totalSales = filteredVentes.reduce((a, v) => a + v.total, 0);
     const totalPurchases = filteredAchats.reduce((a, p) => a + p.total, 0);
     const totalExp = filteredExpenses.reduce((a, e) => a + e.amount, 0);
     const profit = totalSales - totalPurchases - totalExp;
+    
+    // حساب مجموع أرصدة العملاء والموردين (جميع العملاء والموردين، وليس فقط الذين في الفترة)
+    const totalClientBalances = clients.reduce((a, c) => a + c.balance, 0);
+    const totalSupplierBalances = fournisseurs.reduce((a, f) => a + f.balance, 0);
     
     const container = $('reportContent');
     let html = `
@@ -618,92 +622,54 @@ const Reports = {
         <div class="kpi-card warn"><div class="val">${totalPurchases.toFixed(3)}</div><div class="lbl">🛒 إجمالي المشتريات</div></div>
         <div class="kpi-card"><div class="val">${totalExp.toFixed(3)}</div><div class="lbl">💸 إجمالي المصاريف</div></div>
         <div class="kpi-card ${profit >= 0 ? 'ok' : 'warn'}"><div class="val">${profit.toFixed(3)}</div><div class="lbl">📊 صافي الربح</div></div>
+        <div class="kpi-card gold"><div class="val">${totalClientBalances.toFixed(3)}</div><div class="lbl">👥 مجموع أرصدة العملاء</div></div>
+        <div class="kpi-card gold"><div class="val">${totalSupplierBalances.toFixed(3)}</div><div class="lbl">🤝 مجموع أرصدة الموردين</div></div>
         <div class="kpi-card"><div class="val">${filteredVentes.length}</div><div class="lbl">📄 عدد فواتير البيع</div></div>
         <div class="kpi-card"><div class="val">${filteredAchats.length}</div><div class="lbl">📄 عدد فواتير الشراء</div></div>
       </div>
     `;
-    
-    // تفاصيل المبيعات
     html += `<div class="report-section"><div class="section-title">📈 تفاصيل المبيعات</div>`;
     if (filteredVentes.length === 0) html += `<div class="empty-msg">لا توجد مبيعات في هذه الفترة</div>`;
-    else {
-      filteredVentes.slice().reverse().forEach(v => {
-        html += `<div class="report-card"><div class="name">${v.num} - ${v.client}</div><div class="amount">${v.total.toFixed(3)} د.ت</div></div>`;
-      });
-    }
+    else { filteredVentes.slice().reverse().forEach(v => { html += `<div class="report-card"><div class="name">${v.num} - ${v.client}</div><div class="amount">${v.total.toFixed(3)} د.ت</div></div>`; }); }
     html += `</div>`;
-    
-    // تفاصيل المشتريات
     html += `<div class="report-section"><div class="section-title">🛒 تفاصيل المشتريات</div>`;
     if (filteredAchats.length === 0) html += `<div class="empty-msg">لا توجد مشتريات في هذه الفترة</div>`;
-    else {
-      filteredAchats.slice().reverse().forEach(a => {
-        html += `<div class="report-card"><div class="name">${a.num} - ${a.supplier}</div><div class="amount">${a.total.toFixed(3)} د.ت</div></div>`;
-      });
-    }
+    else { filteredAchats.slice().reverse().forEach(a => { html += `<div class="report-card"><div class="name">${a.num} - ${a.supplier}</div><div class="amount">${a.total.toFixed(3)} د.ت</div></div>`; }); }
     html += `</div>`;
-    
-    // تفاصيل المصاريف
     html += `<div class="report-section"><div class="section-title">💸 تفاصيل المصاريف</div>`;
     if (filteredExpenses.length === 0) html += `<div class="empty-msg">لا توجد مصاريف في هذه الفترة</div>`;
-    else {
-      filteredExpenses.slice().reverse().forEach(e => {
-        html += `<div class="report-card"><div class="name">${e.category}${e.description !== '-' ? ' - ' + e.description : ''}</div><div class="amount" style="color:var(--danger);">-${e.amount.toFixed(3)} د.ت</div></div>`;
-      });
-    }
+    else { filteredExpenses.slice().reverse().forEach(e => { html += `<div class="report-card"><div class="name">${e.category}${e.description !== '-' ? ' - ' + e.description : ''}</div><div class="amount" style="color:var(--danger);">-${e.amount.toFixed(3)} د.ت</div></div>`; }); }
     html += `</div>`;
-    
-    // أرصدة العملاء
     html += `<div class="report-section"><div class="section-title">👥 أرصدة العملاء</div>`;
     const clientsWithBalance = clients.filter(c => Math.abs(c.balance) > 0.0009).sort((a, b) => b.balance - a.balance);
     if (clientsWithBalance.length === 0) html += `<div class="empty-msg">لا توجد أرصدة</div>`;
-    else {
-      clientsWithBalance.forEach(c => {
-        const color = c.balance > 0 ? 'var(--danger)' : 'var(--success)';
-        html += `<div class="report-card"><div class="name">${c.name}</div><div class="amount" style="color:${color};">${c.balance.toFixed(3)} د.ت</div></div>`;
-      });
-    }
+    else { clientsWithBalance.forEach(c => { const color = c.balance > 0 ? 'var(--danger)' : 'var(--success)'; html += `<div class="report-card"><div class="name">${c.name}</div><div class="amount" style="color:${color};">${c.balance.toFixed(3)} د.ت</div></div>`; }); }
     html += `</div>`;
-    
-    // أرصدة الموردين
     html += `<div class="report-section"><div class="section-title">🤝 أرصدة الموردين</div>`;
     const fourWithBalance = fournisseurs.filter(f => Math.abs(f.balance) > 0.0009).sort((a, b) => b.balance - a.balance);
     if (fourWithBalance.length === 0) html += `<div class="empty-msg">لا توجد أرصدة</div>`;
-    else {
-      fourWithBalance.forEach(f => {
-        const color = f.balance > 0 ? 'var(--danger)' : 'var(--success)';
-        html += `<div class="report-card"><div class="name">${f.name}</div><div class="amount" style="color:${color};">${f.balance.toFixed(3)} د.ت</div></div>`;
-      });
-    }
+    else { fourWithBalance.forEach(f => { const color = f.balance > 0 ? 'var(--danger)' : 'var(--success)'; html += `<div class="report-card"><div class="name">${f.name}</div><div class="amount" style="color:${color};">${f.balance.toFixed(3)} د.ت</div></div>`; }); }
     html += `</div>`;
-    
-    // المخزون
     html += `<div class="report-section"><div class="section-title">📦 المخزون</div>`;
     const stockItems = articles.filter(a => getStock(a.name) > 0).sort((a, b) => getStock(b.name) - getStock(a.name));
     if (stockItems.length === 0) html += `<div class="empty-msg">لا توجد أصناف في المخزون</div>`;
-    else {
-      stockItems.forEach(a => {
-        const qty = getStock(a.name);
-        html += `<div class="report-card"><div class="name">${a.name}</div><div class="amount">${qty} × ${a.price.toFixed(3)} = ${(qty * a.price).toFixed(3)}</div></div>`;
-      });
-    }
+    else { stockItems.forEach(a => { const qty = getStock(a.name); html += `<div class="report-card"><div class="name">${a.name}</div><div class="amount">${qty} × ${a.price.toFixed(3)} = ${(qty * a.price).toFixed(3)}</div></div>`; }); }
     html += `</div>`;
-    
     container.innerHTML = html;
   }
 };
 
-// ===== CLIENTS =====
+// ===== CLIENTS (with taxId) =====
 const Clients = {
   editingId: null, specialPrices: [],
-  reset() { this.editingId = null; this.specialPrices = []; $('cCode').value = 'CL-' + String(nextId.clients).padStart(4, '0'); $('cName').value = ''; $('cPhone').value = ''; $('cPhone2').value = ''; $('cPhone3').value = ''; $('cAddress').value = ''; $('cBalance').value = '0'; $('cNotes').value = ''; $('cpArticle').value = ''; $('cpPrice').value = ''; this.renderSpecialPrices(); },
+  reset() { this.editingId = null; this.specialPrices = []; $('cCode').value = 'CL-' + String(nextId.clients).padStart(4, '0'); $('cName').value = ''; $('cPhone').value = ''; $('cPhone2').value = ''; $('cPhone3').value = ''; $('cAddress').value = ''; $('cTaxId').value = ''; $('cBalance').value = '0'; $('cNotes').value = ''; $('cpArticle').value = ''; $('cpPrice').value = ''; this.renderSpecialPrices(); },
   addSpecialPrice() { const sel = $('cpArticle'); const name = sel.options[sel.selectedIndex]?.textContent; const price = parseFloat($('cpPrice').value) || 0; if (!name || price <= 0) { showToast('اختر صنفا وأدخل سعرا'); return; } this.specialPrices = this.specialPrices.filter(sp => sp.name !== name); this.specialPrices.push({ name, price }); $('cpArticle').value = ''; $('cpPrice').value = ''; this.renderSpecialPrices(); },
   removeSpecialPrice(idx) { this.specialPrices.splice(idx, 1); this.renderSpecialPrices(); },
   renderSpecialPrices() { const b = $('cpBody'); b.innerHTML = ''; this.specialPrices.forEach((sp, i) => { b.innerHTML += `<tr><td>${sp.name}</td><td>${sp.price.toFixed(3)}</td><td><button class="del-row" onclick="Clients.removeSpecialPrice(${i})">✕</button></td></tr>`; }); },
-  save() { if (!$('cName').value.trim()) { showToast('أدخل اسم العميل'); return; } const bal = parseFloat($('cBalance').value) || 0; const rec = { id: this.editingId || nextId.clients++, name: $('cName').value.trim(), phone: $('cPhone').value, phone2: $('cPhone2').value, phone3: $('cPhone3').value, address: $('cAddress').value, balance: bal, notes: $('cNotes').value, specialPrices: [...this.specialPrices], openingBalance: this.editingId ? clients.find(c => c.id === this.editingId)?.openingBalance || bal : bal }; if (this.editingId) { const idx = clients.findIndex(c => c.id === this.editingId); if (idx !== -1) clients[idx] = rec; } else clients.push(rec); saveState(); refreshClientSelect(); this.render(); closeSheet(); showToast(this.editingId ? 'تم التعديل' : 'تم الحفظ'); },
+  save() { if (!$('cName').value.trim()) { showToast('أدخل اسم العميل'); return; } const bal = parseFloat($('cBalance').value) || 0; const rec = { id: this.editingId || nextId.clients++, name: $('cName').value.trim(), phone: $('cPhone').value, phone2: $('cPhone2').value, phone3: $('cPhone3').value, address: $('cAddress').value, taxId: $('cTaxId').value, balance: bal, notes: $('cNotes').value, specialPrices: [...this.specialPrices], openingBalance: this.editingId ? clients.find(c => c.id === this.editingId)?.openingBalance || bal : bal }; if (this.editingId) { const idx = clients.findIndex(c => c.id === this.editingId); if (idx !== -1) clients[idx] = rec; } else clients.push(rec); saveState(); refreshClientSelect(); this.render(); closeSheet(); showToast(this.editingId ? 'تم التعديل' : 'تم الحفظ'); },
   edit() { if (this.editingId == null) { showToast('اختر عميلا لتعديله'); return; } this.save(); },
   remove() { if (this.editingId == null) { showToast('اختر عميلا لحذفه'); return; } if (ventes.some(v => v.client === clients.find(c => c.id === this.editingId)?.name)) { showToast('لا يمكن حذف عميل له عمليات بيع'); return; } clients = clients.filter(c => c.id !== this.editingId); saveState(); refreshClientSelect(); this.render(); closeSheet(); showToast('تم الحذف'); },
-  load(id) { const c = clients.find(x => x.id === id); if (!c) return; this.editingId = id; $('cCode').value = 'CL-' + String(id).padStart(4, '0'); $('cName').value = c.name; $('cPhone').value = c.phone || ''; $('cPhone2').value = c.phone2 || ''; $('cPhone3').value = c.phone3 || ''; $('cAddress').value = c.address || ''; $('cBalance').value = c.balance; $('cNotes').value = c.notes || ''; this.specialPrices = c.specialPrices ? [...c.specialPrices] : []; this.renderSpecialPrices(); openSheet('clients'); },
+  load(id) { const c = clients.find(x => x.id === id); if (!c) return; this.editingId = id; $('cCode').value = 'CL-' + String(id).padStart(4, '0'); $('cName').value = c.name; $('cPhone').value = c.phone || ''; $('cPhone2').value = c.phone2 || ''; $('cPhone3').value = c.phone3 || ''; $('cAddress').value = c.address || ''; $('cTaxId').value = c.taxId || ''; $('cBalance').value = c.balance; $('cNotes').value = c.notes || ''; this.specialPrices = c.specialPrices ? [...c.specialPrices] : []; this.renderSpecialPrices(); openSheet('clients'); },
   render() { const q = $('cSearch').value.trim().toLowerCase(); const list = $('clientsList'); list.innerHTML = ''; const filtered = clients.filter(c => !q || c.name.toLowerCase().includes(q) || (c.phone || '').includes(q)); if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا يوجد عملاء</div>'; return; } filtered.forEach(c => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => Clients.load(c.id); d.innerHTML = `<div class="main-info"><div class="name">${c.name}</div><div class="meta">${c.phone || ''}</div></div><div class="amount">${c.balance.toFixed(3)} د.ت</div>`; list.appendChild(d); }); }
 };
 
@@ -718,40 +684,358 @@ const Articles = {
   render() { const q = $('aSearch').value.trim().toLowerCase(); const list = $('articlesList'); list.innerHTML = ''; const filtered = articles.filter(a => !q || a.name.toLowerCase().includes(q)); if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا توجد أصناف</div>'; return; } filtered.forEach(a => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => Articles.load(a.id); d.innerHTML = `<div class="main-info"><div class="name">${a.name}</div><div class="meta">مخزون: ${getStock(a.name)}</div></div><div class="amount">${a.price.toFixed(3)} د.ت</div>`; list.appendChild(d); }); }
 };
 
-// ===== FOURNISSEURS =====
+// ===== FOURNISSEURS (with taxId) =====
 const Fournisseurs = {
   editingId: null,
-  reset() { this.editingId = null; $('fCode').value = 'FR-' + String(nextId.fournisseurs).padStart(4, '0'); $('fName').value = ''; $('fPhone').value = ''; $('fPhone2').value = ''; $('fPhone3').value = ''; $('fAddress').value = ''; $('fBalance').value = '0'; $('fNotes').value = ''; },
-  save() { if (!$('fName').value.trim()) { showToast('أدخل اسم المورد'); return; } const rec = { id: this.editingId || nextId.fournisseurs++, name: $('fName').value.trim(), phone: $('fPhone').value, phone2: $('fPhone2').value, phone3: $('fPhone3').value, address: $('fAddress').value, balance: parseFloat($('fBalance').value) || 0, notes: $('fNotes').value }; if (this.editingId) { const idx = fournisseurs.findIndex(f => f.id === this.editingId); if (idx !== -1) fournisseurs[idx] = rec; } else fournisseurs.push(rec); saveState(); refreshSupplierSelect(); this.render(); closeSheet(); showToast('تم الحفظ'); },
+  reset() { this.editingId = null; $('fCode').value = 'FR-' + String(nextId.fournisseurs).padStart(4, '0'); $('fName').value = ''; $('fPhone').value = ''; $('fPhone2').value = ''; $('fPhone3').value = ''; $('fAddress').value = ''; $('fTaxId').value = ''; $('fBalance').value = '0'; $('fNotes').value = ''; },
+  save() { if (!$('fName').value.trim()) { showToast('أدخل اسم المورد'); return; } const rec = { id: this.editingId || nextId.fournisseurs++, name: $('fName').value.trim(), phone: $('fPhone').value, phone2: $('fPhone2').value, phone3: $('fPhone3').value, address: $('fAddress').value, taxId: $('fTaxId').value, balance: parseFloat($('fBalance').value) || 0, notes: $('fNotes').value }; if (this.editingId) { const idx = fournisseurs.findIndex(f => f.id === this.editingId); if (idx !== -1) fournisseurs[idx] = rec; } else fournisseurs.push(rec); saveState(); refreshSupplierSelect(); this.render(); closeSheet(); showToast('تم الحفظ'); },
   edit() { if (this.editingId == null) { showToast('اختر موردا لتعديله'); return; } this.save(); },
   remove() { if (this.editingId == null) { showToast('اختر موردا لحذفه'); return; } if (achats.some(p => p.supplier === fournisseurs.find(f => f.id === this.editingId)?.name)) { showToast('لا يمكن حذف مورد له عمليات شراء'); return; } fournisseurs = fournisseurs.filter(f => f.id !== this.editingId); saveState(); refreshSupplierSelect(); this.render(); closeSheet(); showToast('تم الحذف'); },
-  load(id) { const f = fournisseurs.find(x => x.id === id); if (!f) return; this.editingId = id; $('fCode').value = 'FR-' + String(id).padStart(4, '0'); $('fName').value = f.name; $('fPhone').value = f.phone || ''; $('fPhone2').value = f.phone2 || ''; $('fPhone3').value = f.phone3 || ''; $('fAddress').value = f.address || ''; $('fBalance').value = f.balance; $('fNotes').value = f.notes || ''; openSheet('fournisseurs'); },
+  load(id) { const f = fournisseurs.find(x => x.id === id); if (!f) return; this.editingId = id; $('fCode').value = 'FR-' + String(id).padStart(4, '0'); $('fName').value = f.name; $('fPhone').value = f.phone || ''; $('fPhone2').value = f.phone2 || ''; $('fPhone3').value = f.phone3 || ''; $('fAddress').value = f.address || ''; $('fTaxId').value = f.taxId || ''; $('fBalance').value = f.balance; $('fNotes').value = f.notes || ''; openSheet('fournisseurs'); },
   render() { const q = $('fSearch').value.trim().toLowerCase(); const list = $('fournisseursList'); list.innerHTML = ''; const filtered = fournisseurs.filter(f => !q || f.name.toLowerCase().includes(q) || (f.phone || '').includes(q)); if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا يوجد موردون</div>'; return; } filtered.forEach(f => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => Fournisseurs.load(f.id); d.innerHTML = `<div class="main-info"><div class="name">${f.name}</div><div class="meta">${f.phone || ''}</div></div><div class="amount">${f.balance.toFixed(3)} د.ت</div>`; list.appendChild(d); }); }
 };
 
-// ===== VENTES =====
+// ===== VENTES (FIXED) =====
 const Ventes = {
   editingId: null, lines: [], editingReglementId: null,
-  reset() { this.editingId = null; this.lines = []; this.editingReglementId = null; $('vNum').value = 'VTE-' + String(nextId.ventes).padStart(4, '0'); $('vDate').value = new Date().toISOString().slice(0, 10); $('vClient').value = ''; $('vPhone').value = ''; $('vPayment').value = 'آجل'; $('viArticle').value = ''; $('viManualName').value = ''; $('viPrice').value = ''; $('viQty').value = 1; $('viTotal').value = ''; $('viStockHint').textContent = ''; $('vrAmount').value = ''; $('vrBody').innerHTML = ''; $('vAccountSummary').innerHTML = ''; this.renderLines(); this.refreshArticleOptions(); },
-  refreshArticleOptions() { const used = this.lines.map(l => l.name); const avail = articles.filter(a => !used.includes(a.name)); const s = $('viArticle'); if (s) s.innerHTML = '<option value="">-- اختر --</option>' + avail.map(a => `<option value="${a.id}">${a.name}</option>`).join(''); },
-  fillClient() { const c = clients.find(x => x.id == $('vClient').value); $('vPhone').value = c ? c.phone : ''; },
-  fillArticle() { const a = articles.find(x => x.id == $('viArticle').value); if (!a) { $('viPrice').value = ''; $('viStockHint').textContent = ''; this.calcLine(); return; } const c = clients.find(x => x.id == $('vClient').value); const sp = c && c.specialPrices ? c.specialPrices.find(s => s.name === a.name) : null; $('viPrice').value = (sp ? sp.price : a.price).toFixed(3); $('viStockHint').textContent = 'المخزون: ' + getStock(a.name); this.calcLine(); },
-  calcLine() { const p = parseFloat($('viPrice').value) || 0; const q = parseFloat($('viQty').value) || 0; $('viTotal').value = (p * q).toFixed(3); },
-  addLine() { const sel = $('viArticle'); const manual = $('viManualName').value.trim(); const name = sel.value ? sel.options[sel.selectedIndex].textContent : manual; const price = parseFloat($('viPrice').value) || 0; const qty = parseFloat($('viQty').value) || 0; if (!name || price <= 0 || qty <= 0) { showToast('أدخل بيانات صحيحة'); return; } const existing = this.lines.find(l => l.name === name); if (existing) { existing.qty += qty; existing.price = price; existing.total = existing.price * existing.qty; showToast('تم تحديث الكمية'); } else this.lines.push({ name, price, qty, total: price * qty }); $('viArticle').value = ''; $('viManualName').value = ''; $('viPrice').value = ''; $('viQty').value = 1; $('viTotal').value = ''; $('viStockHint').textContent = ''; this.renderLines(); this.refreshArticleOptions(); },
-  removeLine(idx) { this.lines.splice(idx, 1); this.renderLines(); this.refreshArticleOptions(); },
-  renderLines() { const b = $('vLinesBody'); b.innerHTML = ''; let sum = 0; this.lines.forEach((l, i) => { sum += l.total; b.innerHTML += `<tr><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td><td><button class="del-row" onclick="Ventes.removeLine(${i})">✕</button></td></tr>`; }); $('vGrand').textContent = sum.toFixed(3); },
-  save() { if (!$('vClient').value) { showToast('اختر العميل'); return; } if (this.lines.length === 0) { showToast('أضف صنفا'); return; } const clientName = $('vClient').options[$('vClient').selectedIndex].textContent; const total = this.lines.reduce((a, l) => a + l.total, 0); const rec = { id: this.editingId || nextId.ventes++, num: $('vNum').value, date: $('vDate').value, client: clientName, payment: $('vPayment').value, lines: [...this.lines], total, reglements: [] }; if (this.editingId) { const old = ventes.find(v => v.id === this.editingId); if (old) { const oldClient = clients.find(c => c.name === old.client); const newClient = clients.find(c => c.name === clientName); if (oldClient && oldClient !== newClient) oldClient.balance -= old.total; if (newClient) newClient.balance += total; rec.reglements = old.reglements || []; removeStock('vente', rec.id); this.lines.forEach(l => addStock(l.name, l.qty, 'out', 'vente', rec.id, rec.date, 'بيع ' + rec.num)); } const idx = ventes.findIndex(v => v.id === this.editingId); if (idx !== -1) ventes[idx] = rec; } else { const client = clients.find(c => c.name === clientName); if (client) client.balance += total; this.lines.forEach(l => addStock(l.name, l.qty, 'out', 'vente', rec.id, rec.date, 'بيع ' + rec.num)); ventes.push(rec); if (rec.payment === 'نقدا') { const rId = nextId.reglements++; rec.reglements.push({ id: rId, date: rec.date, amount: total, method: 'نقدا' }); if (client) { client.balance -= total; client.reglements = client.reglements || []; client.reglements.push({ id: rId, date: rec.date, amount: total, method: 'نقدا' }); } caisse.push({ id: nextId.caisse++, date: rec.date, type: 'in', amount: total, description: 'بيع نقدي ' + rec.num, source: 'reglement_vente', sourceId: 'vente-' + rec.id + '-' + rId }); } } saveState(); refreshArticleSelects(); Clients.render(); this.render(); showToast('تم الحفظ'); closeSheet(); },
-  edit() { if (this.editingId == null) { showToast('اختر عملية بيع لتعديلها'); return; } this.save(); },
-  addReglement() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const amount = parseFloat($('vrAmount').value) || 0; if (amount <= 0) { showToast('أدخل مبلغا'); return; } const method = $('vrMethod').options[$('vrMethod').selectedIndex].textContent; const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const client = clients.find(c => c.name === rec.client); const date = new Date().toISOString().slice(0, 10); if (this.editingReglementId) { const entry = rec.reglements.find(r => r.id === this.editingReglementId); if (entry) { const old = entry.amount; entry.amount = amount; entry.method = method; entry.date = date; if (client) { client.balance += old - amount; const ce = client.reglements.find(r => r.id === this.editingReglementId); if (ce) { ce.amount = amount; ce.method = method; ce.date = date; } } Caisse.addAuto('in', amount, date, 'تسديد فاتورة ' + rec.num + ' (' + method + ')', 'reglement_vente', 'vente-' + rec.id + '-' + this.editingReglementId); showToast('تم التحديث'); } this.editingReglementId = null; } else { const rId = nextId.reglements++; rec.reglements.push({ id: rId, date, amount, method }); if (client) { client.balance -= amount; client.reglements = client.reglements || []; client.reglements.push({ id: rId, date, amount, method }); } caisse.push({ id: nextId.caisse++, date, type: 'in', amount, description: 'تسديد فاتورة ' + rec.num + ' (' + method + ')', source: 'reglement_vente', sourceId: 'vente-' + rec.id + '-' + rId }); showToast('تم التسديد'); } $('vrAmount').value = ''; this.renderReglementsSheet(rec.reglements); this.renderAccountSummary(rec); saveState(); if (client) Clients.render(); Caisse.render(); },
-  loadReglementForEdit(id) { const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const entry = rec.reglements.find(r => r.id === id); if (!entry) return; $('vrAmount').value = entry.amount; const opt = [...$('vrMethod').options].find(o => o.textContent === entry.method); if (opt) $('vrMethod').value = opt.value; this.editingReglementId = id; showToast('عدل القيمة ثم اضغط + تسجيل'); },
-  removeReglement(id) { const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const idx = rec.reglements.findIndex(r => r.id === id); if (idx === -1) return; const amount = rec.reglements[idx].amount; rec.reglements.splice(idx, 1); const client = clients.find(c => c.name === rec.client); if (client) { client.balance += amount; client.reglements = client.reglements.filter(r => r.id !== id); } Caisse.removeAuto('reglement_vente', 'vente-' + rec.id + '-' + id); if (this.editingReglementId === id) { this.editingReglementId = null; $('vrAmount').value = ''; } this.renderReglementsSheet(rec.reglements); this.renderAccountSummary(rec); saveState(); showToast('تم حذف التسديد'); if (client) Clients.render(); Caisse.render(); },
-  renderReglementsSheet(regs) { const b = $('vrBody'); b.innerHTML = ''; (regs || []).slice().reverse().forEach(r => { b.innerHTML += `<tr><td>${r.date}</td><td>${r.method || ''}</td><td>${r.amount.toFixed(3)}</td><td><button class="del-row" onclick="event.stopPropagation(); Ventes.removeReglement(${r.id})">✕</button></td></tr>`; }); },
-  renderAccountSummary(rec) { const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); const b = $('vAccountSummary'); b.innerHTML = `<div class="totals-mini"><span>مبلغ الفاتورة</span><span>${rec.total.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>المدفوع</span><span>${paid.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>الباقي</span><span>${(rec.total - paid).toFixed(3)} د.ت</span></div><div class="totals-mini"><span>الرصيد الكلي</span><span>${client ? client.balance.toFixed(3) : '0.000'} د.ت</span></div>`; },
-  shareWhatsapp() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); let text = `*فاتورة ${rec.num}*\nالتاريخ: ${rec.date}\nالعميل: ${rec.client}\n`; rec.lines.forEach(l => { text += `${l.name}  x${l.qty}  ${l.total.toFixed(3)} د.ت\n`; }); text += `\nالمجموع: ${rec.total.toFixed(3)} د.ت\nالمدفوع: ${paid.toFixed(3)} د.ت\nالباقي: ${(rec.total - paid).toFixed(3)} د.ت`; const phone = client ? client.phone.replace(/\D/g, '') : ''; const url = 'https://wa.me/' + (phone ? '216' + phone : '') + '?text=' + encodeURIComponent(text); window.open(url, '_blank'); },
-  printInvoice() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); _invoiceData = { title: 'فاتورة بيع', payment: rec.payment, num: rec.num, date: rec.date, partyLabel: 'العميل', partyName: rec.client, partyAddr: client ? client.address : '', partyPhone: client ? client.phone : '', lines: rec.lines, total: rec.total, paid, prevBalance: client ? client.balance - (rec.total - paid) : 0, currentBalance: client ? client.balance : rec.total - paid }; renderInvoice(); $('printOverlay').classList.add('show'); },
-  remove() { if (this.editingId == null) { showToast('اختر عملية بيع لحذفها'); return; } const rec = ventes.find(v => v.id === this.editingId); if (rec) { const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); if (client) client.balance -= rec.total - paid; removeStock('vente', rec.id); } Caisse.removeAllForInvoice('reglement_vente', this.editingId); ventes = ventes.filter(v => v.id !== this.editingId); saveState(); Clients.render(); this.render(); closeSheet(); showToast('تم الحذف'); },
-  load(id) { const r = ventes.find(v => v.id === id); if (!r) return; this.editingId = id; $('vNum').value = r.num; $('vDate').value = r.date; const opt = [...$('vClient').options].find(o => o.textContent === r.client); if (opt) $('vClient').value = opt.value; this.fillClient(); $('vPayment').value = r.payment; this.lines = [...r.lines]; this.renderLines(); this.refreshArticleOptions(); $('vrAmount').value = ''; this.editingReglementId = null; this.renderReglementsSheet(r.reglements); this.renderAccountSummary(r); openSheet('ventes'); },
-  render() { const q = $('vSearch').value.trim().toLowerCase(); const list = $('ventesList'); list.innerHTML = ''; const filtered = ventes.filter(v => !q || v.num.toLowerCase().includes(q) || v.client.toLowerCase().includes(q)).reverse(); if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا توجد عمليات بيع</div>'; return; } filtered.forEach(v => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => Ventes.load(v.id); d.innerHTML = `<div class="main-info"><div class="name">${v.num}</div><div class="meta">${v.client} - ${v.date}</div></div><div class="amount">${v.total.toFixed(3)} د.ت</div>`; list.appendChild(d); }); }
+  reset() { 
+    this.editingId = null; 
+    this.lines = []; 
+    this.editingReglementId = null; 
+    $('vNum').value = 'VTE-' + String(nextId.ventes).padStart(4, '0'); 
+    $('vDate').value = new Date().toISOString().slice(0, 10); 
+    $('vClient').value = ''; 
+    $('vPhone').value = ''; 
+    $('vPayment').value = 'آجل'; 
+    $('viArticle').value = ''; 
+    $('viManualName').value = ''; 
+    $('viPrice').value = ''; 
+    $('viQty').value = 1; 
+    $('viTotal').value = ''; 
+    $('viStockHint').textContent = ''; 
+    $('vrAmount').value = ''; 
+    $('vrBody').innerHTML = ''; 
+    $('vAccountSummary').innerHTML = ''; 
+    this.renderLines(); 
+    this.refreshArticleOptions(); 
+  },
+  refreshArticleOptions() { 
+    const used = this.lines.map(l => l.name); 
+    const avail = articles.filter(a => !used.includes(a.name)); 
+    const s = $('viArticle'); 
+    if (s) s.innerHTML = '<option value="">-- اختر --</option>' + avail.map(a => `<option value="${a.id}">${a.name}</option>`).join(''); 
+  },
+  fillClient() { 
+    const c = clients.find(x => x.id == $('vClient').value); 
+    $('vPhone').value = c ? c.phone : ''; 
+  },
+  fillArticle() { 
+    const a = articles.find(x => x.id == $('viArticle').value); 
+    if (!a) { $('viPrice').value = ''; $('viStockHint').textContent = ''; this.calcLine(); return; } 
+    const c = clients.find(x => x.id == $('vClient').value); 
+    const sp = c && c.specialPrices ? c.specialPrices.find(s => s.name === a.name) : null; 
+    $('viPrice').value = (sp ? sp.price : a.price).toFixed(3); 
+    $('viStockHint').textContent = 'المخزون: ' + getStock(a.name); 
+    this.calcLine(); 
+  },
+  calcLine() { 
+    const p = parseFloat($('viPrice').value) || 0; 
+    const q = parseFloat($('viQty').value) || 0; 
+    $('viTotal').value = (p * q).toFixed(3); 
+  },
+  addLine() { 
+    const sel = $('viArticle'); 
+    const manual = $('viManualName').value.trim(); 
+    const name = sel.value ? sel.options[sel.selectedIndex].textContent : manual; 
+    const price = parseFloat($('viPrice').value) || 0; 
+    const qty = parseFloat($('viQty').value) || 0; 
+    if (!name || price <= 0 || qty <= 0) { showToast('أدخل بيانات صحيحة'); return; } 
+    const existing = this.lines.find(l => l.name === name); 
+    if (existing) { 
+      existing.qty += qty; 
+      existing.price = price; 
+      existing.total = existing.price * existing.qty; 
+      showToast('تم تحديث الكمية'); 
+    } else { 
+      this.lines.push({ name, price, qty, total: price * qty }); 
+    } 
+    $('viArticle').value = ''; 
+    $('viManualName').value = ''; 
+    $('viPrice').value = ''; 
+    $('viQty').value = 1; 
+    $('viTotal').value = ''; 
+    $('viStockHint').textContent = ''; 
+    this.renderLines(); 
+    this.refreshArticleOptions(); 
+  },
+  removeLine(idx) { 
+    this.lines.splice(idx, 1); 
+    this.renderLines(); 
+    this.refreshArticleOptions(); 
+  },
+  renderLines() { 
+    const b = $('vLinesBody'); 
+    b.innerHTML = ''; 
+    let sum = 0; 
+    this.lines.forEach((l, i) => { 
+      sum += l.total; 
+      b.innerHTML += `<tr><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td><td><button class="del-row" onclick="Ventes.removeLine(${i})">✕</button></td></tr>`; 
+    }); 
+    $('vGrand').textContent = sum.toFixed(3); 
+  },
+  save() { 
+    if (!$('vClient').value) { showToast('اختر العميل'); return; } 
+    if (this.lines.length === 0) { showToast('أضف صنفا'); return; } 
+    const clientName = $('vClient').options[$('vClient').selectedIndex].textContent; 
+    const total = this.lines.reduce((a, l) => a + l.total, 0);
+    
+    // التحقق من وجود العميل
+    const client = clients.find(c => c.name === clientName);
+    if (!client) { showToast('العميل غير موجود'); return; }
+    
+    // إنشاء الفاتورة
+    const newId = this.editingId || nextId.ventes++;
+    const rec = { 
+      id: newId, 
+      num: $('vNum').value, 
+      date: $('vDate').value, 
+      client: clientName, 
+      payment: $('vPayment').value, 
+      lines: [...this.lines], 
+      total: total, 
+      reglements: [] 
+    };
+    
+    if (this.editingId) {
+      // تعديل فاتورة موجودة
+      const old = ventes.find(v => v.id === this.editingId);
+      if (old) {
+        const oldClient = clients.find(c => c.name === old.client);
+        if (oldClient && oldClient.name !== clientName) {
+          oldClient.balance -= old.total;
+        }
+        // إزالة حركات المخزون القديمة
+        removeStock('vente', rec.id);
+        // إضافة حركات المخزون الجديدة
+        this.lines.forEach(l => addStock(l.name, l.qty, 'out', 'vente', rec.id, rec.date, 'بيع ' + rec.num));
+        // نسخ التسديدات القديمة
+        rec.reglements = old.reglements || [];
+      }
+      const idx = ventes.findIndex(v => v.id === this.editingId);
+      if (idx !== -1) ventes[idx] = rec;
+    } else {
+      // فاتورة جديدة
+      client.balance += total;
+      this.lines.forEach(l => addStock(l.name, l.qty, 'out', 'vente', rec.id, rec.date, 'بيع ' + rec.num));
+      ventes.push(rec);
+      
+      // إذا كانت الدفع نقداً
+      if (rec.payment === 'نقدا') {
+        const rId = nextId.reglements++;
+        rec.reglements.push({ id: rId, date: rec.date, amount: total, method: 'نقدا' });
+        client.balance -= total;
+        client.reglements = client.reglements || [];
+        client.reglements.push({ id: rId, date: rec.date, amount: total, method: 'نقدا' });
+        caisse.push({ 
+          id: nextId.caisse++, 
+          date: rec.date, 
+          type: 'in', 
+          amount: total, 
+          description: 'بيع نقدي ' + rec.num, 
+          source: 'reglement_vente', 
+          sourceId: 'vente-' + rec.id + '-' + rId 
+        });
+      }
+    }
+    
+    saveState();
+    refreshArticleSelects();
+    Clients.render();
+    this.render();
+    this.editingId = rec.id;
+    this.renderAccountSummary(rec);
+    showToast('تم الحفظ');
+    closeSheet();
+  },
+  edit() { 
+    if (this.editingId == null) { showToast('اختر عملية بيع لتعديلها'); return; } 
+    this.save(); 
+  },
+  addReglement() { 
+    if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } 
+    const amount = parseFloat($('vrAmount').value) || 0; 
+    if (amount <= 0) { showToast('أدخل مبلغا'); return; } 
+    const method = $('vrMethod').options[$('vrMethod').selectedIndex].textContent; 
+    const rec = ventes.find(v => v.id === this.editingId); 
+    if (!rec) return; 
+    const client = clients.find(c => c.name === rec.client); 
+    const date = new Date().toISOString().slice(0, 10); 
+    if (this.editingReglementId) { 
+      const entry = rec.reglements.find(r => r.id === this.editingReglementId); 
+      if (entry) { 
+        const old = entry.amount; 
+        entry.amount = amount; 
+        entry.method = method; 
+        entry.date = date; 
+        if (client) { 
+          client.balance += old - amount; 
+          const ce = client.reglements.find(r => r.id === this.editingReglementId); 
+          if (ce) { ce.amount = amount; ce.method = method; ce.date = date; } 
+        } 
+        Caisse.addAuto('in', amount, date, 'تسديد فاتورة ' + rec.num + ' (' + method + ')', 'reglement_vente', 'vente-' + rec.id + '-' + this.editingReglementId); 
+        showToast('تم التحديث'); 
+      } 
+      this.editingReglementId = null; 
+    } else { 
+      const rId = nextId.reglements++; 
+      rec.reglements.push({ id: rId, date, amount, method }); 
+      if (client) { 
+        client.balance -= amount; 
+        client.reglements = client.reglements || []; 
+        client.reglements.push({ id: rId, date, amount, method }); 
+      } 
+      caisse.push({ id: nextId.caisse++, date, type: 'in', amount, description: 'تسديد فاتورة ' + rec.num + ' (' + method + ')', source: 'reglement_vente', sourceId: 'vente-' + rec.id + '-' + rId }); 
+      showToast('تم التسديد'); 
+    } 
+    $('vrAmount').value = ''; 
+    this.renderReglementsSheet(rec.reglements); 
+    this.renderAccountSummary(rec); 
+    saveState(); 
+    if (client) Clients.render(); 
+    Caisse.render(); 
+  },
+  loadReglementForEdit(id) { 
+    const rec = ventes.find(v => v.id === this.editingId); 
+    if (!rec) return; 
+    const entry = rec.reglements.find(r => r.id === id); 
+    if (!entry) return; 
+    $('vrAmount').value = entry.amount; 
+    const opt = [...$('vrMethod').options].find(o => o.textContent === entry.method); 
+    if (opt) $('vrMethod').value = opt.value; 
+    this.editingReglementId = id; 
+    showToast('عدل القيمة ثم اضغط + تسجيل'); 
+  },
+  removeReglement(id) { 
+    const rec = ventes.find(v => v.id === this.editingId); 
+    if (!rec) return; 
+    const idx = rec.reglements.findIndex(r => r.id === id); 
+    if (idx === -1) return; 
+    const amount = rec.reglements[idx].amount; 
+    rec.reglements.splice(idx, 1); 
+    const client = clients.find(c => c.name === rec.client); 
+    if (client) { 
+      client.balance += amount; 
+      client.reglements = client.reglements.filter(r => r.id !== id); 
+    } 
+    Caisse.removeAuto('reglement_vente', 'vente-' + rec.id + '-' + id); 
+    if (this.editingReglementId === id) { this.editingReglementId = null; $('vrAmount').value = ''; } 
+    this.renderReglementsSheet(rec.reglements); 
+    this.renderAccountSummary(rec); 
+    saveState(); 
+    showToast('تم حذف التسديد'); 
+    if (client) Clients.render(); 
+    Caisse.render(); 
+  },
+  renderReglementsSheet(regs) { 
+    const b = $('vrBody'); 
+    b.innerHTML = ''; 
+    (regs || []).slice().reverse().forEach(r => { 
+      b.innerHTML += `<tr><td>${r.date}</td><td>${r.method || ''}</td><td>${r.amount.toFixed(3)}</td><td><button class="del-row" onclick="event.stopPropagation(); Ventes.removeReglement(${r.id})">✕</button></td></tr>`; 
+    }); 
+  },
+  renderAccountSummary(rec) { 
+    const client = clients.find(c => c.name === rec.client); 
+    const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); 
+    const b = $('vAccountSummary'); 
+    b.innerHTML = `<div class="totals-mini"><span>مبلغ الفاتورة</span><span>${rec.total.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>المدفوع</span><span>${paid.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>الباقي</span><span>${(rec.total - paid).toFixed(3)} د.ت</span></div><div class="totals-mini"><span>الرصيد الكلي</span><span>${client ? client.balance.toFixed(3) : '0.000'} د.ت</span></div>`; 
+  },
+  shareWhatsapp() { 
+    if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } 
+    const rec = ventes.find(v => v.id === this.editingId); 
+    if (!rec) return; 
+    const client = clients.find(c => c.name === rec.client); 
+    const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); 
+    let text = `*فاتورة ${rec.num}*\nالتاريخ: ${rec.date}\nالعميل: ${rec.client}\n`; 
+    rec.lines.forEach(l => { text += `${l.name}  x${l.qty}  ${l.total.toFixed(3)} د.ت\n`; }); 
+    text += `\nالمجموع: ${rec.total.toFixed(3)} د.ت\nالمدفوع: ${paid.toFixed(3)} د.ت\nالباقي: ${(rec.total - paid).toFixed(3)} د.ت`; 
+    const phone = client ? client.phone.replace(/\D/g, '') : ''; 
+    const url = 'https://wa.me/' + (phone ? '216' + phone : '') + '?text=' + encodeURIComponent(text); 
+    window.open(url, '_blank'); 
+  },
+  printInvoice() { 
+    if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } 
+    const rec = ventes.find(v => v.id === this.editingId); 
+    if (!rec) return; 
+    const client = clients.find(c => c.name === rec.client); 
+    const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); 
+    _invoiceData = { 
+      title: 'فاتورة بيع', 
+      payment: rec.payment, 
+      num: rec.num, 
+      date: rec.date, 
+      partyLabel: 'العميل', 
+      partyName: rec.client, 
+      partyAddr: client ? client.address : '', 
+      partyPhone: client ? client.phone : '', 
+      lines: rec.lines, 
+      total: rec.total, 
+      paid, 
+      prevBalance: client ? client.balance - (rec.total - paid) : 0, 
+      currentBalance: client ? client.balance : rec.total - paid 
+    }; 
+    renderInvoice(); 
+    $('printOverlay').classList.add('show'); 
+  },
+  remove() { 
+    if (this.editingId == null) { showToast('اختر عملية بيع لحذفها'); return; } 
+    const rec = ventes.find(v => v.id === this.editingId); 
+    if (rec) { 
+      const client = clients.find(c => c.name === rec.client); 
+      const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); 
+      if (client) client.balance -= rec.total - paid; 
+      removeStock('vente', rec.id); 
+    } 
+    Caisse.removeAllForInvoice('reglement_vente', this.editingId); 
+    ventes = ventes.filter(v => v.id !== this.editingId); 
+    saveState(); 
+    Clients.render(); 
+    this.render(); 
+    closeSheet(); 
+    showToast('تم الحذف'); 
+  },
+  load(id) { 
+    const r = ventes.find(v => v.id === id); 
+    if (!r) return; 
+    this.editingId = id; 
+    $('vNum').value = r.num; 
+    $('vDate').value = r.date; 
+    const opt = [...$('vClient').options].find(o => o.textContent === r.client); 
+    if (opt) $('vClient').value = opt.value; 
+    this.fillClient(); 
+    $('vPayment').value = r.payment; 
+    this.lines = [...r.lines]; 
+    this.renderLines(); 
+    this.refreshArticleOptions(); 
+    $('vrAmount').value = ''; 
+    this.editingReglementId = null; 
+    this.renderReglementsSheet(r.reglements); 
+    this.renderAccountSummary(r); 
+    openSheet('ventes'); 
+  },
+  render() { 
+    const q = $('vSearch').value.trim().toLowerCase(); 
+    const list = $('ventesList'); 
+    list.innerHTML = ''; 
+    const filtered = ventes.filter(v => !q || v.num.toLowerCase().includes(q) || v.client.toLowerCase().includes(q)).reverse(); 
+    if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا توجد عمليات بيع</div>'; return; } 
+    filtered.forEach(v => { 
+      const d = document.createElement('div'); 
+      d.className = 'row-card'; 
+      d.onclick = () => Ventes.load(v.id); 
+      d.innerHTML = `<div class="main-info"><div class="name">${v.num}</div><div class="meta">${v.client} - ${v.date}</div></div><div class="amount">${v.total.toFixed(3)} د.ت</div>`; 
+      list.appendChild(d); 
+    }); 
+  }
 };
 
 // ===== ACHATS =====
@@ -765,18 +1049,247 @@ const Achats = {
   addLine() { const sel = $('piArticle'); const manual = $('piManualName').value.trim(); const name = sel.value ? sel.options[sel.selectedIndex].textContent : manual; const price = parseFloat($('piPrice').value) || 0; const qty = parseFloat($('piQty').value) || 0; if (!name || price <= 0 || qty <= 0) { showToast('أدخل بيانات صحيحة'); return; } const existing = this.lines.find(l => l.name === name); if (existing) { existing.qty += qty; existing.price = price; existing.total = existing.price * existing.qty; showToast('تم تحديث الكمية'); } else this.lines.push({ name, price, qty, total: price * qty }); $('piArticle').value = ''; $('piManualName').value = ''; $('piPrice').value = ''; $('piQty').value = 1; $('piTotal').value = ''; $('piStockHint').textContent = ''; this.renderLines(); this.refreshArticleOptions(); },
   removeLine(idx) { this.lines.splice(idx, 1); this.renderLines(); this.refreshArticleOptions(); },
   renderLines() { const b = $('pLinesBody'); b.innerHTML = ''; let sum = 0; this.lines.forEach((l, i) => { sum += l.total; b.innerHTML += `<tr><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td><td><button class="del-row" onclick="Achats.removeLine(${i})">✕</button></td></tr>`; }); $('pGrand').textContent = sum.toFixed(3); },
-  save() { if (!$('pSupplier').value) { showToast('اختر المورد'); return; } if (this.lines.length === 0) { showToast('أضف صنفا'); return; } const supplierName = $('pSupplier').options[$('pSupplier').selectedIndex].textContent; const total = this.lines.reduce((a, l) => a + l.total, 0); const rec = { id: this.editingId || nextId.achats++, num: $('pNum').value, date: $('pDate').value, supplier: supplierName, payment: $('pPayment').value, lines: [...this.lines], total, reglements: [] }; if (this.editingId) { const old = achats.find(p => p.id === this.editingId); if (old) { const oldSup = fournisseurs.find(f => f.name === old.supplier); const newSup = fournisseurs.find(f => f.name === supplierName); if (oldSup && oldSup !== newSup) oldSup.balance -= old.total; if (newSup) newSup.balance += total; rec.reglements = old.reglements || []; removeStock('achat', rec.id); this.lines.forEach(l => addStock(l.name, l.qty, 'in', 'achat', rec.id, rec.date, 'شراء ' + rec.num)); } const idx = achats.findIndex(p => p.id === this.editingId); if (idx !== -1) achats[idx] = rec; } else { this.lines.forEach(l => addStock(l.name, l.qty, 'in', 'achat', rec.id, rec.date, 'شراء ' + rec.num)); const supplier = fournisseurs.find(f => f.name === supplierName); if (supplier) supplier.balance += total; achats.push(rec); if (rec.payment === 'نقدا') { const rId = nextId.reglements++; rec.reglements.push({ id: rId, date: rec.date, amount: total, method: 'نقدا' }); if (supplier) { supplier.balance -= total; supplier.reglements = supplier.reglements || []; supplier.reglements.push({ id: rId, date: rec.date, amount: total, method: 'نقدا' }); } caisse.push({ id: nextId.caisse++, date: rec.date, type: 'out', amount: total, description: 'شراء نقدي ' + rec.num, source: 'reglement_achat', sourceId: 'achat-' + rec.id + '-' + rId }); } } saveState(); refreshArticleSelects(); Fournisseurs.render(); this.render(); showToast('تم الحفظ'); closeSheet(); },
+  save() { 
+    if (!$('pSupplier').value) { showToast('اختر المورد'); return; } 
+    if (this.lines.length === 0) { showToast('أضف صنفا'); return; } 
+    const supplierName = $('pSupplier').options[$('pSupplier').selectedIndex].textContent; 
+    const total = this.lines.reduce((a, l) => a + l.total, 0);
+    
+    const supplier = fournisseurs.find(f => f.name === supplierName);
+    if (!supplier) { showToast('المورد غير موجود'); return; }
+    
+    const newId = this.editingId || nextId.achats++;
+    const rec = { 
+      id: newId, 
+      num: $('pNum').value, 
+      date: $('pDate').value, 
+      supplier: supplierName, 
+      payment: $('pPayment').value, 
+      lines: [...this.lines], 
+      total: total, 
+      reglements: [] 
+    };
+    
+    if (this.editingId) {
+      const old = achats.find(p => p.id === this.editingId);
+      if (old) {
+        const oldSup = fournisseurs.find(f => f.name === old.supplier);
+        if (oldSup && oldSup.name !== supplierName) {
+          oldSup.balance -= old.total;
+        }
+        removeStock('achat', rec.id);
+        this.lines.forEach(l => addStock(l.name, l.qty, 'in', 'achat', rec.id, rec.date, 'شراء ' + rec.num));
+        rec.reglements = old.reglements || [];
+      }
+      const idx = achats.findIndex(p => p.id === this.editingId);
+      if (idx !== -1) achats[idx] = rec;
+    } else {
+      supplier.balance += total;
+      this.lines.forEach(l => addStock(l.name, l.qty, 'in', 'achat', rec.id, rec.date, 'شراء ' + rec.num));
+      achats.push(rec);
+      
+      if (rec.payment === 'نقدا') {
+        const rId = nextId.reglements++;
+        rec.reglements.push({ id: rId, date: rec.date, amount: total, method: 'نقدا' });
+        supplier.balance -= total;
+        supplier.reglements = supplier.reglements || [];
+        supplier.reglements.push({ id: rId, date: rec.date, amount: total, method: 'نقدا' });
+        caisse.push({ 
+          id: nextId.caisse++, 
+          date: rec.date, 
+          type: 'out', 
+          amount: total, 
+          description: 'شراء نقدي ' + rec.num, 
+          source: 'reglement_achat', 
+          sourceId: 'achat-' + rec.id + '-' + rId 
+        });
+      }
+    }
+    saveState();
+    refreshArticleSelects();
+    Fournisseurs.render();
+    this.render();
+    this.editingId = rec.id;
+    this.renderAccountSummary(rec);
+    showToast('تم الحفظ');
+    closeSheet();
+  },
   edit() { if (this.editingId == null) { showToast('اختر عملية شراء لتعديلها'); return; } this.save(); },
-  addReglement() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const amount = parseFloat($('arAmount').value) || 0; if (amount <= 0) { showToast('أدخل مبلغا'); return; } const method = $('arMethod').options[$('arMethod').selectedIndex].textContent; const rec = achats.find(p => p.id === this.editingId); if (!rec) return; const supplier = fournisseurs.find(f => f.name === rec.supplier); const date = new Date().toISOString().slice(0, 10); if (this.editingReglementId) { const entry = rec.reglements.find(r => r.id === this.editingReglementId); if (entry) { const old = entry.amount; entry.amount = amount; entry.method = method; entry.date = date; if (supplier) { supplier.balance += old - amount; const se = supplier.reglements.find(r => r.id === this.editingReglementId); if (se) { se.amount = amount; se.method = method; se.date = date; } } Caisse.addAuto('out', amount, date, 'تسديد فاتورة ' + rec.num + ' (' + method + ')', 'reglement_achat', 'achat-' + rec.id + '-' + this.editingReglementId); showToast('تم التحديث'); } this.editingReglementId = null; } else { const rId = nextId.reglements++; rec.reglements.push({ id: rId, date, amount, method }); if (supplier) { supplier.balance -= amount; supplier.reglements = supplier.reglements || []; supplier.reglements.push({ id: rId, date, amount, method }); } caisse.push({ id: nextId.caisse++, date, type: 'out', amount, description: 'تسديد فاتورة ' + rec.num + ' (' + method + ')', source: 'reglement_achat', sourceId: 'achat-' + rec.id + '-' + rId }); showToast('تم التسديد'); } $('arAmount').value = ''; this.renderReglementsSheet(rec.reglements); this.renderAccountSummary(rec); saveState(); if (supplier) Fournisseurs.render(); Caisse.render(); },
-  loadReglementForEdit(id) { const rec = achats.find(p => p.id === this.editingId); if (!rec) return; const entry = rec.reglements.find(r => r.id === id); if (!entry) return; $('arAmount').value = entry.amount; const opt = [...$('arMethod').options].find(o => o.textContent === entry.method); if (opt) $('arMethod').value = opt.value; this.editingReglementId = id; showToast('عدل القيمة ثم اضغط + تسجيل'); },
-  removeReglement(id) { const rec = achats.find(p => p.id === this.editingId); if (!rec) return; const idx = rec.reglements.findIndex(r => r.id === id); if (idx === -1) return; const amount = rec.reglements[idx].amount; rec.reglements.splice(idx, 1); const supplier = fournisseurs.find(f => f.name === rec.supplier); if (supplier) { supplier.balance += amount; supplier.reglements = supplier.reglements.filter(r => r.id !== id); } Caisse.removeAuto('reglement_achat', 'achat-' + rec.id + '-' + id); if (this.editingReglementId === id) { this.editingReglementId = null; $('arAmount').value = ''; } this.renderReglementsSheet(rec.reglements); this.renderAccountSummary(rec); saveState(); showToast('تم حذف التسديد'); if (supplier) Fournisseurs.render(); Caisse.render(); },
-  renderReglementsSheet(regs) { const b = $('arBody'); b.innerHTML = ''; (regs || []).slice().reverse().forEach(r => { b.innerHTML += `<tr><td>${r.date}</td><td>${r.method || ''}</td><td>${r.amount.toFixed(3)}</td><td><button class="del-row" onclick="event.stopPropagation(); Achats.removeReglement(${r.id})">✕</button></td></tr>`; }); },
-  renderAccountSummary(rec) { const supplier = fournisseurs.find(f => f.name === rec.supplier); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); const b = $('pAccountSummary'); b.innerHTML = `<div class="totals-mini"><span>مبلغ الفاتورة</span><span>${rec.total.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>المدفوع</span><span>${paid.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>الباقي</span><span>${(rec.total - paid).toFixed(3)} د.ت</span></div><div class="totals-mini"><span>الرصيد الكلي</span><span>${supplier ? supplier.balance.toFixed(3) : '0.000'} د.ت</span></div>`; },
-  shareWhatsapp() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = achats.find(p => p.id === this.editingId); if (!rec) return; const supplier = fournisseurs.find(f => f.name === rec.supplier); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); let text = `*فاتورة شراء ${rec.num}*\nالتاريخ: ${rec.date}\nالمورد: ${rec.supplier}\n`; rec.lines.forEach(l => { text += `${l.name}  x${l.qty}  ${l.total.toFixed(3)} د.ت\n`; }); text += `\nالمجموع: ${rec.total.toFixed(3)} د.ت\nالمدفوع: ${paid.toFixed(3)} د.ت\nالباقي: ${(rec.total - paid).toFixed(3)} د.ت`; const phone = supplier ? supplier.phone.replace(/\D/g, '') : ''; const url = 'https://wa.me/' + (phone ? '216' + phone : '') + '?text=' + encodeURIComponent(text); window.open(url, '_blank'); },
-  printInvoice() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = achats.find(p => p.id === this.editingId); if (!rec) return; const supplier = fournisseurs.find(f => f.name === rec.supplier); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); _invoiceData = { title: 'فاتورة شراء', payment: rec.payment, num: rec.num, date: rec.date, partyLabel: 'المورد', partyName: rec.supplier, partyAddr: supplier ? supplier.address : '', partyPhone: supplier ? supplier.phone : '', lines: rec.lines, total: rec.total, paid, prevBalance: supplier ? supplier.balance - (rec.total - paid) : 0, currentBalance: supplier ? supplier.balance : rec.total - paid }; renderInvoice(); $('printOverlay').classList.add('show'); },
-  remove() { if (this.editingId == null) { showToast('اختر عملية شراء لحذفها'); return; } const rec = achats.find(p => p.id === this.editingId); if (rec) { const supplier = fournisseurs.find(f => f.name === rec.supplier); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); if (supplier) supplier.balance -= rec.total - paid; removeStock('achat', rec.id); } Caisse.removeAllForInvoice('reglement_achat', this.editingId); achats = achats.filter(p => p.id !== this.editingId); saveState(); Fournisseurs.render(); this.render(); closeSheet(); showToast('تم الحذف'); },
-  load(id) { const r = achats.find(p => p.id === id); if (!r) return; this.editingId = id; $('pNum').value = r.num; $('pDate').value = r.date; const opt = [...$('pSupplier').options].find(o => o.textContent === r.supplier); if (opt) $('pSupplier').value = opt.value; this.fillSupplier(); $('pPayment').value = r.payment; this.lines = [...r.lines]; this.renderLines(); this.refreshArticleOptions(); $('arAmount').value = ''; this.editingReglementId = null; this.renderReglementsSheet(r.reglements); this.renderAccountSummary(r); openSheet('achats'); },
-  render() { const q = $('pSearch').value.trim().toLowerCase(); const list = $('achatsList'); list.innerHTML = ''; const filtered = achats.filter(p => !q || p.num.toLowerCase().includes(q) || p.supplier.toLowerCase().includes(q)).reverse(); if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا توجد عمليات شراء</div>'; return; } filtered.forEach(p => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => Achats.load(p.id); d.innerHTML = `<div class="main-info"><div class="name">${p.num}</div><div class="meta">${p.supplier} - ${p.date}</div></div><div class="amount">${p.total.toFixed(3)} د.ت</div>`; list.appendChild(d); }); }
+  addReglement() { 
+    if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } 
+    const amount = parseFloat($('arAmount').value) || 0; 
+    if (amount <= 0) { showToast('أدخل مبلغا'); return; } 
+    const method = $('arMethod').options[$('arMethod').selectedIndex].textContent; 
+    const rec = achats.find(p => p.id === this.editingId); 
+    if (!rec) return; 
+    const supplier = fournisseurs.find(f => f.name === rec.supplier); 
+    const date = new Date().toISOString().slice(0, 10); 
+    if (this.editingReglementId) { 
+      const entry = rec.reglements.find(r => r.id === this.editingReglementId); 
+      if (entry) { 
+        const old = entry.amount; 
+        entry.amount = amount; 
+        entry.method = method; 
+        entry.date = date; 
+        if (supplier) { 
+          supplier.balance += old - amount; 
+          const se = supplier.reglements.find(r => r.id === this.editingReglementId); 
+          if (se) { se.amount = amount; se.method = method; se.date = date; } 
+        } 
+        Caisse.addAuto('out', amount, date, 'تسديد فاتورة ' + rec.num + ' (' + method + ')', 'reglement_achat', 'achat-' + rec.id + '-' + this.editingReglementId); 
+        showToast('تم التحديث'); 
+      } 
+      this.editingReglementId = null; 
+    } else { 
+      const rId = nextId.reglements++; 
+      rec.reglements.push({ id: rId, date, amount, method }); 
+      if (supplier) { 
+        supplier.balance -= amount; 
+        supplier.reglements = supplier.reglements || []; 
+        supplier.reglements.push({ id: rId, date, amount, method }); 
+      } 
+      caisse.push({ id: nextId.caisse++, date, type: 'out', amount, description: 'تسديد فاتورة ' + rec.num + ' (' + method + ')', source: 'reglement_achat', sourceId: 'achat-' + rec.id + '-' + rId }); 
+      showToast('تم التسديد'); 
+    } 
+    $('arAmount').value = ''; 
+    this.renderReglementsSheet(rec.reglements); 
+    this.renderAccountSummary(rec); 
+    saveState(); 
+    if (supplier) Fournisseurs.render(); 
+    Caisse.render(); 
+  },
+  loadReglementForEdit(id) { 
+    const rec = achats.find(p => p.id === this.editingId); 
+    if (!rec) return; 
+    const entry = rec.reglements.find(r => r.id === id); 
+    if (!entry) return; 
+    $('arAmount').value = entry.amount; 
+    const opt = [...$('arMethod').options].find(o => o.textContent === entry.method); 
+    if (opt) $('arMethod').value = opt.value; 
+    this.editingReglementId = id; 
+    showToast('عدل القيمة ثم اضغط + تسجيل'); 
+  },
+  removeReglement(id) { 
+    const rec = achats.find(p => p.id === this.editingId); 
+    if (!rec) return; 
+    const idx = rec.reglements.findIndex(r => r.id === id); 
+    if (idx === -1) return; 
+    const amount = rec.reglements[idx].amount; 
+    rec.reglements.splice(idx, 1); 
+    const supplier = fournisseurs.find(f => f.name === rec.supplier); 
+    if (supplier) { 
+      supplier.balance += amount; 
+      supplier.reglements = supplier.reglements.filter(r => r.id !== id); 
+    } 
+    Caisse.removeAuto('reglement_achat', 'achat-' + rec.id + '-' + id); 
+    if (this.editingReglementId === id) { this.editingReglementId = null; $('arAmount').value = ''; } 
+    this.renderReglementsSheet(rec.reglements); 
+    this.renderAccountSummary(rec); 
+    saveState(); 
+    showToast('تم حذف التسديد'); 
+    if (supplier) Fournisseurs.render(); 
+    Caisse.render(); 
+  },
+  renderReglementsSheet(regs) { 
+    const b = $('arBody'); 
+    b.innerHTML = ''; 
+    (regs || []).slice().reverse().forEach(r => { 
+      b.innerHTML += `<tr><td>${r.date}</td><td>${r.method || ''}</td><td>${r.amount.toFixed(3)}</td><td><button class="del-row" onclick="event.stopPropagation(); Achats.removeReglement(${r.id})">✕</button></td></tr>`; 
+    }); 
+  },
+  renderAccountSummary(rec) { 
+    const supplier = fournisseurs.find(f => f.name === rec.supplier); 
+    const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); 
+    const b = $('pAccountSummary'); 
+    b.innerHTML = `<div class="totals-mini"><span>مبلغ الفاتورة</span><span>${rec.total.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>المدفوع</span><span>${paid.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>الباقي</span><span>${(rec.total - paid).toFixed(3)} د.ت</span></div><div class="totals-mini"><span>الرصيد الكلي</span><span>${supplier ? supplier.balance.toFixed(3) : '0.000'} د.ت</span></div>`; 
+  },
+  shareWhatsapp() { 
+    if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } 
+    const rec = achats.find(p => p.id === this.editingId); 
+    if (!rec) return; 
+    const supplier = fournisseurs.find(f => f.name === rec.supplier); 
+    const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); 
+    let text = `*فاتورة شراء ${rec.num}*\nالتاريخ: ${rec.date}\nالمورد: ${rec.supplier}\n`; 
+    rec.lines.forEach(l => { text += `${l.name}  x${l.qty}  ${l.total.toFixed(3)} د.ت\n`; }); 
+    text += `\nالمجموع: ${rec.total.toFixed(3)} د.ت\nالمدفوع: ${paid.toFixed(3)} د.ت\nالباقي: ${(rec.total - paid).toFixed(3)} د.ت`; 
+    const phone = supplier ? supplier.phone.replace(/\D/g, '') : ''; 
+    const url = 'https://wa.me/' + (phone ? '216' + phone : '') + '?text=' + encodeURIComponent(text); 
+    window.open(url, '_blank'); 
+  },
+  printInvoice() { 
+    if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } 
+    const rec = achats.find(p => p.id === this.editingId); 
+    if (!rec) return; 
+    const supplier = fournisseurs.find(f => f.name === rec.supplier); 
+    const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); 
+    _invoiceData = { 
+      title: 'فاتورة شراء', 
+      payment: rec.payment, 
+      num: rec.num, 
+      date: rec.date, 
+      partyLabel: 'المورد', 
+      partyName: rec.supplier, 
+      partyAddr: supplier ? supplier.address : '', 
+      partyPhone: supplier ? supplier.phone : '', 
+      lines: rec.lines, 
+      total: rec.total, 
+      paid, 
+      prevBalance: supplier ? supplier.balance - (rec.total - paid) : 0, 
+      currentBalance: supplier ? supplier.balance : rec.total - paid 
+    }; 
+    renderInvoice(); 
+    $('printOverlay').classList.add('show'); 
+  },
+  remove() { 
+    if (this.editingId == null) { showToast('اختر عملية شراء لحذفها'); return; } 
+    const rec = achats.find(p => p.id === this.editingId); 
+    if (rec) { 
+      const supplier = fournisseurs.find(f => f.name === rec.supplier); 
+      const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); 
+      if (supplier) supplier.balance -= rec.total - paid; 
+      removeStock('achat', rec.id); 
+    } 
+    Caisse.removeAllForInvoice('reglement_achat', this.editingId); 
+    achats = achats.filter(p => p.id !== this.editingId); 
+    saveState(); 
+    Fournisseurs.render(); 
+    this.render(); 
+    closeSheet(); 
+    showToast('تم الحذف'); 
+  },
+  load(id) { 
+    const r = achats.find(p => p.id === id); 
+    if (!r) return; 
+    this.editingId = id; 
+    $('pNum').value = r.num; 
+    $('pDate').value = r.date; 
+    const opt = [...$('pSupplier').options].find(o => o.textContent === r.supplier); 
+    if (opt) $('pSupplier').value = opt.value; 
+    this.fillSupplier(); 
+    $('pPayment').value = r.payment; 
+    this.lines = [...r.lines]; 
+    this.renderLines(); 
+    this.refreshArticleOptions(); 
+    $('arAmount').value = ''; 
+    this.editingReglementId = null; 
+    this.renderReglementsSheet(r.reglements); 
+    this.renderAccountSummary(r); 
+    openSheet('achats'); 
+  },
+  render() { 
+    const q = $('pSearch').value.trim().toLowerCase(); 
+    const list = $('achatsList'); 
+    list.innerHTML = ''; 
+    const filtered = achats.filter(p => !q || p.num.toLowerCase().includes(q) || p.supplier.toLowerCase().includes(q)).reverse(); 
+    if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا توجد عمليات شراء</div>'; return; } 
+    filtered.forEach(p => { 
+      const d = document.createElement('div'); 
+      d.className = 'row-card'; 
+      d.onclick = () => Achats.load(p.id); 
+      d.innerHTML = `<div class="main-info"><div class="name">${p.num}</div><div class="meta">${p.supplier} - ${p.date}</div></div><div class="amount">${p.total.toFixed(3)} د.ت</div>`; 
+      list.appendChild(d); 
+    }); 
+  }
 };
 
 // ===== CAISSE =====
