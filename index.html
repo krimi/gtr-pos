@@ -6,7 +6,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1e2f66">
-<title>GTR POS</title>
+<title>GTR POS v0.4.3</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -80,10 +80,15 @@
   .field input, .field select{width:100%; padding:4px 8px; border:1px solid var(--border); border-radius:6px; font-family:'Cairo',sans-serif; font-size:13px; background:#f9fafc; height:32px;}
   .field input:focus, .field select:focus{outline:none; border-color:var(--blue-accent);}
   .field-row{display:grid; grid-template-columns:1fr 1fr; gap:6px;}
+  .field-row-3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px;}
+  .field-row-3 .field input{height:28px; font-size:12px;}
+  .field-row-3 .field label{font-size:10px;}
+  .field.phone-field{width:50%; display:inline-block; margin-left:2%;}
   table.items-mini{width:100%; border-collapse:collapse; font-size:11px; margin-bottom:6px;}
   table.items-mini th{background:var(--navy); color:#fff; padding:4px; font-weight:700;}
   table.items-mini td{padding:4px; border-top:1px solid var(--border); text-align:center; background:#fafbfd;}
   .del-row{background:var(--danger); color:#fff; border:none; border-radius:4px; padding:2px 6px; font-size:10px; cursor:pointer;}
+  .edit-row{background:var(--gold); color:#fff; border:none; border-radius:4px; padding:2px 6px; font-size:10px; cursor:pointer; margin-left:4px;}
   .totals-mini{display:flex; justify-content:space-between; font-size:12px; font-weight:700; color:var(--navy); margin:4px 0 8px;}
   .btn{width:100%; padding:10px; border:none; border-radius:8px; font-family:'Cairo',sans-serif; font-size:14px; font-weight:700; color:#fff; cursor:pointer; margin-bottom:6px; background:linear-gradient(180deg,var(--blue-light),var(--blue-accent));}
   .btn.small{padding:4px 10px; font-size:12px; margin-bottom:4px;}
@@ -183,9 +188,16 @@
   .add-reg-row input{flex:1; padding:3px 6px; border:1px solid var(--border); border-radius:4px; font-size:11px; height:28px;}
   .add-reg-row select{padding:3px 6px; border:1px solid var(--border); border-radius:4px; font-size:11px; height:28px;}
   .add-reg-row .btn{flex:0 0 auto; padding:4px 10px; font-size:11px; margin:0; height:28px; width:auto;}
-  /* زر خروج إضافي */
-  .logout-fixed{position:fixed; bottom:80px; right:10px; z-index:100; background:var(--danger); color:#fff; border:none; border-radius:50%; width:48px; height:48px; font-size:20px; box-shadow:0 4px 12px rgba(214,69,80,.4); cursor:pointer; display:none;}
-  .logout-fixed.show{display:block;}
+  /* تعديل الصف */
+  .edit-line-row{display:flex; gap:4px; align-items:center; margin-top:3px; flex-wrap:wrap;}
+  .edit-line-row input{width:60px; padding:2px 4px; border:1px solid var(--border); border-radius:4px; font-size:10px; height:22px;}
+  .edit-line-row .btn{flex:0 0 auto; padding:2px 8px; font-size:10px; height:22px; margin:0; width:auto;}
+  /* حساب الفاتورة */
+  .account-summary-grid{display:grid; grid-template-columns:1fr 1fr; gap:4px; margin:4px 0 8px; background:#f8f9fc; padding:6px 8px; border-radius:6px;}
+  .account-summary-grid .item{display:flex; justify-content:space-between; font-size:11px; font-weight:600; padding:2px 0; border-bottom:1px dashed #e0e0e0;}
+  .account-summary-grid .item .label{color:var(--muted);}
+  .account-summary-grid .item .value{font-weight:700; color:var(--navy);}
+  .account-summary-grid .item.total .value{color:var(--danger); font-size:13px;}
 </style>
 </head>
 <body>
@@ -224,7 +236,7 @@
 <!-- Phone -->
 <div class="phone">
   <div class="appbar">
-    <div><div class="title" id="pageTitle">لوحة القيادة</div><div class="sub" onclick="openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">v0.4.3</span></div></div>
+    <div><div class="title" id="pageTitle">لوحة القيادة</div><div class="sub" onclick="openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">v0.4.3 (MAJ 2)</span></div></div>
     <div style="display:flex; gap:6px;"><button class="menu-btn" onclick="openSheet('company')">⚙️</button><button class="menu-btn" id="langBtn" style="font-size:12px;">FR</button></div>
   </div>
   <div class="content">
@@ -323,9 +335,11 @@
   <div class="sheet" id="sheet-clients"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات العميل</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field"><label>رمز العميل</label><input id="cCode" readonly></div>
     <div class="field"><label>اسم العميل</label><input id="cName"></div>
-    <div class="field"><label>الهاتف 1</label><input id="cPhone"></div>
-    <div class="field"><label>الهاتف 2</label><input id="cPhone2"></div>
-    <div class="field"><label>الهاتف 3</label><input id="cPhone3"></div>
+    <div class="field-row">
+      <div class="field phone-field"><label>الهاتف 1</label><input id="cPhone"></div>
+      <div class="field phone-field"><label>الهاتف 2</label><input id="cPhone2"></div>
+      <div class="field phone-field"><label>الهاتف 3</label><input id="cPhone3"></div>
+    </div>
     <div class="field"><label>العنوان</label><input id="cAddress"></div>
     <div class="field"><label>البطاقة الجبائية</label><input id="cTaxId"></div>
     <div class="field"><label>الرصيد (د.ت)</label><input id="cBalance" type="number" step="0.001" value="0"></div>
@@ -409,9 +423,11 @@
   <div class="sheet" id="sheet-fournisseurs"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات المورد</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field"><label>رمز المورد</label><input id="fCode" readonly></div>
     <div class="field"><label>اسم المورد</label><input id="fName"></div>
-    <div class="field"><label>الهاتف 1</label><input id="fPhone"></div>
-    <div class="field"><label>الهاتف 2</label><input id="fPhone2"></div>
-    <div class="field"><label>الهاتف 3</label><input id="fPhone3"></div>
+    <div class="field-row">
+      <div class="field phone-field"><label>الهاتف 1</label><input id="fPhone"></div>
+      <div class="field phone-field"><label>الهاتف 2</label><input id="fPhone2"></div>
+      <div class="field phone-field"><label>الهاتف 3</label><input id="fPhone3"></div>
+    </div>
     <div class="field"><label>العنوان</label><input id="fAddress"></div>
     <div class="field"><label>البطاقة الجبائية</label><input id="fTaxId"></div>
     <div class="field"><label>الرصيد (د.ت)</label><input id="fBalance" type="number" step="0.001" value="0"></div>
@@ -421,20 +437,28 @@
   <!-- Vente sheet -->
   <div class="sheet" id="sheet-ventes"><div class="sheet-handle"></div><div class="sheet-header"><h3>عملية بيع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field-row"><div class="field"><label>رقم المبيعات</label><input id="vNum" readonly></div><div class="field"><label>التاريخ</label><input id="vDate" type="date"></div></div>
-    <div class="field"><label>العميل</label><select id="vClient" onchange="Ventes.fillClient()"><option value="">-- اختر --</option></select></div>
-    <div class="field"><label>هاتف العميل</label><input id="vPhone" readonly></div>
-    <!-- تم إزالة طريقة الدفع -->
-    <div class="section-title">إضافة صنف</div>
+    <!-- العميل والهاتف في نفس الصف -->
+    <div class="field-row">
+      <div class="field"><label>العميل</label><select id="vClient" onchange="Ventes.fillClient()"><option value="">-- اختر --</option></select></div>
+      <div class="field"><label>الهاتف</label><input id="vPhone" readonly></div>
+    </div>
+    <!-- قسم الحساب -->
+    <div class="section-title">الحساب</div>
+    <div id="vAccountSummary" class="account-summary-grid"></div>
+    <!-- إضافة صنف -->
+    <div class="section-title" style="margin-top:6px;">إضافة صنف</div>
     <div class="field"><label>الصنف</label><select id="viArticle" onchange="Ventes.fillArticle()"><option value="">-- اختر --</option></select></div>
     <div id="viStockHint" style="font-size:10px; color:var(--muted); margin:-2px 0 4px;"></div>
-    <div class="field-row"><div class="field"><label>السعر (د.ت)</label><input id="viPrice" type="number" step="0.001" oninput="Ventes.calcLine()"></div><div class="field"><label>الكمية</label><input id="viQty" type="number" min="1" value="1" oninput="Ventes.calcLine()"></div></div>
-    <div class="field"><label>الإجمالي (د.ت)</label><input id="viTotal" readonly></div>
+    <!-- السعر والكمية والإجمالي في صف واحد -->
+    <div class="field-row-3">
+      <div class="field"><label>السعر (د.ت)</label><input id="viPrice" type="number" step="0.001" oninput="Ventes.calcLine()"></div>
+      <div class="field"><label>الكمية</label><input id="viQty" type="number" min="1" value="1" oninput="Ventes.calcLine()"></div>
+      <div class="field"><label>الإجمالي</label><input id="viTotal" readonly style="background:#eef0f6;"></div>
+    </div>
     <button class="btn outline small" onclick="Ventes.addLine()">+ إضافة للجدول</button>
-    <table class="items-mini"><thead><tr><th>الصنف</th><th>سعر</th><th>كمية</th><th>مجموع</th><th></th></tr></thead><tbody id="vLinesBody"></tbody></table>
+    <table class="items-mini"><thead><tr><th>الصنف</th><th>سعر</th><th>كمية</th><th>مجموع</th><th>إجراء</th></tr></thead><tbody id="vLinesBody"></tbody></table>
     <div class="totals-mini" style="justify-content:flex-end;"><span>المجموع: </span><span id="vGrand">0.000</span> د.ت</div>
-    <div class="section-title">وضعية الحساب</div>
-    <div id="vAccountSummary"></div>
-    <!-- ===== قسم التسديدات داخل الفاتورة ===== -->
+    <!-- التسديدات -->
     <div class="section-title">التسديدات</div>
     <div id="vReglementsList"></div>
     <div class="add-reg-row">
@@ -442,28 +466,35 @@
       <select id="vRegType"><option value="نقدا">نقدا</option><option value="شيك">شيك</option><option value="كمبيالة">كمبيالة</option><option value="تحويل بنكي">تحويل بنكي</option></select>
       <button class="btn save small" onclick="Ventes.addReglement()">+</button>
     </div>
-    <button class="btn" style="background:linear-gradient(180deg,#3ddc84,#25d366);" onclick="Ventes.shareWhatsapp()">📱 واتساب</button>
-    <button class="btn outline small" onclick="Ventes.printInvoice()">🖨️ طباعة</button>
-    <button class="btn outline small" onclick="Ventes.printBluetooth()">🖨️ طباعة Bluetooth</button>
+    <!-- أزرار -->
+    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;">
+      <button class="btn" style="background:linear-gradient(180deg,#3ddc84,#25d366); flex:1;" onclick="Ventes.shareWhatsapp()">📱 واتساب</button>
+      <button class="btn outline small" style="flex:1;" onclick="Ventes.printInvoice()">🖨️ طباعة</button>
+      <button class="btn outline small" style="flex:1;" onclick="Ventes.printBluetooth()">🖨️ Bluetooth</button>
+    </div>
   </div><div class="sheet-footer"><button class="btn save" onclick="Ventes.save()">💾 حفظ</button><button class="btn edit" onclick="Ventes.edit()">✏️ تعديل</button><button class="btn del" onclick="Ventes.remove()">🗑 حذف</button></div></div>
   
   <!-- Achat sheet -->
   <div class="sheet" id="sheet-achats"><div class="sheet-handle"></div><div class="sheet-header"><h3>عملية شراء</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field-row"><div class="field"><label>رقم المشتريات</label><input id="pNum" readonly></div><div class="field"><label>التاريخ</label><input id="pDate" type="date"></div></div>
-    <div class="field"><label>المورد</label><select id="pSupplier" onchange="Achats.fillSupplier()"><option value="">-- اختر --</option></select></div>
-    <div class="field-row"><div class="field"><label>هاتف المورد</label><input id="pPhone" readonly></div><div class="field"><label>عنوان المورد</label><input id="pAddress" readonly></div></div>
-    <!-- تم إزالة طريقة الدفع -->
-    <div class="section-title">إضافة صنف</div>
+    <div class="field-row">
+      <div class="field"><label>المورد</label><select id="pSupplier" onchange="Achats.fillSupplier()"><option value="">-- اختر --</option></select></div>
+      <div class="field"><label>الهاتف</label><input id="pPhone" readonly></div>
+    </div>
+    <div class="field"><label>عنوان المورد</label><input id="pAddress" readonly></div>
+    <div class="section-title">الحساب</div>
+    <div id="pAccountSummary" class="account-summary-grid"></div>
+    <div class="section-title" style="margin-top:6px;">إضافة صنف</div>
     <div class="field"><label>الصنف</label><select id="piArticle" onchange="Achats.fillArticle()"><option value="">-- اختر --</option></select></div>
     <div id="piStockHint" style="font-size:10px; color:var(--muted); margin:-2px 0 4px;"></div>
-    <div class="field-row"><div class="field"><label>السعر (د.ت)</label><input id="piPrice" type="number" step="0.001" oninput="Achats.calcLine()"></div><div class="field"><label>الكمية</label><input id="piQty" type="number" min="1" value="1" oninput="Achats.calcLine()"></div></div>
-    <div class="field"><label>الإجمالي (د.ت)</label><input id="piTotal" readonly></div>
+    <div class="field-row-3">
+      <div class="field"><label>السعر (د.ت)</label><input id="piPrice" type="number" step="0.001" oninput="Achats.calcLine()"></div>
+      <div class="field"><label>الكمية</label><input id="piQty" type="number" min="1" value="1" oninput="Achats.calcLine()"></div>
+      <div class="field"><label>الإجمالي</label><input id="piTotal" readonly style="background:#eef0f6;"></div>
+    </div>
     <button class="btn outline small" onclick="Achats.addLine()">+ إضافة للجدول</button>
-    <table class="items-mini"><thead><tr><th>الصنف</th><th>سعر</th><th>كمية</th><th>مجموع</th><th></th></tr></thead><tbody id="pLinesBody"></tbody></table>
+    <table class="items-mini"><thead><tr><th>الصنف</th><th>سعر</th><th>كمية</th><th>مجموع</th><th>إجراء</th></tr></thead><tbody id="pLinesBody"></tbody></table>
     <div class="totals-mini" style="justify-content:flex-end;"><span>المجموع: </span><span id="pGrand">0.000</span> د.ت</div>
-    <div class="section-title">وضعية الحساب</div>
-    <div id="pAccountSummary"></div>
-    <!-- ===== قسم التسديدات داخل الفاتورة ===== -->
     <div class="section-title">التسديدات</div>
     <div id="pReglementsList"></div>
     <div class="add-reg-row">
@@ -471,9 +502,11 @@
       <select id="pRegType"><option value="نقدا">نقدا</option><option value="شيك">شيك</option><option value="كمبيالة">كمبيالة</option><option value="تحويل بنكي">تحويل بنكي</option></select>
       <button class="btn save small" onclick="Achats.addReglement()">+</button>
     </div>
-    <button class="btn" style="background:linear-gradient(180deg,#3ddc84,#25d366);" onclick="Achats.shareWhatsapp()">📱 واتساب</button>
-    <button class="btn outline small" onclick="Achats.printInvoice()">🖨️ طباعة</button>
-    <button class="btn outline small" onclick="Achats.printBluetooth()">🖨️ طباعة Bluetooth</button>
+    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;">
+      <button class="btn" style="background:linear-gradient(180deg,#3ddc84,#25d366); flex:1;" onclick="Achats.shareWhatsapp()">📱 واتساب</button>
+      <button class="btn outline small" style="flex:1;" onclick="Achats.printInvoice()">🖨️ طباعة</button>
+      <button class="btn outline small" style="flex:1;" onclick="Achats.printBluetooth()">🖨️ Bluetooth</button>
+    </div>
   </div><div class="sheet-footer"><button class="btn save" onclick="Achats.save()">💾 حفظ</button><button class="btn edit" onclick="Achats.edit()">✏️ تعديل</button><button class="btn del" onclick="Achats.remove()">🗑 حذف</button></div></div>
   
   <!-- Company sheet -->
@@ -493,6 +526,7 @@
     <div style="font-size:10px;color:var(--muted);margin-top:6px;">💡 لتثبيت التطبيق: ⋮ في المتصفح ← إضافة إلى الشاشة الرئيسية</div>
     <div class="section-title">الحساب</div>
     <div id="accountEmailDisplay" style="font-size:12px;color:var(--muted);margin-bottom:4px;"></div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">الإصدار: v0.4.3 (MAJ 2)</div>
     <button class="btn del" onclick="doLogout()">🚪 تسجيل الخروج</button>
   </div></div>
   <div class="toast" id="toast"></div>
@@ -508,10 +542,11 @@
   <div class="invoice-doc paper-80" id="invoiceDoc"></div>
 </div>
 
-<!-- زر خروج طوارئ (يظهر دائماً) -->
-<button class="logout-fixed show" onclick="emergencyLogout()" title="خروج طارئ">🚪</button>
-
 <script>
+// ===== VERSION =====
+const APP_VERSION = 2; // يزيد يدوياً مع كل تحديث
+const APP_VERSION_STRING = 'v0.4.3 (MAJ ' + APP_VERSION + ')';
+
 // ===== FIREBASE =====
 const firebaseConfig = {
   apiKey: "AIzaSyBG_F8TMY4Mmzb1e2etzPHQTw6upu4dkrs",
@@ -590,16 +625,6 @@ function doSignup() { const e = $('loginEmail').value.trim(), p = $('loginPasswo
 function doGoogleLogin() { const provider = new firebase.auth.GoogleAuthProvider(); $('loginError').textContent = ''; $('loginLoading').style.display = 'block'; auth.signInWithPopup(provider).catch(err => { $('loginError').textContent = err.message; }).finally(() => { $('loginLoading').style.display = 'none'; }); }
 function doLogout() { auth.signOut(); closeSheet(); }
 
-// دالة طوارئ للخروج (تعمل مباشرة)
-function emergencyLogout() {
-  auth.signOut();
-  // إخفاء شاشات التحميل
-  document.querySelectorAll('.login-overlay').forEach(el => el.classList.add('hide'));
-  document.getElementById('loginOverlay').classList.remove('hide');
-  // إظهار زر الخروج الطارئ (بالفعل مرئي)
-  showToast('تم تسجيل الخروج');
-}
-
 // ===== UI =====
 function openSheet(name) { $('overlay').classList.add('show'); const s = $('sheet-' + name); if (s) s.classList.add('show'); if (name === 'company') CompanyInfo.load(); }
 function closeSheet() { document.querySelectorAll('.sheet').forEach(s => s.classList.remove('show')); $('overlay').classList.remove('show'); }
@@ -615,7 +640,7 @@ document.querySelectorAll('.tab-item').forEach(tab => {
     currentSection = this.dataset.section;
     const sec = $('sec-' + currentSection);
     if (sec) sec.classList.add('active');
-    $('pageTitle').textContent = this.querySelector('span:last-child').textContent;
+    $('pageTitle').textContent = this.querySelector('span:last-child').textContent + ' ' + APP_VERSION_STRING;
     if (currentSection === 'dashboard') Rapports.render();
     if (currentSection === 'caisse-clients') CaisseClients.render();
     if (currentSection === 'caisse-fournisseurs') CaisseFournisseurs.render();
@@ -647,19 +672,29 @@ function renderInvoice() {
   const doc = $('invoiceDoc');
   doc.className = 'invoice-doc paper-' + size;
   const data = _invoiceData;
+  // الأعمدة: #, المنتج, السعر, الكمية, الإجمالي
   const lines = data.lines.map((l, i) => `<tr><td>${i+1}</td><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td></tr>`).join('');
   const totalQty = data.lines.reduce((a, l) => a + l.qty, 0);
   const logo = companyInfo.logo ? `<div style="text-align:center;margin-bottom:4px;"><img src="${companyInfo.logo}" style="max-width:60px;max-height:60px;"></div>` : '';
   doc.innerHTML = logo + `
     <div class="inv-top">
       <div class="inv-datetime">${new Date().toLocaleDateString('en-GB')}<br>${new Date().toLocaleTimeString('en-US')}</div>
-      <div class="inv-company">${companyInfo.name}<br>${companyInfo.address||''}<br>${companyInfo.phone1||''}${companyInfo.taxId ? '<br>M.F: '+companyInfo.taxId : ''}</div>
+      <div class="inv-company">${companyInfo.name}<br>${companyInfo.address||''}<br>${companyInfo.phone1||''}${companyInfo.taxId ? '<br>M.F: '+companyInfo.taxId : ''}<br>${APP_VERSION_STRING}</div>
     </div>
     <div class="inv-title">${data.title}</div>
     <div class="inv-meta"><b>الرقم:</b> ${data.num} &nbsp; <b>التاريخ:</b> ${data.date} &nbsp; <b>${data.partyLabel}:</b> ${data.partyName}</div>
     <div class="inv-partybar"><div>${data.partyAddr||'-'}<br><small>العنوان</small></div><div>${data.partyPhone||'-'}<br><small>الهاتف</small></div></div>
-    <table class="inv-items"><thead><tr><th>#</th><th>المنتج</th><th>السعر</th><th>الكمية</th><th>الإجمالي</th></tr></thead><tbody>${lines}</tbody><tfoot><tr class="inv-totalrow"><td colspan="2">المبلغ بالحروف: ${amountInWords(data.total)}</td><td></td><td>${totalQty}</td><td>${data.total.toFixed(3)}</td></tr></tfoot></table>
-    <table class="inv-summary"><tr class="highlight"><td class="label">سابقكم</td><td class="value">${data.prevBalance.toFixed(3)}</td></tr><tr class="total"><td class="label">إجمالي الفاتورة</td><td class="value">${data.total.toFixed(3)}</td></tr><tr><td class="label">المدفوع</td><td class="value">${data.paid.toFixed(3)}</td></tr><tr class="highlight"><td class="label">حاليالكم</td><td class="value">${data.currentBalance.toFixed(3)}</td></tr></table>
+    <table class="inv-items">
+      <thead><tr><th>#</th><th>المنتج</th><th>السعر</th><th>الكمية</th><th>الإجمالي</th></tr></thead>
+      <tbody>${lines}</tbody>
+      <tfoot><tr class="inv-totalrow"><td colspan="2">المبلغ بالحروف: ${amountInWords(data.total)}</td><td></td><td>${totalQty}</td><td>${data.total.toFixed(3)}</td></tr></tfoot>
+    </table>
+    <table class="inv-summary">
+      <tr><td class="label">الرصيد السابق</td><td class="value">${data.prevBalance.toFixed(3)}</td></tr>
+      <tr class="total"><td class="label">إجمالي الفاتورة</td><td class="value">${data.total.toFixed(3)}</td></tr>
+      <tr><td class="label">المدفوع</td><td class="value">${data.paid.toFixed(3)}</td></tr>
+      <tr class="highlight"><td class="label">الرصيد الحالي</td><td class="value">${data.currentBalance.toFixed(3)}</td></tr>
+    </table>
   `;
 }
 $('paperSizeSelect').addEventListener('change', renderInvoice);
@@ -833,12 +868,7 @@ const CaisseClients = {
       $('ccBalanceHint').textContent = `الرصيد الحالي: ${client.balance.toFixed(3)} د.ت`;
     }
     
-    // جلب فواتير البيع غير المسددة لهذا العميل (آجلة)
-    const clientVentes = ventes.filter(v => 
-      v.client === client?.name 
-    );
-    
-    // حساب المبلغ المتبقي لكل فاتورة (المبلغ الإجمالي - المدفوع)
+    const clientVentes = ventes.filter(v => v.client === client?.name);
     const unpaidInvoices = clientVentes.map(v => {
       const paid = (v.reglements || []).reduce((sum, r) => sum + r.amount, 0);
       const remaining = v.total - paid;
@@ -1334,27 +1364,85 @@ const Expenses = {
 
 // ===== VENTES =====
 const Ventes = {
-  editingId: null, lines: [],
-  reset() { this.editingId = null; this.lines = []; $('vNum').value = 'VTE-' + String(nextId.ventes).padStart(4, '0'); $('vDate').value = new Date().toISOString().slice(0, 10); $('vClient').value = ''; $('vPhone').value = ''; $('viArticle').value = ''; $('viPrice').value = ''; $('viQty').value = 1; $('viTotal').value = ''; $('viStockHint').textContent = ''; $('vAccountSummary').innerHTML = ''; this.renderLines(); this.renderReglements(); this.refreshArticleOptions(); },
+  editingId: null, lines: [], reglements: [], originalClientBalance: 0,
+  reset() { this.editingId = null; this.lines = []; this.reglements = []; this.originalClientBalance = 0; $('vNum').value = 'VTE-' + String(nextId.ventes).padStart(4, '0'); $('vDate').value = new Date().toISOString().slice(0, 10); $('vClient').value = ''; $('vPhone').value = ''; $('viArticle').value = ''; $('viPrice').value = ''; $('viQty').value = 1; $('viTotal').value = ''; $('viStockHint').textContent = ''; this.renderLines(); this.renderReglements(); this.refreshArticleOptions(); this.updateAccountSummary(); },
   refreshArticleOptions() { const used = this.lines.map(l => l.name); const avail = articles.filter(a => !used.includes(a.name)); const s = $('viArticle'); if (s) s.innerHTML = '<option value="">-- اختر --</option>' + avail.map(a => `<option value="${a.id}">${a.name}</option>`).join(''); },
-  fillClient() { const c = clients.find(x => x.id == $('vClient').value); $('vPhone').value = c ? c.phone : ''; },
+  fillClient() { 
+    const c = clients.find(x => x.id == $('vClient').value); 
+    $('vPhone').value = c ? c.phone : ''; 
+    this.originalClientBalance = c ? c.balance : 0;
+    this.updateAccountSummary(); 
+  },
   fillArticle() { const a = articles.find(x => x.id == $('viArticle').value); if (!a) { $('viPrice').value = ''; $('viStockHint').textContent = ''; this.calcLine(); return; } const c = clients.find(x => x.id == $('vClient').value); const sp = c && c.specialPrices ? c.specialPrices.find(s => s.name === a.name) : null; $('viPrice').value = (sp ? sp.price : a.price).toFixed(3); $('viStockHint').textContent = 'المخزون: ' + getStock(a.name); this.calcLine(); },
   calcLine() { const p = parseFloat($('viPrice').value) || 0; const q = parseFloat($('viQty').value) || 0; $('viTotal').value = (p * q).toFixed(3); },
-  addLine() { const sel = $('viArticle'); const name = sel.value ? sel.options[sel.selectedIndex].textContent : ''; const price = parseFloat($('viPrice').value) || 0; const qty = parseFloat($('viQty').value) || 0; if (!name || price <= 0 || qty <= 0) { showToast('أدخل بيانات صحيحة'); return; } const existing = this.lines.find(l => l.name === name); if (existing) { existing.qty += qty; existing.price = price; existing.total = existing.price * existing.qty; showToast('تم تحديث الكمية'); } else this.lines.push({ name, price, qty, total: price * qty }); $('viArticle').value = ''; $('viPrice').value = ''; $('viQty').value = 1; $('viTotal').value = ''; $('viStockHint').textContent = ''; this.renderLines(); this.refreshArticleOptions(); },
-  removeLine(idx) { this.lines.splice(idx, 1); this.renderLines(); this.refreshArticleOptions(); },
-  renderLines() { const b = $('vLinesBody'); b.innerHTML = ''; let sum = 0; this.lines.forEach((l, i) => { sum += l.total; b.innerHTML += `<tr><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td><td><button class="del-row" onclick="Ventes.removeLine(${i})">✕</button></td></tr>`; }); $('vGrand').textContent = sum.toFixed(3); },
-  save() { if (!$('vClient').value) { showToast('اختر العميل'); return; } if (this.lines.length === 0) { showToast('أضف صنفا'); return; } const clientName = $('vClient').options[$('vClient').selectedIndex].textContent; const total = this.lines.reduce((a, l) => a + l.total, 0); const client = clients.find(c => c.name === clientName); if (!client) { showToast('العميل غير موجود'); return; } const newId = this.editingId || nextId.ventes++; const rec = { id: newId, num: $('vNum').value, date: $('vDate').value, client: clientName, lines: [...this.lines], total: total, reglements: (this.editingId ? ventes.find(v => v.id === this.editingId)?.reglements || [] : []) }; if (this.editingId) { const old = ventes.find(v => v.id === this.editingId); if (old) { const oldClient = clients.find(c => c.name === old.client); if (oldClient && oldClient.name !== clientName) { oldClient.balance -= old.total; } removeStock('vente', rec.id); this.lines.forEach(l => addStock(l.name, l.qty, 'out', 'vente', rec.id, rec.date, 'بيع ' + rec.num)); rec.reglements = old.reglements || []; } const idx = ventes.findIndex(v => v.id === this.editingId); if (idx !== -1) ventes[idx] = rec; } else { client.balance += total; this.lines.forEach(l => addStock(l.name, l.qty, 'out', 'vente', rec.id, rec.date, 'بيع ' + rec.num)); ventes.push(rec); } saveState(); refreshArticleSelects(); Clients.render(); this.render(); this.editingId = rec.id; this.renderAccountSummary(rec); this.renderReglements(); showToast('تم الحفظ'); closeSheet(); },
-  edit() { if (this.editingId == null) { showToast('اختر عملية بيع لتعديلها'); return; } this.save(); },
-  renderAccountSummary(rec) { const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); const b = $('vAccountSummary'); b.innerHTML = `<div class="totals-mini"><span>مبلغ الفاتورة</span><span>${rec.total.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>المدفوع</span><span>${paid.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>المتبقي</span><span>${(rec.total - paid).toFixed(3)} د.ت</span></div><div class="totals-mini"><span>الرصيد الكلي</span><span>${client ? client.balance.toFixed(3) : '0.000'} د.ت</span></div>`; },
-  // ===== إدارة التسديدات داخل الفاتورة =====
+  addLine() { const sel = $('viArticle'); const name = sel.value ? sel.options[sel.selectedIndex].textContent : ''; const price = parseFloat($('viPrice').value) || 0; const qty = parseFloat($('viQty').value) || 0; if (!name || price <= 0 || qty <= 0) { showToast('أدخل بيانات صحيحة'); return; } const existing = this.lines.find(l => l.name === name); if (existing) { existing.qty += qty; existing.price = price; existing.total = existing.price * existing.qty; showToast('تم تحديث الكمية'); } else this.lines.push({ name, price, qty, total: price * qty }); $('viArticle').value = ''; $('viPrice').value = ''; $('viQty').value = 1; $('viTotal').value = ''; $('viStockHint').textContent = ''; this.renderLines(); this.refreshArticleOptions(); this.updateAccountSummary(); },
+  removeLine(idx) { this.lines.splice(idx, 1); this.renderLines(); this.refreshArticleOptions(); this.updateAccountSummary(); },
+  editLine(idx) {
+    const line = this.lines[idx];
+    if (!line) return;
+    const row = document.querySelector(`#vLinesBody tr:nth-child(${idx+1})`);
+    if (!row) return;
+    const cells = row.querySelectorAll('td');
+    cells[0].innerHTML = line.name;
+    cells[1].innerHTML = `<input type="number" step="0.001" value="${line.price}" class="edit-price" style="width:60px;padding:2px;">`;
+    cells[2].innerHTML = `<input type="number" min="1" value="${line.qty}" class="edit-qty" style="width:50px;padding:2px;">`;
+    cells[3].innerHTML = `<span class="edit-total">${line.total.toFixed(3)}</span>`;
+    cells[4].innerHTML = `
+      <button class="edit-row" onclick="Ventes.saveEditLine(${idx})">✔</button>
+      <button class="del-row" onclick="Ventes.removeLine(${idx})">✕</button>
+    `;
+    const priceInput = row.querySelector('.edit-price');
+    const qtyInput = row.querySelector('.edit-qty');
+    const totalSpan = row.querySelector('.edit-total');
+    const update = () => {
+      const p = parseFloat(priceInput.value) || 0;
+      const q = parseFloat(qtyInput.value) || 0;
+      totalSpan.textContent = (p * q).toFixed(3);
+    };
+    priceInput.oninput = update;
+    qtyInput.oninput = update;
+  },
+  saveEditLine(idx) {
+    const row = document.querySelector(`#vLinesBody tr:nth-child(${idx+1})`);
+    if (!row) return;
+    const price = parseFloat(row.querySelector('.edit-price').value) || 0;
+    const qty = parseFloat(row.querySelector('.edit-qty').value) || 0;
+    if (price <= 0 || qty <= 0) { showToast('قيم غير صحيحة'); return; }
+    this.lines[idx].price = price;
+    this.lines[idx].qty = qty;
+    this.lines[idx].total = price * qty;
+    this.renderLines();
+    this.updateAccountSummary();
+  },
+  renderLines() { const b = $('vLinesBody'); b.innerHTML = ''; let sum = 0; this.lines.forEach((l, i) => { sum += l.total; b.innerHTML += `<tr><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td><td><button class="edit-row" onclick="Ventes.editLine(${i})">✏️</button><button class="del-row" onclick="Ventes.removeLine(${i})">✕</button></td></tr>`; }); $('vGrand').textContent = sum.toFixed(3); },
+  updateAccountSummary() {
+    const clientName = $('vClient').options[$('vClient').selectedIndex]?.textContent || '';
+    const client = clients.find(c => c.name === clientName);
+    const total = this.lines.reduce((a, l) => a + l.total, 0);
+    const paid = this.reglements.reduce((a, r) => a + r.amount, 0);
+    const b = $('vAccountSummary');
+    if (!client) { 
+      b.innerHTML = `<div class="item"><span class="label">الرصيد السابق</span><span class="value">0.000</span></div>
+                     <div class="item"><span class="label">مبلغ الفاتورة</span><span class="value">0.000</span></div>
+                     <div class="item"><span class="label">المدفوع</span><span class="value">0.000</span></div>
+                     <div class="item total"><span class="label">الرصيد الحالي</span><span class="value">0.000</span></div>`;
+      return; 
+    }
+    const prevBalance = this.originalClientBalance;
+    const currentBalance = prevBalance + total - paid;
+    b.innerHTML = `
+      <div class="item"><span class="label">الرصيد السابق</span><span class="value">${prevBalance.toFixed(3)}</span></div>
+      <div class="item"><span class="label">مبلغ الفاتورة</span><span class="value">${total.toFixed(3)}</span></div>
+      <div class="item"><span class="label">المدفوع</span><span class="value">${paid.toFixed(3)}</span></div>
+      <div class="item total"><span class="label">الرصيد الحالي</span><span class="value">${currentBalance.toFixed(3)}</span></div>
+    `;
+  },
   renderReglements() {
     const container = $('vReglementsList');
     if (!container) return;
-    const rec = this.editingId ? ventes.find(v => v.id === this.editingId) : null;
-    const regs = rec ? rec.reglements || [] : [];
     container.innerHTML = '';
-    if (regs.length === 0) { container.innerHTML = '<div class="empty-msg">لا توجد تسديدات</div>'; return; }
-    regs.forEach((r, idx) => {
+    if (this.reglements.length === 0) { container.innerHTML = '<div class="empty-msg">لا توجد تسديدات</div>'; return; }
+    this.reglements.forEach((r, idx) => {
       const div = document.createElement('div');
       div.className = 'reg-item';
       div.innerHTML = `
@@ -1365,66 +1453,75 @@ const Ventes = {
       `;
       container.appendChild(div);
     });
+    this.updateAccountSummary();
   },
   addReglement() {
     const amount = parseFloat($('vRegAmount').value) || 0;
     if (amount <= 0) { showToast('أدخل مبلغاً صحيحاً'); return; }
-    if (!this.editingId) { showToast('يجب حفظ الفاتورة أولاً'); return; }
-    const rec = ventes.find(v => v.id === this.editingId);
-    if (!rec) { showToast('الفاتورة غير موجودة'); return; }
     const method = $('vRegType').value;
     const date = new Date().toISOString().slice(0, 10);
-    if (!rec.reglements) rec.reglements = [];
-    rec.reglements.push({ id: nextId.reglements++, date, amount, method });
-    // تحديث رصيد العميل
-    const client = clients.find(c => c.name === rec.client);
+    this.reglements.push({ id: nextId.reglements++, date, amount, method });
+    const clientName = $('vClient').options[$('vClient').selectedIndex]?.textContent || '';
+    const client = clients.find(c => c.name === clientName);
     if (client) {
       client.balance -= amount;
     }
-    // إضافة إلى كاسة العملاء
-    const cRec = { 
-      id: nextId.caisseClients++, 
-      date, 
-      clientId: client ? client.id : null, 
-      clientName: rec.client, 
-      type: 'in', 
-      amount, 
-      regType: method, 
-      description: 'تسديد من فاتورة ' + rec.num,
-      invoiceId: rec.id,
-      invoiceNum: rec.num
-    };
-    caisseClients.push(cRec);
-    saveState();
     this.renderReglements();
-    this.renderAccountSummary(rec);
-    Clients.render();
-    CaisseClients.render();
     $('vRegAmount').value = '';
-    showToast('تم تسجيل التسديد');
+    showToast('تم إضافة التسديد المؤقت');
   },
   deleteReglement(idx) {
-    if (!this.editingId) return;
-    const rec = ventes.find(v => v.id === this.editingId);
-    if (!rec || !rec.reglements) return;
-    const removed = rec.reglements.splice(idx, 1)[0];
+    const removed = this.reglements.splice(idx, 1)[0];
     if (removed) {
-      const client = clients.find(c => c.name === rec.client);
+      const clientName = $('vClient').options[$('vClient').selectedIndex]?.textContent || '';
+      const client = clients.find(c => c.name === clientName);
       if (client) {
         client.balance += removed.amount;
       }
-      caisseClients = caisseClients.filter(cr => !(cr.invoiceId === rec.id && cr.amount === removed.amount && cr.date === removed.date));
-      saveState();
       this.renderReglements();
-      this.renderAccountSummary(rec);
-      Clients.render();
-      CaisseClients.render();
       showToast('تم حذف التسديد');
     }
   },
+  save() {
+    if (!$('vClient').value) { showToast('اختر العميل'); return; }
+    if (this.lines.length === 0) { showToast('أضف صنفا'); return; }
+    const clientName = $('vClient').options[$('vClient').selectedIndex].textContent;
+    const total = this.lines.reduce((a, l) => a + l.total, 0);
+    const client = clients.find(c => c.name === clientName);
+    if (!client) { showToast('العميل غير موجود'); return; }
+    const newId = this.editingId || nextId.ventes++;
+    const rec = { id: newId, num: $('vNum').value, date: $('vDate').value, client: clientName, lines: [...this.lines], total: total, reglements: [...this.reglements] };
+    if (this.editingId) {
+      const old = ventes.find(v => v.id === this.editingId);
+      if (old) {
+        const oldClient = clients.find(c => c.name === old.client);
+        if (oldClient && oldClient.name !== clientName) {
+          oldClient.balance -= old.total;
+        }
+        removeStock('vente', rec.id);
+        this.lines.forEach(l => addStock(l.name, l.qty, 'out', 'vente', rec.id, rec.date, 'بيع ' + rec.num));
+      }
+      const idx = ventes.findIndex(v => v.id === this.editingId);
+      if (idx !== -1) ventes[idx] = rec;
+    } else {
+      this.lines.forEach(l => addStock(l.name, l.qty, 'out', 'vente', rec.id, rec.date, 'بيع ' + rec.num));
+      ventes.push(rec);
+    }
+    saveState();
+    refreshArticleSelects();
+    Clients.render();
+    this.render();
+    this.editingId = rec.id;
+    this.updateAccountSummary();
+    showToast('تم حفظ الفاتورة');
+    // لا نغلق الشيت
+  },
+  edit() { if (this.editingId == null) { showToast('اختر عملية بيع لتعديلها'); return; } this.save(); },
+  remove() { if (this.editingId == null) { showToast('اختر عملية بيع لحذفها'); return; } const rec = ventes.find(v => v.id === this.editingId); if (rec) { const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); if (client) client.balance -= rec.total - paid; removeStock('vente', rec.id); } ventes = ventes.filter(v => v.id !== this.editingId); saveState(); Clients.render(); this.render(); closeSheet(); showToast('تم الحذف'); },
+  load(id) { const r = ventes.find(v => v.id === id); if (!r) return; this.editingId = id; $('vNum').value = r.num; $('vDate').value = r.date; const opt = [...$('vClient').options].find(o => o.textContent === r.client); if (opt) $('vClient').value = opt.value; this.fillClient(); this.lines = [...r.lines]; this.reglements = r.reglements ? [...r.reglements] : []; this.renderLines(); this.refreshArticleOptions(); this.renderReglements(); openSheet('ventes'); },
+  render() { const q = $('vSearch').value.trim().toLowerCase(); const list = $('ventesList'); list.innerHTML = ''; const filtered = ventes.filter(v => !q || v.num.toLowerCase().includes(q) || v.client.toLowerCase().includes(q)).reverse(); if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا توجد عمليات بيع</div>'; return; } filtered.forEach(v => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => Ventes.load(v.id); d.innerHTML = `<div class="main-info"><div class="name">${v.num}</div><div class="meta">${v.client} - ${v.date}</div></div><div class="amount">${v.total.toFixed(3)} د.ت</div>`; list.appendChild(d); }); },
   shareWhatsapp() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); let text = `*فاتورة ${rec.num}*\nالتاريخ: ${rec.date}\nالعميل: ${rec.client}\n`; rec.lines.forEach(l => { text += `${l.name}  x${l.qty}  ${l.total.toFixed(3)} د.ت\n`; }); text += `\nالمجموع: ${rec.total.toFixed(3)} د.ت\nالمدفوع: ${paid.toFixed(3)} د.ت\nالمتبقي: ${(rec.total - paid).toFixed(3)} د.ت`; const phone = client ? client.phone.replace(/\D/g, '') : ''; const url = 'https://wa.me/' + (phone ? '216' + phone : '') + '?text=' + encodeURIComponent(text); window.open(url, '_blank'); },
-  printInvoice() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); _invoiceData = { title: 'فاتورة بيع', payment: '', num: rec.num, date: rec.date, partyLabel: 'العميل', partyName: rec.client, partyAddr: client ? client.address : '', partyPhone: client ? client.phone : '', lines: rec.lines, total: rec.total, paid, prevBalance: client ? client.balance - (rec.total - paid) : 0, currentBalance: client ? client.balance : rec.total - paid }; renderInvoice(); $('printOverlay').classList.add('show'); },
-  // ===== طباعة Bluetooth =====
+  printInvoice() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); _invoiceData = { title: 'فاتورة بيع', payment: '', num: rec.num, date: rec.date, partyLabel: 'العميل', partyName: rec.client, partyAddr: client ? client.address : '', partyPhone: client ? client.phone : '', lines: rec.lines, total: rec.total, paid, prevBalance: this.originalClientBalance, currentBalance: client ? client.balance : rec.total - paid }; renderInvoice(); $('printOverlay').classList.add('show'); },
   printBluetooth() {
     if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; }
     const rec = ventes.find(v => v.id === this.editingId);
@@ -1454,35 +1551,85 @@ const Ventes = {
         console.error(err);
         showToast('❌ فشل الاتصال بالطابعة: ' + err.message);
       });
-  },
-  remove() { if (this.editingId == null) { showToast('اختر عملية بيع لحذفها'); return; } const rec = ventes.find(v => v.id === this.editingId); if (rec) { const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); if (client) client.balance -= rec.total - paid; removeStock('vente', rec.id); } ventes = ventes.filter(v => v.id !== this.editingId); saveState(); Clients.render(); this.render(); closeSheet(); showToast('تم الحذف'); },
-  load(id) { const r = ventes.find(v => v.id === id); if (!r) return; this.editingId = id; $('vNum').value = r.num; $('vDate').value = r.date; const opt = [...$('vClient').options].find(o => o.textContent === r.client); if (opt) $('vClient').value = opt.value; this.fillClient(); this.lines = [...r.lines]; this.renderLines(); this.refreshArticleOptions(); this.renderAccountSummary(r); this.renderReglements(); openSheet('ventes'); },
-  render() { const q = $('vSearch').value.trim().toLowerCase(); const list = $('ventesList'); list.innerHTML = ''; const filtered = ventes.filter(v => !q || v.num.toLowerCase().includes(q) || v.client.toLowerCase().includes(q)).reverse(); if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا توجد عمليات بيع</div>'; return; } filtered.forEach(v => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => Ventes.load(v.id); d.innerHTML = `<div class="main-info"><div class="name">${v.num}</div><div class="meta">${v.client} - ${v.date}</div></div><div class="amount">${v.total.toFixed(3)} د.ت</div>`; list.appendChild(d); }); }
+  }
 };
 
 // ===== ACHATS =====
 const Achats = {
-  editingId: null, lines: [],
-  reset() { this.editingId = null; this.lines = []; $('pNum').value = 'ACH-' + String(nextId.achats).padStart(4, '0'); $('pDate').value = new Date().toISOString().slice(0, 10); $('pSupplier').value = ''; $('pPhone').value = ''; $('pAddress').value = ''; $('piArticle').value = ''; $('piPrice').value = ''; $('piQty').value = 1; $('piTotal').value = ''; $('piStockHint').textContent = ''; $('pAccountSummary').innerHTML = ''; this.renderLines(); this.renderReglements(); this.refreshArticleOptions(); },
+  editingId: null, lines: [], reglements: [], originalSupplierBalance: 0,
+  reset() { this.editingId = null; this.lines = []; this.reglements = []; this.originalSupplierBalance = 0; $('pNum').value = 'ACH-' + String(nextId.achats).padStart(4, '0'); $('pDate').value = new Date().toISOString().slice(0, 10); $('pSupplier').value = ''; $('pPhone').value = ''; $('pAddress').value = ''; $('piArticle').value = ''; $('piPrice').value = ''; $('piQty').value = 1; $('piTotal').value = ''; $('piStockHint').textContent = ''; this.renderLines(); this.renderReglements(); this.refreshArticleOptions(); this.updateAccountSummary(); },
   refreshArticleOptions() { const used = this.lines.map(l => l.name); const avail = articles.filter(a => !used.includes(a.name)); const s = $('piArticle'); if (s) s.innerHTML = '<option value="">-- اختر --</option>' + avail.map(a => `<option value="${a.id}">${a.name}</option>`).join(''); },
-  fillSupplier() { const s = fournisseurs.find(x => x.id == $('pSupplier').value); $('pPhone').value = s ? s.phone : ''; $('pAddress').value = s ? s.address : ''; },
+  fillSupplier() { const s = fournisseurs.find(x => x.id == $('pSupplier').value); $('pPhone').value = s ? s.phone : ''; $('pAddress').value = s ? s.address : ''; this.originalSupplierBalance = s ? s.balance : 0; this.updateAccountSummary(); },
   fillArticle() { const a = articles.find(x => x.id == $('piArticle').value); $('piPrice').value = a ? (a.costPrice || a.price).toFixed(3) : ''; $('piStockHint').textContent = a ? 'المخزون: ' + getStock(a.name) : ''; this.calcLine(); },
   calcLine() { const p = parseFloat($('piPrice').value) || 0; const q = parseFloat($('piQty').value) || 0; $('piTotal').value = (p * q).toFixed(3); },
-  addLine() { const sel = $('piArticle'); const name = sel.value ? sel.options[sel.selectedIndex].textContent : ''; const price = parseFloat($('piPrice').value) || 0; const qty = parseFloat($('piQty').value) || 0; if (!name || price <= 0 || qty <= 0) { showToast('أدخل بيانات صحيحة'); return; } const existing = this.lines.find(l => l.name === name); if (existing) { existing.qty += qty; existing.price = price; existing.total = existing.price * existing.qty; showToast('تم تحديث الكمية'); } else this.lines.push({ name, price, qty, total: price * qty }); $('piArticle').value = ''; $('piPrice').value = ''; $('piQty').value = 1; $('piTotal').value = ''; $('piStockHint').textContent = ''; this.renderLines(); this.refreshArticleOptions(); },
-  removeLine(idx) { this.lines.splice(idx, 1); this.renderLines(); this.refreshArticleOptions(); },
-  renderLines() { const b = $('pLinesBody'); b.innerHTML = ''; let sum = 0; this.lines.forEach((l, i) => { sum += l.total; b.innerHTML += `<tr><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td><td><button class="del-row" onclick="Achats.removeLine(${i})">✕</button></td></tr>`; }); $('pGrand').textContent = sum.toFixed(3); },
-  save() { if (!$('pSupplier').value) { showToast('اختر المورد'); return; } if (this.lines.length === 0) { showToast('أضف صنفا'); return; } const supplierName = $('pSupplier').options[$('pSupplier').selectedIndex].textContent; const total = this.lines.reduce((a, l) => a + l.total, 0); const supplier = fournisseurs.find(f => f.name === supplierName); if (!supplier) { showToast('المورد غير موجود'); return; } const newId = this.editingId || nextId.achats++; const rec = { id: newId, num: $('pNum').value, date: $('pDate').value, supplier: supplierName, lines: [...this.lines], total: total, reglements: (this.editingId ? achats.find(p => p.id === this.editingId)?.reglements || [] : []) }; if (this.editingId) { const old = achats.find(p => p.id === this.editingId); if (old) { const oldSup = fournisseurs.find(f => f.name === old.supplier); if (oldSup && oldSup.name !== supplierName) { oldSup.balance -= old.total; } removeStock('achat', rec.id); this.lines.forEach(l => addStock(l.name, l.qty, 'in', 'achat', rec.id, rec.date, 'شراء ' + rec.num)); rec.reglements = old.reglements || []; } const idx = achats.findIndex(p => p.id === this.editingId); if (idx !== -1) achats[idx] = rec; } else { supplier.balance += total; this.lines.forEach(l => addStock(l.name, l.qty, 'in', 'achat', rec.id, rec.date, 'شراء ' + rec.num)); achats.push(rec); } saveState(); refreshArticleSelects(); Fournisseurs.render(); this.render(); this.editingId = rec.id; this.renderAccountSummary(rec); this.renderReglements(); showToast('تم الحفظ'); closeSheet(); },
-  edit() { if (this.editingId == null) { showToast('اختر عملية شراء لتعديلها'); return; } this.save(); },
-  renderAccountSummary(rec) { const supplier = fournisseurs.find(f => f.name === rec.supplier); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); const b = $('pAccountSummary'); b.innerHTML = `<div class="totals-mini"><span>مبلغ الفاتورة</span><span>${rec.total.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>المدفوع</span><span>${paid.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>المتبقي</span><span>${(rec.total - paid).toFixed(3)} د.ت</span></div><div class="totals-mini"><span>الرصيد الكلي</span><span>${supplier ? supplier.balance.toFixed(3) : '0.000'} د.ت</span></div>`; },
-  // ===== إدارة التسديدات داخل الفاتورة =====
+  addLine() { const sel = $('piArticle'); const name = sel.value ? sel.options[sel.selectedIndex].textContent : ''; const price = parseFloat($('piPrice').value) || 0; const qty = parseFloat($('piQty').value) || 0; if (!name || price <= 0 || qty <= 0) { showToast('أدخل بيانات صحيحة'); return; } const existing = this.lines.find(l => l.name === name); if (existing) { existing.qty += qty; existing.price = price; existing.total = existing.price * existing.qty; showToast('تم تحديث الكمية'); } else this.lines.push({ name, price, qty, total: price * qty }); $('piArticle').value = ''; $('piPrice').value = ''; $('piQty').value = 1; $('piTotal').value = ''; $('piStockHint').textContent = ''; this.renderLines(); this.refreshArticleOptions(); this.updateAccountSummary(); },
+  removeLine(idx) { this.lines.splice(idx, 1); this.renderLines(); this.refreshArticleOptions(); this.updateAccountSummary(); },
+  editLine(idx) {
+    const line = this.lines[idx];
+    if (!line) return;
+    const row = document.querySelector(`#pLinesBody tr:nth-child(${idx+1})`);
+    if (!row) return;
+    const cells = row.querySelectorAll('td');
+    cells[0].innerHTML = line.name;
+    cells[1].innerHTML = `<input type="number" step="0.001" value="${line.price}" class="edit-price" style="width:60px;padding:2px;">`;
+    cells[2].innerHTML = `<input type="number" min="1" value="${line.qty}" class="edit-qty" style="width:50px;padding:2px;">`;
+    cells[3].innerHTML = `<span class="edit-total">${line.total.toFixed(3)}</span>`;
+    cells[4].innerHTML = `
+      <button class="edit-row" onclick="Achats.saveEditLine(${idx})">✔</button>
+      <button class="del-row" onclick="Achats.removeLine(${idx})">✕</button>
+    `;
+    const priceInput = row.querySelector('.edit-price');
+    const qtyInput = row.querySelector('.edit-qty');
+    const totalSpan = row.querySelector('.edit-total');
+    const update = () => {
+      const p = parseFloat(priceInput.value) || 0;
+      const q = parseFloat(qtyInput.value) || 0;
+      totalSpan.textContent = (p * q).toFixed(3);
+    };
+    priceInput.oninput = update;
+    qtyInput.oninput = update;
+  },
+  saveEditLine(idx) {
+    const row = document.querySelector(`#pLinesBody tr:nth-child(${idx+1})`);
+    if (!row) return;
+    const price = parseFloat(row.querySelector('.edit-price').value) || 0;
+    const qty = parseFloat(row.querySelector('.edit-qty').value) || 0;
+    if (price <= 0 || qty <= 0) { showToast('قيم غير صحيحة'); return; }
+    this.lines[idx].price = price;
+    this.lines[idx].qty = qty;
+    this.lines[idx].total = price * qty;
+    this.renderLines();
+    this.updateAccountSummary();
+  },
+  renderLines() { const b = $('pLinesBody'); b.innerHTML = ''; let sum = 0; this.lines.forEach((l, i) => { sum += l.total; b.innerHTML += `<tr><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td><td><button class="edit-row" onclick="Achats.editLine(${i})">✏️</button><button class="del-row" onclick="Achats.removeLine(${i})">✕</button></td></tr>`; }); $('pGrand').textContent = sum.toFixed(3); },
+  updateAccountSummary() {
+    const supplierName = $('pSupplier').options[$('pSupplier').selectedIndex]?.textContent || '';
+    const supplier = fournisseurs.find(f => f.name === supplierName);
+    const total = this.lines.reduce((a, l) => a + l.total, 0);
+    const paid = this.reglements.reduce((a, r) => a + r.amount, 0);
+    const b = $('pAccountSummary');
+    if (!supplier) {
+      b.innerHTML = `<div class="item"><span class="label">الرصيد السابق</span><span class="value">0.000</span></div>
+                     <div class="item"><span class="label">مبلغ الفاتورة</span><span class="value">0.000</span></div>
+                     <div class="item"><span class="label">المدفوع</span><span class="value">0.000</span></div>
+                     <div class="item total"><span class="label">الرصيد الحالي</span><span class="value">0.000</span></div>`;
+      return;
+    }
+    const prevBalance = this.originalSupplierBalance;
+    const currentBalance = prevBalance + total - paid;
+    b.innerHTML = `
+      <div class="item"><span class="label">الرصيد السابق</span><span class="value">${prevBalance.toFixed(3)}</span></div>
+      <div class="item"><span class="label">مبلغ الفاتورة</span><span class="value">${total.toFixed(3)}</span></div>
+      <div class="item"><span class="label">المدفوع</span><span class="value">${paid.toFixed(3)}</span></div>
+      <div class="item total"><span class="label">الرصيد الحالي</span><span class="value">${currentBalance.toFixed(3)}</span></div>
+    `;
+  },
   renderReglements() {
     const container = $('pReglementsList');
     if (!container) return;
-    const rec = this.editingId ? achats.find(p => p.id === this.editingId) : null;
-    const regs = rec ? rec.reglements || [] : [];
     container.innerHTML = '';
-    if (regs.length === 0) { container.innerHTML = '<div class="empty-msg">لا توجد تسديدات</div>'; return; }
-    regs.forEach((r, idx) => {
+    if (this.reglements.length === 0) { container.innerHTML = '<div class="empty-msg">لا توجد تسديدات</div>'; return; }
+    this.reglements.forEach((r, idx) => {
       const div = document.createElement('div');
       div.className = 'reg-item';
       div.innerHTML = `
@@ -1493,64 +1640,75 @@ const Achats = {
       `;
       container.appendChild(div);
     });
+    this.updateAccountSummary();
   },
   addReglement() {
     const amount = parseFloat($('pRegAmount').value) || 0;
     if (amount <= 0) { showToast('أدخل مبلغاً صحيحاً'); return; }
-    if (!this.editingId) { showToast('يجب حفظ الفاتورة أولاً'); return; }
-    const rec = achats.find(p => p.id === this.editingId);
-    if (!rec) { showToast('الفاتورة غير موجودة'); return; }
     const method = $('pRegType').value;
     const date = new Date().toISOString().slice(0, 10);
-    if (!rec.reglements) rec.reglements = [];
-    rec.reglements.push({ id: nextId.reglements++, date, amount, method });
-    const supplier = fournisseurs.find(f => f.name === rec.supplier);
+    this.reglements.push({ id: nextId.reglements++, date, amount, method });
+    const supplierName = $('pSupplier').options[$('pSupplier').selectedIndex]?.textContent || '';
+    const supplier = fournisseurs.find(f => f.name === supplierName);
     if (supplier) {
       supplier.balance -= amount;
     }
-    const cRec = { 
-      id: nextId.caisseFournisseurs++, 
-      date, 
-      fournisseurId: supplier ? supplier.id : null, 
-      fournisseurName: rec.supplier, 
-      type: 'out', 
-      amount, 
-      regType: method, 
-      description: 'تسديد من فاتورة شراء ' + rec.num,
-      invoiceId: rec.id,
-      invoiceNum: rec.num
-    };
-    caisseFournisseurs.push(cRec);
-    saveState();
     this.renderReglements();
-    this.renderAccountSummary(rec);
-    Fournisseurs.render();
-    CaisseFournisseurs.render();
     $('pRegAmount').value = '';
-    showToast('تم تسجيل التسديد');
+    showToast('تم إضافة التسديد المؤقت');
   },
   deleteReglement(idx) {
-    if (!this.editingId) return;
-    const rec = achats.find(p => p.id === this.editingId);
-    if (!rec || !rec.reglements) return;
-    const removed = rec.reglements.splice(idx, 1)[0];
+    const removed = this.reglements.splice(idx, 1)[0];
     if (removed) {
-      const supplier = fournisseurs.find(f => f.name === rec.supplier);
+      const supplierName = $('pSupplier').options[$('pSupplier').selectedIndex]?.textContent || '';
+      const supplier = fournisseurs.find(f => f.name === supplierName);
       if (supplier) {
         supplier.balance += removed.amount;
       }
-      caisseFournisseurs = caisseFournisseurs.filter(cr => !(cr.invoiceId === rec.id && cr.amount === removed.amount && cr.date === removed.date));
-      saveState();
       this.renderReglements();
-      this.renderAccountSummary(rec);
-      Fournisseurs.render();
-      CaisseFournisseurs.render();
       showToast('تم حذف التسديد');
     }
   },
+  save() {
+    if (!$('pSupplier').value) { showToast('اختر المورد'); return; }
+    if (this.lines.length === 0) { showToast('أضف صنفا'); return; }
+    const supplierName = $('pSupplier').options[$('pSupplier').selectedIndex].textContent;
+    const total = this.lines.reduce((a, l) => a + l.total, 0);
+    const supplier = fournisseurs.find(f => f.name === supplierName);
+    if (!supplier) { showToast('المورد غير موجود'); return; }
+    const newId = this.editingId || nextId.achats++;
+    const rec = { id: newId, num: $('pNum').value, date: $('pDate').value, supplier: supplierName, lines: [...this.lines], total: total, reglements: [...this.reglements] };
+    if (this.editingId) {
+      const old = achats.find(p => p.id === this.editingId);
+      if (old) {
+        const oldSup = fournisseurs.find(f => f.name === old.supplier);
+        if (oldSup && oldSup.name !== supplierName) {
+          oldSup.balance -= old.total;
+        }
+        removeStock('achat', rec.id);
+        this.lines.forEach(l => addStock(l.name, l.qty, 'in', 'achat', rec.id, rec.date, 'شراء ' + rec.num));
+      }
+      const idx = achats.findIndex(p => p.id === this.editingId);
+      if (idx !== -1) achats[idx] = rec;
+    } else {
+      this.lines.forEach(l => addStock(l.name, l.qty, 'in', 'achat', rec.id, rec.date, 'شراء ' + rec.num));
+      achats.push(rec);
+    }
+    saveState();
+    refreshArticleSelects();
+    Fournisseurs.render();
+    this.render();
+    this.editingId = rec.id;
+    this.updateAccountSummary();
+    showToast('تم حفظ الفاتورة');
+    // لا نغلق الشيت
+  },
+  edit() { if (this.editingId == null) { showToast('اختر عملية شراء لتعديلها'); return; } this.save(); },
+  remove() { if (this.editingId == null) { showToast('اختر عملية شراء لحذفها'); return; } const rec = achats.find(p => p.id === this.editingId); if (rec) { const supplier = fournisseurs.find(f => f.name === rec.supplier); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); if (supplier) supplier.balance -= rec.total - paid; removeStock('achat', rec.id); } achats = achats.filter(p => p.id !== this.editingId); saveState(); Fournisseurs.render(); this.render(); closeSheet(); showToast('تم الحذف'); },
+  load(id) { const r = achats.find(p => p.id === id); if (!r) return; this.editingId = id; $('pNum').value = r.num; $('pDate').value = r.date; const opt = [...$('pSupplier').options].find(o => o.textContent === r.supplier); if (opt) $('pSupplier').value = opt.value; this.fillSupplier(); this.lines = [...r.lines]; this.reglements = r.reglements ? [...r.reglements] : []; this.renderLines(); this.refreshArticleOptions(); this.renderReglements(); openSheet('achats'); },
+  render() { const q = $('pSearch').value.trim().toLowerCase(); const list = $('achatsList'); list.innerHTML = ''; const filtered = achats.filter(p => !q || p.num.toLowerCase().includes(q) || p.supplier.toLowerCase().includes(q)).reverse(); if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا توجد عمليات شراء</div>'; return; } filtered.forEach(p => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => Achats.load(p.id); d.innerHTML = `<div class="main-info"><div class="name">${p.num}</div><div class="meta">${p.supplier} - ${p.date}</div></div><div class="amount">${p.total.toFixed(3)} د.ت</div>`; list.appendChild(d); }); },
   shareWhatsapp() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = achats.find(p => p.id === this.editingId); if (!rec) return; const supplier = fournisseurs.find(f => f.name === rec.supplier); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); let text = `*فاتورة شراء ${rec.num}*\nالتاريخ: ${rec.date}\nالمورد: ${rec.supplier}\n`; rec.lines.forEach(l => { text += `${l.name}  x${l.qty}  ${l.total.toFixed(3)} د.ت\n`; }); text += `\nالمجموع: ${rec.total.toFixed(3)} د.ت\nالمدفوع: ${paid.toFixed(3)} د.ت\nالمتبقي: ${(rec.total - paid).toFixed(3)} د.ت`; const phone = supplier ? supplier.phone.replace(/\D/g, '') : ''; const url = 'https://wa.me/' + (phone ? '216' + phone : '') + '?text=' + encodeURIComponent(text); window.open(url, '_blank'); },
-  printInvoice() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = achats.find(p => p.id === this.editingId); if (!rec) return; const supplier = fournisseurs.find(f => f.name === rec.supplier); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); _invoiceData = { title: 'فاتورة شراء', payment: '', num: rec.num, date: rec.date, partyLabel: 'المورد', partyName: rec.supplier, partyAddr: supplier ? supplier.address : '', partyPhone: supplier ? supplier.phone : '', lines: rec.lines, total: rec.total, paid, prevBalance: supplier ? supplier.balance - (rec.total - paid) : 0, currentBalance: supplier ? supplier.balance : rec.total - paid }; renderInvoice(); $('printOverlay').classList.add('show'); },
-  // ===== طباعة Bluetooth =====
+  printInvoice() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = achats.find(p => p.id === this.editingId); if (!rec) return; const supplier = fournisseurs.find(f => f.name === rec.supplier); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); _invoiceData = { title: 'فاتورة شراء', payment: '', num: rec.num, date: rec.date, partyLabel: 'المورد', partyName: rec.supplier, partyAddr: supplier ? supplier.address : '', partyPhone: supplier ? supplier.phone : '', lines: rec.lines, total: rec.total, paid, prevBalance: this.originalSupplierBalance, currentBalance: supplier ? supplier.balance : rec.total - paid }; renderInvoice(); $('printOverlay').classList.add('show'); },
   printBluetooth() {
     if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; }
     const rec = achats.find(p => p.id === this.editingId);
@@ -1580,10 +1738,7 @@ const Achats = {
         console.error(err);
         showToast('❌ فشل الاتصال بالطابعة: ' + err.message);
       });
-  },
-  remove() { if (this.editingId == null) { showToast('اختر عملية شراء لحذفها'); return; } const rec = achats.find(p => p.id === this.editingId); if (rec) { const supplier = fournisseurs.find(f => f.name === rec.supplier); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); if (supplier) supplier.balance -= rec.total - paid; removeStock('achat', rec.id); } achats = achats.filter(p => p.id !== this.editingId); saveState(); Fournisseurs.render(); this.render(); closeSheet(); showToast('تم الحذف'); },
-  load(id) { const r = achats.find(p => p.id === id); if (!r) return; this.editingId = id; $('pNum').value = r.num; $('pDate').value = r.date; const opt = [...$('pSupplier').options].find(o => o.textContent === r.supplier); if (opt) $('pSupplier').value = opt.value; this.fillSupplier(); this.lines = [...r.lines]; this.renderLines(); this.refreshArticleOptions(); this.renderAccountSummary(r); this.renderReglements(); openSheet('achats'); },
-  render() { const q = $('pSearch').value.trim().toLowerCase(); const list = $('achatsList'); list.innerHTML = ''; const filtered = achats.filter(p => !q || p.num.toLowerCase().includes(q) || p.supplier.toLowerCase().includes(q)).reverse(); if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا توجد عمليات شراء</div>'; return; } filtered.forEach(p => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => Achats.load(p.id); d.innerHTML = `<div class="main-info"><div class="name">${p.num}</div><div class="meta">${p.supplier} - ${p.date}</div></div><div class="amount">${p.total.toFixed(3)} د.ت</div>`; list.appendChild(d); }); }
+  }
 };
 
 // ===== APPROVALS =====
