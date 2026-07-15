@@ -56,7 +56,6 @@
   .sheet-header h3{font-size:15px; font-weight:800; color:var(--navy); margin:0;}
   .sheet-close{width:28px;height:28px;border-radius:50%;background:#f0f2f8;border:none;font-size:14px;cursor:pointer;}
   .sheet-body{padding:10px 14px; overflow-y:auto; flex:1;}
-  /* جعل الفوتر ثابتاً في الأسفل */
   .sheet-footer{
     padding:10px 14px 14px;
     background:#fff;
@@ -168,13 +167,20 @@
   .report-card .amount{font-size:12px; font-weight:700;}
   .report-section{margin-bottom:12px;}
   .report-section .section-title{font-size:13px; margin:8px 0 4px;}
+  /* ===== تصميم خاص بقائمة الفواتير ===== */
+  .invoice-list-item{display:flex; justify-content:space-between; align-items:center; padding:6px 10px; margin-bottom:4px; background:#f8f9fc; border-radius:6px; border-right:3px solid var(--gold); cursor:pointer; transition:background 0.2s;}
+  .invoice-list-item:hover{background:#eef0f6;}
+  .invoice-list-item.selected{background:#e0f0e0; border-right-color:var(--success);}
+  .invoice-list-item .inv-num{font-weight:700; font-size:12px; color:var(--navy);}
+  .invoice-list-item .inv-amount{font-weight:700; font-size:13px; color:var(--danger);}
+  .invoice-list-item .inv-remaining{font-size:11px; color:var(--muted);}
 </style>
 </head>
 <body>
 <!-- Login overlay -->
-<div class="login-overlay" id="loginOverlay">
+<div class="login-overlay hide" id="loginOverlay">
   <div class="login-box">
-    <div class="login-logo">GTR POS <span style="font-size:13px; opacity:.6; font-weight:400;">v0.3.8</span></div>
+    <div class="login-logo">GTR POS <span style="font-size:13px; opacity:.6; font-weight:400;">v0.4.3</span></div>
     <div class="login-sub" id="loginModeLabel">تسجيل الدخول لحسابك</div>
     <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="email">
     <input type="password" id="loginPassword" placeholder="كلمة السر" autocomplete="current-password">
@@ -206,7 +212,7 @@
 <!-- Phone -->
 <div class="phone">
   <div class="appbar">
-    <div><div class="title" id="pageTitle">لوحة القيادة</div><div class="sub" onclick="openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">v0.3.8</span></div></div>
+    <div><div class="title" id="pageTitle">لوحة القيادة</div><div class="sub" onclick="openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">v0.4.3</span></div></div>
     <div style="display:flex; gap:6px;"><button class="menu-btn" onclick="openSheet('company')">⚙️</button><button class="menu-btn" id="langBtn" style="font-size:12px;">FR</button></div>
   </div>
   <div class="content">
@@ -221,12 +227,14 @@
       <div class="kpi-row">
         <div class="kpi-card"><div class="val" id="kpiNbVentes">0</div><div class="lbl">عدد فواتير البيع</div></div>
         <div class="kpi-card"><div class="val" id="kpiNbAchats">0</div><div class="lbl">عدد فواتير الشراء</div></div>
-        <div class="kpi-card ok"><div class="val" id="kpiCaisseSolde">0.000</div><div class="lbl">رصيد الكاسة</div></div>
-        <div class="kpi-card warn"><div class="val" id="kpiSoldesClients">0.000</div><div class="lbl">مجموع أرصدة العملاء</div></div>
+        <div class="kpi-card ok"><div class="val" id="kpiCaisseClientsSolde">0.000</div><div class="lbl">كاسة الحرفاء</div></div>
+        <div class="kpi-card gold"><div class="val" id="kpiCaisseFournisseursSolde">0.000</div><div class="lbl">كاسة المزودين</div></div>
       </div>
       <div class="kpi-row">
+        <div class="kpi-card warn"><div class="val" id="kpiCaisseExpensesSolde">0.000</div><div class="lbl">كاسة المصاريف</div></div>
+        <div class="kpi-card"><div class="val" id="kpiCaisseTotalSolde">0.000</div><div class="lbl">الرصيد الكلي للكاسات</div></div>
+        <div class="kpi-card warn"><div class="val" id="kpiSoldesClients">0.000</div><div class="lbl">مجموع أرصدة العملاء</div></div>
         <div class="kpi-card gold"><div class="val" id="kpiSoldesFournisseurs">0.000</div><div class="lbl">مجموع أرصدة الموردين</div></div>
-        <div class="kpi-card warn"><div class="val" id="kpiTotalExpenses">0.000</div><div class="lbl">مجموع المصاريف</div></div>
       </div>
       <div class="section-title">⚠️ مخزون منخفض</div>
       <div id="lowStockList"></div>
@@ -239,15 +247,44 @@
         <button class="btn" style="flex:0 0 auto; padding:6px 14px;" onclick="Reports.generate()">🔍 عرض</button>
         <button class="btn outline" style="flex:0 0 auto; padding:6px 14px;" onclick="Reports.reset()">↺ إعادة</button>
       </div>
-      <div id="reportContent">
-        <div class="empty-msg">اختر الفترة ثم اضغط "عرض"</div>
-      </div>
+      <div id="reportContent"><div class="empty-msg">اختر الفترة ثم اضغط "عرض"</div></div>
     </div>
-    <div class="section" id="sec-clients"><input class="search-box" id="cSearch" placeholder="🔍 بحث بالاسم أو الهاتف..." oninput="Clients.render()"><div id="clientsList"></div></div>
+    <div class="section" id="sec-clients">
+      <input class="search-box" id="cSearch" placeholder="🔍 بحث بالاسم أو الهاتف..." oninput="Clients.render()">
+      <div id="clientsList"></div>
+    </div>
     <div class="section" id="sec-articles"><input class="search-box" id="aSearch" placeholder="🔍 بحث باسم الصنف..." oninput="Articles.render()"><div id="articlesList"></div></div>
-    <div class="section" id="sec-caisse"><div class="kpi-row" style="grid-template-columns:1fr;"><div class="kpi-card ok"><div class="val" id="caisseBalance">0.000 د.ت</div><div class="lbl">الرصيد الحالي</div></div></div><div id="caisseList"></div></div>
+    
+    <!-- ===== كاسة الحرفاء ===== -->
+    <div class="section" id="sec-caisse-clients">
+      <div class="kpi-row" style="grid-template-columns:1fr;">
+        <div class="kpi-card ok"><div class="val" id="caisseClientsBalance">0.000 د.ت</div><div class="lbl">رصيد كاسة الحرفاء</div></div>
+      </div>
+      <button class="btn" style="background:linear-gradient(180deg,#4dbf8c,var(--success));" onclick="CaisseClients.openQuick()">⚡ تسديد سريع من حريف</button>
+      <div class="section-title" style="margin-top:10px;">سجل التسديدات</div>
+      <div id="caisseClientsList"></div>
+    </div>
+    
+    <!-- ===== كاسة المزودين ===== -->
+    <div class="section" id="sec-caisse-fournisseurs">
+      <div class="kpi-row" style="grid-template-columns:1fr;">
+        <div class="kpi-card ok"><div class="val" id="caisseFournisseursBalance">0.000 د.ت</div><div class="lbl">رصيد كاسة المزودين</div></div>
+      </div>
+      <button class="btn" style="background:linear-gradient(180deg,#4dbf8c,var(--success));" onclick="CaisseFournisseurs.openQuick()">⚡ تسديد سريع لمزود</button>
+      <div class="section-title" style="margin-top:10px;">سجل التسديدات</div>
+      <div id="caisseFournisseursList"></div>
+    </div>
+    
+    <!-- ===== كاسة المصاريف ===== -->
+    <div class="section" id="sec-caisse-expenses">
+      <div class="kpi-row" style="grid-template-columns:1fr;">
+        <div class="kpi-card ok"><div class="val" id="caisseExpensesBalance">0.000 د.ت</div><div class="lbl">رصيد كاسة المصاريف</div></div>
+      </div>
+      <button class="btn" onclick="CaisseExpenses.openNew()">+ إضافة حركة</button>
+      <div id="caisseExpensesList"></div>
+    </div>
+    
     <div class="section" id="sec-expenses"><button class="btn" style="background:linear-gradient(180deg,#e46b74,var(--danger));" onclick="Expenses.openNew()">+ إضافة مصروف</button><div class="kpi-row" style="grid-template-columns:1fr;"><div class="kpi-card warn"><div class="val" id="expensesTotal">0.000 د.ت</div><div class="lbl">مجموع المصاريف</div></div></div><div id="expensesList"></div></div>
-    <div class="section" id="sec-reglements"><button class="btn" style="background:linear-gradient(180deg,#4dbf8c,var(--success));" onclick="QuickReglement.open()">+ تسجيل تسديد سريع</button><div class="kpi-row"><div class="kpi-card ok"><div class="val" id="reglTotalClients">0.000</div><div class="lbl">تسديدات من العملاء</div></div><div class="kpi-card warn"><div class="val" id="reglTotalFournisseurs">0.000</div><div class="lbl">تسديدات للموردين</div></div></div><div class="section-title">أرصدة العملاء</div><div id="balancesClientsList"></div><div class="section-title">أرصدة الموردين</div><div id="balancesFournisseursList"></div><div class="section-title">سجل التسديدات</div><input class="search-box" id="rgSearch" placeholder="🔍 بحث بالاسم..." oninput="Reglements.render()"><div id="reglementsList"></div></div>
     <div class="section" id="sec-approvals"><div class="section-title">حسابات بانتظار الموافقة</div><div id="pendingApprovalsList"></div><div class="section-title">حسابات موافق عليها</div><div id="approvedAccountsList"></div></div>
     <div class="section" id="sec-fournisseurs"><input class="search-box" id="fSearch" placeholder="🔍 بحث بالاسم أو الهاتف..." oninput="Fournisseurs.render()"><div id="fournisseursList"></div></div>
     <div class="section" id="sec-ventes"><input class="search-box" id="vSearch" placeholder="🔍 بحث برقم المبيعات أو العميل..." oninput="Ventes.render()"><div id="ventesList"></div></div>
@@ -261,13 +298,15 @@
     <div class="tab-item" data-section="clients"><span class="ic">👥</span><span>عملاء</span></div>
     <div class="tab-item" data-section="fournisseurs"><span class="ic">🤝</span><span>موردين</span></div>
     <div class="tab-item" data-section="articles"><span class="ic">📦</span><span>أصناف</span></div>
-    <div class="tab-item" data-section="caisse"><span class="ic">💰</span><span>الكاسة</span></div>
+    <div class="tab-item" data-section="caisse-clients"><span class="ic">💰</span><span>كاسة حرفاء</span></div>
+    <div class="tab-item" data-section="caisse-fournisseurs"><span class="ic">💰</span><span>كاسة مزودين</span></div>
+    <div class="tab-item" data-section="caisse-expenses"><span class="ic">💰</span><span>كاسة مصاريف</span></div>
     <div class="tab-item" data-section="expenses"><span class="ic">💸</span><span>مصاريف</span></div>
-    <div class="tab-item" data-section="reglements"><span class="ic">🧾</span><span>التسديدات</span></div>
     <div class="tab-item" data-section="reports"><span class="ic">📋</span><span>تقارير</span></div>
     <div class="tab-item" data-section="approvals" id="tabApprovals" style="display:none;"><span class="ic">👤</span><span>الحسابات</span></div>
   </div>
   <div class="sheet-overlay" id="overlay"></div>
+  
   <!-- Client sheet -->
   <div class="sheet" id="sheet-clients"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات العميل</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field"><label>رمز العميل</label><input id="cCode" readonly></div>
@@ -278,13 +317,13 @@
     <div class="field"><label>العنوان</label><input id="cAddress"></div>
     <div class="field"><label>البطاقة الجبائية</label><input id="cTaxId"></div>
     <div class="field"><label>الرصيد (د.ت)</label><input id="cBalance" type="number" step="0.001" value="0"></div>
-    <div class="field"><label>ملاحظات</label><input id="cNotes"></div>
     <div class="section-title">أسعار خاصة</div>
     <div class="field"><label>الصنف</label><select id="cpArticle"><option value="">-- اختر --</option></select></div>
     <div class="field"><label>السعر الخاص (د.ت)</label><input id="cpPrice" type="number" step="0.001"></div>
     <button class="btn outline small" onclick="Clients.addSpecialPrice()">+ إضافة سعر خاص</button>
     <table class="items-mini"><thead><tr><th>الصنف</th><th>السعر الخاص</th><th></th></tr></thead><tbody id="cpBody"></tbody></table>
   </div><div class="sheet-footer"><button class="btn save" onclick="Clients.save()">💾 حفظ</button><button class="btn edit" onclick="Clients.edit()">✏️ تعديل</button><button class="btn del" onclick="Clients.remove()">🗑 حذف</button></div></div>
+  
   <!-- Article sheet -->
   <div class="sheet" id="sheet-articles"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات الصنف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field"><label>رمز الصنف</label><input id="aCode" readonly></div>
@@ -293,34 +332,67 @@
     <div class="field"><label>سعر الشراء (د.ت)</label><input id="aCostPrice" type="number" step="0.001"></div>
     <div class="field"><label>الكمية بالمخزون</label><input id="aStock" type="number" value="0"></div>
   </div><div class="sheet-footer"><button class="btn save" onclick="Articles.save()">💾 حفظ</button><button class="btn edit" onclick="Articles.edit()">✏️ تعديل</button><button class="btn del" onclick="Articles.remove()">🗑 حذف</button></div></div>
-  <!-- Caisse sheet -->
-  <div class="sheet" id="sheet-caisse"><div class="sheet-handle"></div><div class="sheet-header"><h3>حركة الكاسة</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
-    <div class="field"><label>التاريخ</label><input id="ksDate" type="date"></div>
-    <div class="field"><label>النوع</label><select id="ksType"><option value="in">دخول (+)</option><option value="out">خروج (-)</option></select></div>
-    <div class="field"><label>المبلغ (د.ت)</label><input id="ksAmount" type="number" step="0.001"></div>
-    <div class="field"><label>البيان</label><input id="ksDesc"></div>
-  </div><div class="sheet-footer"><button class="btn save" onclick="Caisse.save()">💾 حفظ</button><button class="btn del" onclick="Caisse.remove()">🗑 حذف</button></div></div>
-  <!-- Expenses sheet with clear footer -->
+  
+  <!-- ===== Caisse Clients sheet مع قائمة الفواتير ===== -->
+  <div class="sheet" id="sheet-caisse-clients"><div class="sheet-handle"></div><div class="sheet-header"><h3>تسديد سريع - حريف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
+    <div class="field"><label>العميل</label>
+      <select id="ccClient" onchange="CaisseClients.loadClientInvoices()">
+        <option value="">-- اختر --</option>
+      </select>
+    </div>
+    <div id="ccInvoicesContainer" style="display:none; margin-bottom:8px;">
+      <label style="font-size:11px; font-weight:700; color:var(--text); display:block; margin-bottom:4px;">اختر الفاتورة المراد تسديدها</label>
+      <div id="ccInvoiceList" style="max-height:150px; overflow-y:auto;"></div>
+      <div id="ccSelectedInvoice" style="font-size:11px; color:var(--navy); margin-top:4px; font-weight:700;"></div>
+    </div>
+    <div class="field"><label>المبلغ المسدد (د.ت)</label><input id="ccAmount" type="number" step="0.001" placeholder="أدخل المبلغ" oninput="CaisseClients.calcRemaining()"></div>
+    <div class="field"><label>نوع التسديد</label>
+      <select id="ccRegType">
+        <option value="نقدا">نقدا</option>
+        <option value="شيك">شيك</option>
+        <option value="كمبيالة">كمبيالة</option>
+        <option value="تحويل بنكي">تحويل بنكي</option>
+      </select>
+    </div>
+    <div class="field"><label>البيان</label><input id="ccDesc" placeholder="اختياري"></div>
+    <div id="ccBalanceHint" style="font-size:12px; color:var(--muted); margin-top:4px;"></div>
+    <div id="ccRemainingHint" style="font-size:12px; color:var(--danger); margin-top:4px; font-weight:700;"></div>
+  </div><div class="sheet-footer"><button class="btn save" onclick="CaisseClients.save()">💾 تسجيل التسديد</button><button class="btn del" onclick="CaisseClients.remove()">🗑 حذف</button></div></div>
+  
+  <!-- Caisse Fournisseurs sheet -->
+  <div class="sheet" id="sheet-caisse-fournisseurs"><div class="sheet-handle"></div><div class="sheet-header"><h3>تسديد سريع - مزود</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
+    <div class="field"><label>المزود</label><select id="cfFournisseur"><option value="">-- اختر --</option></select></div>
+    <div class="field"><label>المبلغ (د.ت)</label><input id="cfAmount" type="number" step="0.001" placeholder="أدخل المبلغ"></div>
+    <div class="field"><label>نوع التسديد</label>
+      <select id="cfRegType">
+        <option value="نقدا">نقدا</option>
+        <option value="شيك">شيك</option>
+        <option value="كمبيالة">كمبيالة</option>
+        <option value="تحويل بنكي">تحويل بنكي</option>
+      </select>
+    </div>
+    <div class="field"><label>البيان</label><input id="cfDesc" placeholder="اختياري"></div>
+    <div id="cfBalanceHint" style="font-size:12px; color:var(--muted); margin-top:4px;"></div>
+  </div><div class="sheet-footer"><button class="btn save" onclick="CaisseFournisseurs.save()">💾 تسجيل التسديد</button><button class="btn del" onclick="CaisseFournisseurs.remove()">🗑 حذف</button></div></div>
+  
+  <!-- Caisse Expenses sheet -->
+  <div class="sheet" id="sheet-caisse-expenses"><div class="sheet-handle"></div><div class="sheet-header"><h3>حركة كاسة المصاريف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
+    <div class="field"><label>التاريخ</label><input id="ceDate" type="date"></div>
+    <div class="field"><label>الفئة</label><select id="ceCategory"><option>كراء</option><option>أجور</option><option>فواتير</option><option>نقل</option><option>صيانة</option><option>أخرى</option></select></div>
+    <div class="field"><label>النوع</label><select id="ceType"><option value="out">خروج (-)</option><option value="in">دخول (+)</option></select></div>
+    <div class="field"><label>المبلغ (د.ت)</label><input id="ceAmount" type="number" step="0.001"></div>
+    <div class="field"><label>البيان</label><input id="ceDesc"></div>
+  </div><div class="sheet-footer"><button class="btn save" onclick="CaisseExpenses.save()">💾 حفظ</button><button class="btn del" onclick="CaisseExpenses.remove()">🗑 حذف</button></div></div>
+  
+  <!-- Expenses sheet -->
   <div class="sheet" id="sheet-expenses"><div class="sheet-handle"></div><div class="sheet-header"><h3>مصروف</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field"><label>رقم المصروف</label><input id="exCode" readonly></div>
     <div class="field"><label>التاريخ</label><input id="exDate" type="date"></div>
     <div class="field"><label>الفئة</label><select id="exCategory"><option>كراء</option><option>أجور</option><option>فواتير</option><option>نقل</option><option>صيانة</option><option>أخرى</option></select></div>
     <div class="field"><label>المبلغ (د.ت)</label><input id="exAmount" type="number" step="0.001"></div>
     <div class="field"><label>البيان</label><input id="exDesc"></div>
-  </div>
-  <div class="sheet-footer">
-    <button class="btn save" onclick="Expenses.save()">💾 حفظ</button>
-    <button class="btn edit" onclick="Expenses.edit()">✏️ تعديل</button>
-    <button class="btn del" onclick="Expenses.remove()">🗑 حذف</button>
-  </div></div>
-  <!-- Quick reglement -->
-  <div class="sheet" id="sheet-quickreglement"><div class="sheet-handle"></div><div class="sheet-header"><h3>تسجيل تسديد سريع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
-    <div class="field"><label>النوع</label><select id="qrType" onchange="QuickReglement.refreshTargets()"><option value="client">تسديد من عميل</option><option value="fournisseur">تسديد لمورد</option></select></div>
-    <div class="field"><label>الاسم</label><select id="qrTarget" onchange="QuickReglement.showHint()"><option value="">-- اختر --</option></select></div>
-    <div style="font-size:11px; color:var(--muted); margin:-2px 0 6px;" id="qrBalanceHint"></div>
-    <div class="field"><label>مبلغ التسديد (د.ت)</label><input id="qrAmount" type="number" step="0.001"></div>
-    <div class="field"><label>نوع التسديد</label><select id="qrMethod"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option></select></div>
-  </div><div class="sheet-footer"><button class="btn save" onclick="QuickReglement.save()">💾 تسجيل التسديد</button></div></div>
+  </div><div class="sheet-footer"><button class="btn save" onclick="Expenses.save()">💾 حفظ</button><button class="btn edit" onclick="Expenses.edit()">✏️ تعديل</button><button class="btn del" onclick="Expenses.remove()">🗑 حذف</button></div></div>
+  
   <!-- Fournisseur sheet -->
   <div class="sheet" id="sheet-fournisseurs"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات المورد</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field"><label>رمز المورد</label><input id="fCode" readonly></div>
@@ -333,6 +405,7 @@
     <div class="field"><label>الرصيد (د.ت)</label><input id="fBalance" type="number" step="0.001" value="0"></div>
     <div class="field"><label>ملاحظات</label><input id="fNotes"></div>
   </div><div class="sheet-footer"><button class="btn save" onclick="Fournisseurs.save()">💾 حفظ</button><button class="btn edit" onclick="Fournisseurs.edit()">✏️ تعديل</button><button class="btn del" onclick="Fournisseurs.remove()">🗑 حذف</button></div></div>
+  
   <!-- Vente sheet -->
   <div class="sheet" id="sheet-ventes"><div class="sheet-handle"></div><div class="sheet-header"><h3>عملية بيع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field-row"><div class="field"><label>رقم المبيعات</label><input id="vNum" readonly></div><div class="field"><label>التاريخ</label><input id="vDate" type="date"></div></div>
@@ -348,16 +421,12 @@
     <button class="btn outline small" onclick="Ventes.addLine()">+ إضافة للجدول</button>
     <table class="items-mini"><thead><tr><th>الصنف</th><th>سعر</th><th>كمية</th><th>مجموع</th><th></th></tr></thead><tbody id="vLinesBody"></tbody></table>
     <div class="totals-mini" style="justify-content:flex-end;"><span>المجموع: </span><span id="vGrand">0.000</span> د.ت</div>
-    <div class="section-title">تسديد</div>
-    <div class="field"><label>مبلغ التسديد (د.ت)</label><input id="vrAmount" type="number" step="0.001"></div>
-    <div class="field"><label>نوع التسديد</label><select id="vrMethod"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option></select></div>
-    <button class="btn outline small" onclick="Ventes.addReglement()">+ تسجيل تسديد</button>
-    <table class="items-mini"><thead><tr><th>التاريخ</th><th>الطريقة</th><th>المبلغ (د.ت)</th><th></th></tr></thead><tbody id="vrBody"></tbody></table>
     <div class="section-title">وضعية الحساب</div>
     <div id="vAccountSummary"></div>
     <button class="btn" style="background:linear-gradient(180deg,#3ddc84,#25d366);" onclick="Ventes.shareWhatsapp()">📱 واتساب</button>
     <button class="btn outline small" onclick="Ventes.printInvoice()">🖨️ طباعة</button>
   </div><div class="sheet-footer"><button class="btn save" onclick="Ventes.save()">💾 حفظ</button><button class="btn edit" onclick="Ventes.edit()">✏️ تعديل</button><button class="btn del" onclick="Ventes.remove()">🗑 حذف</button></div></div>
+  
   <!-- Achat sheet -->
   <div class="sheet" id="sheet-achats"><div class="sheet-handle"></div><div class="sheet-header"><h3>عملية شراء</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field-row"><div class="field"><label>رقم المشتريات</label><input id="pNum" readonly></div><div class="field"><label>التاريخ</label><input id="pDate" type="date"></div></div>
@@ -373,16 +442,12 @@
     <button class="btn outline small" onclick="Achats.addLine()">+ إضافة للجدول</button>
     <table class="items-mini"><thead><tr><th>الصنف</th><th>سعر</th><th>كمية</th><th>مجموع</th><th></th></tr></thead><tbody id="pLinesBody"></tbody></table>
     <div class="totals-mini" style="justify-content:flex-end;"><span>المجموع: </span><span id="pGrand">0.000</span> د.ت</div>
-    <div class="section-title">تسديد</div>
-    <div class="field"><label>مبلغ التسديد (د.ت)</label><input id="arAmount" type="number" step="0.001"></div>
-    <div class="field"><label>نوع التسديد</label><select id="arMethod"><option>نقدا</option><option>شيك</option><option>كمبيالة</option><option>تحويل بنكي</option></select></div>
-    <button class="btn outline small" onclick="Achats.addReglement()">+ تسجيل تسديد</button>
-    <table class="items-mini"><thead><tr><th>التاريخ</th><th>الطريقة</th><th>المبلغ (د.ت)</th><th></th></tr></thead><tbody id="arBody"></tbody></table>
     <div class="section-title">وضعية الحساب</div>
     <div id="pAccountSummary"></div>
     <button class="btn" style="background:linear-gradient(180deg,#3ddc84,#25d366);" onclick="Achats.shareWhatsapp()">📱 واتساب</button>
     <button class="btn outline small" onclick="Achats.printInvoice()">🖨️ طباعة</button>
   </div><div class="sheet-footer"><button class="btn save" onclick="Achats.save()">💾 حفظ</button><button class="btn edit" onclick="Achats.edit()">✏️ تعديل</button><button class="btn del" onclick="Achats.remove()">🗑 حذف</button></div></div>
+  
   <!-- Company sheet -->
   <div class="sheet" id="sheet-company"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات المؤسسة</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field"><label>اسم المؤسسة</label><input id="cpyName"></div>
@@ -414,6 +479,7 @@
   <div style="text-align:center;color:#aaa;font-size:11px;margin-bottom:4px;">💡 اختر الطابعة من قائمة الطباعة (بلوتوث/USB)</div>
   <div class="invoice-doc paper-80" id="invoiceDoc"></div>
 </div>
+
 <script>
 // ===== FIREBASE =====
 const firebaseConfig = {
@@ -452,14 +518,15 @@ let fournisseurs = [];
 let articles = [];
 let ventes = [];
 let achats = [];
-let caisse = [];
+let caisseClients = [];
+let caisseFournisseurs = [];
+let caisseExpenses = [];
 let expenses = [];
 let stockMovements = [];
-let nextId = { clients: 1, articles: 1, fournisseurs: 1, ventes: 1, achats: 1, caisse: 1, expenses: 1, stockMovements: 1, reglements: 1 };
+let nextId = { clients: 1, articles: 1, fournisseurs: 1, ventes: 1, achats: 1, caisseClients: 1, caisseFournisseurs: 1, caisseExpenses: 1, expenses: 1, stockMovements: 1 };
 let companyInfo = { name: 'GTR POS', address: '', phone1: '', taxId: '', logo: '' };
 let toastTimer;
 
-// ===== HELPERS =====
 function $(id) { return document.getElementById(id); }
 function showToast(msg) { const t = $('toast'); if (!t) return; t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 3000); }
 function getStock(name) { return stockMovements.filter(m => m.articleName === name).reduce((a, m) => a + (m.type === 'in' ? m.qty : -m.qty), 0); }
@@ -469,19 +536,19 @@ function removeStock(src, srcId) { stockMovements = stockMovements.filter(m => !
 // ===== PERSISTENCE =====
 const STORAGE_KEY = 'gtrpos_data_v1';
 function saveState() {
-  try { const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo }; localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
+  try { const data = { clients, articles, fournisseurs, ventes, achats, caisseClients, caisseFournisseurs, caisseExpenses, expenses, stockMovements, nextId, companyInfo }; localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
   if (storageMode === 'cloud' && currentUser) {
-    const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo };
+    const data = { clients, articles, fournisseurs, ventes, achats, caisseClients, caisseFournisseurs, caisseExpenses, expenses, stockMovements, nextId, companyInfo };
     db.collection('users').doc(currentUser.uid).set(data).catch(e => { console.error('Firestore save error:', e); showToast('⚠️ فشل الحفظ في السحابة'); });
   }
 }
 function loadState() {
-  try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return false; const data = JSON.parse(raw); if (data.clients) clients = data.clients; if (data.articles) articles = data.articles; if (data.fournisseurs) fournisseurs = data.fournisseurs; if (data.ventes) ventes = data.ventes; if (data.achats) achats = data.achats; if (data.caisse) caisse = data.caisse; if (data.expenses) expenses = data.expenses; if (data.stockMovements) stockMovements = data.stockMovements; if (data.nextId) nextId = data.nextId; if (data.companyInfo) companyInfo = data.companyInfo; return true; } catch(e) { return false; } }
+  try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return false; const data = JSON.parse(raw); if (data.clients) clients = data.clients; if (data.articles) articles = data.articles; if (data.fournisseurs) fournisseurs = data.fournisseurs; if (data.ventes) ventes = data.ventes; if (data.achats) achats = data.achats; if (data.caisseClients) caisseClients = data.caisseClients; if (data.caisseFournisseurs) caisseFournisseurs = data.caisseFournisseurs; if (data.caisseExpenses) caisseExpenses = data.caisseExpenses; if (data.expenses) expenses = data.expenses; if (data.stockMovements) stockMovements = data.stockMovements; if (data.nextId) nextId = data.nextId; if (data.companyInfo) companyInfo = data.companyInfo; return true; } catch(e) { return false; } }
 function loadStateFromFirestore(uid) {
   if (storageMode !== 'cloud') return Promise.resolve();
   return db.collection('users').doc(uid).get().then(doc => {
-    if (doc.exists) { const d = doc.data(); clients = d.clients || []; articles = d.articles || []; fournisseurs = d.fournisseurs || []; ventes = d.ventes || []; achats = d.achats || []; caisse = d.caisse || []; expenses = d.expenses || []; stockMovements = d.stockMovements || []; nextId = d.nextId || { clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisse:1, expenses:1, stockMovements:1, reglements:1 }; companyInfo = d.companyInfo || { name:'GTR POS', address:'', phone1:'', taxId:'', logo:'' }; saveState(); showToast('✅ تم تحميل البيانات من السحابة'); }
-    else { loadState(); const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo }; db.collection('users').doc(uid).set(data).catch(e => console.error(e)); }
+    if (doc.exists) { const d = doc.data(); clients = d.clients || []; articles = d.articles || []; fournisseurs = d.fournisseurs || []; ventes = d.ventes || []; achats = d.achats || []; caisseClients = d.caisseClients || []; caisseFournisseurs = d.caisseFournisseurs || []; caisseExpenses = d.caisseExpenses || []; expenses = d.expenses || []; stockMovements = d.stockMovements || []; nextId = d.nextId || { clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisseClients:1, caisseFournisseurs:1, caisseExpenses:1, expenses:1, stockMovements:1 }; companyInfo = d.companyInfo || { name:'GTR POS', address:'', phone1:'', taxId:'', logo:'' }; saveState(); showToast('✅ تم تحميل البيانات من السحابة'); }
+    else { loadState(); const data = { clients, articles, fournisseurs, ventes, achats, caisseClients, caisseFournisseurs, caisseExpenses, expenses, stockMovements, nextId, companyInfo }; db.collection('users').doc(uid).set(data).catch(e => console.error(e)); }
   }).catch(e => { console.error('Firestore load error:', e); showToast('⚠️ تعذر الاتصال بالسحابة، جارٍ استخدام البيانات المحلية'); loadState(); });
 }
 
@@ -509,9 +576,10 @@ document.querySelectorAll('.tab-item').forEach(tab => {
     if (sec) sec.classList.add('active');
     $('pageTitle').textContent = this.querySelector('span:last-child').textContent;
     if (currentSection === 'dashboard') Rapports.render();
-    if (currentSection === 'caisse') Caisse.render();
+    if (currentSection === 'caisse-clients') CaisseClients.render();
+    if (currentSection === 'caisse-fournisseurs') CaisseFournisseurs.render();
+    if (currentSection === 'caisse-expenses') CaisseExpenses.render();
     if (currentSection === 'expenses') Expenses.render();
-    if (currentSection === 'reglements') Reglements.render();
     if (currentSection === 'approvals') Approvals.render();
     if (currentSection === 'reports') { Reports.init(); }
   });
@@ -523,7 +591,7 @@ $('langBtn').addEventListener('click', function() {
   this.textContent = isAr ? 'ع' : 'FR';
 });
 $('fabBtn').addEventListener('click', function() {
-  const map = { clients: Clients, articles: Articles, fournisseurs: Fournisseurs, ventes: Ventes, achats: Achats, caisse: Caisse, expenses: Expenses };
+  const map = { clients: Clients, articles: Articles, fournisseurs: Fournisseurs, ventes: Ventes, achats: Achats, 'caisse-clients': CaisseClients, 'caisse-fournisseurs': CaisseFournisseurs, 'caisse-expenses': CaisseExpenses, expenses: Expenses };
   if (!map[currentSection]) { showToast('اختر قسما لإضافة عنصر'); return; }
   if (map[currentSection].reset) map[currentSection].reset();
   openSheet(currentSection);
@@ -537,7 +605,6 @@ function renderInvoice() {
   const size = $('paperSizeSelect').value;
   const doc = $('invoiceDoc');
   doc.className = 'invoice-doc paper-' + size;
-  const t = { invItemNum: '#', invItemName: 'المنتج', invItemPrice: 'السعر', invItemQty: 'الكمية', invItemTotal: 'الإجمالي', invAmountWords: 'المبلغ بالحروف', invPrevBalance: 'سابقكم', invInvoiceTotal: 'إجمالي الفاتورة', invAmountPaid: 'المدفوع', invCurrentBalance: 'حاليالكم', invPaymentMethod: 'الدفع', invNum: 'الرقم', invDateField: 'التاريخ' };
   const data = _invoiceData;
   const lines = data.lines.map((l, i) => `<tr><td>${i+1}</td><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td></tr>`).join('');
   const totalQty = data.lines.reduce((a, l) => a + l.qty, 0);
@@ -548,10 +615,10 @@ function renderInvoice() {
       <div class="inv-company">${companyInfo.name}<br>${companyInfo.address||''}<br>${companyInfo.phone1||''}${companyInfo.taxId ? '<br>M.F: '+companyInfo.taxId : ''}</div>
     </div>
     <div class="inv-title">${data.title}</div>
-    <div class="inv-meta"><b>${t.invPaymentMethod}:</b> ${data.payment}<br><b>${t.invNum}:</b> ${data.num} &nbsp; <b>${t.invDateField}:</b> ${data.date} &nbsp; <b>${data.partyLabel}:</b> ${data.partyName}</div>
+    <div class="inv-meta"><b>طريقة الدفع:</b> ${data.payment}<br><b>الرقم:</b> ${data.num} &nbsp; <b>التاريخ:</b> ${data.date} &nbsp; <b>${data.partyLabel}:</b> ${data.partyName}</div>
     <div class="inv-partybar"><div>${data.partyAddr||'-'}<br><small>العنوان</small></div><div>${data.partyPhone||'-'}<br><small>الهاتف</small></div></div>
-    <table class="inv-items"><thead><tr><th>#</th><th>المنتج</th><th>السعر</th><th>الكمية</th><th>الإجمالي</th></tr></thead><tbody>${lines}</tbody><tfoot><tr class="inv-totalrow"><td colspan="2">${t.invAmountWords}: ${amountInWords(data.total)}</td><td></td><td>${totalQty}</td><td>${data.total.toFixed(3)}</td></tr></tfoot></table>
-    <table class="inv-summary"><tr class="highlight"><td class="label">${t.invPrevBalance}</td><td class="value">${data.prevBalance.toFixed(3)}</td></tr><tr class="total"><td class="label">${t.invInvoiceTotal}</td><td class="value">${data.total.toFixed(3)}</td></tr><tr><td class="label">${t.invAmountPaid}</td><td class="value">${data.paid.toFixed(3)}</td></tr><tr class="highlight"><td class="label">${t.invCurrentBalance}</td><td class="value">${data.currentBalance.toFixed(3)}</td></tr></table>
+    <table class="inv-items"><thead><tr><th>#</th><th>المنتج</th><th>السعر</th><th>الكمية</th><th>الإجمالي</th></tr></thead><tbody>${lines}</tbody><tfoot><tr class="inv-totalrow"><td colspan="2">المبلغ بالحروف: ${amountInWords(data.total)}</td><td></td><td>${totalQty}</td><td>${data.total.toFixed(3)}</td></tr></tfoot></table>
+    <table class="inv-summary"><tr class="highlight"><td class="label">سابقكم</td><td class="value">${data.prevBalance.toFixed(3)}</td></tr><tr class="total"><td class="label">إجمالي الفاتورة</td><td class="value">${data.total.toFixed(3)}</td></tr><tr><td class="label">المدفوع</td><td class="value">${data.paid.toFixed(3)}</td></tr><tr class="highlight"><td class="label">حاليالكم</td><td class="value">${data.currentBalance.toFixed(3)}</td></tr></table>
   `;
 }
 $('paperSizeSelect').addEventListener('change', renderInvoice);
@@ -585,10 +652,15 @@ const Rapports = {
     set('kpiFournisseurs', fournisseurs.length);
     set('kpiNbVentes', ventes.length);
     set('kpiNbAchats', achats.length);
-    set('kpiCaisseSolde', caisse.reduce((a, k) => a + (k.type === 'in' ? k.amount : -k.amount), 0).toFixed(3));
+    const soldeClients = caisseClients.reduce((a, k) => a + (k.type === 'in' ? k.amount : -k.amount), 0);
+    const soldeFournisseurs = caisseFournisseurs.reduce((a, k) => a + (k.type === 'in' ? k.amount : -k.amount), 0);
+    const soldeExpenses = caisseExpenses.reduce((a, k) => a + (k.type === 'in' ? k.amount : -k.amount), 0);
+    set('kpiCaisseClientsSolde', soldeClients.toFixed(3));
+    set('kpiCaisseFournisseursSolde', soldeFournisseurs.toFixed(3));
+    set('kpiCaisseExpensesSolde', soldeExpenses.toFixed(3));
+    set('kpiCaisseTotalSolde', (soldeClients + soldeFournisseurs + soldeExpenses).toFixed(3));
     set('kpiSoldesClients', clients.reduce((a, c) => a + c.balance, 0).toFixed(3));
     set('kpiSoldesFournisseurs', fournisseurs.reduce((a, f) => a + f.balance, 0).toFixed(3));
-    set('kpiTotalExpenses', expenses.reduce((a, e) => a + e.amount, 0).toFixed(3));
     const list = $('lowStockList');
     if (!list) return;
     list.innerHTML = '';
@@ -680,17 +752,441 @@ const Reports = {
   }
 };
 
+// ===== CAISSE CLIENTS (مع قائمة الفواتير) =====
+const CaisseClients = {
+  editingId: null,
+  selectedInvoice: null,
+  reset() {
+    this.editingId = null;
+    this.selectedInvoice = null;
+    $('ccClient').value = '';
+    $('ccAmount').value = '';
+    $('ccRegType').value = 'نقدا';
+    $('ccDesc').value = '';
+    $('ccBalanceHint').textContent = '';
+    $('ccRemainingHint').textContent = '';
+    $('ccInvoicesContainer').style.display = 'none';
+    $('ccInvoiceList').innerHTML = '';
+    $('ccSelectedInvoice').textContent = '';
+    this.refreshClientSelect();
+  },
+  refreshClientSelect() {
+    const s = $('ccClient');
+    if (s) s.innerHTML = '<option value="">-- اختر --</option>' + clients.map(c => `<option value="${c.id}">${c.name} (الرصيد: ${c.balance.toFixed(3)} د.ت)</option>`).join('');
+  },
+  loadClientInvoices() {
+    const clientId = $('ccClient').value;
+    const container = $('ccInvoicesContainer');
+    const list = $('ccInvoiceList');
+    const selected = $('ccSelectedInvoice');
+    
+    if (!clientId) {
+      container.style.display = 'none';
+      this.selectedInvoice = null;
+      $('ccBalanceHint').textContent = '';
+      return;
+    }
+    
+    const client = clients.find(c => c.id == clientId);
+    if (client) {
+      $('ccBalanceHint').textContent = `الرصيد الحالي: ${client.balance.toFixed(3)} د.ت`;
+    }
+    
+    // جلب فواتير البيع غير المسددة لهذا العميل (آجلة)
+    const clientVentes = ventes.filter(v => 
+      v.client === client?.name && 
+      v.payment === 'آجل'
+    );
+    
+    // حساب المبلغ المتبقي لكل فاتورة (المبلغ الإجمالي - المدفوع)
+    const unpaidInvoices = clientVentes.map(v => {
+      const paid = (v.reglements || []).reduce((sum, r) => sum + r.amount, 0);
+      const remaining = v.total - paid;
+      return { ...v, paid, remaining };
+    }).filter(v => v.remaining > 0.001);
+    
+    if (unpaidInvoices.length === 0) {
+      container.style.display = 'block';
+      list.innerHTML = '<div class="empty-msg">لا توجد فواتير غير مسددة لهذا العميل</div>';
+      selected.textContent = '';
+      this.selectedInvoice = null;
+      return;
+    }
+    
+    container.style.display = 'block';
+    list.innerHTML = '';
+    unpaidInvoices.forEach(v => {
+      const div = document.createElement('div');
+      div.className = 'invoice-list-item';
+      div.innerHTML = `
+        <div>
+          <div class="inv-num">${v.num}</div>
+          <div class="inv-remaining">المتبقي: ${v.remaining.toFixed(3)} د.ت</div>
+        </div>
+        <div class="inv-amount">${v.total.toFixed(3)} د.ت</div>
+      `;
+      div.onclick = () => {
+        // إزالة التحديد من جميع العناصر
+        document.querySelectorAll('.invoice-list-item').forEach(el => el.classList.remove('selected'));
+        div.classList.add('selected');
+        this.selectedInvoice = v;
+        $('ccSelectedInvoice').textContent = `✅ تم اختيار: ${v.num} - المتبقي: ${v.remaining.toFixed(3)} د.ت`;
+        // وضع المبلغ المتبقي في حقل المبلغ تلقائياً
+        $('ccAmount').value = v.remaining.toFixed(3);
+        this.calcRemaining();
+      };
+      list.appendChild(div);
+    });
+    selected.textContent = '';
+    this.selectedInvoice = null;
+  },
+  calcRemaining() {
+    const amount = parseFloat($('ccAmount').value) || 0;
+    if (this.selectedInvoice) {
+      const remaining = this.selectedInvoice.remaining - amount;
+      if (remaining > 0.001) {
+        $('ccRemainingHint').textContent = `المتبقي بعد التسديد: ${remaining.toFixed(3)} د.ت`;
+        $('ccRemainingHint').style.color = 'var(--gold)';
+      } else if (remaining < -0.001) {
+        $('ccRemainingHint').textContent = `⚠️ المبلغ أكبر من المتبقي (${this.selectedInvoice.remaining.toFixed(3)} د.ت)`;
+        $('ccRemainingHint').style.color = 'var(--danger)';
+      } else {
+        $('ccRemainingHint').textContent = '✅ تم تسديد الفاتورة بالكامل';
+        $('ccRemainingHint').style.color = 'var(--success)';
+      }
+    } else {
+      $('ccRemainingHint').textContent = '';
+    }
+  },
+  openQuick() {
+    this.reset();
+    $('ccDesc').value = 'تسديد من حريف';
+    openSheet('caisse-clients');
+    // تحديث قائمة الفواتير بعد فتح الشيت
+    setTimeout(() => this.loadClientInvoices(), 100);
+  },
+  load(id) {
+    const k = caisseClients.find(x => x.id === id);
+    if (!k) { showToast('الحركة غير موجودة'); return; }
+    this.editingId = id;
+    $('ccClient').value = k.clientId;
+    $('ccAmount').value = k.amount;
+    $('ccRegType').value = k.regType || 'نقدا';
+    $('ccDesc').value = k.description || '';
+    const c = clients.find(x => x.id == k.clientId);
+    $('ccBalanceHint').textContent = c ? `الرصيد الحالي: ${c.balance.toFixed(3)} د.ت` : '';
+    $('ccInvoicesContainer').style.display = 'none';
+    this.selectedInvoice = null;
+    openSheet('caisse-clients');
+  },
+  save() {
+    const clientId = $('ccClient').value;
+    const amount = parseFloat($('ccAmount').value) || 0;
+    if (!clientId || amount <= 0) { showToast('اختر عميلا وأدخل مبلغا صحيحا'); return; }
+    const client = clients.find(c => c.id == clientId);
+    if (!client) { showToast('العميل غير موجود'); return; }
+    
+    const regType = $('ccRegType').value;
+    const desc = $('ccDesc').value || 'تسديد من حريف';
+    const date = new Date().toISOString().slice(0, 10);
+    const id = this.editingId || nextId.caisseClients++;
+    const rec = { 
+      id, date, 
+      clientId: client.id, 
+      clientName: client.name, 
+      type: 'in', 
+      amount, 
+      regType: regType,
+      description: desc,
+      invoiceId: this.selectedInvoice ? this.selectedInvoice.id : null,
+      invoiceNum: this.selectedInvoice ? this.selectedInvoice.num : null
+    };
+    
+    if (this.editingId) {
+      const oldRec = caisseClients.find(k => k.id === this.editingId);
+      if (oldRec) {
+        const diff = amount - oldRec.amount;
+        client.balance -= diff;
+        const idx = caisseClients.findIndex(k => k.id === this.editingId);
+        if (idx !== -1) caisseClients[idx] = rec;
+      }
+      showToast('تم تعديل التسديد');
+    } else {
+      client.balance -= amount;
+      caisseClients.push(rec);
+      
+      // إذا تم اختيار فاتورة، نضيف التسديد إلى سجل الفاتورة
+      if (this.selectedInvoice) {
+        const vente = ventes.find(v => v.id === this.selectedInvoice.id);
+        if (vente) {
+          if (!vente.reglements) vente.reglements = [];
+          vente.reglements.push({
+            id: nextId.reglements || 1,
+            date: date,
+            amount: amount,
+            method: regType
+          });
+          nextId.reglements = (nextId.reglements || 1) + 1;
+        }
+      }
+      showToast('تم تسجيل التسديد');
+    }
+    saveState();
+    this.render();
+    Clients.render();
+    Ventes.render();
+    closeSheet();
+  },
+  remove() {
+    if (this.editingId == null) { showToast('اختر حركة لحذفها'); return; }
+    const entry = caisseClients.find(k => k.id === this.editingId);
+    if (!entry) { showToast('الحركة غير موجودة'); return; }
+    const client = clients.find(c => c.id == entry.clientId);
+    if (client) {
+      client.balance += entry.amount;
+    }
+    // حذف التسديد من الفاتورة إذا كان مرتبطاً بها
+    if (entry.invoiceId) {
+      const vente = ventes.find(v => v.id === entry.invoiceId);
+      if (vente && vente.reglements) {
+        vente.reglements = vente.reglements.filter(r => r.id !== entry.id);
+      }
+    }
+    caisseClients = caisseClients.filter(k => k.id !== this.editingId);
+    saveState();
+    this.render();
+    Clients.render();
+    Ventes.render();
+    closeSheet();
+    showToast('تم حذف التسديد');
+  },
+  render() {
+    const balance = caisseClients.reduce((a, k) => a + (k.type === 'in' ? k.amount : -k.amount), 0);
+    const bal = $('caisseClientsBalance');
+    if (bal) bal.textContent = balance.toFixed(3) + ' د.ت';
+    const list = $('caisseClientsList');
+    if (!list) return;
+    list.innerHTML = '';
+    const sorted = caisseClients.slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+    if (!sorted.length) { list.innerHTML = '<div class="empty-msg">لا توجد تسديدات</div>'; return; }
+    sorted.forEach(k => {
+      const d = document.createElement('div');
+      d.className = 'row-card';
+      d.onclick = () => CaisseClients.load(k.id);
+      const invoiceInfo = k.invoiceNum ? ` - ${k.invoiceNum}` : '';
+      d.innerHTML = `
+        <div class="main-info">
+          <div class="name">${k.clientName}</div>
+          <div class="meta">${k.date} - ${k.regType || 'نقدا'} ${k.description ? '- ' + k.description : ''}${invoiceInfo}</div>
+        </div>
+        <div class="amount" style="color:var(--danger);">-${k.amount.toFixed(3)} د.ت</div>
+      `;
+      list.appendChild(d);
+    });
+  }
+};
+
+// ===== CAISSE FOURNISSEURS =====
+const CaisseFournisseurs = {
+  editingId: null,
+  reset() {
+    this.editingId = null;
+    $('cfFournisseur').value = '';
+    $('cfAmount').value = '';
+    $('cfRegType').value = 'نقدا';
+    $('cfDesc').value = '';
+    $('cfBalanceHint').textContent = '';
+    this.refreshFournisseurSelect();
+  },
+  refreshFournisseurSelect() {
+    const s = $('cfFournisseur');
+    if (s) s.innerHTML = '<option value="">-- اختر --</option>' + fournisseurs.map(f => `<option value="${f.id}">${f.name} (الرصيد: ${f.balance.toFixed(3)} د.ت)</option>`).join('');
+    $('cfFournisseur').onchange = function() {
+      const f = fournisseurs.find(x => x.id == this.value);
+      $('cfBalanceHint').textContent = f ? `الرصيد الحالي: ${f.balance.toFixed(3)} د.ت` : '';
+    };
+  },
+  openQuick() {
+    this.reset();
+    $('cfDesc').value = 'تسديد لمزود';
+    openSheet('caisse-fournisseurs');
+  },
+  load(id) {
+    const k = caisseFournisseurs.find(x => x.id === id);
+    if (!k) { showToast('الحركة غير موجودة'); return; }
+    this.editingId = id;
+    $('cfFournisseur').value = k.fournisseurId;
+    $('cfAmount').value = k.amount;
+    $('cfRegType').value = k.regType || 'نقدا';
+    $('cfDesc').value = k.description || '';
+    const f = fournisseurs.find(x => x.id == k.fournisseurId);
+    $('cfBalanceHint').textContent = f ? `الرصيد الحالي: ${f.balance.toFixed(3)} د.ت` : '';
+    openSheet('caisse-fournisseurs');
+  },
+  save() {
+    const fournisseurId = $('cfFournisseur').value;
+    const amount = parseFloat($('cfAmount').value) || 0;
+    if (!fournisseurId || amount <= 0) { showToast('اختر مزودا وأدخل مبلغا صحيحا'); return; }
+    const fournisseur = fournisseurs.find(f => f.id == fournisseurId);
+    if (!fournisseur) { showToast('المزود غير موجود'); return; }
+    const regType = $('cfRegType').value;
+    const desc = $('cfDesc').value || 'تسديد لمزود';
+    const date = new Date().toISOString().slice(0, 10);
+    const id = this.editingId || nextId.caisseFournisseurs++;
+    const rec = { 
+      id, date, 
+      fournisseurId: fournisseur.id, 
+      fournisseurName: fournisseur.name, 
+      type: 'out', 
+      amount, 
+      regType: regType,
+      description: desc 
+    };
+    
+    if (this.editingId) {
+      const oldRec = caisseFournisseurs.find(k => k.id === this.editingId);
+      if (oldRec) {
+        const diff = amount - oldRec.amount;
+        fournisseur.balance -= diff;
+        const idx = caisseFournisseurs.findIndex(k => k.id === this.editingId);
+        if (idx !== -1) caisseFournisseurs[idx] = rec;
+      }
+      showToast('تم تعديل التسديد');
+    } else {
+      fournisseur.balance -= amount;
+      caisseFournisseurs.push(rec);
+      showToast('تم تسجيل التسديد');
+    }
+    saveState();
+    this.render();
+    Fournisseurs.render();
+    closeSheet();
+  },
+  remove() {
+    if (this.editingId == null) { showToast('اختر حركة لحذفها'); return; }
+    const entry = caisseFournisseurs.find(k => k.id === this.editingId);
+    if (!entry) { showToast('الحركة غير موجودة'); return; }
+    const fournisseur = fournisseurs.find(f => f.id == entry.fournisseurId);
+    if (fournisseur) {
+      fournisseur.balance += entry.amount;
+    }
+    caisseFournisseurs = caisseFournisseurs.filter(k => k.id !== this.editingId);
+    saveState();
+    this.render();
+    Fournisseurs.render();
+    closeSheet();
+    showToast('تم حذف التسديد');
+  },
+  render() {
+    const balance = caisseFournisseurs.reduce((a, k) => a + (k.type === 'in' ? k.amount : -k.amount), 0);
+    const bal = $('caisseFournisseursBalance');
+    if (bal) bal.textContent = balance.toFixed(3) + ' د.ت';
+    const list = $('caisseFournisseursList');
+    if (!list) return;
+    list.innerHTML = '';
+    const sorted = caisseFournisseurs.slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+    if (!sorted.length) { list.innerHTML = '<div class="empty-msg">لا توجد تسديدات</div>'; return; }
+    sorted.forEach(k => {
+      const d = document.createElement('div');
+      d.className = 'row-card';
+      d.onclick = () => CaisseFournisseurs.load(k.id);
+      d.innerHTML = `
+        <div class="main-info">
+          <div class="name">${k.fournisseurName}</div>
+          <div class="meta">${k.date} - ${k.regType || 'نقدا'} ${k.description ? '- ' + k.description : ''}</div>
+        </div>
+        <div class="amount" style="color:var(--danger);">-${k.amount.toFixed(3)} د.ت</div>
+      `;
+      list.appendChild(d);
+    });
+  }
+};
+
+// ===== CAISSE EXPENSES =====
+const CaisseExpenses = {
+  editingId: null,
+  reset() {
+    this.editingId = null;
+    $('ceDate').value = new Date().toISOString().slice(0, 10);
+    $('ceCategory').selectedIndex = 0;
+    $('ceType').value = 'out';
+    $('ceAmount').value = '';
+    $('ceDesc').value = '';
+  },
+  openNew() { this.reset(); openSheet('caisse-expenses'); },
+  save() {
+    const amount = parseFloat($('ceAmount').value) || 0;
+    if (amount <= 0) { showToast('أدخل مبلغا صحيحا'); return; }
+    const category = $('ceCategory').options[$('ceCategory').selectedIndex].textContent;
+    const type = $('ceType').value;
+    const date = $('ceDate').value;
+    const desc = $('ceDesc').value || '-';
+    const id = this.editingId || nextId.caisseExpenses++;
+    const rec = { id, date, category, type, amount, description: desc };
+    if (this.editingId) {
+      const idx = caisseExpenses.findIndex(k => k.id === this.editingId);
+      if (idx !== -1) caisseExpenses[idx] = rec;
+      showToast('تم التعديل');
+    } else {
+      caisseExpenses.push(rec);
+      showToast('تم الحفظ');
+    }
+    saveState();
+    this.render();
+    closeSheet();
+  },
+  remove() {
+    if (this.editingId == null) { showToast('اختر حركة لحذفها'); return; }
+    caisseExpenses = caisseExpenses.filter(k => k.id !== this.editingId);
+    saveState();
+    this.render();
+    closeSheet();
+    showToast('تم الحذف');
+  },
+  load(id) {
+    const k = caisseExpenses.find(x => x.id === id);
+    if (!k) { showToast('الحركة غير موجودة'); return; }
+    this.editingId = id;
+    $('ceDate').value = k.date;
+    const opt = [...$('ceCategory').options].find(o => o.textContent === k.category);
+    if (opt) $('ceCategory').value = opt.value;
+    $('ceType').value = k.type;
+    $('ceAmount').value = k.amount;
+    $('ceDesc').value = k.description;
+    openSheet('caisse-expenses');
+  },
+  render() {
+    const balance = caisseExpenses.reduce((a, k) => a + (k.type === 'in' ? k.amount : -k.amount), 0);
+    const bal = $('caisseExpensesBalance');
+    if (bal) bal.textContent = balance.toFixed(3) + ' د.ت';
+    const list = $('caisseExpensesList');
+    if (!list) return;
+    list.innerHTML = '';
+    const sorted = caisseExpenses.slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+    if (!sorted.length) { list.innerHTML = '<div class="empty-msg">لا توجد حركات</div>'; return; }
+    sorted.forEach(k => {
+      const d = document.createElement('div');
+      d.className = 'row-card';
+      d.onclick = () => CaisseExpenses.load(k.id);
+      const sign = k.type === 'in' ? '+' : '-';
+      const color = k.type === 'in' ? 'var(--success)' : 'var(--danger)';
+      d.innerHTML = `<div class="main-info"><div class="name">${k.category}</div><div class="meta">${k.date} - ${k.description}</div></div><div class="amount" style="color:${color};">${sign}${k.amount.toFixed(3)} د.ت</div>`;
+      list.appendChild(d);
+    });
+  }
+};
+
 // ===== CLIENTS =====
 const Clients = {
   editingId: null, specialPrices: [],
-  reset() { this.editingId = null; this.specialPrices = []; $('cCode').value = 'CL-' + String(nextId.clients).padStart(4, '0'); $('cName').value = ''; $('cPhone').value = ''; $('cPhone2').value = ''; $('cPhone3').value = ''; $('cAddress').value = ''; $('cTaxId').value = ''; $('cBalance').value = '0'; $('cNotes').value = ''; $('cpArticle').value = ''; $('cpPrice').value = ''; this.renderSpecialPrices(); },
+  reset() { this.editingId = null; this.specialPrices = []; $('cCode').value = 'CL-' + String(nextId.clients).padStart(4, '0'); $('cName').value = ''; $('cPhone').value = ''; $('cPhone2').value = ''; $('cPhone3').value = ''; $('cAddress').value = ''; $('cTaxId').value = ''; $('cBalance').value = '0'; $('cpArticle').value = ''; $('cpPrice').value = ''; this.renderSpecialPrices(); },
   addSpecialPrice() { const sel = $('cpArticle'); const name = sel.options[sel.selectedIndex]?.textContent; const price = parseFloat($('cpPrice').value) || 0; if (!name || price <= 0) { showToast('اختر صنفا وأدخل سعرا'); return; } this.specialPrices = this.specialPrices.filter(sp => sp.name !== name); this.specialPrices.push({ name, price }); $('cpArticle').value = ''; $('cpPrice').value = ''; this.renderSpecialPrices(); },
   removeSpecialPrice(idx) { this.specialPrices.splice(idx, 1); this.renderSpecialPrices(); },
   renderSpecialPrices() { const b = $('cpBody'); b.innerHTML = ''; this.specialPrices.forEach((sp, i) => { b.innerHTML += `<tr><td>${sp.name}</td><td>${sp.price.toFixed(3)}</td><td><button class="del-row" onclick="Clients.removeSpecialPrice(${i})">✕</button></td></tr>`; }); },
-  save() { if (!$('cName').value.trim()) { showToast('أدخل اسم العميل'); return; } const bal = parseFloat($('cBalance').value) || 0; const rec = { id: this.editingId || nextId.clients++, name: $('cName').value.trim(), phone: $('cPhone').value, phone2: $('cPhone2').value, phone3: $('cPhone3').value, address: $('cAddress').value, taxId: $('cTaxId').value, balance: bal, notes: $('cNotes').value, specialPrices: [...this.specialPrices], openingBalance: this.editingId ? clients.find(c => c.id === this.editingId)?.openingBalance || bal : bal }; if (this.editingId) { const idx = clients.findIndex(c => c.id === this.editingId); if (idx !== -1) clients[idx] = rec; } else clients.push(rec); saveState(); refreshClientSelect(); this.render(); closeSheet(); showToast(this.editingId ? 'تم التعديل' : 'تم الحفظ'); },
+  save() { if (!$('cName').value.trim()) { showToast('أدخل اسم العميل'); return; } const bal = parseFloat($('cBalance').value) || 0; const rec = { id: this.editingId || nextId.clients++, name: $('cName').value.trim(), phone: $('cPhone').value, phone2: $('cPhone2').value, phone3: $('cPhone3').value, address: $('cAddress').value, taxId: $('cTaxId').value, balance: bal, specialPrices: [...this.specialPrices] }; if (this.editingId) { const idx = clients.findIndex(c => c.id === this.editingId); if (idx !== -1) clients[idx] = rec; } else clients.push(rec); saveState(); refreshClientSelect(); CaisseClients.refreshClientSelect(); this.render(); closeSheet(); showToast(this.editingId ? 'تم التعديل' : 'تم الحفظ'); },
   edit() { if (this.editingId == null) { showToast('اختر عميلا لتعديله'); return; } this.save(); },
-  remove() { if (this.editingId == null) { showToast('اختر عميلا لحذفه'); return; } if (ventes.some(v => v.client === clients.find(c => c.id === this.editingId)?.name)) { showToast('لا يمكن حذف عميل له عمليات بيع'); return; } clients = clients.filter(c => c.id !== this.editingId); saveState(); refreshClientSelect(); this.render(); closeSheet(); showToast('تم الحذف'); },
-  load(id) { const c = clients.find(x => x.id === id); if (!c) return; this.editingId = id; $('cCode').value = 'CL-' + String(id).padStart(4, '0'); $('cName').value = c.name; $('cPhone').value = c.phone || ''; $('cPhone2').value = c.phone2 || ''; $('cPhone3').value = c.phone3 || ''; $('cAddress').value = c.address || ''; $('cTaxId').value = c.taxId || ''; $('cBalance').value = c.balance; $('cNotes').value = c.notes || ''; this.specialPrices = c.specialPrices ? [...c.specialPrices] : []; this.renderSpecialPrices(); openSheet('clients'); },
+  remove() { if (this.editingId == null) { showToast('اختر عميلا لحذفه'); return; } if (ventes.some(v => v.client === clients.find(c => c.id === this.editingId)?.name)) { showToast('لا يمكن حذف عميل له عمليات بيع'); return; } clients = clients.filter(c => c.id !== this.editingId); saveState(); refreshClientSelect(); CaisseClients.refreshClientSelect(); this.render(); closeSheet(); showToast('تم الحذف'); },
+  load(id) { const c = clients.find(x => x.id === id); if (!c) return; this.editingId = id; $('cCode').value = 'CL-' + String(id).padStart(4, '0'); $('cName').value = c.name; $('cPhone').value = c.phone || ''; $('cPhone2').value = c.phone2 || ''; $('cPhone3').value = c.phone3 || ''; $('cAddress').value = c.address || ''; $('cTaxId').value = c.taxId || ''; $('cBalance').value = c.balance; this.specialPrices = c.specialPrices ? [...c.specialPrices] : []; this.renderSpecialPrices(); refreshArticleSelects(); openSheet('clients'); },
   render() { const q = $('cSearch').value.trim().toLowerCase(); const list = $('clientsList'); list.innerHTML = ''; const filtered = clients.filter(c => !q || c.name.toLowerCase().includes(q) || (c.phone || '').includes(q)); if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا يوجد عملاء</div>'; return; } filtered.forEach(c => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => Clients.load(c.id); d.innerHTML = `<div class="main-info"><div class="name">${c.name}</div><div class="meta">${c.phone || ''}</div></div><div class="amount">${c.balance.toFixed(3)} د.ت</div>`; list.appendChild(d); }); }
 };
 
@@ -709,14 +1205,14 @@ const Articles = {
 const Fournisseurs = {
   editingId: null,
   reset() { this.editingId = null; $('fCode').value = 'FR-' + String(nextId.fournisseurs).padStart(4, '0'); $('fName').value = ''; $('fPhone').value = ''; $('fPhone2').value = ''; $('fPhone3').value = ''; $('fAddress').value = ''; $('fTaxId').value = ''; $('fBalance').value = '0'; $('fNotes').value = ''; },
-  save() { if (!$('fName').value.trim()) { showToast('أدخل اسم المورد'); return; } const rec = { id: this.editingId || nextId.fournisseurs++, name: $('fName').value.trim(), phone: $('fPhone').value, phone2: $('fPhone2').value, phone3: $('fPhone3').value, address: $('fAddress').value, taxId: $('fTaxId').value, balance: parseFloat($('fBalance').value) || 0, notes: $('fNotes').value }; if (this.editingId) { const idx = fournisseurs.findIndex(f => f.id === this.editingId); if (idx !== -1) fournisseurs[idx] = rec; } else fournisseurs.push(rec); saveState(); refreshSupplierSelect(); this.render(); closeSheet(); showToast('تم الحفظ'); },
+  save() { if (!$('fName').value.trim()) { showToast('أدخل اسم المورد'); return; } const rec = { id: this.editingId || nextId.fournisseurs++, name: $('fName').value.trim(), phone: $('fPhone').value, phone2: $('fPhone2').value, phone3: $('fPhone3').value, address: $('fAddress').value, taxId: $('fTaxId').value, balance: parseFloat($('fBalance').value) || 0, notes: $('fNotes').value }; if (this.editingId) { const idx = fournisseurs.findIndex(f => f.id === this.editingId); if (idx !== -1) fournisseurs[idx] = rec; } else fournisseurs.push(rec); saveState(); refreshSupplierSelect(); CaisseFournisseurs.refreshFournisseurSelect(); this.render(); closeSheet(); showToast('تم الحفظ'); },
   edit() { if (this.editingId == null) { showToast('اختر موردا لتعديله'); return; } this.save(); },
-  remove() { if (this.editingId == null) { showToast('اختر موردا لحذفه'); return; } if (achats.some(p => p.supplier === fournisseurs.find(f => f.id === this.editingId)?.name)) { showToast('لا يمكن حذف مورد له عمليات شراء'); return; } fournisseurs = fournisseurs.filter(f => f.id !== this.editingId); saveState(); refreshSupplierSelect(); this.render(); closeSheet(); showToast('تم الحذف'); },
+  remove() { if (this.editingId == null) { showToast('اختر موردا لحذفه'); return; } if (achats.some(p => p.supplier === fournisseurs.find(f => f.id === this.editingId)?.name)) { showToast('لا يمكن حذف مورد له عمليات شراء'); return; } fournisseurs = fournisseurs.filter(f => f.id !== this.editingId); saveState(); refreshSupplierSelect(); CaisseFournisseurs.refreshFournisseurSelect(); this.render(); closeSheet(); showToast('تم الحذف'); },
   load(id) { const f = fournisseurs.find(x => x.id === id); if (!f) return; this.editingId = id; $('fCode').value = 'FR-' + String(id).padStart(4, '0'); $('fName').value = f.name; $('fPhone').value = f.phone || ''; $('fPhone2').value = f.phone2 || ''; $('fPhone3').value = f.phone3 || ''; $('fAddress').value = f.address || ''; $('fTaxId').value = f.taxId || ''; $('fBalance').value = f.balance; $('fNotes').value = f.notes || ''; openSheet('fournisseurs'); },
   render() { const q = $('fSearch').value.trim().toLowerCase(); const list = $('fournisseursList'); list.innerHTML = ''; const filtered = fournisseurs.filter(f => !q || f.name.toLowerCase().includes(q) || (f.phone || '').includes(q)); if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا يوجد موردون</div>'; return; } filtered.forEach(f => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => Fournisseurs.load(f.id); d.innerHTML = `<div class="main-info"><div class="name">${f.name}</div><div class="meta">${f.phone || ''}</div></div><div class="amount">${f.balance.toFixed(3)} د.ت</div>`; list.appendChild(d); }); }
 };
 
-// ===== EXPENSES (FIXED - with expense code, proper edit, clear footer) =====
+// ===== EXPENSES =====
 const Expenses = {
   editingId: null,
   reset() {
@@ -743,19 +1239,16 @@ const Expenses = {
       if (idx !== -1) {
         if (!rec.code || rec.code === 'EXP-0000') { rec.code = expenses[idx].code || 'EXP-' + String(this.editingId).padStart(4, '0'); }
         expenses[idx] = rec;
-        Caisse.addAuto('out', rec.amount, rec.date, 'مصروف: ' + rec.category + (rec.description !== '-' ? ' - ' + rec.description : ''), 'expense', String(rec.id));
         showToast('✅ تم تعديل المصروف');
       } else { showToast('❌ المصروف غير موجود'); return; }
     } else {
       rec.code = 'EXP-' + String(rec.id).padStart(4, '0');
       expenses.push(rec);
-      caisse.push({ id: nextId.caisse++, date: rec.date, type: 'out', amount: rec.amount, description: 'مصروف: ' + rec.category + (rec.description !== '-' ? ' - ' + rec.description : ''), source: 'expense', sourceId: String(rec.id) });
       showToast('✅ تم حفظ المصروف');
     }
     $('exCode').value = rec.code;
     saveState();
     this.render();
-    Caisse.render();
     closeSheet();
   },
   edit() {
@@ -767,10 +1260,8 @@ const Expenses = {
     const idx = expenses.findIndex(e => e.id === this.editingId);
     if (idx !== -1) {
       expenses.splice(idx, 1);
-      Caisse.removeAuto('expense', String(this.editingId));
       saveState();
       this.render();
-      Caisse.render();
       closeSheet();
       showToast('✅ تم حذف المصروف');
     } else { showToast('❌ المصروف غير موجود'); }
@@ -809,8 +1300,8 @@ const Expenses = {
 
 // ===== VENTES =====
 const Ventes = {
-  editingId: null, lines: [], editingReglementId: null,
-  reset() { this.editingId = null; this.lines = []; this.editingReglementId = null; $('vNum').value = 'VTE-' + String(nextId.ventes).padStart(4, '0'); $('vDate').value = new Date().toISOString().slice(0, 10); $('vClient').value = ''; $('vPhone').value = ''; $('vPayment').value = 'آجل'; $('viArticle').value = ''; $('viManualName').value = ''; $('viPrice').value = ''; $('viQty').value = 1; $('viTotal').value = ''; $('viStockHint').textContent = ''; $('vrAmount').value = ''; $('vrBody').innerHTML = ''; $('vAccountSummary').innerHTML = ''; this.renderLines(); this.refreshArticleOptions(); },
+  editingId: null, lines: [],
+  reset() { this.editingId = null; this.lines = []; $('vNum').value = 'VTE-' + String(nextId.ventes).padStart(4, '0'); $('vDate').value = new Date().toISOString().slice(0, 10); $('vClient').value = ''; $('vPhone').value = ''; $('vPayment').value = 'آجل'; $('viArticle').value = ''; $('viManualName').value = ''; $('viPrice').value = ''; $('viQty').value = 1; $('viTotal').value = ''; $('viStockHint').textContent = ''; $('vAccountSummary').innerHTML = ''; this.renderLines(); this.refreshArticleOptions(); },
   refreshArticleOptions() { const used = this.lines.map(l => l.name); const avail = articles.filter(a => !used.includes(a.name)); const s = $('viArticle'); if (s) s.innerHTML = '<option value="">-- اختر --</option>' + avail.map(a => `<option value="${a.id}">${a.name}</option>`).join(''); },
   fillClient() { const c = clients.find(x => x.id == $('vClient').value); $('vPhone').value = c ? c.phone : ''; },
   fillArticle() { const a = articles.find(x => x.id == $('viArticle').value); if (!a) { $('viPrice').value = ''; $('viStockHint').textContent = ''; this.calcLine(); return; } const c = clients.find(x => x.id == $('vClient').value); const sp = c && c.specialPrices ? c.specialPrices.find(s => s.name === a.name) : null; $('viPrice').value = (sp ? sp.price : a.price).toFixed(3); $('viStockHint').textContent = 'المخزون: ' + getStock(a.name); this.calcLine(); },
@@ -818,24 +1309,20 @@ const Ventes = {
   addLine() { const sel = $('viArticle'); const manual = $('viManualName').value.trim(); const name = sel.value ? sel.options[sel.selectedIndex].textContent : manual; const price = parseFloat($('viPrice').value) || 0; const qty = parseFloat($('viQty').value) || 0; if (!name || price <= 0 || qty <= 0) { showToast('أدخل بيانات صحيحة'); return; } const existing = this.lines.find(l => l.name === name); if (existing) { existing.qty += qty; existing.price = price; existing.total = existing.price * existing.qty; showToast('تم تحديث الكمية'); } else this.lines.push({ name, price, qty, total: price * qty }); $('viArticle').value = ''; $('viManualName').value = ''; $('viPrice').value = ''; $('viQty').value = 1; $('viTotal').value = ''; $('viStockHint').textContent = ''; this.renderLines(); this.refreshArticleOptions(); },
   removeLine(idx) { this.lines.splice(idx, 1); this.renderLines(); this.refreshArticleOptions(); },
   renderLines() { const b = $('vLinesBody'); b.innerHTML = ''; let sum = 0; this.lines.forEach((l, i) => { sum += l.total; b.innerHTML += `<tr><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td><td><button class="del-row" onclick="Ventes.removeLine(${i})">✕</button></td></tr>`; }); $('vGrand').textContent = sum.toFixed(3); },
-  save() { if (!$('vClient').value) { showToast('اختر العميل'); return; } if (this.lines.length === 0) { showToast('أضف صنفا'); return; } const clientName = $('vClient').options[$('vClient').selectedIndex].textContent; const total = this.lines.reduce((a, l) => a + l.total, 0); const client = clients.find(c => c.name === clientName); if (!client) { showToast('العميل غير موجود'); return; } const newId = this.editingId || nextId.ventes++; const rec = { id: newId, num: $('vNum').value, date: $('vDate').value, client: clientName, payment: $('vPayment').value, lines: [...this.lines], total: total, reglements: [] }; if (this.editingId) { const old = ventes.find(v => v.id === this.editingId); if (old) { const oldClient = clients.find(c => c.name === old.client); if (oldClient && oldClient.name !== clientName) { oldClient.balance -= old.total; } removeStock('vente', rec.id); this.lines.forEach(l => addStock(l.name, l.qty, 'out', 'vente', rec.id, rec.date, 'بيع ' + rec.num)); rec.reglements = old.reglements || []; } const idx = ventes.findIndex(v => v.id === this.editingId); if (idx !== -1) ventes[idx] = rec; } else { client.balance += total; this.lines.forEach(l => addStock(l.name, l.qty, 'out', 'vente', rec.id, rec.date, 'بيع ' + rec.num)); ventes.push(rec); if (rec.payment === 'نقدا') { const rId = nextId.reglements++; rec.reglements.push({ id: rId, date: rec.date, amount: total, method: 'نقدا' }); client.balance -= total; client.reglements = client.reglements || []; client.reglements.push({ id: rId, date: rec.date, amount: total, method: 'نقدا' }); caisse.push({ id: nextId.caisse++, date: rec.date, type: 'in', amount: total, description: 'بيع نقدي ' + rec.num, source: 'reglement_vente', sourceId: 'vente-' + rec.id + '-' + rId }); } } saveState(); refreshArticleSelects(); Clients.render(); this.render(); this.editingId = rec.id; this.renderAccountSummary(rec); showToast('تم الحفظ'); closeSheet(); },
+  save() { if (!$('vClient').value) { showToast('اختر العميل'); return; } if (this.lines.length === 0) { showToast('أضف صنفا'); return; } const clientName = $('vClient').options[$('vClient').selectedIndex].textContent; const total = this.lines.reduce((a, l) => a + l.total, 0); const client = clients.find(c => c.name === clientName); if (!client) { showToast('العميل غير موجود'); return; } const newId = this.editingId || nextId.ventes++; const rec = { id: newId, num: $('vNum').value, date: $('vDate').value, client: clientName, payment: $('vPayment').value, lines: [...this.lines], total: total, reglements: [] }; if (this.editingId) { const old = ventes.find(v => v.id === this.editingId); if (old) { const oldClient = clients.find(c => c.name === old.client); if (oldClient && oldClient.name !== clientName) { oldClient.balance -= old.total; } removeStock('vente', rec.id); this.lines.forEach(l => addStock(l.name, l.qty, 'out', 'vente', rec.id, rec.date, 'بيع ' + rec.num)); rec.reglements = old.reglements || []; } const idx = ventes.findIndex(v => v.id === this.editingId); if (idx !== -1) ventes[idx] = rec; } else { client.balance += total; this.lines.forEach(l => addStock(l.name, l.qty, 'out', 'vente', rec.id, rec.date, 'بيع ' + rec.num)); ventes.push(rec); } saveState(); refreshArticleSelects(); Clients.render(); this.render(); this.editingId = rec.id; this.renderAccountSummary(rec); showToast('تم الحفظ'); closeSheet(); },
   edit() { if (this.editingId == null) { showToast('اختر عملية بيع لتعديلها'); return; } this.save(); },
-  addReglement() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const amount = parseFloat($('vrAmount').value) || 0; if (amount <= 0) { showToast('أدخل مبلغا'); return; } const method = $('vrMethod').options[$('vrMethod').selectedIndex].textContent; const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const client = clients.find(c => c.name === rec.client); const date = new Date().toISOString().slice(0, 10); if (this.editingReglementId) { const entry = rec.reglements.find(r => r.id === this.editingReglementId); if (entry) { const old = entry.amount; entry.amount = amount; entry.method = method; entry.date = date; if (client) { client.balance += old - amount; const ce = client.reglements.find(r => r.id === this.editingReglementId); if (ce) { ce.amount = amount; ce.method = method; ce.date = date; } } Caisse.addAuto('in', amount, date, 'تسديد فاتورة ' + rec.num + ' (' + method + ')', 'reglement_vente', 'vente-' + rec.id + '-' + this.editingReglementId); showToast('تم التحديث'); } this.editingReglementId = null; } else { const rId = nextId.reglements++; rec.reglements.push({ id: rId, date, amount, method }); if (client) { client.balance -= amount; client.reglements = client.reglements || []; client.reglements.push({ id: rId, date, amount, method }); } caisse.push({ id: nextId.caisse++, date, type: 'in', amount, description: 'تسديد فاتورة ' + rec.num + ' (' + method + ')', source: 'reglement_vente', sourceId: 'vente-' + rec.id + '-' + rId }); showToast('تم التسديد'); } $('vrAmount').value = ''; this.renderReglementsSheet(rec.reglements); this.renderAccountSummary(rec); saveState(); if (client) Clients.render(); Caisse.render(); },
-  loadReglementForEdit(id) { const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const entry = rec.reglements.find(r => r.id === id); if (!entry) return; $('vrAmount').value = entry.amount; const opt = [...$('vrMethod').options].find(o => o.textContent === entry.method); if (opt) $('vrMethod').value = opt.value; this.editingReglementId = id; showToast('عدل القيمة ثم اضغط + تسجيل'); },
-  removeReglement(id) { const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const idx = rec.reglements.findIndex(r => r.id === id); if (idx === -1) return; const amount = rec.reglements[idx].amount; rec.reglements.splice(idx, 1); const client = clients.find(c => c.name === rec.client); if (client) { client.balance += amount; client.reglements = client.reglements.filter(r => r.id !== id); } Caisse.removeAuto('reglement_vente', 'vente-' + rec.id + '-' + id); if (this.editingReglementId === id) { this.editingReglementId = null; $('vrAmount').value = ''; } this.renderReglementsSheet(rec.reglements); this.renderAccountSummary(rec); saveState(); showToast('تم حذف التسديد'); if (client) Clients.render(); Caisse.render(); },
-  renderReglementsSheet(regs) { const b = $('vrBody'); b.innerHTML = ''; (regs || []).slice().reverse().forEach(r => { b.innerHTML += `<tr><td>${r.date}</td><td>${r.method || ''}</td><td>${r.amount.toFixed(3)}</td><td><button class="del-row" onclick="event.stopPropagation(); Ventes.removeReglement(${r.id})">✕</button></td></tr>`; }); },
-  renderAccountSummary(rec) { const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); const b = $('vAccountSummary'); b.innerHTML = `<div class="totals-mini"><span>مبلغ الفاتورة</span><span>${rec.total.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>المدفوع</span><span>${paid.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>الباقي</span><span>${(rec.total - paid).toFixed(3)} د.ت</span></div><div class="totals-mini"><span>الرصيد الكلي</span><span>${client ? client.balance.toFixed(3) : '0.000'} د.ت</span></div>`; },
-  shareWhatsapp() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); let text = `*فاتورة ${rec.num}*\nالتاريخ: ${rec.date}\nالعميل: ${rec.client}\n`; rec.lines.forEach(l => { text += `${l.name}  x${l.qty}  ${l.total.toFixed(3)} د.ت\n`; }); text += `\nالمجموع: ${rec.total.toFixed(3)} د.ت\nالمدفوع: ${paid.toFixed(3)} د.ت\nالباقي: ${(rec.total - paid).toFixed(3)} د.ت`; const phone = client ? client.phone.replace(/\D/g, '') : ''; const url = 'https://wa.me/' + (phone ? '216' + phone : '') + '?text=' + encodeURIComponent(text); window.open(url, '_blank'); },
+  renderAccountSummary(rec) { const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); const b = $('vAccountSummary'); b.innerHTML = `<div class="totals-mini"><span>مبلغ الفاتورة</span><span>${rec.total.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>المدفوع</span><span>${paid.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>المتبقي</span><span>${(rec.total - paid).toFixed(3)} د.ت</span></div><div class="totals-mini"><span>الرصيد الكلي</span><span>${client ? client.balance.toFixed(3) : '0.000'} د.ت</span></div>`; },
+  shareWhatsapp() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); let text = `*فاتورة ${rec.num}*\nالتاريخ: ${rec.date}\nالعميل: ${rec.client}\n`; rec.lines.forEach(l => { text += `${l.name}  x${l.qty}  ${l.total.toFixed(3)} د.ت\n`; }); text += `\nالمجموع: ${rec.total.toFixed(3)} د.ت\nالمدفوع: ${paid.toFixed(3)} د.ت\nالمتبقي: ${(rec.total - paid).toFixed(3)} د.ت`; const phone = client ? client.phone.replace(/\D/g, '') : ''; const url = 'https://wa.me/' + (phone ? '216' + phone : '') + '?text=' + encodeURIComponent(text); window.open(url, '_blank'); },
   printInvoice() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); _invoiceData = { title: 'فاتورة بيع', payment: rec.payment, num: rec.num, date: rec.date, partyLabel: 'العميل', partyName: rec.client, partyAddr: client ? client.address : '', partyPhone: client ? client.phone : '', lines: rec.lines, total: rec.total, paid, prevBalance: client ? client.balance - (rec.total - paid) : 0, currentBalance: client ? client.balance : rec.total - paid }; renderInvoice(); $('printOverlay').classList.add('show'); },
-  remove() { if (this.editingId == null) { showToast('اختر عملية بيع لحذفها'); return; } const rec = ventes.find(v => v.id === this.editingId); if (rec) { const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); if (client) client.balance -= rec.total - paid; removeStock('vente', rec.id); } Caisse.removeAllForInvoice('reglement_vente', this.editingId); ventes = ventes.filter(v => v.id !== this.editingId); saveState(); Clients.render(); this.render(); closeSheet(); showToast('تم الحذف'); },
-  load(id) { const r = ventes.find(v => v.id === id); if (!r) return; this.editingId = id; $('vNum').value = r.num; $('vDate').value = r.date; const opt = [...$('vClient').options].find(o => o.textContent === r.client); if (opt) $('vClient').value = opt.value; this.fillClient(); $('vPayment').value = r.payment; this.lines = [...r.lines]; this.renderLines(); this.refreshArticleOptions(); $('vrAmount').value = ''; this.editingReglementId = null; this.renderReglementsSheet(r.reglements); this.renderAccountSummary(r); openSheet('ventes'); },
+  remove() { if (this.editingId == null) { showToast('اختر عملية بيع لحذفها'); return; } const rec = ventes.find(v => v.id === this.editingId); if (rec) { const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); if (client) client.balance -= rec.total - paid; removeStock('vente', rec.id); } ventes = ventes.filter(v => v.id !== this.editingId); saveState(); Clients.render(); this.render(); closeSheet(); showToast('تم الحذف'); },
+  load(id) { const r = ventes.find(v => v.id === id); if (!r) return; this.editingId = id; $('vNum').value = r.num; $('vDate').value = r.date; const opt = [...$('vClient').options].find(o => o.textContent === r.client); if (opt) $('vClient').value = opt.value; this.fillClient(); $('vPayment').value = r.payment; this.lines = [...r.lines]; this.renderLines(); this.refreshArticleOptions(); this.renderAccountSummary(r); openSheet('ventes'); },
   render() { const q = $('vSearch').value.trim().toLowerCase(); const list = $('ventesList'); list.innerHTML = ''; const filtered = ventes.filter(v => !q || v.num.toLowerCase().includes(q) || v.client.toLowerCase().includes(q)).reverse(); if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا توجد عمليات بيع</div>'; return; } filtered.forEach(v => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => Ventes.load(v.id); d.innerHTML = `<div class="main-info"><div class="name">${v.num}</div><div class="meta">${v.client} - ${v.date}</div></div><div class="amount">${v.total.toFixed(3)} د.ت</div>`; list.appendChild(d); }); }
 };
 
 // ===== ACHATS =====
 const Achats = {
-  editingId: null, lines: [], editingReglementId: null,
-  reset() { this.editingId = null; this.lines = []; this.editingReglementId = null; $('pNum').value = 'ACH-' + String(nextId.achats).padStart(4, '0'); $('pDate').value = new Date().toISOString().slice(0, 10); $('pSupplier').value = ''; $('pPhone').value = ''; $('pAddress').value = ''; $('pPayment').value = 'آجل'; $('piArticle').value = ''; $('piManualName').value = ''; $('piPrice').value = ''; $('piQty').value = 1; $('piTotal').value = ''; $('piStockHint').textContent = ''; $('arAmount').value = ''; $('arBody').innerHTML = ''; $('pAccountSummary').innerHTML = ''; this.renderLines(); this.refreshArticleOptions(); },
+  editingId: null, lines: [],
+  reset() { this.editingId = null; this.lines = []; $('pNum').value = 'ACH-' + String(nextId.achats).padStart(4, '0'); $('pDate').value = new Date().toISOString().slice(0, 10); $('pSupplier').value = ''; $('pPhone').value = ''; $('pAddress').value = ''; $('pPayment').value = 'آجل'; $('piArticle').value = ''; $('piManualName').value = ''; $('piPrice').value = ''; $('piQty').value = 1; $('piTotal').value = ''; $('piStockHint').textContent = ''; $('pAccountSummary').innerHTML = ''; this.renderLines(); this.refreshArticleOptions(); },
   refreshArticleOptions() { const used = this.lines.map(l => l.name); const avail = articles.filter(a => !used.includes(a.name)); const s = $('piArticle'); if (s) s.innerHTML = '<option value="">-- اختر --</option>' + avail.map(a => `<option value="${a.id}">${a.name}</option>`).join(''); },
   fillSupplier() { const s = fournisseurs.find(x => x.id == $('pSupplier').value); $('pPhone').value = s ? s.phone : ''; $('pAddress').value = s ? s.address : ''; },
   fillArticle() { const a = articles.find(x => x.id == $('piArticle').value); $('piPrice').value = a ? (a.costPrice || a.price).toFixed(3) : ''; $('piStockHint').textContent = a ? 'المخزون: ' + getStock(a.name) : ''; this.calcLine(); },
@@ -843,223 +1330,14 @@ const Achats = {
   addLine() { const sel = $('piArticle'); const manual = $('piManualName').value.trim(); const name = sel.value ? sel.options[sel.selectedIndex].textContent : manual; const price = parseFloat($('piPrice').value) || 0; const qty = parseFloat($('piQty').value) || 0; if (!name || price <= 0 || qty <= 0) { showToast('أدخل بيانات صحيحة'); return; } const existing = this.lines.find(l => l.name === name); if (existing) { existing.qty += qty; existing.price = price; existing.total = existing.price * existing.qty; showToast('تم تحديث الكمية'); } else this.lines.push({ name, price, qty, total: price * qty }); $('piArticle').value = ''; $('piManualName').value = ''; $('piPrice').value = ''; $('piQty').value = 1; $('piTotal').value = ''; $('piStockHint').textContent = ''; this.renderLines(); this.refreshArticleOptions(); },
   removeLine(idx) { this.lines.splice(idx, 1); this.renderLines(); this.refreshArticleOptions(); },
   renderLines() { const b = $('pLinesBody'); b.innerHTML = ''; let sum = 0; this.lines.forEach((l, i) => { sum += l.total; b.innerHTML += `<tr><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td><td><button class="del-row" onclick="Achats.removeLine(${i})">✕</button></td></tr>`; }); $('pGrand').textContent = sum.toFixed(3); },
-  save() { if (!$('pSupplier').value) { showToast('اختر المورد'); return; } if (this.lines.length === 0) { showToast('أضف صنفا'); return; } const supplierName = $('pSupplier').options[$('pSupplier').selectedIndex].textContent; const total = this.lines.reduce((a, l) => a + l.total, 0); const supplier = fournisseurs.find(f => f.name === supplierName); if (!supplier) { showToast('المورد غير موجود'); return; } const newId = this.editingId || nextId.achats++; const rec = { id: newId, num: $('pNum').value, date: $('pDate').value, supplier: supplierName, payment: $('pPayment').value, lines: [...this.lines], total: total, reglements: [] }; if (this.editingId) { const old = achats.find(p => p.id === this.editingId); if (old) { const oldSup = fournisseurs.find(f => f.name === old.supplier); if (oldSup && oldSup.name !== supplierName) { oldSup.balance -= old.total; } removeStock('achat', rec.id); this.lines.forEach(l => addStock(l.name, l.qty, 'in', 'achat', rec.id, rec.date, 'شراء ' + rec.num)); rec.reglements = old.reglements || []; } const idx = achats.findIndex(p => p.id === this.editingId); if (idx !== -1) achats[idx] = rec; } else { supplier.balance += total; this.lines.forEach(l => addStock(l.name, l.qty, 'in', 'achat', rec.id, rec.date, 'شراء ' + rec.num)); achats.push(rec); if (rec.payment === 'نقدا') { const rId = nextId.reglements++; rec.reglements.push({ id: rId, date: rec.date, amount: total, method: 'نقدا' }); supplier.balance -= total; supplier.reglements = supplier.reglements || []; supplier.reglements.push({ id: rId, date: rec.date, amount: total, method: 'نقدا' }); caisse.push({ id: nextId.caisse++, date: rec.date, type: 'out', amount: total, description: 'شراء نقدي ' + rec.num, source: 'reglement_achat', sourceId: 'achat-' + rec.id + '-' + rId }); } } saveState(); refreshArticleSelects(); Fournisseurs.render(); this.render(); this.editingId = rec.id; this.renderAccountSummary(rec); showToast('تم الحفظ'); closeSheet(); },
+  save() { if (!$('pSupplier').value) { showToast('اختر المورد'); return; } if (this.lines.length === 0) { showToast('أضف صنفا'); return; } const supplierName = $('pSupplier').options[$('pSupplier').selectedIndex].textContent; const total = this.lines.reduce((a, l) => a + l.total, 0); const supplier = fournisseurs.find(f => f.name === supplierName); if (!supplier) { showToast('المورد غير موجود'); return; } const newId = this.editingId || nextId.achats++; const rec = { id: newId, num: $('pNum').value, date: $('pDate').value, supplier: supplierName, payment: $('pPayment').value, lines: [...this.lines], total: total, reglements: [] }; if (this.editingId) { const old = achats.find(p => p.id === this.editingId); if (old) { const oldSup = fournisseurs.find(f => f.name === old.supplier); if (oldSup && oldSup.name !== supplierName) { oldSup.balance -= old.total; } removeStock('achat', rec.id); this.lines.forEach(l => addStock(l.name, l.qty, 'in', 'achat', rec.id, rec.date, 'شراء ' + rec.num)); rec.reglements = old.reglements || []; } const idx = achats.findIndex(p => p.id === this.editingId); if (idx !== -1) achats[idx] = rec; } else { supplier.balance += total; this.lines.forEach(l => addStock(l.name, l.qty, 'in', 'achat', rec.id, rec.date, 'شراء ' + rec.num)); achats.push(rec); } saveState(); refreshArticleSelects(); Fournisseurs.render(); this.render(); this.editingId = rec.id; this.renderAccountSummary(rec); showToast('تم الحفظ'); closeSheet(); },
   edit() { if (this.editingId == null) { showToast('اختر عملية شراء لتعديلها'); return; } this.save(); },
-  addReglement() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const amount = parseFloat($('arAmount').value) || 0; if (amount <= 0) { showToast('أدخل مبلغا'); return; } const method = $('arMethod').options[$('arMethod').selectedIndex].textContent; const rec = achats.find(p => p.id === this.editingId); if (!rec) return; const supplier = fournisseurs.find(f => f.name === rec.supplier); const date = new Date().toISOString().slice(0, 10); if (this.editingReglementId) { const entry = rec.reglements.find(r => r.id === this.editingReglementId); if (entry) { const old = entry.amount; entry.amount = amount; entry.method = method; entry.date = date; if (supplier) { supplier.balance += old - amount; const se = supplier.reglements.find(r => r.id === this.editingReglementId); if (se) { se.amount = amount; se.method = method; se.date = date; } } Caisse.addAuto('out', amount, date, 'تسديد فاتورة ' + rec.num + ' (' + method + ')', 'reglement_achat', 'achat-' + rec.id + '-' + this.editingReglementId); showToast('تم التحديث'); } this.editingReglementId = null; } else { const rId = nextId.reglements++; rec.reglements.push({ id: rId, date, amount, method }); if (supplier) { supplier.balance -= amount; supplier.reglements = supplier.reglements || []; supplier.reglements.push({ id: rId, date, amount, method }); } caisse.push({ id: nextId.caisse++, date, type: 'out', amount, description: 'تسديد فاتورة ' + rec.num + ' (' + method + ')', source: 'reglement_achat', sourceId: 'achat-' + rec.id + '-' + rId }); showToast('تم التسديد'); } $('arAmount').value = ''; this.renderReglementsSheet(rec.reglements); this.renderAccountSummary(rec); saveState(); if (supplier) Fournisseurs.render(); Caisse.render(); },
-  loadReglementForEdit(id) { const rec = achats.find(p => p.id === this.editingId); if (!rec) return; const entry = rec.reglements.find(r => r.id === id); if (!entry) return; $('arAmount').value = entry.amount; const opt = [...$('arMethod').options].find(o => o.textContent === entry.method); if (opt) $('arMethod').value = opt.value; this.editingReglementId = id; showToast('عدل القيمة ثم اضغط + تسجيل'); },
-  removeReglement(id) { const rec = achats.find(p => p.id === this.editingId); if (!rec) return; const idx = rec.reglements.findIndex(r => r.id === id); if (idx === -1) return; const amount = rec.reglements[idx].amount; rec.reglements.splice(idx, 1); const supplier = fournisseurs.find(f => f.name === rec.supplier); if (supplier) { supplier.balance += amount; supplier.reglements = supplier.reglements.filter(r => r.id !== id); } Caisse.removeAuto('reglement_achat', 'achat-' + rec.id + '-' + id); if (this.editingReglementId === id) { this.editingReglementId = null; $('arAmount').value = ''; } this.renderReglementsSheet(rec.reglements); this.renderAccountSummary(rec); saveState(); showToast('تم حذف التسديد'); if (supplier) Fournisseurs.render(); Caisse.render(); },
-  renderReglementsSheet(regs) { const b = $('arBody'); b.innerHTML = ''; (regs || []).slice().reverse().forEach(r => { b.innerHTML += `<tr><td>${r.date}</td><td>${r.method || ''}</td><td>${r.amount.toFixed(3)}</td><td><button class="del-row" onclick="event.stopPropagation(); Achats.removeReglement(${r.id})">✕</button></td></tr>`; }); },
-  renderAccountSummary(rec) { const supplier = fournisseurs.find(f => f.name === rec.supplier); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); const b = $('pAccountSummary'); b.innerHTML = `<div class="totals-mini"><span>مبلغ الفاتورة</span><span>${rec.total.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>المدفوع</span><span>${paid.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>الباقي</span><span>${(rec.total - paid).toFixed(3)} د.ت</span></div><div class="totals-mini"><span>الرصيد الكلي</span><span>${supplier ? supplier.balance.toFixed(3) : '0.000'} د.ت</span></div>`; },
-  shareWhatsapp() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = achats.find(p => p.id === this.editingId); if (!rec) return; const supplier = fournisseurs.find(f => f.name === rec.supplier); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); let text = `*فاتورة شراء ${rec.num}*\nالتاريخ: ${rec.date}\nالمورد: ${rec.supplier}\n`; rec.lines.forEach(l => { text += `${l.name}  x${l.qty}  ${l.total.toFixed(3)} د.ت\n`; }); text += `\nالمجموع: ${rec.total.toFixed(3)} د.ت\nالمدفوع: ${paid.toFixed(3)} د.ت\nالباقي: ${(rec.total - paid).toFixed(3)} د.ت`; const phone = supplier ? supplier.phone.replace(/\D/g, '') : ''; const url = 'https://wa.me/' + (phone ? '216' + phone : '') + '?text=' + encodeURIComponent(text); window.open(url, '_blank'); },
+  renderAccountSummary(rec) { const supplier = fournisseurs.find(f => f.name === rec.supplier); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); const b = $('pAccountSummary'); b.innerHTML = `<div class="totals-mini"><span>مبلغ الفاتورة</span><span>${rec.total.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>المدفوع</span><span>${paid.toFixed(3)} د.ت</span></div><div class="totals-mini"><span>المتبقي</span><span>${(rec.total - paid).toFixed(3)} د.ت</span></div><div class="totals-mini"><span>الرصيد الكلي</span><span>${supplier ? supplier.balance.toFixed(3) : '0.000'} د.ت</span></div>`; },
+  shareWhatsapp() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = achats.find(p => p.id === this.editingId); if (!rec) return; const supplier = fournisseurs.find(f => f.name === rec.supplier); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); let text = `*فاتورة شراء ${rec.num}*\nالتاريخ: ${rec.date}\nالمورد: ${rec.supplier}\n`; rec.lines.forEach(l => { text += `${l.name}  x${l.qty}  ${l.total.toFixed(3)} د.ت\n`; }); text += `\nالمجموع: ${rec.total.toFixed(3)} د.ت\nالمدفوع: ${paid.toFixed(3)} د.ت\nالمتبقي: ${(rec.total - paid).toFixed(3)} د.ت`; const phone = supplier ? supplier.phone.replace(/\D/g, '') : ''; const url = 'https://wa.me/' + (phone ? '216' + phone : '') + '?text=' + encodeURIComponent(text); window.open(url, '_blank'); },
   printInvoice() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = achats.find(p => p.id === this.editingId); if (!rec) return; const supplier = fournisseurs.find(f => f.name === rec.supplier); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); _invoiceData = { title: 'فاتورة شراء', payment: rec.payment, num: rec.num, date: rec.date, partyLabel: 'المورد', partyName: rec.supplier, partyAddr: supplier ? supplier.address : '', partyPhone: supplier ? supplier.phone : '', lines: rec.lines, total: rec.total, paid, prevBalance: supplier ? supplier.balance - (rec.total - paid) : 0, currentBalance: supplier ? supplier.balance : rec.total - paid }; renderInvoice(); $('printOverlay').classList.add('show'); },
-  remove() { if (this.editingId == null) { showToast('اختر عملية شراء لحذفها'); return; } const rec = achats.find(p => p.id === this.editingId); if (rec) { const supplier = fournisseurs.find(f => f.name === rec.supplier); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); if (supplier) supplier.balance -= rec.total - paid; removeStock('achat', rec.id); } Caisse.removeAllForInvoice('reglement_achat', this.editingId); achats = achats.filter(p => p.id !== this.editingId); saveState(); Fournisseurs.render(); this.render(); closeSheet(); showToast('تم الحذف'); },
-  load(id) { const r = achats.find(p => p.id === id); if (!r) return; this.editingId = id; $('pNum').value = r.num; $('pDate').value = r.date; const opt = [...$('pSupplier').options].find(o => o.textContent === r.supplier); if (opt) $('pSupplier').value = opt.value; this.fillSupplier(); $('pPayment').value = r.payment; this.lines = [...r.lines]; this.renderLines(); this.refreshArticleOptions(); $('arAmount').value = ''; this.editingReglementId = null; this.renderReglementsSheet(r.reglements); this.renderAccountSummary(r); openSheet('achats'); },
+  remove() { if (this.editingId == null) { showToast('اختر عملية شراء لحذفها'); return; } const rec = achats.find(p => p.id === this.editingId); if (rec) { const supplier = fournisseurs.find(f => f.name === rec.supplier); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); if (supplier) supplier.balance -= rec.total - paid; removeStock('achat', rec.id); } achats = achats.filter(p => p.id !== this.editingId); saveState(); Fournisseurs.render(); this.render(); closeSheet(); showToast('تم الحذف'); },
+  load(id) { const r = achats.find(p => p.id === id); if (!r) return; this.editingId = id; $('pNum').value = r.num; $('pDate').value = r.date; const opt = [...$('pSupplier').options].find(o => o.textContent === r.supplier); if (opt) $('pSupplier').value = opt.value; this.fillSupplier(); $('pPayment').value = r.payment; this.lines = [...r.lines]; this.renderLines(); this.refreshArticleOptions(); this.renderAccountSummary(r); openSheet('achats'); },
   render() { const q = $('pSearch').value.trim().toLowerCase(); const list = $('achatsList'); list.innerHTML = ''; const filtered = achats.filter(p => !q || p.num.toLowerCase().includes(q) || p.supplier.toLowerCase().includes(q)).reverse(); if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا توجد عمليات شراء</div>'; return; } filtered.forEach(p => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => Achats.load(p.id); d.innerHTML = `<div class="main-info"><div class="name">${p.num}</div><div class="meta">${p.supplier} - ${p.date}</div></div><div class="amount">${p.total.toFixed(3)} د.ت</div>`; list.appendChild(d); }); }
-};
-
-// ===== CAISSE =====
-const Caisse = {
-  editingId: null,
-  reset() { this.editingId = null; $('ksDate').value = new Date().toISOString().slice(0, 10); $('ksType').value = 'in'; $('ksAmount').value = ''; $('ksDesc').value = ''; },
-  save() {
-    const amount = parseFloat($('ksAmount').value) || 0;
-    if (amount <= 0) { showToast('أدخل مبلغا صحيحا'); return; }
-    const date = $('ksDate').value;
-    const type = $('ksType').value;
-    const desc = $('ksDesc').value || '-';
-    if (this.editingId) {
-      const oldEntry = caisse.find(k => k.id === this.editingId);
-      if (!oldEntry) { showToast('الحركة غير موجودة'); return; }
-      const oldAmount = oldEntry.amount;
-      let delta = 0;
-      if (type === oldEntry.type) { delta = amount - oldAmount; }
-      else { delta = type === 'in' ? (amount + oldAmount) : -(amount + oldAmount); }
-      this._updateLinkedEntity(oldEntry.source, oldEntry.sourceId, delta, { amount, date, type, description: desc, method: oldEntry.method || '' });
-      const idx = caisse.findIndex(k => k.id === this.editingId);
-      if (idx !== -1) { caisse[idx] = { ...oldEntry, date, type, amount, description: desc }; }
-      showToast('تم التعديل');
-    } else {
-      const rec = { id: nextId.caisse++, date, type, amount, description: desc, source: 'manual' };
-      caisse.push(rec);
-      showToast('تم الحفظ');
-    }
-    saveState();
-    this.render();
-    closeSheet();
-  },
-  remove() {
-    if (this.editingId == null) { showToast('اختر حركة لحذفها'); return; }
-    const entry = caisse.find(k => k.id === this.editingId);
-    if (!entry) { showToast('الحركة غير موجودة'); return; }
-    const delta = entry.type === 'in' ? -entry.amount : entry.amount;
-    this._updateLinkedEntity(entry.source, entry.sourceId, delta, { amount: -entry.amount, date: entry.date, type: entry.type === 'in' ? 'out' : 'in', description: entry.description, method: entry.method || '' });
-    caisse = caisse.filter(k => k.id !== this.editingId);
-    saveState();
-    this.render();
-    closeSheet();
-    showToast('تم الحذف');
-  },
-  _updateLinkedEntity(source, sourceId, delta, newData) {
-    if (!source || source === 'manual') return;
-    try {
-      if (source === 'reglement_vente') {
-        const parts = sourceId.split('-');
-        if (parts.length >= 3) {
-          const venteId = parseInt(parts[1]);
-          const vente = ventes.find(v => v.id === venteId);
-          if (vente) {
-            const client = clients.find(c => c.name === vente.client);
-            if (client) {
-              client.balance += delta;
-              const regId = parseInt(parts[2]);
-              const regEntry = client.reglements?.find(r => r.id === regId);
-              if (regEntry && newData) {
-                regEntry.amount = newData.amount;
-                regEntry.date = newData.date;
-                regEntry.method = newData.method || regEntry.method;
-              }
-            }
-          }
-        }
-      } else if (source === 'reglement_achat') {
-        const parts = sourceId.split('-');
-        if (parts.length >= 3) {
-          const achatId = parseInt(parts[1]);
-          const achat = achats.find(a => a.id === achatId);
-          if (achat) {
-            const supplier = fournisseurs.find(f => f.name === achat.supplier);
-            if (supplier) {
-              supplier.balance += delta;
-              const regId = parseInt(parts[2]);
-              const regEntry = supplier.reglements?.find(r => r.id === regId);
-              if (regEntry && newData) {
-                regEntry.amount = newData.amount;
-                regEntry.date = newData.date;
-                regEntry.method = newData.method || regEntry.method;
-              }
-            }
-          }
-        }
-      } else if (source === 'reglement_client') {
-        const desc = newData.description || '';
-        const match = desc.match(/تسديد من (.+?) \(/);
-        if (match) {
-          const clientName = match[1];
-          const client = clients.find(c => c.name === clientName);
-          if (client) {
-            client.balance += delta;
-            const regs = client.reglements || [];
-            if (regs.length > 0) {
-              const last = regs[regs.length - 1];
-              if (last && newData) {
-                last.amount = newData.amount;
-                last.date = newData.date;
-                last.method = newData.method || last.method;
-              }
-            }
-          }
-        }
-      } else if (source === 'reglement_fournisseur') {
-        const desc = newData.description || '';
-        const match = desc.match(/تسديد لـ (.+?) \(/);
-        if (match) {
-          const supplierName = match[1];
-          const supplier = fournisseurs.find(f => f.name === supplierName);
-          if (supplier) {
-            supplier.balance += delta;
-            const regs = supplier.reglements || [];
-            if (regs.length > 0) {
-              const last = regs[regs.length - 1];
-              if (last && newData) {
-                last.amount = newData.amount;
-                last.date = newData.date;
-                last.method = newData.method || last.method;
-              }
-            }
-          }
-        }
-      } else if (source === 'expense') {
-        const expId = parseInt(sourceId);
-        if (!isNaN(expId)) {
-          const exp = expenses.find(e => e.id === expId);
-          if (exp && newData) {
-            exp.amount = newData.amount;
-            exp.date = newData.date;
-            exp.description = newData.description;
-          }
-        }
-      }
-      Clients.render();
-      Fournisseurs.render();
-      Reglements.render();
-      Expenses.render();
-    } catch (e) { console.warn('Error updating linked entity:', e); }
-  },
-  load(id) {
-    const k = caisse.find(x => x.id === id);
-    if (!k) { showToast('الحركة غير موجودة'); return; }
-    this.editingId = id;
-    $('ksDate').value = k.date;
-    $('ksType').value = k.type;
-    $('ksAmount').value = k.amount;
-    $('ksDesc').value = k.description;
-    openSheet('caisse');
-  },
-  addAuto(type, amount, date, desc, source, sourceId) {
-    const existing = caisse.find(k => k.source === source && k.sourceId === sourceId);
-    if (existing) { existing.type = type; existing.amount = amount; existing.date = date; existing.description = desc; }
-    else { caisse.push({ id: nextId.caisse++, date, type, amount, description: desc, source, sourceId }); }
-    saveState();
-  },
-  removeAuto(source, sourceId) {
-    caisse = caisse.filter(k => !(k.source === source && k.sourceId === sourceId));
-    saveState();
-  },
-  removeAllForInvoice(reglementSource, invoiceId) {
-    const prefix = reglementSource + '-' + invoiceId + '-';
-    caisse = caisse.filter(k => {
-      if (k.source !== reglementSource) return true;
-      if (k.sourceId && k.sourceId.startsWith(prefix)) return false;
-      return true;
-    });
-    saveState();
-  },
-  render() {
-    const balance = caisse.reduce((a, k) => a + (k.type === 'in' ? k.amount : -k.amount), 0);
-    const bal = $('caisseBalance');
-    if (bal) bal.textContent = balance.toFixed(3) + ' د.ت';
-    const list = $('caisseList');
-    if (!list) return;
-    list.innerHTML = '';
-    const sorted = caisse.slice().sort((a, b) => (a.date < b.date ? 1 : -1));
-    if (!sorted.length) { list.innerHTML = '<div class="empty-msg">لا توجد حركات</div>'; return; }
-    sorted.forEach(k => {
-      const d = document.createElement('div');
-      d.className = 'row-card';
-      d.onclick = () => Caisse.load(k.id);
-      const sign = k.type === 'in' ? '+' : '-';
-      const color = k.type === 'in' ? 'var(--success)' : 'var(--danger)';
-      d.innerHTML = `<div class="main-info"><div class="name">${k.description}</div><div class="meta">${k.date}</div></div><div class="amount" style="color:${color};">${sign}${k.amount.toFixed(3)} د.ت</div>`;
-      list.appendChild(d);
-    });
-  }
-};
-
-// ===== QUICK REGLEMENT =====
-const QuickReglement = {
-  open() { $('qrType').value = 'client'; $('qrAmount').value = ''; this.refreshTargets(); openSheet('quickreglement'); },
-  refreshTargets() { const type = $('qrType').value; const sel = $('qrTarget'); if (type === 'client') { sel.innerHTML = '<option value="">-- اختر --</option>' + clients.map(c => `<option value="${c.id}">${c.name} (${c.balance.toFixed(3)} د.ت)</option>`).join(''); } else { sel.innerHTML = '<option value="">-- اختر --</option>' + fournisseurs.map(f => `<option value="${f.id}">${f.name} (${f.balance.toFixed(3)} د.ت)</option>`).join(''); } $('qrBalanceHint').textContent = ''; },
-  showHint() { const type = $('qrType').value; const id = $('qrTarget').value; if (!id) { $('qrBalanceHint').textContent = ''; return; } if (type === 'client') { const c = clients.find(x => x.id == id); $('qrBalanceHint').textContent = c ? 'الرصيد: ' + c.balance.toFixed(3) + ' د.ت' : ''; } else { const f = fournisseurs.find(x => x.id == id); $('qrBalanceHint').textContent = f ? 'الرصيد: ' + f.balance.toFixed(3) + ' د.ت' : ''; } },
-  save() { const type = $('qrType').value; const targetId = $('qrTarget').value; const amount = parseFloat($('qrAmount').value) || 0; const method = $('qrMethod').options[$('qrMethod').selectedIndex].textContent; if (!targetId || amount <= 0) { showToast('اختر جهة وأدخل مبلغا'); return; } const date = new Date().toISOString().slice(0, 10); const sourceId = 'quick-' + Date.now(); if (type === 'client') { const c = clients.find(x => x.id == targetId); if (!c) return; c.balance -= amount; c.reglements = c.reglements || []; c.reglements.push({ date, amount, method }); caisse.push({ id: nextId.caisse++, date, type: 'in', amount, description: 'تسديد من ' + c.name + ' (' + method + ')', source: 'reglement_client', sourceId }); Clients.render(); } else { const f = fournisseurs.find(x => x.id == targetId); if (!f) return; f.balance -= amount; f.reglements = f.reglements || []; f.reglements.push({ date, amount, method }); caisse.push({ id: nextId.caisse++, date, type: 'out', amount, description: 'تسديد لـ ' + f.name + ' (' + method + ')', source: 'reglement_fournisseur', sourceId }); Fournisseurs.render(); } Caisse.render(); Reglements.render(); saveState(); showToast('تم التسديد'); closeSheet(); }
-};
-
-// ===== REGLEMENTS =====
-const Reglements = {
-  render() { this.renderBalances(); const q = $('rgSearch').value.trim().toLowerCase(); let all = []; clients.forEach(c => { (c.reglements || []).forEach(r => all.push({ date: r.date, amount: r.amount, name: c.name, kind: 'client' })); }); fournisseurs.forEach(f => { (f.reglements || []).forEach(r => all.push({ date: r.date, amount: r.amount, name: f.name, kind: 'fournisseur' })); }); const totalC = all.filter(r => r.kind === 'client').reduce((a, r) => a + r.amount, 0); const totalF = all.filter(r => r.kind === 'fournisseur').reduce((a, r) => a + r.amount, 0); const cEl = $('reglTotalClients'); if (cEl) cEl.textContent = totalC.toFixed(3); const fEl = $('reglTotalFournisseurs'); if (fEl) fEl.textContent = totalF.toFixed(3); all = all.filter(r => !q || r.name.toLowerCase().includes(q)).sort((a, b) => (a.date < b.date ? 1 : -1)); const list = $('reglementsList'); if (!list) return; list.innerHTML = ''; if (!all.length) { list.innerHTML = '<div class="empty-msg">لا توجد تسديدات</div>'; return; } all.forEach(r => { const d = document.createElement('div'); d.className = 'row-card'; const label = r.kind === 'client' ? 'من ' : 'إلى '; const color = r.kind === 'client' ? 'var(--success)' : 'var(--danger)'; d.innerHTML = `<div class="main-info"><div class="name">${label}${r.name}</div><div class="meta">${r.date}</div></div><div class="amount" style="color:${color};">${r.amount.toFixed(3)} د.ت</div>`; list.appendChild(d); }); },
-  renderBalances() {
-    const cList = $('balancesClientsList'); if (cList) { cList.innerHTML = ''; const withB = clients.filter(c => Math.abs(c.balance) > 0.0009); if (!withB.length) { cList.innerHTML = '<div class="empty-msg">لا توجد أرصدة</div>'; } else { withB.sort((a, b) => b.balance - a.balance).forEach(c => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => Clients.load(c.id); d.innerHTML = `<div class="main-info"><div class="name">${c.name}</div></div><div class="amount" style="color:${c.balance > 0 ? 'var(--danger)' : 'var(--success)'};">${c.balance.toFixed(3)} د.ت</div>`; cList.appendChild(d); }); } }
-    const fList = $('balancesFournisseursList'); if (fList) { fList.innerHTML = ''; const withB = fournisseurs.filter(f => Math.abs(f.balance) > 0.0009); if (!withB.length) { fList.innerHTML = '<div class="empty-msg">لا توجد أرصدة</div>'; } else { withB.sort((a, b) => b.balance - a.balance).forEach(f => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => Fournisseurs.load(f.id); d.innerHTML = `<div class="main-info"><div class="name">${f.name}</div></div><div class="amount" style="color:${f.balance > 0 ? 'var(--danger)' : 'var(--success)'};">${f.balance.toFixed(3)} د.ت</div>`; fList.appendChild(d); }); } }
-  }
 };
 
 // ===== APPROVALS =====
@@ -1082,12 +1360,12 @@ const UiScale = { set(s) { document.querySelector('.phone').style.zoom = s; try 
 UiScale.init();
 
 // ===== BACKUP =====
-function exportBackup() { const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo, exportedAt: new Date().toISOString() }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'gtrpos_backup_' + new Date().toISOString().slice(0, 10) + '.json'; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); showToast('تم التصدير'); }
-function exportBackupToDrive() { if (!currentUser) { showToast('يجب تسجيل الدخول'); return; } const provider = new firebase.auth.GoogleAuthProvider(); provider.addScope('https://www.googleapis.com/auth/drive.file'); showToast('جاري فتح Google...'); const upload = (token) => { if (!token) { showToast('تعذر الحصول على إذن'); return; } const data = { clients, articles, fournisseurs, ventes, achats, caisse, expenses, stockMovements, nextId, companyInfo, exportedAt: new Date().toISOString() }; const fileName = 'gtrpos_backup_' + new Date().toISOString().slice(0, 10) + '.json'; const metadata = { name: fileName, mimeType: 'application/json' }; const boundary = '-------gtrpos314159'; const delimiter = "\r\n--" + boundary + "\r\n"; const closeDelim = "\r\n--" + boundary + "--"; const body = delimiter + 'Content-Type: application/json\r\n\r\n' + JSON.stringify(metadata) + delimiter + 'Content-Type: application/json\r\n\r\n' + JSON.stringify(data, null, 2) + closeDelim; fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'multipart/related; boundary=' + boundary }, body }).then(res => res.json()).then(json => { if (json.id) showToast('تم الرفع إلى Drive'); else showToast('حدث خطأ'); }).catch(() => showToast('حدث خطأ')); }; currentUser.linkWithPopup(provider).then(result => { const cred = firebase.auth.GoogleAuthProvider.credentialFromResult(result); upload(cred.accessToken); }).catch(err => { if (err.code === 'auth/credential-already-in-use' || err.code === 'auth/provider-already-linked') { currentUser.reauthenticateWithPopup(provider).then(result => { const cred = firebase.auth.GoogleAuthProvider.credentialFromResult(result); upload(cred.accessToken); }).catch(() => showToast('تعذر الحصول على إذن')); } else showToast('تعذر الحصول على إذن'); }); }
-function importBackupFile(input) { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = e => { try { const data = JSON.parse(e.target.result); if (data.clients) clients = data.clients; if (data.articles) articles = data.articles; if (data.fournisseurs) fournisseurs = data.fournisseurs; if (data.ventes) ventes = data.ventes; if (data.achats) achats = data.achats; if (data.caisse) caisse = data.caisse; if (data.expenses) expenses = data.expenses; if (data.stockMovements) stockMovements = data.stockMovements; if (data.nextId) nextId = data.nextId; if (data.companyInfo) companyInfo = data.companyInfo; saveState(); initAll(); showToast('تم الاستيراد'); } catch (err) { showToast('ملف غير صالح'); } }; reader.readAsText(file); input.value = ''; }
+function exportBackup() { const data = { clients, articles, fournisseurs, ventes, achats, caisseClients, caisseFournisseurs, caisseExpenses, expenses, stockMovements, nextId, companyInfo, exportedAt: new Date().toISOString() }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'gtrpos_backup_' + new Date().toISOString().slice(0, 10) + '.json'; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); showToast('تم التصدير'); }
+function exportBackupToDrive() { if (!currentUser) { showToast('يجب تسجيل الدخول'); return; } const provider = new firebase.auth.GoogleAuthProvider(); provider.addScope('https://www.googleapis.com/auth/drive.file'); showToast('جاري فتح Google...'); const upload = (token) => { if (!token) { showToast('تعذر الحصول على إذن'); return; } const data = { clients, articles, fournisseurs, ventes, achats, caisseClients, caisseFournisseurs, caisseExpenses, expenses, stockMovements, nextId, companyInfo, exportedAt: new Date().toISOString() }; const fileName = 'gtrpos_backup_' + new Date().toISOString().slice(0, 10) + '.json'; const metadata = { name: fileName, mimeType: 'application/json' }; const boundary = '-------gtrpos314159'; const delimiter = "\r\n--" + boundary + "\r\n"; const closeDelim = "\r\n--" + boundary + "--"; const body = delimiter + 'Content-Type: application/json\r\n\r\n' + JSON.stringify(metadata) + delimiter + 'Content-Type: application/json\r\n\r\n' + JSON.stringify(data, null, 2) + closeDelim; fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'multipart/related; boundary=' + boundary }, body }).then(res => res.json()).then(json => { if (json.id) showToast('تم الرفع إلى Drive'); else showToast('حدث خطأ'); }).catch(() => showToast('حدث خطأ')); }; currentUser.linkWithPopup(provider).then(result => { const cred = firebase.auth.GoogleAuthProvider.credentialFromResult(result); upload(cred.accessToken); }).catch(err => { if (err.code === 'auth/credential-already-in-use' || err.code === 'auth/provider-already-linked') { currentUser.reauthenticateWithPopup(provider).then(result => { const cred = firebase.auth.GoogleAuthProvider.credentialFromResult(result); upload(cred.accessToken); }).catch(() => showToast('تعذر الحصول على إذن')); } else showToast('تعذر الحصول على إذن'); }); }
+function importBackupFile(input) { const file = input.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = e => { try { const data = JSON.parse(e.target.result); if (data.clients) clients = data.clients; if (data.articles) articles = data.articles; if (data.fournisseurs) fournisseurs = data.fournisseurs; if (data.ventes) ventes = data.ventes; if (data.achats) achats = data.achats; if (data.caisseClients) caisseClients = data.caisseClients; if (data.caisseFournisseurs) caisseFournisseurs = data.caisseFournisseurs; if (data.caisseExpenses) caisseExpenses = data.caisseExpenses; if (data.expenses) expenses = data.expenses; if (data.stockMovements) stockMovements = data.stockMovements; if (data.nextId) nextId = data.nextId; if (data.companyInfo) companyInfo = data.companyInfo; saveState(); initAll(); showToast('تم الاستيراد'); } catch (err) { showToast('ملف غير صالح'); } }; reader.readAsText(file); input.value = ''; }
 
-function refreshClientSelect() { const s = $('vClient'); if (s) s.innerHTML = '<option value="">-- اختر --</option>' + clients.map(c => `<option value="${c.id}">${c.name}</option>`).join(''); }
-function refreshSupplierSelect() { const s = $('pSupplier'); if (s) s.innerHTML = '<option value="">-- اختر --</option>' + fournisseurs.map(f => `<option value="${f.id}">${f.name}</option>`).join(''); }
+function refreshClientSelect() { const s = $('vClient'); if (s) s.innerHTML = '<option value="">-- اختر --</option>' + clients.map(c => `<option value="${c.id}">${c.name}</option>`).join(''); CaisseClients.refreshClientSelect(); }
+function refreshSupplierSelect() { const s = $('pSupplier'); if (s) s.innerHTML = '<option value="">-- اختر --</option>' + fournisseurs.map(f => `<option value="${f.id}">${f.name}</option>`).join(''); CaisseFournisseurs.refreshFournisseurSelect(); }
 function refreshArticleSelects() { const opts = '<option value="">-- اختر --</option>' + articles.map(a => `<option value="${a.id}">${a.name}</option>`).join(''); ['viArticle','piArticle','cpArticle'].forEach(id => { const s = $(id); if (s) s.innerHTML = opts; }); if (Ventes && Ventes.refreshArticleOptions) Ventes.refreshArticleOptions(); if (Achats && Achats.refreshArticleOptions) Achats.refreshArticleOptions(); }
 
 // ===== INIT =====
@@ -1102,10 +1380,10 @@ function initAll() {
     Fournisseurs.render();
     Ventes.render();
     Achats.render();
-    Caisse.reset();
-    Caisse.render();
+    CaisseClients.render();
+    CaisseFournisseurs.render();
+    CaisseExpenses.render();
     Expenses.render();
-    Reglements.render();
     if (currentUser.email === 'krimi.neji@gmail.com') $('tabApprovals').style.display = '';
     Rapports.render();
     Reports.init();
