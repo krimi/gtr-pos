@@ -183,6 +183,9 @@
   .add-reg-row input{flex:1; padding:3px 6px; border:1px solid var(--border); border-radius:4px; font-size:11px; height:28px;}
   .add-reg-row select{padding:3px 6px; border:1px solid var(--border); border-radius:4px; font-size:11px; height:28px;}
   .add-reg-row .btn{flex:0 0 auto; padding:4px 10px; font-size:11px; margin:0; height:28px; width:auto;}
+  /* زر خروج إضافي */
+  .logout-fixed{position:fixed; bottom:80px; right:10px; z-index:100; background:var(--danger); color:#fff; border:none; border-radius:50%; width:48px; height:48px; font-size:20px; box-shadow:0 4px 12px rgba(214,69,80,.4); cursor:pointer; display:none;}
+  .logout-fixed.show{display:block;}
 </style>
 </head>
 <body>
@@ -505,6 +508,9 @@
   <div class="invoice-doc paper-80" id="invoiceDoc"></div>
 </div>
 
+<!-- زر خروج طوارئ (يظهر دائماً) -->
+<button class="logout-fixed show" onclick="emergencyLogout()" title="خروج طارئ">🚪</button>
+
 <script>
 // ===== FIREBASE =====
 const firebaseConfig = {
@@ -548,7 +554,7 @@ let caisseFournisseurs = [];
 let caisseExpenses = [];
 let expenses = [];
 let stockMovements = [];
-let nextId = { clients: 1, articles: 1, fournisseurs: 1, ventes: 1, achats: 1, caisseClients: 1, caisseFournisseurs: 1, caisseExpenses: 1, expenses: 1, stockMovements: 1 };
+let nextId = { clients: 1, articles: 1, fournisseurs: 1, ventes: 1, achats: 1, caisseClients: 1, caisseFournisseurs: 1, caisseExpenses: 1, expenses: 1, stockMovements: 1, reglements: 1 };
 let companyInfo = { name: 'GTR POS', address: '', phone1: '', taxId: '', logo: '' };
 let toastTimer;
 
@@ -572,7 +578,7 @@ function loadState() {
 function loadStateFromFirestore(uid) {
   if (storageMode !== 'cloud') return Promise.resolve();
   return db.collection('users').doc(uid).get().then(doc => {
-    if (doc.exists) { const d = doc.data(); clients = d.clients || []; articles = d.articles || []; fournisseurs = d.fournisseurs || []; ventes = d.ventes || []; achats = d.achats || []; caisseClients = d.caisseClients || []; caisseFournisseurs = d.caisseFournisseurs || []; caisseExpenses = d.caisseExpenses || []; expenses = d.expenses || []; stockMovements = d.stockMovements || []; nextId = d.nextId || { clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisseClients:1, caisseFournisseurs:1, caisseExpenses:1, expenses:1, stockMovements:1 }; companyInfo = d.companyInfo || { name:'GTR POS', address:'', phone1:'', taxId:'', logo:'' }; saveState(); showToast('✅ تم تحميل البيانات من السحابة'); }
+    if (doc.exists) { const d = doc.data(); clients = d.clients || []; articles = d.articles || []; fournisseurs = d.fournisseurs || []; ventes = d.ventes || []; achats = d.achats || []; caisseClients = d.caisseClients || []; caisseFournisseurs = d.caisseFournisseurs || []; caisseExpenses = d.caisseExpenses || []; expenses = d.expenses || []; stockMovements = d.stockMovements || []; nextId = d.nextId || { clients:1, articles:1, fournisseurs:1, ventes:1, achats:1, caisseClients:1, caisseFournisseurs:1, caisseExpenses:1, expenses:1, stockMovements:1, reglements:1 }; companyInfo = d.companyInfo || { name:'GTR POS', address:'', phone1:'', taxId:'', logo:'' }; saveState(); showToast('✅ تم تحميل البيانات من السحابة'); }
     else { loadState(); const data = { clients, articles, fournisseurs, ventes, achats, caisseClients, caisseFournisseurs, caisseExpenses, expenses, stockMovements, nextId, companyInfo }; db.collection('users').doc(uid).set(data).catch(e => console.error(e)); }
   }).catch(e => { console.error('Firestore load error:', e); showToast('⚠️ تعذر الاتصال بالسحابة، جارٍ استخدام البيانات المحلية'); loadState(); });
 }
@@ -583,6 +589,16 @@ function doLogin() { const e = $('loginEmail').value.trim(), p = $('loginPasswor
 function doSignup() { const e = $('loginEmail').value.trim(), p = $('loginPassword').value; if (!e || !p) { $('loginError').textContent = 'أدخل البريد وكلمة السر'; return; } $('loginError').textContent = ''; $('loginLoading').style.display = 'block'; auth.createUserWithEmailAndPassword(e, p).catch(err => { $('loginError').textContent = err.message; }).finally(() => { $('loginLoading').style.display = 'none'; }); }
 function doGoogleLogin() { const provider = new firebase.auth.GoogleAuthProvider(); $('loginError').textContent = ''; $('loginLoading').style.display = 'block'; auth.signInWithPopup(provider).catch(err => { $('loginError').textContent = err.message; }).finally(() => { $('loginLoading').style.display = 'none'; }); }
 function doLogout() { auth.signOut(); closeSheet(); }
+
+// دالة طوارئ للخروج (تعمل مباشرة)
+function emergencyLogout() {
+  auth.signOut();
+  // إخفاء شاشات التحميل
+  document.querySelectorAll('.login-overlay').forEach(el => el.classList.add('hide'));
+  document.getElementById('loginOverlay').classList.remove('hide');
+  // إظهار زر الخروج الطارئ (بالفعل مرئي)
+  showToast('تم تسجيل الخروج');
+}
 
 // ===== UI =====
 function openSheet(name) { $('overlay').classList.add('show'); const s = $('sheet-' + name); if (s) s.classList.add('show'); if (name === 'company') CompanyInfo.load(); }
@@ -941,12 +957,11 @@ const CaisseClients = {
         if (vente) {
           if (!vente.reglements) vente.reglements = [];
           vente.reglements.push({
-            id: nextId.reglements || 1,
+            id: nextId.reglements++,
             date: date,
             amount: amount,
             method: regType
           });
-          nextId.reglements = (nextId.reglements || 1) + 1;
         }
       }
       showToast('تم تسجيل التسديد');
@@ -1360,7 +1375,7 @@ const Ventes = {
     const method = $('vRegType').value;
     const date = new Date().toISOString().slice(0, 10);
     if (!rec.reglements) rec.reglements = [];
-    rec.reglements.push({ id: (nextId.reglements || 1)++, date, amount, method });
+    rec.reglements.push({ id: nextId.reglements++, date, amount, method });
     // تحديث رصيد العميل
     const client = clients.find(c => c.name === rec.client);
     if (client) {
@@ -1394,12 +1409,10 @@ const Ventes = {
     if (!rec || !rec.reglements) return;
     const removed = rec.reglements.splice(idx, 1)[0];
     if (removed) {
-      // عكس التأثير على رصيد العميل
       const client = clients.find(c => c.name === rec.client);
       if (client) {
         client.balance += removed.amount;
       }
-      // حذف من كاسة العملاء
       caisseClients = caisseClients.filter(cr => !(cr.invoiceId === rec.id && cr.amount === removed.amount && cr.date === removed.date));
       saveState();
       this.renderReglements();
@@ -1418,7 +1431,6 @@ const Ventes = {
     if (!rec) return;
     const client = clients.find(c => c.name === rec.client);
     const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0);
-    // بناء نص الفاتورة
     let text = `${companyInfo.name}\n${companyInfo.address}\n${companyInfo.phone1}\n`;
     text += `----------------\nفاتورة بيع: ${rec.num}\nالتاريخ: ${rec.date}\nالعميل: ${rec.client}\n`;
     text += `----------------\n`;
@@ -1427,28 +1439,21 @@ const Ventes = {
     });
     text += `----------------\nالمجموع: ${rec.total.toFixed(3)}\nالمدفوع: ${paid.toFixed(3)}\nالمتبقي: ${(rec.total - paid).toFixed(3)}\n`;
     text += `شكراً لكم\n`;
-    // الاتصال بالطابعة عبر Bluetooth
     if (!navigator.bluetooth) { showToast('متصفحك لا يدعم Bluetooth'); return; }
     navigator.bluetooth.requestDevice({
       filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }],
       optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
-    }).then(device => {
-      return device.gatt.connect();
-    }).then(server => {
-      return server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
-    }).then(service => {
-      return service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
-    }).then(characteristic => {
-      // إرسال النص
-      const encoder = new TextEncoder();
-      const data = encoder.encode(text);
-      return characteristic.writeValue(data);
-    }).then(() => {
-      showToast('✅ تم الإرسال إلى الطابعة');
-    }).catch(err => {
-      console.error(err);
-      showToast('❌ فشل الاتصال بالطابعة: ' + err.message);
-    });
+    }).then(device => device.gatt.connect())
+      .then(server => server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb'))
+      .then(service => service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb'))
+      .then(characteristic => {
+        const encoder = new TextEncoder();
+        characteristic.writeValue(encoder.encode(text));
+        showToast('✅ تم الإرسال إلى الطابعة');
+      }).catch(err => {
+        console.error(err);
+        showToast('❌ فشل الاتصال بالطابعة: ' + err.message);
+      });
   },
   remove() { if (this.editingId == null) { showToast('اختر عملية بيع لحذفها'); return; } const rec = ventes.find(v => v.id === this.editingId); if (rec) { const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); if (client) client.balance -= rec.total - paid; removeStock('vente', rec.id); } ventes = ventes.filter(v => v.id !== this.editingId); saveState(); Clients.render(); this.render(); closeSheet(); showToast('تم الحذف'); },
   load(id) { const r = ventes.find(v => v.id === id); if (!r) return; this.editingId = id; $('vNum').value = r.num; $('vDate').value = r.date; const opt = [...$('vClient').options].find(o => o.textContent === r.client); if (opt) $('vClient').value = opt.value; this.fillClient(); this.lines = [...r.lines]; this.renderLines(); this.refreshArticleOptions(); this.renderAccountSummary(r); this.renderReglements(); openSheet('ventes'); },
@@ -1498,13 +1503,11 @@ const Achats = {
     const method = $('pRegType').value;
     const date = new Date().toISOString().slice(0, 10);
     if (!rec.reglements) rec.reglements = [];
-    rec.reglements.push({ id: (nextId.reglements || 1)++, date, amount, method });
-    // تحديث رصيد المورد
+    rec.reglements.push({ id: nextId.reglements++, date, amount, method });
     const supplier = fournisseurs.find(f => f.name === rec.supplier);
     if (supplier) {
       supplier.balance -= amount;
     }
-    // إضافة إلى كاسة الموردين
     const cRec = { 
       id: nextId.caisseFournisseurs++, 
       date, 
@@ -1615,27 +1618,37 @@ function refreshArticleSelects() { const opts = '<option value="">-- اختر --
 function initAll() {
   try {
     if (!currentUser) return;
+    console.log('initAll started for user:', currentUser.email);
+    
     refreshClientSelect();
     refreshSupplierSelect();
     refreshArticleSelects();
-    Clients.render();
-    Articles.render();
-    Fournisseurs.render();
-    Ventes.render();
-    Achats.render();
-    CaisseClients.render();
-    CaisseFournisseurs.render();
-    CaisseExpenses.render();
-    Expenses.render();
-    if (currentUser.email === 'krimi.neji@gmail.com') $('tabApprovals').style.display = '';
-    Rapports.render();
-    Reports.init();
-    $('loginOverlay').classList.add('hide');
-    $('pendingOverlay').classList.add('hide');
+    
+    try { Clients.render(); } catch(e) { console.error('Clients.render error:', e); }
+    try { Articles.render(); } catch(e) { console.error('Articles.render error:', e); }
+    try { Fournisseurs.render(); } catch(e) { console.error('Fournisseurs.render error:', e); }
+    try { Ventes.render(); } catch(e) { console.error('Ventes.render error:', e); }
+    try { Achats.render(); } catch(e) { console.error('Achats.render error:', e); }
+    try { CaisseClients.render(); } catch(e) { console.error('CaisseClients.render error:', e); }
+    try { CaisseFournisseurs.render(); } catch(e) { console.error('CaisseFournisseurs.render error:', e); }
+    try { CaisseExpenses.render(); } catch(e) { console.error('CaisseExpenses.render error:', e); }
+    try { Expenses.render(); } catch(e) { console.error('Expenses.render error:', e); }
+    
+    if (currentUser.email === 'krimi.neji@gmail.com') {
+      document.getElementById('tabApprovals').style.display = '';
+    }
+    
+    try { Rapports.render(); } catch(e) { console.error('Rapports.render error:', e); }
+    try { Reports.init(); } catch(e) { console.error('Reports.init error:', e); }
+    
+    document.getElementById('loginOverlay').classList.add('hide');
+    document.getElementById('pendingOverlay').classList.add('hide');
+    
     showToast('✅ وضع التخزين: ' + (storageMode === 'cloud' ? 'السحابة' : 'المحلي'));
+    console.log('initAll completed successfully');
   } catch(e) {
-    console.error('Init error:', e);
-    showToast('حدث خطأ بسيط، لكن التطبيق يعمل');
+    console.error('Fatal initAll error:', e);
+    showToast('⚠️ حدث خطأ في التهيئة: ' + e.message);
   }
 }
 
