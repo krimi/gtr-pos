@@ -12,6 +12,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
+  /* نفس الـ CSS السابق مع إضافة تحسينات بسيطة */
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0;}
   html,body{height:100%; font-family:'Cairo',sans-serif; background:#0e142e;}
   :root{
@@ -232,7 +233,7 @@
 <!-- Phone -->
 <div class="phone">
   <div class="appbar">
-    <div><div class="title" id="pageTitle">لوحة القيادة</div><div class="sub" onclick="openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">v0.4.3 (MAJ 5)</span></div></div>
+    <div><div class="title" id="pageTitle">لوحة القيادة</div><div class="sub" onclick="openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">v0.4.3 (MAJ 7)</span></div></div>
     <div style="display:flex; gap:6px;"><button class="menu-btn" onclick="openSheet('company')">⚙️</button><button class="menu-btn" id="langBtn" style="font-size:12px;">FR</button></div>
   </div>
   <div class="content">
@@ -529,7 +530,7 @@
     <div style="font-size:10px;color:var(--muted);margin-top:6px;">💡 لتثبيت التطبيق: ⋮ في المتصفح ← إضافة إلى الشاشة الرئيسية</div>
     <div class="section-title">الحساب</div>
     <div id="accountEmailDisplay" style="font-size:12px;color:var(--muted);margin-bottom:4px;"></div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">الإصدار: v0.4.3 (MAJ 5)</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">الإصدار: v0.4.3 (MAJ 7)</div>
     <button class="btn del" onclick="doLogout()">🚪 تسجيل الخروج</button>
   </div></div>
   <div class="toast" id="toast"></div>
@@ -547,7 +548,7 @@
 
 <script>
 // ===== VERSION =====
-const APP_VERSION = 5;
+const APP_VERSION = 7; // زيادة رقم الإصدار
 const APP_VERSION_STRING = 'v0.4.3 (MAJ ' + APP_VERSION + ')';
 
 // ===== FIREBASE =====
@@ -1364,7 +1365,7 @@ const Expenses = {
   }
 };
 
-// ===== VENTES =====
+// ===== VENTES (المعدل بالكامل) =====
 const Ventes = {
   editingId: null, lines: [], reglements: [], originalClientBalance: 0,
   reset() { 
@@ -1500,12 +1501,12 @@ const Ventes = {
   updateAccountSummary() {
     const clientName = $('vClient').options[$('vClient').selectedIndex]?.textContent || '';
     const client = clients.find(c => c.name === clientName);
+    const prevBalance = client ? this.originalClientBalance : 0;
     const total = this.lines.reduce((a, l) => a + l.total, 0);
     const paid = this.reglements.reduce((a, r) => a + r.amount, 0);
+    const currentBalance = prevBalance + total - paid;
     const b = $('vAccountSummary');
     if (!b) return;
-    const prevBalance = client ? this.originalClientBalance : 0;
-    const currentBalance = prevBalance + total - paid;
     b.innerHTML = `
       <div class="item"><span class="label">الرصيد السابق</span><span class="value">${prevBalance.toFixed(3)}</span></div>
       <div class="item"><span class="label">مبلغ الفاتورة</span><span class="value">${total.toFixed(3)}</span></div>
@@ -1534,17 +1535,14 @@ const Ventes = {
     });
     this.updateAccountSummary();
   },
+  // ===== التعديل الأساسي: addReglement لم يعد يغير الرصيد =====
   addReglement() {
     const amount = parseFloat($('vRegAmount').value) || 0;
     if (amount <= 0) { showToast('أدخل مبلغاً صحيحاً'); return; }
     const method = $('vRegType').value;
     const date = new Date().toISOString().slice(0, 10);
     this.reglements.push({ id: nextId.reglements++, date, amount, method });
-    const clientName = $('vClient').options[$('vClient').selectedIndex]?.textContent || '';
-    const client = clients.find(c => c.name === clientName);
-    if (client) {
-      client.balance -= amount;
-    }
+    // لا نغير رصيد العميل هنا
     this.renderReglements();
     $('vRegAmount').value = '';
     showToast('تم إضافة التسديد المؤقت');
@@ -1552,15 +1550,12 @@ const Ventes = {
   deleteReglement(idx) {
     const removed = this.reglements.splice(idx, 1)[0];
     if (removed) {
-      const clientName = $('vClient').options[$('vClient').selectedIndex]?.textContent || '';
-      const client = clients.find(c => c.name === clientName);
-      if (client) {
-        client.balance += removed.amount;
-      }
+      // لا نعيد المبلغ إلى الرصيد (لأنه لم يُخصم)
       this.renderReglements();
       showToast('تم حذف التسديد');
     }
   },
+  // ===== save المعدل بشكل صحيح =====
   save() {
     if (!$('vClient').value) { showToast('اختر العميل'); return; }
     if (this.lines.length === 0) { showToast('أضف صنفا'); return; }
@@ -1568,35 +1563,72 @@ const Ventes = {
     const total = this.lines.reduce((a, l) => a + l.total, 0);
     const client = clients.find(c => c.name === clientName);
     if (!client) { showToast('العميل غير موجود'); return; }
+    const paid = this.reglements.reduce((a, r) => a + r.amount, 0);
     const newId = this.editingId || nextId.ventes++;
     const prevBalance = this.originalClientBalance;
-    const rec = { id: newId, num: $('vNum').value, date: $('vDate').value, client: clientName, lines: [...this.lines], total: total, reglements: [...this.reglements], prevBalance: prevBalance };
+    const rec = { 
+      id: newId, 
+      num: $('vNum').value, 
+      date: $('vDate').value, 
+      client: clientName, 
+      lines: [...this.lines], 
+      total: total, 
+      reglements: [...this.reglements], 
+      prevBalance: prevBalance 
+    };
+
+    // ===== تحديث رصيد العميل =====
     if (this.editingId) {
       const old = ventes.find(v => v.id === this.editingId);
       if (old) {
-        const oldClient = clients.find(c => c.name === old.client);
-        if (oldClient && oldClient.name !== clientName) {
-          oldClient.balance -= old.total;
-        }
+        const oldTotal = old.total;
+        const oldPaid = (old.reglements || []).reduce((a, r) => a + r.amount, 0);
+        // الفرق في المبلغ المتبقي على العميل
+        const diff = (total - paid) - (oldTotal - oldPaid);
+        client.balance += diff;
         removeStock('vente', rec.id);
         this.lines.forEach(l => addStock(l.name, l.qty, 'out', 'vente', rec.id, rec.date, 'بيع ' + rec.num));
       }
+    } else {
+      // فاتورة جديدة: نضيف total - paid إلى الرصيد
+      client.balance += (total - paid);
+      this.lines.forEach(l => addStock(l.name, l.qty, 'out', 'vente', rec.id, rec.date, 'بيع ' + rec.num));
+    }
+
+    if (this.editingId) {
       const idx = ventes.findIndex(v => v.id === this.editingId);
       if (idx !== -1) ventes[idx] = rec;
     } else {
-      this.lines.forEach(l => addStock(l.name, l.qty, 'out', 'vente', rec.id, rec.date, 'بيع ' + rec.num));
       ventes.push(rec);
     }
+
     saveState();
     refreshArticleSelects();
     Clients.render();
     this.render();
     this.editingId = rec.id;
+    // تحديث الرصيد السابق المخزن للرجوع إليه في الطباعة
+    this.originalClientBalance = client.balance;
     this.updateAccountSummary();
     showToast('تم حفظ الفاتورة');
   },
   edit() { if (this.editingId == null) { showToast('اختر عملية بيع لتعديلها'); return; } this.save(); },
-  remove() { if (this.editingId == null) { showToast('اختر عملية بيع لحذفها'); return; } const rec = ventes.find(v => v.id === this.editingId); if (rec) { const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); if (client) client.balance -= rec.total - paid; removeStock('vente', rec.id); } ventes = ventes.filter(v => v.id !== this.editingId); saveState(); Clients.render(); this.render(); closeSheet(); showToast('تم الحذف'); },
+  remove() { 
+    if (this.editingId == null) { showToast('اختر عملية بيع لحذفها'); return; } 
+    const rec = ventes.find(v => v.id === this.editingId); 
+    if (rec) { 
+      const client = clients.find(c => c.name === rec.client); 
+      const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); 
+      if (client) client.balance -= (rec.total - paid); 
+      removeStock('vente', rec.id); 
+    } 
+    ventes = ventes.filter(v => v.id !== this.editingId); 
+    saveState(); 
+    Clients.render(); 
+    this.render(); 
+    closeSheet(); 
+    showToast('تم الحذف'); 
+  },
   load(id) { 
     const r = ventes.find(v => v.id === id); 
     if (!r) return; 
@@ -1606,7 +1638,7 @@ const Ventes = {
     const opt = [...$('vClient').options].find(o => o.textContent === r.client); 
     if (opt) $('vClient').value = opt.value; 
     const c = clients.find(x => x.name === r.client);
-    this.originalClientBalance = (r.prevBalance !== undefined) ? r.prevBalance : (c ? c.balance : 0);
+    this.originalClientBalance = (r.prevBalance !== undefined) ? r.prevBalance : (c ? c.balance - (r.total - (r.reglements || []).reduce((a, rr) => a + rr.amount, 0)) : 0);
     $('vPhone').value = c ? c.phone : ''; 
     this.lines = [...r.lines]; 
     this.reglements = r.reglements ? [...r.reglements] : []; 
@@ -1654,7 +1686,7 @@ const Ventes = {
     const client = clients.find(c => c.name === rec.client); 
     const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); 
     const prevBalance = (rec.prevBalance !== undefined) ? rec.prevBalance : (client ? client.balance - (rec.total - paid) : 0);
-    const currentBalance = (client) ? client.balance : (rec.total - paid);
+    const currentBalance = prevBalance + rec.total - paid;
     _invoiceData = { 
       title: 'فاتورة بيع', 
       payment: '', 
@@ -1705,7 +1737,7 @@ const Ventes = {
   }
 };
 
-// ===== ACHATS =====
+// ===== ACHATS (معدل بالمثل) =====
 const Achats = {
   editingId: null, lines: [], reglements: [], originalSupplierBalance: 0,
   reset() { 
@@ -1835,12 +1867,12 @@ const Achats = {
   updateAccountSummary() {
     const supplierName = $('pSupplier').options[$('pSupplier').selectedIndex]?.textContent || '';
     const supplier = fournisseurs.find(f => f.name === supplierName);
+    const prevBalance = supplier ? this.originalSupplierBalance : 0;
     const total = this.lines.reduce((a, l) => a + l.total, 0);
     const paid = this.reglements.reduce((a, r) => a + r.amount, 0);
+    const currentBalance = prevBalance + total - paid;
     const b = $('pAccountSummary');
     if (!b) return;
-    const prevBalance = supplier ? this.originalSupplierBalance : 0;
-    const currentBalance = prevBalance + total - paid;
     b.innerHTML = `
       <div class="item"><span class="label">الرصيد السابق</span><span class="value">${prevBalance.toFixed(3)}</span></div>
       <div class="item"><span class="label">مبلغ الفاتورة</span><span class="value">${total.toFixed(3)}</span></div>
@@ -1875,11 +1907,7 @@ const Achats = {
     const method = $('pRegType').value;
     const date = new Date().toISOString().slice(0, 10);
     this.reglements.push({ id: nextId.reglements++, date, amount, method });
-    const supplierName = $('pSupplier').options[$('pSupplier').selectedIndex]?.textContent || '';
-    const supplier = fournisseurs.find(f => f.name === supplierName);
-    if (supplier) {
-      supplier.balance -= amount;
-    }
+    // لا نغير رصيد المورد هنا
     this.renderReglements();
     $('pRegAmount').value = '';
     showToast('تم إضافة التسديد المؤقت');
@@ -1887,11 +1915,6 @@ const Achats = {
   deleteReglement(idx) {
     const removed = this.reglements.splice(idx, 1)[0];
     if (removed) {
-      const supplierName = $('pSupplier').options[$('pSupplier').selectedIndex]?.textContent || '';
-      const supplier = fournisseurs.find(f => f.name === supplierName);
-      if (supplier) {
-        supplier.balance += removed.amount;
-      }
       this.renderReglements();
       showToast('تم حذف التسديد');
     }
@@ -1903,35 +1926,68 @@ const Achats = {
     const total = this.lines.reduce((a, l) => a + l.total, 0);
     const supplier = fournisseurs.find(f => f.name === supplierName);
     if (!supplier) { showToast('المورد غير موجود'); return; }
+    const paid = this.reglements.reduce((a, r) => a + r.amount, 0);
     const newId = this.editingId || nextId.achats++;
     const prevBalance = this.originalSupplierBalance;
-    const rec = { id: newId, num: $('pNum').value, date: $('pDate').value, supplier: supplierName, lines: [...this.lines], total: total, reglements: [...this.reglements], prevBalance: prevBalance };
+    const rec = { 
+      id: newId, 
+      num: $('pNum').value, 
+      date: $('pDate').value, 
+      supplier: supplierName, 
+      lines: [...this.lines], 
+      total: total, 
+      reglements: [...this.reglements], 
+      prevBalance: prevBalance 
+    };
+
     if (this.editingId) {
       const old = achats.find(p => p.id === this.editingId);
       if (old) {
-        const oldSup = fournisseurs.find(f => f.name === old.supplier);
-        if (oldSup && oldSup.name !== supplierName) {
-          oldSup.balance -= old.total;
-        }
+        const oldTotal = old.total;
+        const oldPaid = (old.reglements || []).reduce((a, r) => a + r.amount, 0);
+        const diff = (total - paid) - (oldTotal - oldPaid);
+        supplier.balance += diff;
         removeStock('achat', rec.id);
         this.lines.forEach(l => addStock(l.name, l.qty, 'in', 'achat', rec.id, rec.date, 'شراء ' + rec.num));
       }
+    } else {
+      supplier.balance += (total - paid);
+      this.lines.forEach(l => addStock(l.name, l.qty, 'in', 'achat', rec.id, rec.date, 'شراء ' + rec.num));
+    }
+
+    if (this.editingId) {
       const idx = achats.findIndex(p => p.id === this.editingId);
       if (idx !== -1) achats[idx] = rec;
     } else {
-      this.lines.forEach(l => addStock(l.name, l.qty, 'in', 'achat', rec.id, rec.date, 'شراء ' + rec.num));
       achats.push(rec);
     }
+
     saveState();
     refreshArticleSelects();
     Fournisseurs.render();
     this.render();
     this.editingId = rec.id;
+    this.originalSupplierBalance = supplier.balance;
     this.updateAccountSummary();
     showToast('تم حفظ الفاتورة');
   },
   edit() { if (this.editingId == null) { showToast('اختر عملية شراء لتعديلها'); return; } this.save(); },
-  remove() { if (this.editingId == null) { showToast('اختر عملية شراء لحذفها'); return; } const rec = achats.find(p => p.id === this.editingId); if (rec) { const supplier = fournisseurs.find(f => f.name === rec.supplier); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); if (supplier) supplier.balance -= rec.total - paid; removeStock('achat', rec.id); } achats = achats.filter(p => p.id !== this.editingId); saveState(); Fournisseurs.render(); this.render(); closeSheet(); showToast('تم الحذف'); },
+  remove() { 
+    if (this.editingId == null) { showToast('اختر عملية شراء لحذفها'); return; } 
+    const rec = achats.find(p => p.id === this.editingId); 
+    if (rec) { 
+      const supplier = fournisseurs.find(f => f.name === rec.supplier); 
+      const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); 
+      if (supplier) supplier.balance -= (rec.total - paid); 
+      removeStock('achat', rec.id); 
+    } 
+    achats = achats.filter(p => p.id !== this.editingId); 
+    saveState(); 
+    Fournisseurs.render(); 
+    this.render(); 
+    closeSheet(); 
+    showToast('تم الحذف'); 
+  },
   load(id) { 
     const r = achats.find(p => p.id === id); 
     if (!r) return; 
@@ -1941,7 +1997,7 @@ const Achats = {
     const opt = [...$('pSupplier').options].find(o => o.textContent === r.supplier); 
     if (opt) $('pSupplier').value = opt.value; 
     const s = fournisseurs.find(f => f.name === r.supplier);
-    this.originalSupplierBalance = (r.prevBalance !== undefined) ? r.prevBalance : (s ? s.balance : 0);
+    this.originalSupplierBalance = (r.prevBalance !== undefined) ? r.prevBalance : (s ? s.balance - (r.total - (r.reglements || []).reduce((a, rr) => a + rr.amount, 0)) : 0);
     $('pPhone').value = s ? s.phone : ''; 
     $('pAddress').value = s ? s.address : ''; 
     this.lines = [...r.lines]; 
@@ -1990,7 +2046,7 @@ const Achats = {
     const supplier = fournisseurs.find(f => f.name === rec.supplier); 
     const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); 
     const prevBalance = (rec.prevBalance !== undefined) ? rec.prevBalance : (supplier ? supplier.balance - (rec.total - paid) : 0);
-    const currentBalance = (supplier) ? supplier.balance : (rec.total - paid);
+    const currentBalance = prevBalance + rec.total - paid;
     _invoiceData = { 
       title: 'فاتورة شراء', 
       payment: '', 
