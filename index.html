@@ -659,7 +659,7 @@
     border-bottom:1px solid var(--border);
     font-size:9px;
   }
-  .history-item .h-date{color:var(--muted); width:60px; flex-shrink:0; font-size:8px;}
+  .history-item .h-date{color:var(--muted); width:75px; flex-shrink:0; font-size:8px;}
   .history-item .h-desc{flex:1; margin:0 2px; font-weight:600; font-size:9px;}
   .history-item .h-debit{color:var(--danger); font-weight:700; width:55px; text-align:left; flex-shrink:0; font-size:9px;}
   .history-item .h-credit{color:var(--success); font-weight:700; width:55px; text-align:left; flex-shrink:0; font-size:9px;}
@@ -977,7 +977,7 @@ function $(id) { return document.getElementById(id); }
 function showToast(msg) { const t = $('toast'); if (!t) return; t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 3000); }
 
 // ===== PERSISTENCE =====
-const STORAGE_KEY = 'gtrpos_data_v15';
+const STORAGE_KEY = 'gtrpos_data_v16';
 function saveState() {
   try { const data = { clients, fournisseurs, articles, ventes, caisseClients, nextId, companyInfo }; localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
   if (storageMode === 'cloud' && currentUser) {
@@ -1275,8 +1275,6 @@ const ClientHistory = {
         const debitDisplay = h.debit > 0 ? h.debit.toFixed(3) : '-';
         const creditDisplay = h.credit > 0 ? h.credit.toFixed(3) : '-';
         const icon = h.type === 'فاتورة' ? '📄' : '💰';
-        // عرض فقط إذا كان المبلغ أكبر من 0 أو كان الفاتورة
-        if (h.type === 'تسديد' && h.credit <= 0) return;
         html += `<div class="history-item">
           <span class="h-date">${h.date}</span>
           <span class="h-desc">${icon} ${h.desc}</span>
