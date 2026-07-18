@@ -393,7 +393,6 @@
   }
   .storage-selector .btn.active{background:var(--blue-accent); color:#fff; border-color:var(--blue-accent);}
   
-  /* ===== حسابات المستخدمين ===== */
   .account-item{
     background:var(--panel);
     border:1px solid var(--border);
@@ -441,7 +440,6 @@
   .account-stats .stat .num{font-size:16px; font-weight:800; color:var(--navy);}
   .account-stats .stat .label{font-size:8px; color:var(--muted);}
   
-  /* ===== فاتورة البيع ===== */
   .invoice-summary-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -650,6 +648,44 @@
   .inv-summary td.label{text-align:right; width:40%;}
   .inv-summary tr.highlight td{background:#fbdcc9;}
   .inv-summary tr.total td.value{color:#c0392b; font-weight:800;}
+
+  /* ===== سجل العميل ===== */
+  .history-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:4px 8px;
+    background:var(--panel);
+    border-bottom:1px solid var(--border);
+    font-size:10px;
+  }
+  .history-item .h-date{color:var(--muted); width:80px; flex-shrink:0;}
+  .history-item .h-desc{flex:1; margin:0 4px; font-weight:600;}
+  .history-item .h-debit{color:var(--danger); font-weight:700; width:70px; text-align:left; flex-shrink:0;}
+  .history-item .h-credit{color:var(--success); font-weight:700; width:70px; text-align:left; flex-shrink:0;}
+  .history-item .h-balance{font-weight:800; color:var(--navy); width:70px; text-align:left; flex-shrink:0;}
+  .history-header{
+    display:flex;
+    justify-content:space-between;
+    background:var(--navy);
+    color:#fff;
+    padding:3px 8px;
+    font-size:9px;
+    font-weight:700;
+    border-radius:3px 3px 0 0;
+  }
+  .history-header span{width:70px; text-align:left; flex-shrink:0;}
+  .history-header .h-desc{flex:1; text-align:center;}
+  .client-balance-big{
+    font-size:16px;
+    font-weight:800;
+    padding:8px;
+    text-align:center;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:6px;
+    margin-bottom:8px;
+  }
 </style>
 </head>
 <body>
@@ -723,6 +759,12 @@
       <div id="clientsList"></div>
     </div>
     
+    <!-- Client History -->
+    <div class="section" id="sec-client-history">
+      <div class="section-title">📜 سجل العميل (Relevé Client)</div>
+      <div id="clientHistoryContent"></div>
+    </div>
+    
     <!-- Fournisseurs -->
     <div class="section" id="sec-fournisseurs">
       <input class="search-box" id="fSearch" placeholder="🔍 بحث بالاسم أو الهاتف..." oninput="Fournisseurs.render()">
@@ -758,6 +800,7 @@
   <div class="tabbar">
     <div class="tab-item active" data-section="dashboard"><span class="ic">📊</span><span>الرئيسية</span></div>
     <div class="tab-item" data-section="clients"><span class="ic">👥</span><span>العملاء</span></div>
+    <div class="tab-item" data-section="client-history"><span class="ic">📜</span><span>سجل العميل</span></div>
     <div class="tab-item" data-section="fournisseurs"><span class="ic">🤝</span><span>الموردين</span></div>
     <div class="tab-item" data-section="articles"><span class="ic">📦</span><span>الأصناف</span></div>
     <div class="tab-item" data-section="ventes"><span class="ic">📈</span><span>المبيعات</span></div>
@@ -926,12 +969,13 @@ let nextId = { clients: 1, fournisseurs: 1, articles: 1, ventes: 1, caisseClient
 let companyInfo = { name: 'GTR POS', address: '', phone1: '', taxId: '' };
 let toastTimer;
 let _invoiceData = null;
+let isSaving = false;
 
 function $(id) { return document.getElementById(id); }
 function showToast(msg) { const t = $('toast'); if (!t) return; t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 3000); }
 
 // ===== PERSISTENCE =====
-const STORAGE_KEY = 'gtrpos_data_v5';
+const STORAGE_KEY = 'gtrpos_data_v14';
 function saveState() {
   try { const data = { clients, fournisseurs, articles, ventes, caisseClients, nextId, companyInfo }; localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
   if (storageMode === 'cloud' && currentUser) {
@@ -980,6 +1024,7 @@ document.querySelectorAll('.tab-item').forEach(tab => {
     showSection(sectionId);
     if (sectionId === 'dashboard') { Dashboard.render(); }
     if (sectionId === 'clients') { Clients.render(); }
+    if (sectionId === 'client-history') { ClientHistory.render(); }
     if (sectionId === 'fournisseurs') { Fournisseurs.render(); }
     if (sectionId === 'articles') { Articles.render(); }
     if (sectionId === 'ventes') { Ventes.render(); }
@@ -1045,7 +1090,6 @@ const Dashboard = {
       $('kpiPending').textContent = '-';
     }
     
-    // آخر العملاء
     const listClients = $('recentClients');
     listClients.innerHTML = '';
     const recentC = clients.slice().reverse().slice(0, 5);
@@ -1059,7 +1103,6 @@ const Dashboard = {
         listClients.appendChild(d);
       });
     }
-    // آخر الموردين
     const listFour = $('recentFournisseurs');
     listFour.innerHTML = '';
     const recentF = fournisseurs.slice().reverse().slice(0, 5);
@@ -1073,7 +1116,6 @@ const Dashboard = {
         listFour.appendChild(d);
       });
     }
-    // آخر الأصناف
     const listArt = $('recentArticles');
     listArt.innerHTML = '';
     const recentA = articles.slice().reverse().slice(0, 5);
@@ -1108,6 +1150,149 @@ const Clients = {
   render() { const q = $('cSearch').value.trim().toLowerCase(); const list = $('clientsList'); list.innerHTML = ''; const filtered = clients.filter(c => !q || c.name.toLowerCase().includes(q) || (c.phone || '').includes(q)); if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا يوجد عملاء</div>'; return; } filtered.forEach(c => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => { Clients.load(c.id); openSheet('clients'); }; d.innerHTML = `<div class="main-info"><div class="name">${c.name}</div><div class="meta">${c.phone || ''}</div></div><div class="amount">${c.balance ? c.balance.toFixed(3) : '0.000'} د.ت</div>`; list.appendChild(d); }); }
 };
 
+// =====================================================
+// ===== CLIENT HISTORY (Relevé Client - مُصحح) =====
+// =====================================================
+const ClientHistory = {
+  render() {
+    const container = $('clientHistoryContent');
+    if (!container) return;
+    let html = `<div class="field"><label>اختر العميل</label><select id="historyClientSelect" onchange="ClientHistory.show()">`;
+    html += `<option value="">-- اختر --</option>`;
+    clients.forEach(c => { html += `<option value="${c.id}">${c.name}</option>`; });
+    html += `</select></div>`;
+    html += `<div id="clientHistoryResult"></div>`;
+    container.innerHTML = html;
+  },
+  
+  show() {
+    const select = $('historyClientSelect');
+    const result = $('clientHistoryResult');
+    if (!select || !result) return;
+    const clientId = parseInt(select.value);
+    if (!clientId) { result.innerHTML = '<div class="empty-msg">اختر عميلاً لعرض سجله</div>'; return; }
+    const client = clients.find(c => c.id === clientId);
+    if (!client) { result.innerHTML = '<div class="empty-msg">العميل غير موجود</div>'; return; }
+    
+    // 1. جمع الفواتير والتسديدات الخاصة بالعميل
+    const clientVentes = ventes.filter(v => v.client === client.name);
+    const clientReglements = caisseClients.filter(r => r.clientName === client.name);
+    
+    // 2. بناء قائمة الحركات مرتبة حسب التاريخ، مع ربط التسديدات بالفواتير
+    let history = [];
+    
+    // فرز الفواتير حسب التاريخ
+    const sortedVentes = clientVentes.sort((a, b) => a.date < b.date ? -1 : 1);
+    
+    // لكل فاتورة نضيف سطر الفاتورة ثم سطور التسديدات المرتبطة بها
+    sortedVentes.forEach(v => {
+      // سطر الفاتورة (مدين)
+      history.push({
+        date: v.date,
+        type: 'فاتورة',
+        desc: v.num,
+        debit: v.total,
+        credit: 0
+      });
+      
+      // التسديدات المرتبطة بهذه الفاتورة (دائن)
+      const invoicePayments = clientReglements.filter(r => r.invoiceNum === v.num);
+      invoicePayments.forEach(p => {
+        history.push({
+          date: p.date,
+          type: 'تسديد',
+          desc: p.description || 'تسديد',
+          debit: 0,
+          credit: p.amount
+        });
+      });
+    });
+    
+    // التسديدات غير المرتبطة بفاتورة محددة (يتيمة)
+    const linkedInvoiceNums = clientVentes.map(v => v.num);
+    const orphanPayments = clientReglements.filter(r => !linkedInvoiceNums.includes(r.invoiceNum));
+    orphanPayments.forEach(p => {
+      history.push({
+        date: p.date,
+        type: 'تسديد',
+        desc: p.description || 'تسديد',
+        debit: 0,
+        credit: p.amount
+      });
+    });
+    
+    // 3. ترتيب الحركات حسب التاريخ (في نفس اليوم: فاتورة قبل تسديد)
+    history.sort((a, b) => {
+      if (a.date < b.date) return -1;
+      if (a.date > b.date) return 1;
+      if (a.type === 'فاتورة' && b.type === 'تسديد') return -1;
+      if (a.type === 'تسديد' && b.type === 'فاتورة') return 1;
+      return 0;
+    });
+    
+    // 4. حساب الرصيد الافتتاحي
+    const totalDebit = history.reduce((sum, h) => sum + h.debit, 0);
+    const totalCredit = history.reduce((sum, h) => sum + h.credit, 0);
+    const openingBalance = client.balance - (totalDebit - totalCredit);
+    
+    // 5. عرض السجل
+    let cumulative = 0;
+    let html = `<div class="client-balance-big">
+      العميل: <strong>${client.name}</strong> | الرصيد الحالي: 
+      <span style="color:${client.balance >= 0 ? 'var(--danger)' : 'var(--success)'};">
+        ${client.balance.toFixed(3)} د.ت
+      </span>
+    </div>`;
+    
+    html += `<div class="history-header">
+      <span class="h-date">التاريخ</span>
+      <span class="h-desc">البيان</span>
+      <span class="h-debit">مدين</span>
+      <span class="h-credit">دائن</span>
+      <span class="h-balance">الرصيد</span>
+    </div>`;
+    
+    // الرصيد الافتتاحي
+    if (Math.abs(openingBalance) > 0.0001) {
+      html += `<div class="history-item">
+        <span class="h-date">---</span>
+        <span class="h-desc">الرصيد الافتتاحي</span>
+        <span class="h-debit">${openingBalance.toFixed(3)}</span>
+        <span class="h-credit">-</span>
+        <span class="h-balance" style="color:var(--danger);">${openingBalance.toFixed(3)}</span>
+      </div>`;
+      cumulative = openingBalance;
+    }
+    
+    if (history.length === 0 && Math.abs(openingBalance) <= 0.0001) {
+      html += '<div class="empty-msg">لا توجد حركات لهذا العميل</div>';
+    } else {
+      history.forEach(h => {
+        cumulative += h.debit - h.credit;
+        const color = cumulative >= 0 ? 'var(--danger)' : 'var(--success)';
+        const debitDisplay = h.debit > 0 ? h.debit.toFixed(3) : '-';
+        const creditDisplay = h.credit > 0 ? h.credit.toFixed(3) : '-';
+        const icon = h.type === 'فاتورة' ? '📄' : '💰';
+        html += `<div class="history-item">
+          <span class="h-date">${h.date}</span>
+          <span class="h-desc">${icon} ${h.desc}</span>
+          <span class="h-debit">${debitDisplay}</span>
+          <span class="h-credit">${creditDisplay}</span>
+          <span class="h-balance" style="color:${color};">${cumulative.toFixed(3)}</span>
+        </div>`;
+      });
+      
+      // التحقق من صحة الرصيد النهائي
+      if (Math.abs(cumulative - client.balance) > 0.001) {
+        html += `<div style="color:var(--danger);font-size:9px;padding:4px;text-align:center;background:#ffe0e0;border-radius:3px;">
+          ⚠️ ملاحظة: الرصيد المحسوب (${cumulative.toFixed(3)}) يختلف عن رصيد العميل (${client.balance.toFixed(3)})
+        </div>`;
+      }
+    }
+    result.innerHTML = html;
+  }
+};
+
 // ===== FOURNISSEURS =====
 const Fournisseurs = {
   editingId: null,
@@ -1131,7 +1316,7 @@ const Articles = {
 };
 
 // =====================================================
-// ===== VENTES (فاتورة البيع مع التسديد) =====
+// ===== VENTES =====
 // =====================================================
 const Ventes = {
   editingId: null,
@@ -1216,13 +1401,6 @@ const Ventes = {
     const qty = parseFloat($('viQty').value) || 0;
     if (!name || price <= 0 || qty <= 0) { showToast('أدخل بيانات صحيحة'); return; }
     
-    // التحقق من المخزون
-    const article = articles.find(a => a.name === name);
-    if (article && (article.stock || 0) < qty) {
-      showToast('⚠️ المخزون غير كافي! المتوفر: ' + (article.stock || 0));
-      return;
-    }
-    
     const existing = this.lines.find(l => l.name === name);
     if (existing) {
       existing.qty += qty;
@@ -1232,7 +1410,7 @@ const Ventes = {
       this.lines.push({ name, price, qty, total: price * qty });
     }
     
-    // تحديث المخزون مؤقتاً
+    const article = articles.find(a => a.name === name);
     if (article) {
       article.stock = (article.stock || 0) - qty;
     }
@@ -1249,7 +1427,6 @@ const Ventes = {
 
   removeLine(idx) {
     const line = this.lines[idx];
-    // إرجاع المخزون
     const article = articles.find(a => a.name === line.name);
     if (article) {
       article.stock = (article.stock || 0) + line.qty;
@@ -1318,14 +1495,9 @@ const Ventes = {
       method
     });
     
-    // تحديث رصيد العميل فوراً
     const clientName = $('vClient').options[$('vClient').selectedIndex]?.textContent || '';
     const client = clients.find(c => c.name === clientName);
-    if (client) {
-      client.balance -= amount;
-    }
     
-    // تسجيل في سجل التسديدات
     const cRec = {
       id: nextId.caisseClients++,
       date,
@@ -1352,9 +1524,7 @@ const Ventes = {
     if (removed) {
       const clientName = $('vClient').options[$('vClient').selectedIndex]?.textContent || '';
       const client = clients.find(c => c.name === clientName);
-      if (client) {
-        client.balance += removed.amount;
-      }
+      
       caisseClients = caisseClients.filter(cr =>
         !(cr.invoiceId === this.editingId &&
           cr.amount === removed.amount &&
@@ -1368,8 +1538,12 @@ const Ventes = {
   },
 
   save() {
+    if (isSaving) {
+      showToast('⏳ جاري الحفظ... انتظر');
+      return;
+    }
+    
     if (!$('vClient').value) { showToast('⚠️ اختر العميل'); return; }
-    if (this.lines.length === 0) { showToast('⚠️ أضف صنفاً'); return; }
     
     const clientName = $('vClient').options[$('vClient').selectedIndex].textContent;
     const total = this.lines.reduce((a, l) => a + l.total, 0);
@@ -1393,19 +1567,44 @@ const Ventes = {
       clientAddress: client.address || ''
     };
 
-    if (this.editingId) {
-      const idx = ventes.findIndex(v => v.id === this.editingId);
-      if (idx !== -1) ventes[idx] = rec;
-    } else {
-      ventes.push(rec);
-    }
+    isSaving = true;
+    
+    try {
+      const newBalance = prevBalance + total - paid;
+      
+      if (this.editingId) {
+        const old = ventes.find(v => v.id === this.editingId);
+        if (old) {
+          const diff = newBalance - client.balance;
+          client.balance += diff;
+        }
+      } else {
+        client.balance = newBalance;
+      }
 
-    saveState();
-    this.render();
-    this.editingId = rec.id;
-    this.originalClientBalance = client.balance;
-    this.updateAccountSummary();
-    showToast('✅ تم حفظ الفاتورة');
+      if (this.editingId) {
+        const idx = ventes.findIndex(v => v.id === this.editingId);
+        if (idx !== -1) {
+          ventes[idx] = rec;
+        } else {
+          ventes.push(rec);
+        }
+      } else {
+        ventes.push(rec);
+      }
+
+      saveState();
+      this.render();
+      this.editingId = rec.id;
+      this.originalClientBalance = client.balance;
+      this.updateAccountSummary();
+      showToast('✅ تم حفظ الفاتورة');
+    } catch (e) {
+      showToast('❌ حدث خطأ أثناء الحفظ');
+      console.error(e);
+    } finally {
+      isSaving = false;
+    }
   },
 
   edit() { if (this.editingId == null) { showToast('اختر فاتورة لتعديلها'); return; } this.save(); },
@@ -1419,7 +1618,6 @@ const Ventes = {
       if (client) {
         client.balance -= (rec.total - paid);
       }
-      // إرجاع المخزون
       rec.lines.forEach(l => {
         const article = articles.find(a => a.name === l.name);
         if (article) {
@@ -1512,7 +1710,7 @@ const Ventes = {
       partyAddr: rec.clientAddress || (client ? client.address : ''),
       partyPhone: client ? client.phone : '',
       partyTaxId: rec.clientTaxId || (client ? client.taxId : ''),
-      lines: rec.lines,
+      lines: rec.lines || [],
       total: rec.total,
       paid: paid,
       prevBalance: prevBalance,
@@ -1651,26 +1849,11 @@ const Accounts = {
           const date = data.requestedAt ? data.requestedAt.slice(0, 10) : '';
           if (data.approved === true) {
             ac++;
-            div.innerHTML = `
-              <span class="email">${email}</span>
-              <span class="date">${date}</span>
-              <span class="status approved">✅ موافق عليه</span>
-              <div class="actions">
-                <button class="btn del small" onclick="Accounts.setApproved('${uid}', false)">إلغاء</button>
-              </div>
-            `;
+            div.innerHTML = `<span class="email">${email}</span><span class="date">${date}</span><span class="status approved">✅ موافق عليه</span><div class="actions"><button class="btn del small" onclick="Accounts.setApproved('${uid}', false)">إلغاء</button></div>`;
             approved.appendChild(div);
           } else {
             pc++;
-            div.innerHTML = `
-              <span class="email">${email}</span>
-              <span class="date">${date}</span>
-              <span class="status pending">⏳ بانتظار</span>
-              <div class="actions">
-                <button class="btn save small" onclick="Accounts.setApproved('${uid}', true)">موافقة</button>
-                <button class="btn del small" onclick="Accounts.setApproved('${uid}', false)">رفض</button>
-              </div>
-            `;
+            div.innerHTML = `<span class="email">${email}</span><span class="date">${date}</span><span class="status pending">⏳ بانتظار</span><div class="actions"><button class="btn save small" onclick="Accounts.setApproved('${uid}', true)">موافقة</button><button class="btn del small" onclick="Accounts.setApproved('${uid}', false)">رفض</button></div>`;
             pending.appendChild(div);
           }
         });
@@ -1681,8 +1864,7 @@ const Accounts = {
         $('statPending').textContent = pc;
         $('kpiUsers').textContent = snap.size;
         $('kpiPending').textContent = pc;
-      })
-      .catch(() => {});
+      }).catch(() => {});
   },
   setApproved(uid, val) {
     db.collection('approvals').doc(uid).update({ approved: val })
@@ -1786,6 +1968,7 @@ function initAll() {
     Ventes.refreshArticleOptions();
     Dashboard.render();
     Clients.render();
+    ClientHistory.render();
     Fournisseurs.render();
     Articles.render();
     Ventes.render();
