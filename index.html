@@ -12,682 +12,717 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
-  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0;}
-  html,body{height:100%; font-family:'Cairo',sans-serif; background:#0e142e; font-size:14px;}
-  
-  :root{
-    --navy:#1e2f66; --navy-mid:#2b3f8c; --blue-accent:#3b5bdb; --blue-light:#5c7cf0;
-    --bg:#eef0f6; --panel:#fff; --border:#dde1ec; --text:#1b1f2e; --muted:#7a8194;
-    --danger:#d64550; --success:#2e9e6e; --gold:#e0a72e;
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    margin: 0;
+    padding: 0;
   }
-  
-  .phone{
-    width:100%; 
-    height:100dvh; 
-    background:var(--bg); 
-    display:flex; 
-    flex-direction:column; 
-    position:relative; 
-    overflow:hidden;
-    max-width:100%;
-    margin:0 auto;
+  html, body {
+    height: 100%;
+    font-family: 'Cairo', sans-serif;
+    background: #0e142e;
+    font-size: 14px;
+    overflow: hidden;
   }
-  
-  @media(min-width:768px){
-    .phone{
-      max-width:600px; 
-      height:95dvh; 
-      margin:20px auto; 
-      border-radius:36px;
-      box-shadow:0 10px 40px rgba(0,0,0,0.3);
+
+  :root {
+    --navy: #1e2f66;
+    --navy-mid: #2b3f8c;
+    --blue-accent: #3b5bdb;
+    --blue-light: #5c7cf0;
+    --bg: #eef0f6;
+    --panel: #fff;
+    --border: #dde1ec;
+    --text: #1b1f2e;
+    --muted: #7a8194;
+    --danger: #d64550;
+    --success: #2e9e6e;
+    --gold: #e0a72e;
+  }
+
+  .phone {
+    width: 100%;
+    height: 100dvh;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 768px) {
+    .phone {
+      max-width: 420px;
+      height: 95dvh;
+      margin: 20px auto;
+      border-radius: 36px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     }
   }
-  
-  .appbar{
-    background:var(--navy); 
-    color:#fff; 
-    padding:10px 12px; 
-    display:flex; 
-    align-items:center; 
-    justify-content:space-between; 
-    flex-shrink:0;
-    min-height:50px;
-    z-index:5;
-  }
-  .appbar .title{font-size:16px; font-weight:800;}
-  .appbar .sub{font-size:10px; color:#b9c2e6; cursor:pointer;}
-  .appbar .menu-btn{
-    width:32px;height:32px;
-    border-radius:50%;
-    background:rgba(255,255,255,.15);
-    border:none;
-    color:#fff;
-    font-size:15px;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-  
-  .content{
-    flex:1; 
-    overflow-y:auto; 
-    padding:8px 8px 60px; 
-    -webkit-overflow-scrolling:touch;
-    position:relative;
-  }
-  
-  .section{
-    display:none !important;
-    animation:fadeIn .2s;
-  }
-  .section.active{
-    display:block !important;
-  }
-  
-  @keyframes fadeIn{
-    from{opacity:0;transform:translateY(6px);}
-    to{opacity:1;transform:translateY(0);}
-  }
-  
-  .kpi-row{
-    display:grid; 
-    grid-template-columns:1fr 1fr 1fr; 
-    gap:6px; 
-    margin-bottom:8px;
-  }
-  .kpi-card{
-    background:var(--panel); 
-    border:1px solid var(--border); 
-    border-radius:8px; 
-    padding:8px; 
-    text-align:center; 
-    border-top:3px solid var(--blue-accent);
-  }
-  .kpi-card .val{font-size:16px; font-weight:800; color:var(--navy);}
-  .kpi-card .lbl{font-size:9px; color:var(--muted); margin-top:1px; font-weight:600;}
-  
-  .section-title{font-size:12px; font-weight:800; color:var(--navy); margin:6px 0 4px;}
-  
-  .row-card{
-    background:var(--panel); 
-    border:1px solid var(--border); 
-    border-radius:6px; 
-    padding:6px 8px; 
-    margin-bottom:4px; 
-    display:flex; 
-    justify-content:space-between; 
-    align-items:center; 
-    cursor:pointer;
-    transition: background 0.2s;
-  }
-  .row-card:hover{background:var(--border);}
-  .row-card .name{font-size:12px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .row-card .meta{font-size:10px; color:var(--muted);}
-  .row-card .amount{font-size:12px; font-weight:800; flex-shrink:0;}
-  
-  .empty-msg{text-align:center; color:var(--muted); font-size:11px; padding:12px 0;}
-  
-  .search-box{
-    width:100%; 
-    padding:5px 8px; 
-    border:1px solid var(--border); 
-    border-radius:6px; 
-    font-family:'Cairo',sans-serif; 
-    font-size:12px; 
-    margin-bottom:6px; 
-    background:#fff;
-    height:30px;
-  }
-  
-  .sheet-overlay{
-    position:absolute; 
-    inset:0; 
-    background:rgba(0,0,0,.4); 
-    display:none; 
-    z-index:20;
-  }
-  .sheet-overlay.show{display:block;}
-  
-  .sheet{
-    position:absolute; 
-    left:0; 
-    right:0; 
-    bottom:0; 
-    max-height:92%; 
-    background:#fff; 
-    border-radius:12px 12px 0 0; 
-    z-index:21; 
-    transform:translateY(100%); 
-    transition:transform .25s; 
-    display:flex; 
-    flex-direction:column;
-  }
-  .sheet.show{transform:translateY(0);}
-  .sheet-handle{width:32px; height:3px; background:#ccc; border-radius:2px; margin:6px auto 3px;}
-  .sheet-header{
-    display:flex; 
-    justify-content:space-between; 
-    align-items:center; 
-    padding:4px 12px 6px; 
-    border-bottom:1px solid var(--border); 
-    flex-shrink:0;
-  }
-  .sheet-header h3{font-size:14px; font-weight:800; color:var(--navy); margin:0;}
-  .sheet-close{
-    width:26px;height:26px;
-    border-radius:50%;
-    background:#f0f2f8;
-    border:none;
-    font-size:13px;
-    cursor:pointer;
-  }
-  .sheet-body{padding:8px 12px; overflow-y:auto; flex:1;}
-  .sheet-footer{
-    padding:8px 12px 12px;
-    background:#fff;
-    border-top:1px solid var(--border);
-    display:flex;
-    gap:6px;
-    flex-shrink:0;
-    position:sticky;
-    bottom:0;
-    z-index:5;
-    box-shadow:0 -2px 8px rgba(0,0,0,0.05);
-  }
-  .sheet-footer .btn{
-    flex:1;
-    margin:0;
-    padding:8px 4px;
-    font-size:12px;
-    border-radius:6px;
-  }
-  
-  .field{margin-bottom:5px;}
-  .field label{display:block; font-size:9px; font-weight:700; color:var(--text); margin-bottom:1px;}
-  .field input, .field select{
-    width:100%; 
-    padding:3px 6px; 
-    border:1px solid var(--border); 
-    border-radius:5px; 
-    font-family:'Cairo',sans-serif; 
-    font-size:12px; 
-    background:#f9fafc; 
-    height:26px;
-  }
-  .field input:focus, .field select:focus{outline:none; border-color:var(--blue-accent);}
-  
-  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:5px;}
-  .field-row .field input{height:26px; font-size:12px; padding:2px 5px;}
-  .field-row-3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:3px;}
-  .field-row-3 .field input{height:22px; font-size:11px; padding:2px 3px;}
-  
-  .btn{
-    width:100%; 
-    padding:7px; 
-    border:none; 
-    border-radius:6px; 
-    font-family:'Cairo',sans-serif; 
-    font-size:12px; 
-    font-weight:700; 
-    color:#fff; 
-    cursor:pointer; 
-    margin-bottom:4px; 
-    background:linear-gradient(180deg,var(--blue-light),var(--blue-accent));
-  }
-  .btn.small{padding:2px 6px; font-size:10px; margin-bottom:2px;}
-  .btn.save{background:linear-gradient(180deg,#4dbf8c,var(--success));}
-  .btn.edit{background:linear-gradient(180deg,#e0b84e,var(--gold));}
-  .btn.del{background:linear-gradient(180deg,#e46b74,var(--danger));}
-  .btn.outline{background:#fff; color:var(--navy); border:1.5px solid var(--navy);}
-  
-  .fab{
-    position:absolute; 
-    bottom:62px; 
-    left:10px; 
-    width:44px; 
-    height:44px; 
-    border-radius:50%; 
-    background:linear-gradient(180deg,var(--blue-light),var(--blue-accent)); 
-    color:#fff; 
-    font-size:22px; 
-    border:none; 
-    box-shadow:0 4px 12px rgba(59,91,219,.4); 
-    z-index:15; 
-    cursor:pointer; 
-    display:flex; 
-    align-items:center; 
-    justify-content:center;
-  }
-  
-  .tabbar{
-    position:absolute; 
-    bottom:0; 
-    left:0; 
-    right:0; 
-    background:#fff; 
-    border-top:1px solid var(--border); 
-    display:flex; 
-    overflow-x:auto; 
-    padding:2px 0; 
-    z-index:10;
-    min-height:50px;
-  }
-  .tab-item{
-    flex:0 0 auto; 
-    min-width:44px; 
-    display:flex; 
-    flex-direction:column; 
-    align-items:center; 
-    padding:2px 4px; 
-    color:var(--muted); 
-    font-size:8px; 
-    font-weight:700; 
-    cursor:pointer;
-    transition:color 0.2s;
-  }
-  .tab-item .ic{font-size:15px;}
-  .tab-item.active{color:var(--blue-accent);}
-  
-  .toast{
-    position:absolute; 
-    top:60px; 
-    left:50%; 
-    transform:translateX(-50%) translateY(-10px); 
-    background:var(--navy); 
-    color:#fff; 
-    padding:5px 14px; 
-    border-radius:12px; 
-    font-size:11px; 
-    font-weight:700; 
-    opacity:0; 
-    pointer-events:none; 
-    transition:.25s; 
-    z-index:250; 
-    white-space:nowrap; 
-    max-width:90%;
-  }
-  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
-  
-  .login-overlay{
-    position:fixed; 
-    inset:0; 
-    background:linear-gradient(160deg,#3a4a63,#8a97a8); 
-    z-index:300; 
-    display:flex; 
-    align-items:center; 
-    justify-content:center; 
-    padding:16px;
-  }
-  .login-overlay.hide{display:none;}
-  .login-box{
-    background:#fff; 
-    border-radius:14px; 
-    padding:24px 16px; 
-    width:100%; 
-    max-width:340px; 
-    box-shadow:0 20px 60px rgba(0,0,0,.4); 
-    text-align:center;
-  }
-  .login-logo{font-size:20px; font-weight:800; color:var(--navy);}
-  .login-sub{font-size:11px; color:var(--muted); margin-bottom:12px;}
-  .login-box input{
-    width:100%; 
-    padding:7px 10px; 
-    border:1px solid var(--border); 
-    border-radius:6px; 
-    font-size:12px; 
-    margin-bottom:6px; 
-    background:#f9fafc;
-  }
-  .login-box input:focus{outline:none; border-color:var(--blue-accent);}
-  .login-btn{
-    width:100%; 
-    padding:8px; 
-    border:none; 
-    border-radius:6px; 
-    font-size:12px; 
-    font-weight:700; 
-    cursor:pointer; 
-    margin-bottom:4px; 
-    background:linear-gradient(180deg,var(--blue-light),var(--blue-accent)); 
-    color:#fff;
-  }
-  .login-btn.secondary{background:#fff; color:var(--navy); border:1.5px solid var(--navy);}
-  .login-btn.google{
-    background:#fff; 
-    color:#333; 
-    border:1.5px solid var(--border); 
-    display:flex; 
-    align-items:center; 
-    justify-content:center; 
-    gap:4px;
-  }
-  .login-divider{
-    display:flex; 
-    align-items:center; 
-    gap:6px; 
-    color:var(--muted); 
-    font-size:10px; 
-    margin:8px 0;
-  }
-  .login-divider::before,.login-divider::after{content:''; flex:1; height:1px; background:var(--border);}
-  .login-error{color:var(--danger); font-size:10px; min-height:14px;}
-  .login-toggle{font-size:11px; color:var(--blue-accent); cursor:pointer; font-weight:700; margin-top:3px;}
-  .login-loading{font-size:11px; color:var(--muted); margin-top:4px;}
-  
-  .storage-selector{
-    display:flex; 
-    gap:6px; 
-    margin:8px 0; 
-    justify-content:center;
-  }
-  .storage-selector .btn{
-    flex:1; 
-    padding:5px; 
-    font-size:11px; 
-    margin:0; 
-    background:#eee; 
-    color:#333; 
-    border:1px solid var(--border);
-  }
-  .storage-selector .btn.active{background:var(--blue-accent); color:#fff; border-color:var(--blue-accent);}
-  
-  .account-item{
-    background:var(--panel);
-    border:1px solid var(--border);
-    border-radius:6px;
-    padding:6px 8px;
-    margin-bottom:4px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:4px;
-  }
-  .account-item .email{font-size:11px; font-weight:600; flex:1;}
-  .account-item .status{font-size:9px; padding:2px 8px; border-radius:8px; color:#fff; white-space:nowrap;}
-  .account-item .status.approved{background:var(--success);}
-  .account-item .status.pending{background:var(--gold);}
-  .account-item .date{font-size:9px; color:var(--muted);}
-  .account-item .actions{display:flex; gap:4px;}
-  .account-item .actions .btn{width:auto; padding:2px 8px; font-size:9px; margin:0; border-radius:4px;}
-  
-  .badge{
-    padding:2px 6px;
-    border-radius:8px;
-    font-size:9px;
-    font-weight:700;
-    color:#fff;
-  }
-  .badge.low{background:var(--danger);}
-  .badge.medium{background:var(--gold);}
-  .badge.high{background:var(--success);}
-  
-  .account-stats{
-    display:grid;
-    grid-template-columns:1fr 1fr 1fr;
-    gap:6px;
-    margin-bottom:8px;
-  }
-  .account-stats .stat{
-    background:var(--panel);
-    border:1px solid var(--border);
-    border-radius:6px;
-    padding:6px;
-    text-align:center;
-  }
-  .account-stats .stat .num{font-size:16px; font-weight:800; color:var(--navy);}
-  .account-stats .stat .label{font-size:8px; color:var(--muted);}
-  
-  .invoice-summary-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:2px;
-    margin:3px 0 5px;
-    background:#f8f9fc;
-    padding:4px 6px;
-    border-radius:5px;
-  }
-  .invoice-summary-grid .item{
-    display:flex;
-    justify-content:space-between;
-    font-size:9px;
-    font-weight:600;
-    padding:2px 0;
-    border-bottom:1px dashed #e0e0e0;
-  }
-  .invoice-summary-grid .item .label{color:var(--muted);}
-  .invoice-summary-grid .item .value{font-weight:700; color:var(--navy);}
-  .invoice-summary-grid .item.total .value{color:var(--danger); font-size:11px;}
-  
-  table.items-mini{
-    width:100%;
-    border-collapse:collapse;
-    font-size:9px;
-    margin-bottom:4px;
-  }
-  table.items-mini th{
-    background:var(--navy);
-    color:#fff;
-    padding:2px 3px;
-    font-weight:700;
-    font-size:9px;
-  }
-  table.items-mini td{
-    padding:2px 3px;
-    border-top:1px solid var(--border);
-    text-align:center;
-    background:#fafbfd;
-    font-size:9px;
-  }
-  
-  .reg-item{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    background:#f5f7fc;
-    padding:3px 6px;
-    border-radius:3px;
-    margin-bottom:2px;
-    font-size:10px;
-  }
-  .reg-item .reg-date{color:var(--muted);}
-  .reg-item .reg-amount{font-weight:700; color:var(--danger);}
-  .reg-item .reg-del{cursor:pointer; color:var(--danger); font-weight:700; margin-right:4px;}
-  
-  .add-reg-row{
-    display:flex;
-    gap:4px;
-    align-items:center;
-    margin-top:3px;
-  }
-  .add-reg-row input{
-    flex:1;
-    padding:2px 5px;
-    border:1px solid var(--border);
-    border-radius:3px;
-    font-size:10px;
-    height:24px;
-  }
-  .add-reg-row select{
-    padding:2px 5px;
-    border:1px solid var(--border);
-    border-radius:3px;
-    font-size:10px;
-    height:24px;
-  }
-  .add-reg-row .btn{
-    flex:0 0 auto;
-    padding:2px 8px;
-    font-size:10px;
-    margin:0;
-    height:24px;
-    width:auto;
-  }
-  
-  .totals-mini{
-    display:flex;
-    justify-content:flex-end;
-    font-size:11px;
-    font-weight:700;
-    color:var(--navy);
-    margin:3px 0 5px;
-  }
-  
-  .del-row{
-    background:var(--danger);
-    color:#fff;
-    border:none;
-    border-radius:3px;
-    padding:1px 5px;
-    font-size:8px;
-    cursor:pointer;
-  }
-  .edit-row{
-    background:var(--gold);
-    color:#fff;
-    border:none;
-    border-radius:3px;
-    padding:1px 5px;
-    font-size:8px;
-    cursor:pointer;
-    margin-left:3px;
-  }
-  
-  .print-overlay{
-    position:fixed;
-    inset:0;
-    background:#525659;
-    z-index:200;
-    display:none;
-    overflow-y:auto;
-    padding:10px;
-  }
-  .print-overlay.show{display:block;}
-  .print-actions{
-    position:sticky;
-    top:0;
-    display:flex;
-    flex-wrap:wrap;
-    align-items:center;
-    gap:4px;
-    margin-bottom:8px;
-    z-index:2;
-    background:#525659;
-    padding:4px 0;
-  }
-  .print-actions button{
-    flex:1;
-    padding:6px;
-    border:none;
-    border-radius:5px;
-    font-weight:700;
-    font-size:11px;
-    cursor:pointer;
-  }
-  .print-actions .btn-close{background:#fff; color:#333;}
-  .print-actions .btn-print{background:#25d366; color:#fff;}
-  .print-actions .paper-selector{
-    display:flex;
-    align-items:center;
-    gap:3px;
-    color:#fff;
-    font-size:11px;
-    background:rgba(255,255,255,.12);
-    padding:3px 8px;
-    border-radius:5px;
-  }
-  .print-actions .paper-selector select{
-    padding:2px 5px;
-    border-radius:3px;
-    border:none;
-    font-family:'Cairo',sans-serif;
-    font-size:11px;
-  }
-  .invoice-doc{
-    background:#fff;
-    color:#111;
-    border-radius:5px;
-    padding:10px;
-    font-family:'Cairo',sans-serif;
-    direction:rtl;
-    margin:0 auto;
-    font-size:10px;
-    transition:.2s;
-  }
-  .invoice-doc.paper-80{max-width:80mm; font-size:8px; padding:6px;}
-  .invoice-doc.paper-56{max-width:56mm; font-size:6px; padding:4px;}
-  .invoice-doc.paper-a4{max-width:650px; font-size:10px; padding:10px;}
-  .inv-top{display:flex; justify-content:space-between; font-size:9px;}
-  .inv-datetime{direction:ltr; text-align:left;}
-  .inv-company{color:#1a4fd6; font-weight:700; text-align:right;}
-  .inv-title{text-align:center; font-size:13px; font-weight:800; margin:3px 0;}
-  .inv-meta{font-size:10px; line-height:1.5; margin:3px 0;}
-  .inv-partybar{
-    display:grid;
-    grid-template-columns:1fr 1fr 1fr;
-    border:1px solid #999;
-    font-size:8px;
-    margin-bottom:3px;
-  }
-  .inv-partybar > div{padding:2px 3px; border-left:1px solid #999; text-align:center;}
-  .inv-partybar > div:last-child{border-left:none;}
-  .inv-partybar .label{font-size:6px; color:#666;}
-  table.inv-items{width:100%; border-collapse:collapse; font-size:9px;}
-  table.inv-items th{background:#e8e8e8; border:1px solid #999; padding:2px;}
-  table.inv-items td{border:1px solid #999; padding:2px 3px; text-align:center;}
-  .inv-totalrow td{background:#d9ede2; font-weight:700;}
-  .inv-summary{
-    width:100%;
-    border-collapse:collapse;
-    font-size:10px;
-    margin-top:0;
-  }
-  .inv-summary td{border:1px solid #999; padding:2px 4px;}
-  .inv-summary td.label{text-align:right; width:40%;}
-  .inv-summary tr.highlight td{background:#fbdcc9;}
-  .inv-summary tr.total td.value{color:#c0392b; font-weight:800;}
 
-  /* ===== سجل العميل والمورد ===== */
-  .history-item{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:2px 4px;
-    background:var(--panel);
-    border-bottom:1px solid var(--border);
-    font-size:9px;
+  .appbar {
+    background: var(--navy);
+    color: #fff;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    min-height: 50px;
+    z-index: 5;
   }
-  .history-item .h-date{color:var(--muted); width:75px; flex-shrink:0; font-size:8px;}
-  .history-item .h-desc{flex:1; margin:0 2px; font-weight:600; font-size:9px;}
-  .history-item .h-debit{color:var(--danger); font-weight:700; width:55px; text-align:left; flex-shrink:0; font-size:9px;}
-  .history-item .h-credit{color:var(--success); font-weight:700; width:55px; text-align:left; flex-shrink:0; font-size:9px;}
-  .history-item .h-balance{font-weight:800; color:var(--navy); width:60px; text-align:left; flex-shrink:0; font-size:9px;}
-  
-  .history-header{
-    display:flex;
-    justify-content:space-between;
-    background:var(--navy);
-    color:#fff;
-    padding:2px 4px;
-    font-size:8px;
-    font-weight:700;
-    border-radius:3px 3px 0 0;
+  .appbar .title {
+    font-size: 16px;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
   }
-  .history-header span{width:60px; text-align:left; flex-shrink:0;}
-  .history-header .h-desc{flex:1; text-align:center;}
-  
-  .client-balance-big{
-    font-size:14px;
-    font-weight:800;
-    padding:6px;
-    text-align:center;
-    background:var(--panel);
-    border:1px solid var(--border);
-    border-radius:6px;
-    margin-bottom:6px;
+  .appbar .sub {
+    font-size: 10px;
+    color: #b9c2e6;
+    cursor: pointer;
+    white-space: nowrap;
   }
+  .appbar .menu-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .15);
+    border: none;
+    color: #fff;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 8px 60px;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+  }
+
+  .section {
+    display: none !important;
+    animation: fadeIn .2s;
+  }
+  .section.active {
+    display: block !important;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .kpi-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .kpi-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 6px 4px;
+    text-align: center;
+    border-top: 3px solid var(--blue-accent);
+    min-height: 54px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .kpi-card .val {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--navy);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .kpi-card .lbl {
+    font-size: 8px;
+    color: var(--muted);
+    margin-top: 1px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .section-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--navy);
+    margin: 6px 0 4px;
+  }
+
+  .row-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 6px;
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    min-height: 36px;
+  }
+  .row-card .name {
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 110px;
+  }
+  .row-card .meta {
+    font-size: 9px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .row-card .amount {
+    font-size: 11px;
+    font-weight: 800;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .badge {
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 8px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+  }
+  .badge.paid { background: var(--success); }
+  .badge.pending { background: var(--gold); }
+  .badge.low { background: var(--danger); }
+
+  .empty-msg {
+    text-align: center;
+    color: var(--muted);
+    font-size: 11px;
+    padding: 12px 0;
+  }
+
+  .search-box {
+    width: 100%;
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 11px;
+    margin-bottom: 6px;
+    background: #fff;
+    height: 28px;
+  }
+
+  .sheet-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, .4);
+    display: none;
+    z-index: 20;
+  }
+  .sheet-overlay.show { display: block; }
+
+  .sheet {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: 92%;
+    background: #fff;
+    border-radius: 12px 12px 0 0;
+    z-index: 21;
+    transform: translateY(100%);
+    transition: transform .25s;
+    display: flex;
+    flex-direction: column;
+  }
+  .sheet.show { transform: translateY(0); }
+  .sheet-handle { width: 32px; height: 3px; background: #ccc; border-radius: 2px; margin: 6px auto 3px; }
+  .sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 12px 6px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .sheet-header h3 { font-size: 14px; font-weight: 800; color: var(--navy); margin: 0; }
+  .sheet-close {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: #f0f2f8;
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .sheet-body { padding: 8px 12px; overflow-y: auto; flex: 1; }
+  .sheet-footer {
+    padding: 8px 12px 12px;
+    background: #fff;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
+  }
+  .sheet-footer .btn { flex: 1; margin: 0; padding: 8px 4px; font-size: 12px; border-radius: 6px; }
+
+  .field { margin-bottom: 4px; }
+  .field label { display: block; font-size: 9px; font-weight: 700; color: var(--text); margin-bottom: 1px; }
+  .field input, .field select {
+    width: 100%;
+    padding: 3px 6px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 11px;
+    background: #f9fafc;
+    height: 24px;
+  }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+  .field-row .field input { height: 24px; font-size: 11px; padding: 2px 5px; }
+  .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3px; }
+  .field-row-3 .field input { height: 22px; font-size: 10px; padding: 2px 3px; }
+
+  .btn {
+    width: 100%;
+    padding: 6px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    margin-bottom: 4px;
+    background: linear-gradient(180deg, var(--blue-light), var(--blue-accent));
+  }
+  .btn.small { padding: 2px 6px; font-size: 10px; margin-bottom: 2px; }
+  .btn.save { background: linear-gradient(180deg, #4dbf8c, var(--success)); }
+  .btn.edit { background: linear-gradient(180deg, #e0b84e, var(--gold)); }
+  .btn.del { background: linear-gradient(180deg, #e46b74, var(--danger)); }
+  .btn.outline { background: #fff; color: var(--navy); border: 1.5px solid var(--navy); }
+
+  .fab {
+    position: absolute;
+    bottom: 62px;
+    left: 10px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, var(--blue-light), var(--blue-accent));
+    color: #fff;
+    font-size: 22px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(59, 91, 219, .4);
+    z-index: 15;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tabbar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-top: 1px solid var(--border);
+    display: flex;
+    overflow-x: auto;
+    padding: 2px 0;
+    z-index: 10;
+    min-height: 48px;
+  }
+  .tab-item {
+    flex: 0 0 auto;
+    min-width: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2px 4px;
+    color: var(--muted);
+    font-size: 7px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .tab-item .ic { font-size: 14px; }
+  .tab-item.active { color: var(--blue-accent); }
+
+  .toast {
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px);
+    background: var(--navy);
+    color: #fff;
+    padding: 4px 14px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    opacity: 0;
+    pointer-events: none;
+    transition: .25s;
+    z-index: 250;
+    white-space: nowrap;
+    max-width: 90%;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Login Overlay */
+  .login-overlay {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(160deg, #3a4a63, #8a97a8);
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .login-overlay.hide { display: none; }
+  .login-box {
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px 16px;
+    width: 100%;
+    max-width: 340px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .4);
+    text-align: center;
+  }
+  .login-logo { font-size: 20px; font-weight: 800; color: var(--navy); }
+  .login-sub { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+  .login-box input {
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 12px;
+    margin-bottom: 6px;
+    background: #f9fafc;
+  }
+  .login-btn {
+    width: 100%;
+    padding: 8px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 4px;
+    background: linear-gradient(180deg, var(--blue-light), var(--blue-accent));
+    color: #fff;
+  }
+  .login-btn.secondary { background: #fff; color: var(--navy); border: 1.5px solid var(--navy); }
+  .login-btn.google {
+    background: #fff;
+    color: #333;
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .login-divider {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 10px;
+    margin: 8px 0;
+  }
+  .login-divider::before, .login-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .login-error { color: var(--danger); font-size: 10px; min-height: 14px; }
+  .login-toggle { font-size: 11px; color: var(--blue-accent); cursor: pointer; font-weight: 700; margin-top: 3px; }
+  .login-loading { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .storage-selector { display: flex; gap: 6px; margin: 8px 0; justify-content: center; }
+  .storage-selector .btn {
+    flex: 1;
+    padding: 5px;
+    font-size: 11px;
+    margin: 0;
+    background: #eee;
+    color: #333;
+    border: 1px solid var(--border);
+  }
+  .storage-selector .btn.active { background: var(--blue-accent); color: #fff; border-color: var(--blue-accent); }
+
+  /* History */
+  .history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 4px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    font-size: 8px;
+  }
+  .history-item .h-date { color: var(--muted); width: 60px; flex-shrink: 0; font-size: 7px; }
+  .history-item .h-desc { flex: 1; margin: 0 2px; font-weight: 600; font-size: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .history-item .h-debit { color: var(--danger); font-weight: 700; width: 50px; text-align: left; flex-shrink: 0; font-size: 8px; }
+  .history-item .h-credit { color: var(--success); font-weight: 700; width: 50px; text-align: left; flex-shrink: 0; font-size: 8px; }
+  .history-item .h-balance { font-weight: 800; color: var(--navy); width: 55px; text-align: left; flex-shrink: 0; font-size: 8px; }
+
+  .history-header {
+    display: flex;
+    justify-content: space-between;
+    background: var(--navy);
+    color: #fff;
+    padding: 2px 4px;
+    font-size: 7px;
+    font-weight: 700;
+    border-radius: 3px 3px 0 0;
+  }
+  .history-header span { width: 55px; text-align: left; flex-shrink: 0; }
+  .history-header .h-desc { flex: 1; text-align: center; }
+
+  .client-balance-big {
+    font-size: 13px;
+    font-weight: 800;
+    padding: 6px;
+    text-align: center;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .account-item {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 6px;
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2px;
+    font-size: 10px;
+  }
+  .account-item .email { font-weight: 600; flex: 1; }
+  .account-item .status { font-size: 8px; padding: 1px 6px; border-radius: 8px; color: #fff; white-space: nowrap; }
+  .account-item .status.approved { background: var(--success); }
+  .account-item .status.pending { background: var(--gold); }
+  .account-item .actions .btn { padding: 1px 6px; font-size: 8px; margin: 0; border-radius: 4px; width: auto; }
+
+  .account-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .account-stats .stat {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px;
+    text-align: center;
+  }
+  .account-stats .stat .num { font-size: 14px; font-weight: 800; color: var(--navy); }
+  .account-stats .stat .label { font-size: 7px; color: var(--muted); }
+
+  .invoice-summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin: 3px 0 5px;
+    background: #f8f9fc;
+    padding: 4px 6px;
+    border-radius: 5px;
+  }
+  .invoice-summary-grid .item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 8px;
+    font-weight: 600;
+    padding: 2px 0;
+    border-bottom: 1px dashed #e0e0e0;
+  }
+  .invoice-summary-grid .item .label { color: var(--muted); }
+  .invoice-summary-grid .item .value { font-weight: 700; color: var(--navy); }
+  .invoice-summary-grid .item.total .value { color: var(--danger); font-size: 10px; }
+
+  table.items-mini {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8px;
+    margin-bottom: 4px;
+  }
+  table.items-mini th {
+    background: var(--navy);
+    color: #fff;
+    padding: 2px 3px;
+    font-weight: 700;
+    font-size: 8px;
+  }
+  table.items-mini td {
+    padding: 2px 3px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    background: #fafbfd;
+    font-size: 8px;
+  }
+
+  .reg-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f5f7fc;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-bottom: 2px;
+    font-size: 9px;
+  }
+  .reg-item .reg-date { color: var(--muted); }
+  .reg-item .reg-amount { font-weight: 700; color: var(--danger); }
+  .reg-item .reg-del { cursor: pointer; color: var(--danger); font-weight: 700; margin-right: 4px; }
+
+  .add-reg-row {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    margin-top: 3px;
+  }
+  .add-reg-row input { flex: 1; padding: 2px 5px; border: 1px solid var(--border); border-radius: 3px; font-size: 9px; height: 22px; }
+  .add-reg-row select { padding: 2px 5px; border: 1px solid var(--border); border-radius: 3px; font-size: 9px; height: 22px; }
+  .add-reg-row .btn { flex: 0 0 auto; padding: 2px 8px; font-size: 9px; margin: 0; height: 22px; width: auto; }
+
+  .totals-mini {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 3px 0 5px;
+  }
+
+  .del-row {
+    background: var(--danger);
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-size: 7px;
+    cursor: pointer;
+  }
+  .edit-row {
+    background: var(--gold);
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-size: 7px;
+    cursor: pointer;
+    margin-left: 3px;
+  }
+
+  .print-overlay {
+    position: fixed;
+    inset: 0;
+    background: #525659;
+    z-index: 200;
+    display: none;
+    overflow-y: auto;
+    padding: 10px;
+  }
+  .print-overlay.show { display: block; }
+  .print-actions {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 8px;
+    z-index: 2;
+    background: #525659;
+    padding: 4px 0;
+  }
+  .print-actions button { flex: 1; padding: 6px; border: none; border-radius: 5px; font-weight: 700; font-size: 11px; cursor: pointer; }
+  .print-actions .btn-close { background: #fff; color: #333; }
+  .print-actions .btn-print { background: #25d366; color: #fff; }
+  .print-actions .paper-selector {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    color: #fff;
+    font-size: 11px;
+    background: rgba(255,255,255,.12);
+    padding: 3px 8px;
+    border-radius: 5px;
+  }
+  .print-actions .paper-selector select { padding: 2px 5px; border-radius: 3px; border: none; font-family: 'Cairo', sans-serif; font-size: 11px; }
+  .invoice-doc {
+    background: #fff;
+    color: #111;
+    border-radius: 5px;
+    padding: 10px;
+    font-family: 'Cairo', sans-serif;
+    direction: rtl;
+    margin: 0 auto;
+    font-size: 10px;
+  }
+  .invoice-doc.paper-80 { max-width: 80mm; font-size: 8px; padding: 6px; }
+  .invoice-doc.paper-56 { max-width: 56mm; font-size: 6px; padding: 4px; }
+  .invoice-doc.paper-a4 { max-width: 650px; font-size: 10px; padding: 10px; }
+  .inv-top { display: flex; justify-content: space-between; font-size: 9px; }
+  .inv-datetime { direction: ltr; text-align: left; }
+  .inv-company { color: #1a4fd6; font-weight: 700; text-align: right; }
+  .inv-title { text-align: center; font-size: 13px; font-weight: 800; margin: 3px 0; }
+  .inv-meta { font-size: 10px; line-height: 1.5; margin: 3px 0; }
+  .inv-partybar {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    border: 1px solid #999;
+    font-size: 8px;
+    margin-bottom: 3px;
+  }
+  .inv-partybar > div { padding: 2px 3px; border-left: 1px solid #999; text-align: center; }
+  .inv-partybar > div:last-child { border-left: none; }
+  .inv-partybar .label { font-size: 6px; color: #666; }
+  table.inv-items { width: 100%; border-collapse: collapse; font-size: 9px; }
+  table.inv-items th { background: #e8e8e8; border: 1px solid #999; padding: 2px; }
+  table.inv-items td { border: 1px solid #999; padding: 2px 3px; text-align: center; }
+  .inv-totalrow td { background: #d9ede2; font-weight: 700; }
+  .inv-summary {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 10px;
+    margin-top: 0;
+  }
+  .inv-summary td { border: 1px solid #999; padding: 2px 4px; }
+  .inv-summary td.label { text-align: right; width: 40%; }
+  .inv-summary tr.highlight td { background: #fbdcc9; }
+  .inv-summary tr.total td.value { color: #c0392b; font-weight: 800; }
 </style>
 </head>
 <body>
@@ -715,7 +750,6 @@
     <div style="font-size:9px; color:var(--muted); margin-top:4px;" id="storageStatus">حالياً: التخزين المحلي</div>
   </div>
 </div>
-<!-- Pending overlay -->
 <div class="login-overlay hide" id="pendingOverlay">
   <div class="login-box">
     <div class="login-logo">⏳ GTR POS</div>
@@ -768,7 +802,7 @@
       <div id="clientHistoryContent"></div>
     </div>
     
-    <!-- Fournisseurs (Supplier list) -->
+    <!-- Fournisseurs -->
     <div class="section" id="sec-fournisseurs">
       <input class="search-box" id="fSearch" placeholder="🔍 بحث بالاسم أو الهاتف..." oninput="Fournisseurs.render()">
       <div id="fournisseursList"></div>
@@ -862,7 +896,7 @@
     <div class="field"><label>الحد الأدنى للمخزون</label><input id="aMinStock" type="number" value="5"></div>
   </div><div class="sheet-footer"><button class="btn save" onclick="Articles.save()">💾 حفظ</button><button class="btn edit" onclick="Articles.edit()">✏️ تعديل</button><button class="btn del" onclick="Articles.remove()">🗑 حذف</button></div></div>
   
-  <!-- Vente sheet (Sales invoice) -->
+  <!-- Vente sheet -->
   <div class="sheet" id="sheet-ventes"><div class="sheet-handle"></div><div class="sheet-header"><h3>فاتورة بيع</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field-row">
       <div class="field"><label>رقم الفاتورة</label><input id="vNum" readonly></div>
@@ -904,7 +938,7 @@
     </div>
   </div><div class="sheet-footer"><button class="btn save" onclick="Ventes.save()">💾 حفظ</button><button class="btn edit" onclick="Ventes.edit()">✏️ تعديل</button><button class="btn del" onclick="Ventes.remove()">🗑 حذف</button></div></div>
   
-  <!-- Achat sheet (Purchase invoice) -->
+  <!-- Achat sheet -->
   <div class="sheet" id="sheet-achats"><div class="sheet-handle"></div><div class="sheet-header"><h3>فاتورة شراء</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
     <div class="field-row">
       <div class="field"><label>رقم الفاتورة</label><input id="pNum" readonly></div>
@@ -1036,7 +1070,7 @@ function $(id) { return document.getElementById(id); }
 function showToast(msg) { const t = $('toast'); if (!t) return; t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 3000); }
 
 // ===== PERSISTENCE =====
-const STORAGE_KEY = 'gtrpos_data_v17';
+const STORAGE_KEY = 'gtrpos_data_v18';
 function saveState() {
   try { const data = { clients, fournisseurs, articles, ventes, achats, caisseClients, caisseFournisseurs, nextId, companyInfo }; localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
   if (storageMode === 'cloud' && currentUser) {
@@ -1253,7 +1287,7 @@ const ClientHistory = {
     history.sort((a, b) => {
       if (a.date < b.date) return -1;
       if (a.date > b.date) return 1;
-      if (a.debit > 0 && b.credit > 0) return -1; // invoice before payment same day
+      if (a.debit > 0 && b.credit > 0) return -1;
       if (a.credit > 0 && b.debit > 0) return 1;
       return 0;
     });
@@ -1279,14 +1313,14 @@ const ClientHistory = {
         html += `<div class="history-item"><span class="h-date">${h.date}</span><span class="h-desc">${icon} ${h.desc}</span><span class="h-debit">${h.debit > 0 ? h.debit.toFixed(3) : '-'}</span><span class="h-credit">${h.credit > 0 ? h.credit.toFixed(3) : '-'}</span><span class="h-balance" style="color:${color};">${cumulative.toFixed(3)}</span></div>`;
       });
       if (Math.abs(cumulative - client.balance) > 0.001) {
-        html += `<div style="color:var(--danger);font-size:9px;padding:4px;text-align:center;background:#ffe0e0;border-radius:3px;">⚠️ ملاحظة: الرصيد المحسوب (${cumulative.toFixed(3)}) يختلف عن رصيد العميل (${client.balance.toFixed(3)})</div>`;
+        html += `<div style="color:var(--danger);font-size:9px;padding:4px;text-align:center;background:#ffe0e0;border-radius:3px;">⚠️ الرصيد المحسوب (${cumulative.toFixed(3)}) ≠ رصيد العميل (${client.balance.toFixed(3)})</div>`;
       }
     }
     result.innerHTML = html;
   }
 };
 
-// ===== FOURNISSEURS (Supplier list) =====
+// ===== FOURNISSEURS =====
 const Fournisseurs = {
   editingId: null,
   reset() { this.editingId = null; $('fCode').value = 'FR-' + String(nextId.fournisseurs).padStart(4, '0'); $('fName').value = ''; $('fPhone').value = ''; $('fPhone2').value = ''; $('fAddress').value = ''; $('fTaxId').value = ''; $('fBalance').value = '0'; $('fNotes').value = ''; },
@@ -1318,7 +1352,6 @@ const FournisseurHistory = {
     const fournisseur = fournisseurs.find(f => f.id === fournisseurId);
     if (!fournisseur) { result.innerHTML = '<div class="empty-msg">المورد غير موجود</div>'; return; }
     
-    // Collect purchase invoices and payments for this supplier
     const fournisseurAchats = achats.filter(a => a.supplier === fournisseur.name);
     const fournisseurPayments = caisseFournisseurs.filter(p => p.fournisseurName === fournisseur.name);
     
@@ -1336,7 +1369,7 @@ const FournisseurHistory = {
     history.sort((a, b) => {
       if (a.date < b.date) return -1;
       if (a.date > b.date) return 1;
-      if (a.debit > 0 && b.credit > 0) return -1; // invoice before payment
+      if (a.debit > 0 && b.credit > 0) return -1;
       if (a.credit > 0 && b.debit > 0) return 1;
       return 0;
     });
@@ -1362,7 +1395,7 @@ const FournisseurHistory = {
         html += `<div class="history-item"><span class="h-date">${h.date}</span><span class="h-desc">${icon} ${h.desc}</span><span class="h-debit">${h.debit > 0 ? h.debit.toFixed(3) : '-'}</span><span class="h-credit">${h.credit > 0 ? h.credit.toFixed(3) : '-'}</span><span class="h-balance" style="color:${color};">${cumulative.toFixed(3)}</span></div>`;
       });
       if (Math.abs(cumulative - fournisseur.balance) > 0.001) {
-        html += `<div style="color:var(--danger);font-size:9px;padding:4px;text-align:center;background:#ffe0e0;border-radius:3px;">⚠️ ملاحظة: الرصيد المحسوب (${cumulative.toFixed(3)}) يختلف عن رصيد المورد (${fournisseur.balance.toFixed(3)})</div>`;
+        html += `<div style="color:var(--danger);font-size:9px;padding:4px;text-align:center;background:#ffe0e0;border-radius:3px;">⚠️ الرصيد المحسوب (${cumulative.toFixed(3)}) ≠ رصيد المورد (${fournisseur.balance.toFixed(3)})</div>`;
       }
     }
     result.innerHTML = html;
@@ -1381,665 +1414,77 @@ const Articles = {
 };
 
 // =====================================================
-// ===== VENTES (Sales) =====
+// ===== VENTES (Sales) - مختصر =====
 // =====================================================
 const Ventes = {
-  editingId: null,
-  lines: [],
-  reglements: [],
-  originalClientBalance: 0,
-  originalClientId: null,
-
+  editingId: null, lines: [], reglements: [], originalClientBalance: 0, originalClientId: null,
   reset() {
-    this.editingId = null;
-    this.lines = [];
-    this.reglements = [];
-    this.originalClientBalance = 0;
-    this.originalClientId = null;
+    this.editingId = null; this.lines = []; this.reglements = []; this.originalClientBalance = 0; this.originalClientId = null;
     $('vNum').value = 'VTE-' + String(nextId.ventes).padStart(4, '0');
     $('vDate').value = new Date().toISOString().slice(0, 10);
-    $('vClient').value = '';
-    $('vPhone').value = '';
-    $('viArticle').value = '';
-    $('viPrice').value = '';
-    $('viQty').value = 1;
-    $('viTotal').value = '';
-    $('viStockHint').textContent = '';
-    this.renderLines();
-    this.renderReglements();
-    this.refreshArticleOptions();
-    this.updateAccountSummary();
-    this.refreshClientOptions();
-  },
-
-  refreshClientOptions() {
-    const s = $('vClient');
-    if (s) s.innerHTML = '<option value="">-- اختر --</option>' + clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-  },
-
-  refreshArticleOptions() {
-    const used = this.lines.map(l => l.name);
-    const avail = articles.filter(a => !used.includes(a.name));
-    const s = $('viArticle');
-    if (s) s.innerHTML = '<option value="">-- اختر --</option>' + avail.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
-  },
-
-  fillClient() {
-    const clientId = parseInt($('vClient').value);
-    const c = clients.find(x => x.id === clientId);
-    if (c) {
-      $('vPhone').value = c.phone || '';
-      this.originalClientId = c.id;
-      this.originalClientBalance = c.balance;
-      this.clientTaxId = c.taxId || '';
-      this.clientAddress = c.address || '';
-    } else {
-      $('vPhone').value = '';
-      this.originalClientId = null;
-      this.originalClientBalance = 0;
-      this.clientTaxId = '';
-      this.clientAddress = '';
-    }
-    this.updateAccountSummary();
-  },
-
-  fillArticle() {
-    const a = articles.find(x => x.id == $('viArticle').value);
-    if (!a) { $('viPrice').value = ''; $('viStockHint').textContent = ''; this.calcLine(); return; }
-    const c = clients.find(x => x.id == $('vClient').value);
-    const sp = c && c.specialPrices ? c.specialPrices.find(s => s.name === a.name) : null;
-    $('viPrice').value = (sp ? sp.price : a.price).toFixed(3);
-    $('viStockHint').textContent = 'المخزون: ' + (a.stock || 0);
-    this.calcLine();
-  },
-
-  calcLine() {
-    const p = parseFloat($('viPrice').value) || 0;
-    const q = parseFloat($('viQty').value) || 0;
-    $('viTotal').value = (p * q).toFixed(3);
-  },
-
-  addLine() {
-    const sel = $('viArticle');
-    const name = sel.value ? sel.options[sel.selectedIndex].textContent : '';
-    const price = parseFloat($('viPrice').value) || 0;
-    const qty = parseFloat($('viQty').value) || 0;
-    if (!name || price <= 0 || qty <= 0) { showToast('أدخل بيانات صحيحة'); return; }
-    const existing = this.lines.find(l => l.name === name);
-    if (existing) {
-      existing.qty += qty;
-      existing.total = existing.price * existing.qty;
-      showToast('تم تحديث الكمية');
-    } else {
-      this.lines.push({ name, price, qty, total: price * qty });
-    }
-    const article = articles.find(a => a.name === name);
-    if (article) { article.stock = (article.stock || 0) - qty; }
+    $('vClient').value = ''; $('vPhone').value = '';
     $('viArticle').value = ''; $('viPrice').value = ''; $('viQty').value = 1; $('viTotal').value = ''; $('viStockHint').textContent = '';
-    this.renderLines();
-    this.refreshArticleOptions();
-    this.updateAccountSummary();
+    this.renderLines(); this.renderReglements(); this.refreshArticleOptions(); this.updateAccountSummary(); this.refreshClientOptions();
   },
-
-  removeLine(idx) {
-    const line = this.lines[idx];
-    const article = articles.find(a => a.name === line.name);
-    if (article) { article.stock = (article.stock || 0) + line.qty; }
-    this.lines.splice(idx, 1);
-    this.renderLines();
-    this.refreshArticleOptions();
-    this.updateAccountSummary();
-  },
-
-  renderLines() {
-    const b = $('vLinesBody');
-    b.innerHTML = '';
-    let sum = 0;
-    this.lines.forEach((l, i) => {
-      sum += l.total;
-      b.innerHTML += `<tr><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td><td><button class="del-row" onclick="Ventes.removeLine(${i})">✕</button></td></tr>`;
-    });
-    $('vGrand').textContent = sum.toFixed(3);
-  },
-
-  updateAccountSummary() {
-    const total = this.lines.reduce((a, l) => a + l.total, 0);
-    const paid = this.reglements.reduce((a, r) => a + r.amount, 0);
-    const currentBalance = this.originalClientBalance + total - paid;
-    $('vPrevBalance').textContent = this.originalClientBalance.toFixed(3);
-    $('vInvoiceTotal').textContent = total.toFixed(3);
-    $('vPaidAmount').textContent = paid.toFixed(3);
-    $('vCurrentBalance').textContent = currentBalance.toFixed(3);
-  },
-
-  renderReglements() {
-    const container = $('vReglementsList');
-    if (!container) return;
-    container.innerHTML = '';
-    if (this.reglements.length === 0) {
-      container.innerHTML = '<div class="empty-msg">لا توجد تسديدات</div>';
-      return;
-    }
-    this.reglements.forEach((r, idx) => {
-      const div = document.createElement('div');
-      div.className = 'reg-item';
-      div.innerHTML = `
-        <span class="reg-date">${r.date || ''}</span>
-        <span>${r.method || 'نقدا'}</span>
-        <span class="reg-amount">${r.amount.toFixed(3)} د.ت</span>
-        <span class="reg-del" onclick="Ventes.deleteReglement(${idx})">✕</span>
-      `;
-      container.appendChild(div);
-    });
-    this.updateAccountSummary();
-  },
-
-  addReglement() {
-    const amount = parseFloat($('vRegAmount').value) || 0;
-    if (amount <= 0) { showToast('أدخل مبلغاً صحيحاً'); return; }
-    const method = $('vRegType').value;
-    const date = new Date().toISOString().slice(0, 10);
-    this.reglements.push({ id: nextId.reglements++, date, amount, method });
-    const clientName = $('vClient').options[$('vClient').selectedIndex]?.textContent || '';
-    const client = clients.find(c => c.name === clientName);
-    const cRec = { id: nextId.caisseClients++, date, clientId: client ? client.id : null, clientName: clientName, type: 'in', amount, regType: method, description: 'تسديد من فاتورة ' + $('vNum').value, invoiceId: this.editingId ? this.editingId : null, invoiceNum: $('vNum').value };
-    caisseClients.push(cRec);
-    saveState();
-    this.renderReglements();
-    this.updateAccountSummary();
-    $('vRegAmount').value = '';
-    showToast('✅ تم إضافة التسديد');
-  },
-
-  deleteReglement(idx) {
-    const removed = this.reglements.splice(idx, 1)[0];
-    if (removed) {
-      const clientName = $('vClient').options[$('vClient').selectedIndex]?.textContent || '';
-      const client = clients.find(c => c.name === clientName);
-      caisseClients = caisseClients.filter(cr => !(cr.invoiceId === this.editingId && cr.amount === removed.amount && cr.date === removed.date));
-      saveState();
-      this.renderReglements();
-      this.updateAccountSummary();
-      showToast('🗑️ تم حذف التسديد');
-    }
-  },
-
-  save() {
-    if (isSaving) { showToast('⏳ جاري الحفظ... انتظر'); return; }
-    if (!$('vClient').value) { showToast('⚠️ اختر العميل'); return; }
-    const clientName = $('vClient').options[$('vClient').selectedIndex].textContent;
-    const total = this.lines.reduce((a, l) => a + l.total, 0);
-    const client = clients.find(c => c.name === clientName);
-    if (!client) { showToast('⚠️ العميل غير موجود'); return; }
-    const paid = this.reglements.reduce((a, r) => a + r.amount, 0);
-    const newId = this.editingId || nextId.ventes++;
-    const prevBalance = this.originalClientBalance;
-    const rec = { id: newId, num: $('vNum').value, date: $('vDate').value, client: clientName, lines: [...this.lines], total: total, reglements: [...this.reglements], prevBalance: prevBalance, clientTaxId: client.taxId || '', clientAddress: client.address || '' };
-    isSaving = true;
-    try {
-      const newBalance = prevBalance + total - paid;
-      if (this.editingId) {
-        const old = ventes.find(v => v.id === this.editingId);
-        if (old) {
-          const diff = newBalance - client.balance;
-          client.balance += diff;
-        }
-      } else {
-        client.balance = newBalance;
-      }
-      if (this.editingId) {
-        const idx = ventes.findIndex(v => v.id === this.editingId);
-        if (idx !== -1) ventes[idx] = rec; else ventes.push(rec);
-      } else {
-        ventes.push(rec);
-      }
-      saveState();
-      this.render();
-      this.editingId = rec.id;
-      this.originalClientBalance = client.balance;
-      this.updateAccountSummary();
-      showToast('✅ تم حفظ الفاتورة');
-    } catch (e) { showToast('❌ حدث خطأ أثناء الحفظ'); } finally { isSaving = false; }
-  },
-
+  refreshClientOptions() { const s = $('vClient'); if (s) s.innerHTML = '<option value="">-- اختر --</option>' + clients.map(c => `<option value="${c.id}">${c.name}</option>`).join(''); },
+  refreshArticleOptions() { const used = this.lines.map(l => l.name); const avail = articles.filter(a => !used.includes(a.name)); const s = $('viArticle'); if (s) s.innerHTML = '<option value="">-- اختر --</option>' + avail.map(a => `<option value="${a.id}">${a.name}</option>`).join(''); },
+  fillClient() { const c = clients.find(x => x.id == $('vClient').value); if (c) { $('vPhone').value = c.phone || ''; this.originalClientId = c.id; this.originalClientBalance = c.balance; this.clientTaxId = c.taxId || ''; this.clientAddress = c.address || ''; } else { $('vPhone').value = ''; this.originalClientId = null; this.originalClientBalance = 0; this.clientTaxId = ''; this.clientAddress = ''; } this.updateAccountSummary(); },
+  fillArticle() { const a = articles.find(x => x.id == $('viArticle').value); if (!a) { $('viPrice').value = ''; $('viStockHint').textContent = ''; this.calcLine(); return; } const c = clients.find(x => x.id == $('vClient').value); const sp = c && c.specialPrices ? c.specialPrices.find(s => s.name === a.name) : null; $('viPrice').value = (sp ? sp.price : a.price).toFixed(3); $('viStockHint').textContent = 'المخزون: ' + (a.stock || 0); this.calcLine(); },
+  calcLine() { const p = parseFloat($('viPrice').value) || 0; const q = parseFloat($('viQty').value) || 0; $('viTotal').value = (p * q).toFixed(3); },
+  addLine() { const sel = $('viArticle'); const name = sel.value ? sel.options[sel.selectedIndex].textContent : ''; const price = parseFloat($('viPrice').value) || 0; const qty = parseFloat($('viQty').value) || 0; if (!name || price <= 0 || qty <= 0) { showToast('أدخل بيانات صحيحة'); return; } const existing = this.lines.find(l => l.name === name); if (existing) { existing.qty += qty; existing.total = existing.price * existing.qty; showToast('تم تحديث الكمية'); } else { this.lines.push({ name, price, qty, total: price * qty }); } const article = articles.find(a => a.name === name); if (article) article.stock = (article.stock || 0) - qty; $('viArticle').value = ''; $('viPrice').value = ''; $('viQty').value = 1; $('viTotal').value = ''; $('viStockHint').textContent = ''; this.renderLines(); this.refreshArticleOptions(); this.updateAccountSummary(); },
+  removeLine(idx) { const line = this.lines[idx]; const article = articles.find(a => a.name === line.name); if (article) article.stock = (article.stock || 0) + line.qty; this.lines.splice(idx, 1); this.renderLines(); this.refreshArticleOptions(); this.updateAccountSummary(); },
+  renderLines() { const b = $('vLinesBody'); b.innerHTML = ''; let sum = 0; this.lines.forEach((l, i) => { sum += l.total; b.innerHTML += `<tr><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td><td><button class="del-row" onclick="Ventes.removeLine(${i})">✕</button></td></tr>`; }); $('vGrand').textContent = sum.toFixed(3); },
+  updateAccountSummary() { const total = this.lines.reduce((a, l) => a + l.total, 0); const paid = this.reglements.reduce((a, r) => a + r.amount, 0); const currentBalance = this.originalClientBalance + total - paid; $('vPrevBalance').textContent = this.originalClientBalance.toFixed(3); $('vInvoiceTotal').textContent = total.toFixed(3); $('vPaidAmount').textContent = paid.toFixed(3); $('vCurrentBalance').textContent = currentBalance.toFixed(3); },
+  renderReglements() { const container = $('vReglementsList'); if (!container) return; container.innerHTML = ''; if (this.reglements.length === 0) { container.innerHTML = '<div class="empty-msg">لا توجد تسديدات</div>'; return; } this.reglements.forEach((r, idx) => { const div = document.createElement('div'); div.className = 'reg-item'; div.innerHTML = `<span class="reg-date">${r.date || ''}</span><span>${r.method || 'نقدا'}</span><span class="reg-amount">${r.amount.toFixed(3)} د.ت</span><span class="reg-del" onclick="Ventes.deleteReglement(${idx})">✕</span>`; container.appendChild(div); }); this.updateAccountSummary(); },
+  addReglement() { const amount = parseFloat($('vRegAmount').value) || 0; if (amount <= 0) { showToast('أدخل مبلغاً صحيحاً'); return; } const method = $('vRegType').value; const date = new Date().toISOString().slice(0, 10); this.reglements.push({ id: nextId.reglements++, date, amount, method }); const clientName = $('vClient').options[$('vClient').selectedIndex]?.textContent || ''; const client = clients.find(c => c.name === clientName); const cRec = { id: nextId.caisseClients++, date, clientId: client ? client.id : null, clientName: clientName, type: 'in', amount, regType: method, description: 'تسديد من فاتورة ' + $('vNum').value, invoiceId: this.editingId ? this.editingId : null, invoiceNum: $('vNum').value }; caisseClients.push(cRec); saveState(); this.renderReglements(); this.updateAccountSummary(); $('vRegAmount').value = ''; showToast('✅ تم إضافة التسديد'); },
+  deleteReglement(idx) { const removed = this.reglements.splice(idx, 1)[0]; if (removed) { const clientName = $('vClient').options[$('vClient').selectedIndex]?.textContent || ''; caisseClients = caisseClients.filter(cr => !(cr.invoiceId === this.editingId && cr.amount === removed.amount && cr.date === removed.date)); saveState(); this.renderReglements(); this.updateAccountSummary(); showToast('🗑️ تم حذف التسديد'); } },
+  save() { if (isSaving) { showToast('⏳ جاري الحفظ... انتظر'); return; } if (!$('vClient').value) { showToast('⚠️ اختر العميل'); return; } const clientName = $('vClient').options[$('vClient').selectedIndex].textContent; const total = this.lines.reduce((a, l) => a + l.total, 0); const client = clients.find(c => c.name === clientName); if (!client) { showToast('⚠️ العميل غير موجود'); return; } const paid = this.reglements.reduce((a, r) => a + r.amount, 0); const newId = this.editingId || nextId.ventes++; const prevBalance = this.originalClientBalance; const rec = { id: newId, num: $('vNum').value, date: $('vDate').value, client: clientName, lines: [...this.lines], total: total, reglements: [...this.reglements], prevBalance: prevBalance, clientTaxId: client.taxId || '', clientAddress: client.address || '' }; isSaving = true; try { const newBalance = prevBalance + total - paid; if (this.editingId) { const old = ventes.find(v => v.id === this.editingId); if (old) { const diff = newBalance - client.balance; client.balance += diff; } } else { client.balance = newBalance; } if (this.editingId) { const idx = ventes.findIndex(v => v.id === this.editingId); if (idx !== -1) ventes[idx] = rec; else ventes.push(rec); } else { ventes.push(rec); } saveState(); this.render(); this.editingId = rec.id; this.originalClientBalance = client.balance; this.updateAccountSummary(); showToast('✅ تم حفظ الفاتورة'); } catch (e) { showToast('❌ حدث خطأ أثناء الحفظ'); } finally { isSaving = false; } },
   edit() { if (this.editingId == null) { showToast('اختر فاتورة لتعديلها'); return; } this.save(); },
-
-  remove() {
-    if (this.editingId == null) { showToast('اختر فاتورة لحذفها'); return; }
-    const rec = ventes.find(v => v.id === this.editingId);
-    if (rec) {
-      const client = clients.find(c => c.name === rec.client);
-      const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0);
-      if (client) { client.balance -= (rec.total - paid); }
-      rec.lines.forEach(l => { const article = articles.find(a => a.name === l.name); if (article) article.stock = (article.stock || 0) + l.qty; });
-    }
-    ventes = ventes.filter(v => v.id !== this.editingId);
-    saveState();
-    this.render();
-    closeSheet();
-    showToast('🗑️ تم الحذف');
-  },
-
-  load(id) {
-    const r = ventes.find(v => v.id === id);
-    if (!r) return;
-    this.editingId = id;
-    $('vNum').value = r.num;
-    $('vDate').value = r.date;
-    const opt = [...$('vClient').options].find(o => o.textContent === r.client);
-    if (opt) $('vClient').value = opt.value;
-    const c = clients.find(x => x.name === r.client);
-    const paid = (r.reglements || []).reduce((a, rr) => a + rr.amount, 0);
-    this.originalClientBalance = r.prevBalance || (c ? c.balance - (r.total - paid) : 0);
-    this.originalClientId = c ? c.id : null;
-    this.clientTaxId = r.clientTaxId || (c ? c.taxId || '' : '');
-    this.clientAddress = r.clientAddress || (c ? c.address || '' : '');
-    $('vPhone').value = c ? c.phone : '';
-    this.lines = [...r.lines];
-    this.reglements = r.reglements ? [...r.reglements] : [];
-    this.renderLines();
-    this.refreshArticleOptions();
-    this.renderReglements();
-    this.updateAccountSummary();
-    openSheet('ventes');
-  },
-
-  render() {
-    const q = $('vSearch').value.trim().toLowerCase();
-    const list = $('ventesList');
-    list.innerHTML = '';
-    const filtered = ventes.filter(v => !q || v.num.toLowerCase().includes(q) || v.client.toLowerCase().includes(q)).reverse();
-    if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا توجد فواتير بيع</div>'; return; }
-    filtered.slice(0, 50).forEach(v => {
-      const d = document.createElement('div');
-      d.className = 'row-card';
-      d.onclick = () => { Ventes.load(v.id); openSheet('ventes'); };
-      const paid = (v.reglements || []).reduce((a, r) => a + r.amount, 0);
-      d.innerHTML = `<div class="main-info"><div class="name">${v.num}</div><div class="meta">${v.client} - ${v.date} | المدفوع: ${paid.toFixed(3)}</div></div><div class="amount">${v.total.toFixed(3)} د.ت</div>`;
-      list.appendChild(d);
-    });
-  },
-
-  shareWhatsapp() {
-    if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; }
-    const rec = ventes.find(v => v.id === this.editingId);
-    if (!rec) return;
-    const client = clients.find(c => c.name === rec.client);
-    const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0);
-    let text = `*فاتورة ${rec.num}*\nالتاريخ: ${rec.date}\nالعميل: ${rec.client}\n`;
-    if (rec.clientTaxId) text += `MF: ${rec.clientTaxId}\n`;
-    rec.lines.forEach(l => { text += `${l.name}  x${l.qty}  ${l.total.toFixed(3)} د.ت\n`; });
-    text += `\nالمجموع: ${rec.total.toFixed(3)} د.ت\nالمدفوع: ${paid.toFixed(3)} د.ت\nالمتبقي: ${(rec.total - paid).toFixed(3)} د.ت`;
-    const phone = client ? client.phone.replace(/\D/g, '') : '';
-    const url = 'https://wa.me/' + (phone ? '216' + phone : '') + '?text=' + encodeURIComponent(text);
-    window.open(url, '_blank');
-  },
-
-  printInvoice() {
-    if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; }
-    const rec = ventes.find(v => v.id === this.editingId);
-    if (!rec) return;
-    const client = clients.find(c => c.name === rec.client);
-    const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0);
-    const prevBalance = rec.prevBalance || (client ? client.balance - (rec.total - paid) : 0);
-    const currentBalance = prevBalance + rec.total - paid;
-    _invoiceData = { title: 'فاتورة بيع', num: rec.num, date: rec.date, partyLabel: 'العميل', partyName: rec.client, partyAddr: rec.clientAddress || (client ? client.address : ''), partyPhone: client ? client.phone : '', partyTaxId: rec.clientTaxId || (client ? client.taxId : ''), lines: rec.lines || [], total: rec.total, paid: paid, prevBalance: prevBalance, currentBalance: currentBalance };
-    renderInvoice();
-    $('printOverlay').classList.add('show');
-  },
-
-  printBluetooth() {
-    if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; }
-    const rec = ventes.find(v => v.id === this.editingId);
-    if (!rec) return;
-    const client = clients.find(c => c.name === rec.client);
-    const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0);
-    let text = `${companyInfo.name}\n${companyInfo.address}\n${companyInfo.phone1}\n----------------\nفاتورة بيع: ${rec.num}\nالتاريخ: ${rec.date}\nالعميل: ${rec.client}\n`;
-    if (rec.clientTaxId) text += `MF: ${rec.clientTaxId}\n`;
-    text += `----------------\n`;
-    rec.lines.forEach(l => { text += `${l.name}  ${l.qty} x ${l.price.toFixed(3)} = ${l.total.toFixed(3)}\n`; });
-    text += `----------------\nالمجموع: ${rec.total.toFixed(3)}\nالمدفوع: ${paid.toFixed(3)}\nالمتبقي: ${(rec.total - paid).toFixed(3)}\nشكراً لكم\n`;
-    if (!navigator.bluetooth) { showToast('متصفحك لا يدعم Bluetooth'); return; }
-    navigator.bluetooth.requestDevice({ filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }], optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] })
-      .then(device => device.gatt.connect())
-      .then(server => server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb'))
-      .then(service => service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb'))
-      .then(characteristic => { characteristic.writeValue(new TextEncoder().encode(text)); showToast('✅ تم الإرسال إلى الطابعة'); })
-      .catch(err => { console.error(err); showToast('❌ فشل الاتصال بالطابعة: ' + err.message); });
-  }
+  remove() { if (this.editingId == null) { showToast('اختر فاتورة لحذفها'); return; } const rec = ventes.find(v => v.id === this.editingId); if (rec) { const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); if (client) client.balance -= (rec.total - paid); rec.lines.forEach(l => { const article = articles.find(a => a.name === l.name); if (article) article.stock = (article.stock || 0) + l.qty; }); } ventes = ventes.filter(v => v.id !== this.editingId); saveState(); this.render(); closeSheet(); showToast('🗑️ تم الحذف'); },
+  load(id) { const r = ventes.find(v => v.id === id); if (!r) return; this.editingId = id; $('vNum').value = r.num; $('vDate').value = r.date; const opt = [...$('vClient').options].find(o => o.textContent === r.client); if (opt) $('vClient').value = opt.value; const c = clients.find(x => x.name === r.client); const paid = (r.reglements || []).reduce((a, rr) => a + rr.amount, 0); this.originalClientBalance = r.prevBalance || (c ? c.balance - (r.total - paid) : 0); this.originalClientId = c ? c.id : null; this.clientTaxId = r.clientTaxId || (c ? c.taxId || '' : ''); this.clientAddress = r.clientAddress || (c ? c.address || '' : ''); $('vPhone').value = c ? c.phone : ''; this.lines = [...r.lines]; this.reglements = r.reglements ? [...r.reglements] : []; this.renderLines(); this.refreshArticleOptions(); this.renderReglements(); this.updateAccountSummary(); openSheet('ventes'); },
+  render() { const q = $('vSearch').value.trim().toLowerCase(); const list = $('ventesList'); list.innerHTML = ''; const filtered = ventes.filter(v => !q || v.num.toLowerCase().includes(q) || v.client.toLowerCase().includes(q)).reverse(); if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا توجد فواتير بيع</div>'; return; } filtered.slice(0, 50).forEach(v => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => { Ventes.load(v.id); openSheet('ventes'); }; const paid = (v.reglements || []).reduce((a, r) => a + r.amount, 0); d.innerHTML = `<div class="main-info"><div class="name">${v.num}</div><div class="meta">${v.client} - ${v.date} | المدفوع: ${paid.toFixed(3)}</div></div><div class="amount">${v.total.toFixed(3)} د.ت</div>`; list.appendChild(d); }); },
+  shareWhatsapp() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); let text = `*فاتورة ${rec.num}*\nالتاريخ: ${rec.date}\nالعميل: ${rec.client}\n`; if (rec.clientTaxId) text += `MF: ${rec.clientTaxId}\n`; rec.lines.forEach(l => { text += `${l.name}  x${l.qty}  ${l.total.toFixed(3)} د.ت\n`; }); text += `\nالمجموع: ${rec.total.toFixed(3)} د.ت\nالمدفوع: ${paid.toFixed(3)} د.ت\nالمتبقي: ${(rec.total - paid).toFixed(3)} د.ت`; const phone = client ? client.phone.replace(/\D/g, '') : ''; const url = 'https://wa.me/' + (phone ? '216' + phone : '') + '?text=' + encodeURIComponent(text); window.open(url, '_blank'); },
+  printInvoice() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); const prevBalance = rec.prevBalance || (client ? client.balance - (rec.total - paid) : 0); const currentBalance = prevBalance + rec.total - paid; _invoiceData = { title: 'فاتورة بيع', num: rec.num, date: rec.date, partyLabel: 'العميل', partyName: rec.client, partyAddr: rec.clientAddress || (client ? client.address : ''), partyPhone: client ? client.phone : '', partyTaxId: rec.clientTaxId || (client ? client.taxId : ''), lines: rec.lines || [], total: rec.total, paid: paid, prevBalance: prevBalance, currentBalance: currentBalance }; renderInvoice(); $('printOverlay').classList.add('show'); },
+  printBluetooth() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = ventes.find(v => v.id === this.editingId); if (!rec) return; const client = clients.find(c => c.name === rec.client); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); let text = `${companyInfo.name}\n${companyInfo.address}\n${companyInfo.phone1}\n----------------\nفاتورة بيع: ${rec.num}\nالتاريخ: ${rec.date}\nالعميل: ${rec.client}\n`; if (rec.clientTaxId) text += `MF: ${rec.clientTaxId}\n`; text += `----------------\n`; rec.lines.forEach(l => { text += `${l.name}  ${l.qty} x ${l.price.toFixed(3)} = ${l.total.toFixed(3)}\n`; }); text += `----------------\nالمجموع: ${rec.total.toFixed(3)}\nالمدفوع: ${paid.toFixed(3)}\nالمتبقي: ${(rec.total - paid).toFixed(3)}\nشكراً لكم\n`; if (!navigator.bluetooth) { showToast('متصفحك لا يدعم Bluetooth'); return; } navigator.bluetooth.requestDevice({ filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }], optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] }).then(device => device.gatt.connect()).then(server => server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb')).then(service => service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb')).then(characteristic => { characteristic.writeValue(new TextEncoder().encode(text)); showToast('✅ تم الإرسال إلى الطابعة'); }).catch(err => { console.error(err); showToast('❌ فشل الاتصال بالطابعة: ' + err.message); }); }
 };
 
 // =====================================================
-// ===== ACHATS (Purchases) - similar to Ventes =====
+// ===== ACHATS (Purchases) - مختصر =====
 // =====================================================
 const Achats = {
-  editingId: null,
-  lines: [],
-  reglements: [],
-  originalSupplierBalance: 0,
-  originalSupplierId: null,
-
+  editingId: null, lines: [], reglements: [], originalSupplierBalance: 0, originalSupplierId: null,
   reset() {
-    this.editingId = null;
-    this.lines = [];
-    this.reglements = [];
-    this.originalSupplierBalance = 0;
-    this.originalSupplierId = null;
+    this.editingId = null; this.lines = []; this.reglements = []; this.originalSupplierBalance = 0; this.originalSupplierId = null;
     $('pNum').value = 'ACH-' + String(nextId.achats).padStart(4, '0');
     $('pDate').value = new Date().toISOString().slice(0, 10);
-    $('pSupplier').value = '';
-    $('pPhone').value = '';
-    $('piArticle').value = '';
-    $('piPrice').value = '';
-    $('piQty').value = 1;
-    $('piTotal').value = '';
-    $('piStockHint').textContent = '';
-    this.renderLines();
-    this.renderReglements();
-    this.refreshArticleOptions();
-    this.updateAccountSummary();
-    this.refreshSupplierOptions();
-  },
-
-  refreshSupplierOptions() {
-    const s = $('pSupplier');
-    if (s) s.innerHTML = '<option value="">-- اختر --</option>' + fournisseurs.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
-  },
-
-  refreshArticleOptions() {
-    const used = this.lines.map(l => l.name);
-    const avail = articles.filter(a => !used.includes(a.name));
-    const s = $('piArticle');
-    if (s) s.innerHTML = '<option value="">-- اختر --</option>' + avail.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
-  },
-
-  fillSupplier() {
-    const supplierId = parseInt($('pSupplier').value);
-    const s = fournisseurs.find(x => x.id === supplierId);
-    if (s) {
-      $('pPhone').value = s.phone || '';
-      this.originalSupplierId = s.id;
-      this.originalSupplierBalance = s.balance;
-      this.supplierTaxId = s.taxId || '';
-      this.supplierAddress = s.address || '';
-    } else {
-      $('pPhone').value = '';
-      this.originalSupplierId = null;
-      this.originalSupplierBalance = 0;
-      this.supplierTaxId = '';
-      this.supplierAddress = '';
-    }
-    this.updateAccountSummary();
-  },
-
-  fillArticle() {
-    const a = articles.find(x => x.id == $('piArticle').value);
-    if (!a) { $('piPrice').value = ''; $('piStockHint').textContent = ''; this.calcLine(); return; }
-    $('piPrice').value = (a.costPrice || a.price).toFixed(3);
-    $('piStockHint').textContent = 'المخزون الحالي: ' + (a.stock || 0) + ' (سيتم إضافته)';
-    this.calcLine();
-  },
-
-  calcLine() {
-    const p = parseFloat($('piPrice').value) || 0;
-    const q = parseFloat($('piQty').value) || 0;
-    $('piTotal').value = (p * q).toFixed(3);
-  },
-
-  addLine() {
-    const sel = $('piArticle');
-    const name = sel.value ? sel.options[sel.selectedIndex].textContent : '';
-    const price = parseFloat($('piPrice').value) || 0;
-    const qty = parseFloat($('piQty').value) || 0;
-    if (!name || price <= 0 || qty <= 0) { showToast('أدخل بيانات صحيحة'); return; }
-    const existing = this.lines.find(l => l.name === name);
-    if (existing) {
-      existing.qty += qty;
-      existing.total = existing.price * existing.qty;
-      showToast('تم تحديث الكمية');
-    } else {
-      this.lines.push({ name, price, qty, total: price * qty });
-    }
-    // Increase stock (purchase)
-    const article = articles.find(a => a.name === name);
-    if (article) { article.stock = (article.stock || 0) + qty; }
+    $('pSupplier').value = ''; $('pPhone').value = '';
     $('piArticle').value = ''; $('piPrice').value = ''; $('piQty').value = 1; $('piTotal').value = ''; $('piStockHint').textContent = '';
-    this.renderLines();
-    this.refreshArticleOptions();
-    this.updateAccountSummary();
+    this.renderLines(); this.renderReglements(); this.refreshArticleOptions(); this.updateAccountSummary(); this.refreshSupplierOptions();
   },
-
-  removeLine(idx) {
-    const line = this.lines[idx];
-    const article = articles.find(a => a.name === line.name);
-    if (article) { article.stock = (article.stock || 0) - line.qty; }
-    this.lines.splice(idx, 1);
-    this.renderLines();
-    this.refreshArticleOptions();
-    this.updateAccountSummary();
-  },
-
-  renderLines() {
-    const b = $('pLinesBody');
-    b.innerHTML = '';
-    let sum = 0;
-    this.lines.forEach((l, i) => {
-      sum += l.total;
-      b.innerHTML += `<tr><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td><td><button class="del-row" onclick="Achats.removeLine(${i})">✕</button></td></tr>`;
-    });
-    $('pGrand').textContent = sum.toFixed(3);
-  },
-
-  updateAccountSummary() {
-    const total = this.lines.reduce((a, l) => a + l.total, 0);
-    const paid = this.reglements.reduce((a, r) => a + r.amount, 0);
-    const currentBalance = this.originalSupplierBalance + total - paid;
-    $('pPrevBalance').textContent = this.originalSupplierBalance.toFixed(3);
-    $('pInvoiceTotal').textContent = total.toFixed(3);
-    $('pPaidAmount').textContent = paid.toFixed(3);
-    $('pCurrentBalance').textContent = currentBalance.toFixed(3);
-  },
-
-  renderReglements() {
-    const container = $('pReglementsList');
-    if (!container) return;
-    container.innerHTML = '';
-    if (this.reglements.length === 0) {
-      container.innerHTML = '<div class="empty-msg">لا توجد تسديدات</div>';
-      return;
-    }
-    this.reglements.forEach((r, idx) => {
-      const div = document.createElement('div');
-      div.className = 'reg-item';
-      div.innerHTML = `
-        <span class="reg-date">${r.date || ''}</span>
-        <span>${r.method || 'نقدا'}</span>
-        <span class="reg-amount">${r.amount.toFixed(3)} د.ت</span>
-        <span class="reg-del" onclick="Achats.deleteReglement(${idx})">✕</span>
-      `;
-      container.appendChild(div);
-    });
-    this.updateAccountSummary();
-  },
-
-  addReglement() {
-    const amount = parseFloat($('pRegAmount').value) || 0;
-    if (amount <= 0) { showToast('أدخل مبلغاً صحيحاً'); return; }
-    const method = $('pRegType').value;
-    const date = new Date().toISOString().slice(0, 10);
-    this.reglements.push({ id: nextId.reglements++, date, amount, method });
-    const supplierName = $('pSupplier').options[$('pSupplier').selectedIndex]?.textContent || '';
-    const supplier = fournisseurs.find(s => s.name === supplierName);
-    const cRec = { id: nextId.caisseFournisseurs++, date, fournisseurId: supplier ? supplier.id : null, fournisseurName: supplierName, type: 'out', amount, regType: method, description: 'تسديد من فاتورة ' + $('pNum').value, invoiceId: this.editingId ? this.editingId : null, invoiceNum: $('pNum').value };
-    caisseFournisseurs.push(cRec);
-    saveState();
-    this.renderReglements();
-    this.updateAccountSummary();
-    $('pRegAmount').value = '';
-    showToast('✅ تم إضافة التسديد');
-  },
-
-  deleteReglement(idx) {
-    const removed = this.reglements.splice(idx, 1)[0];
-    if (removed) {
-      const supplierName = $('pSupplier').options[$('pSupplier').selectedIndex]?.textContent || '';
-      const supplier = fournisseurs.find(s => s.name === supplierName);
-      caisseFournisseurs = caisseFournisseurs.filter(cr => !(cr.invoiceId === this.editingId && cr.amount === removed.amount && cr.date === removed.date));
-      saveState();
-      this.renderReglements();
-      this.updateAccountSummary();
-      showToast('🗑️ تم حذف التسديد');
-    }
-  },
-
-  save() {
-    if (isSaving) { showToast('⏳ جاري الحفظ... انتظر'); return; }
-    if (!$('pSupplier').value) { showToast('⚠️ اختر المورد'); return; }
-    const supplierName = $('pSupplier').options[$('pSupplier').selectedIndex].textContent;
-    const total = this.lines.reduce((a, l) => a + l.total, 0);
-    const supplier = fournisseurs.find(s => s.name === supplierName);
-    if (!supplier) { showToast('⚠️ المورد غير موجود'); return; }
-    const paid = this.reglements.reduce((a, r) => a + r.amount, 0);
-    const newId = this.editingId || nextId.achats++;
-    const prevBalance = this.originalSupplierBalance;
-    const rec = { id: newId, num: $('pNum').value, date: $('pDate').value, supplier: supplierName, lines: [...this.lines], total: total, reglements: [...this.reglements], prevBalance: prevBalance, supplierTaxId: supplier.taxId || '', supplierAddress: supplier.address || '' };
-    isSaving = true;
-    try {
-      const newBalance = prevBalance + total - paid;
-      if (this.editingId) {
-        const old = achats.find(a => a.id === this.editingId);
-        if (old) {
-          const diff = newBalance - supplier.balance;
-          supplier.balance += diff;
-        }
-      } else {
-        supplier.balance = newBalance;
-      }
-      if (this.editingId) {
-        const idx = achats.findIndex(a => a.id === this.editingId);
-        if (idx !== -1) achats[idx] = rec; else achats.push(rec);
-      } else {
-        achats.push(rec);
-      }
-      saveState();
-      this.render();
-      this.editingId = rec.id;
-      this.originalSupplierBalance = supplier.balance;
-      this.updateAccountSummary();
-      showToast('✅ تم حفظ فاتورة الشراء');
-    } catch (e) { showToast('❌ حدث خطأ أثناء الحفظ'); } finally { isSaving = false; }
-  },
-
+  refreshSupplierOptions() { const s = $('pSupplier'); if (s) s.innerHTML = '<option value="">-- اختر --</option>' + fournisseurs.map(f => `<option value="${f.id}">${f.name}</option>`).join(''); },
+  refreshArticleOptions() { const used = this.lines.map(l => l.name); const avail = articles.filter(a => !used.includes(a.name)); const s = $('piArticle'); if (s) s.innerHTML = '<option value="">-- اختر --</option>' + avail.map(a => `<option value="${a.id}">${a.name}</option>`).join(''); },
+  fillSupplier() { const s = fournisseurs.find(x => x.id == $('pSupplier').value); if (s) { $('pPhone').value = s.phone || ''; this.originalSupplierId = s.id; this.originalSupplierBalance = s.balance; this.supplierTaxId = s.taxId || ''; this.supplierAddress = s.address || ''; } else { $('pPhone').value = ''; this.originalSupplierId = null; this.originalSupplierBalance = 0; this.supplierTaxId = ''; this.supplierAddress = ''; } this.updateAccountSummary(); },
+  fillArticle() { const a = articles.find(x => x.id == $('piArticle').value); if (!a) { $('piPrice').value = ''; $('piStockHint').textContent = ''; this.calcLine(); return; } $('piPrice').value = (a.costPrice || a.price).toFixed(3); $('piStockHint').textContent = 'المخزون: ' + (a.stock || 0) + ' (سيتم إضافته)'; this.calcLine(); },
+  calcLine() { const p = parseFloat($('piPrice').value) || 0; const q = parseFloat($('piQty').value) || 0; $('piTotal').value = (p * q).toFixed(3); },
+  addLine() { const sel = $('piArticle'); const name = sel.value ? sel.options[sel.selectedIndex].textContent : ''; const price = parseFloat($('piPrice').value) || 0; const qty = parseFloat($('piQty').value) || 0; if (!name || price <= 0 || qty <= 0) { showToast('أدخل بيانات صحيحة'); return; } const existing = this.lines.find(l => l.name === name); if (existing) { existing.qty += qty; existing.total = existing.price * existing.qty; showToast('تم تحديث الكمية'); } else { this.lines.push({ name, price, qty, total: price * qty }); } const article = articles.find(a => a.name === name); if (article) article.stock = (article.stock || 0) + qty; $('piArticle').value = ''; $('piPrice').value = ''; $('piQty').value = 1; $('piTotal').value = ''; $('piStockHint').textContent = ''; this.renderLines(); this.refreshArticleOptions(); this.updateAccountSummary(); },
+  removeLine(idx) { const line = this.lines[idx]; const article = articles.find(a => a.name === line.name); if (article) article.stock = (article.stock || 0) - line.qty; this.lines.splice(idx, 1); this.renderLines(); this.refreshArticleOptions(); this.updateAccountSummary(); },
+  renderLines() { const b = $('pLinesBody'); b.innerHTML = ''; let sum = 0; this.lines.forEach((l, i) => { sum += l.total; b.innerHTML += `<tr><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td><td><button class="del-row" onclick="Achats.removeLine(${i})">✕</button></td></tr>`; }); $('pGrand').textContent = sum.toFixed(3); },
+  updateAccountSummary() { const total = this.lines.reduce((a, l) => a + l.total, 0); const paid = this.reglements.reduce((a, r) => a + r.amount, 0); const currentBalance = this.originalSupplierBalance + total - paid; $('pPrevBalance').textContent = this.originalSupplierBalance.toFixed(3); $('pInvoiceTotal').textContent = total.toFixed(3); $('pPaidAmount').textContent = paid.toFixed(3); $('pCurrentBalance').textContent = currentBalance.toFixed(3); },
+  renderReglements() { const container = $('pReglementsList'); if (!container) return; container.innerHTML = ''; if (this.reglements.length === 0) { container.innerHTML = '<div class="empty-msg">لا توجد تسديدات</div>'; return; } this.reglements.forEach((r, idx) => { const div = document.createElement('div'); div.className = 'reg-item'; div.innerHTML = `<span class="reg-date">${r.date || ''}</span><span>${r.method || 'نقدا'}</span><span class="reg-amount">${r.amount.toFixed(3)} د.ت</span><span class="reg-del" onclick="Achats.deleteReglement(${idx})">✕</span>`; container.appendChild(div); }); this.updateAccountSummary(); },
+  addReglement() { const amount = parseFloat($('pRegAmount').value) || 0; if (amount <= 0) { showToast('أدخل مبلغاً صحيحاً'); return; } const method = $('pRegType').value; const date = new Date().toISOString().slice(0, 10); this.reglements.push({ id: nextId.reglements++, date, amount, method }); const supplierName = $('pSupplier').options[$('pSupplier').selectedIndex]?.textContent || ''; const supplier = fournisseurs.find(s => s.name === supplierName); const cRec = { id: nextId.caisseFournisseurs++, date, fournisseurId: supplier ? supplier.id : null, fournisseurName: supplierName, type: 'out', amount, regType: method, description: 'تسديد من فاتورة ' + $('pNum').value, invoiceId: this.editingId ? this.editingId : null, invoiceNum: $('pNum').value }; caisseFournisseurs.push(cRec); saveState(); this.renderReglements(); this.updateAccountSummary(); $('pRegAmount').value = ''; showToast('✅ تم إضافة التسديد'); },
+  deleteReglement(idx) { const removed = this.reglements.splice(idx, 1)[0]; if (removed) { const supplierName = $('pSupplier').options[$('pSupplier').selectedIndex]?.textContent || ''; caisseFournisseurs = caisseFournisseurs.filter(cr => !(cr.invoiceId === this.editingId && cr.amount === removed.amount && cr.date === removed.date)); saveState(); this.renderReglements(); this.updateAccountSummary(); showToast('🗑️ تم حذف التسديد'); } },
+  save() { if (isSaving) { showToast('⏳ جاري الحفظ... انتظر'); return; } if (!$('pSupplier').value) { showToast('⚠️ اختر المورد'); return; } const supplierName = $('pSupplier').options[$('pSupplier').selectedIndex].textContent; const total = this.lines.reduce((a, l) => a + l.total, 0); const supplier = fournisseurs.find(s => s.name === supplierName); if (!supplier) { showToast('⚠️ المورد غير موجود'); return; } const paid = this.reglements.reduce((a, r) => a + r.amount, 0); const newId = this.editingId || nextId.achats++; const prevBalance = this.originalSupplierBalance; const rec = { id: newId, num: $('pNum').value, date: $('pDate').value, supplier: supplierName, lines: [...this.lines], total: total, reglements: [...this.reglements], prevBalance: prevBalance, supplierTaxId: supplier.taxId || '', supplierAddress: supplier.address || '' }; isSaving = true; try { const newBalance = prevBalance + total - paid; if (this.editingId) { const old = achats.find(a => a.id === this.editingId); if (old) { const diff = newBalance - supplier.balance; supplier.balance += diff; } } else { supplier.balance = newBalance; } if (this.editingId) { const idx = achats.findIndex(a => a.id === this.editingId); if (idx !== -1) achats[idx] = rec; else achats.push(rec); } else { achats.push(rec); } saveState(); this.render(); this.editingId = rec.id; this.originalSupplierBalance = supplier.balance; this.updateAccountSummary(); showToast('✅ تم حفظ فاتورة الشراء'); } catch (e) { showToast('❌ حدث خطأ أثناء الحفظ'); } finally { isSaving = false; } },
   edit() { if (this.editingId == null) { showToast('اختر فاتورة لتعديلها'); return; } this.save(); },
-
-  remove() {
-    if (this.editingId == null) { showToast('اختر فاتورة لحذفها'); return; }
-    const rec = achats.find(a => a.id === this.editingId);
-    if (rec) {
-      const supplier = fournisseurs.find(s => s.name === rec.supplier);
-      const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0);
-      if (supplier) { supplier.balance -= (rec.total - paid); }
-      rec.lines.forEach(l => { const article = articles.find(a => a.name === l.name); if (article) article.stock = (article.stock || 0) - l.qty; });
-    }
-    achats = achats.filter(a => a.id !== this.editingId);
-    saveState();
-    this.render();
-    closeSheet();
-    showToast('🗑️ تم الحذف');
-  },
-
-  load(id) {
-    const r = achats.find(a => a.id === id);
-    if (!r) return;
-    this.editingId = id;
-    $('pNum').value = r.num;
-    $('pDate').value = r.date;
-    const opt = [...$('pSupplier').options].find(o => o.textContent === r.supplier);
-    if (opt) $('pSupplier').value = opt.value;
-    const s = fournisseurs.find(f => f.name === r.supplier);
-    const paid = (r.reglements || []).reduce((a, rr) => a + rr.amount, 0);
-    this.originalSupplierBalance = r.prevBalance || (s ? s.balance - (r.total - paid) : 0);
-    this.originalSupplierId = s ? s.id : null;
-    this.supplierTaxId = r.supplierTaxId || (s ? s.taxId || '' : '');
-    this.supplierAddress = r.supplierAddress || (s ? s.address || '' : '');
-    $('pPhone').value = s ? s.phone : '';
-    this.lines = [...r.lines];
-    this.reglements = r.reglements ? [...r.reglements] : [];
-    this.renderLines();
-    this.refreshArticleOptions();
-    this.renderReglements();
-    this.updateAccountSummary();
-    openSheet('achats');
-  },
-
-  render() {
-    const q = $('aSearchP').value.trim().toLowerCase();
-    const list = $('achatsList');
-    list.innerHTML = '';
-    const filtered = achats.filter(a => !q || a.num.toLowerCase().includes(q) || a.supplier.toLowerCase().includes(q)).reverse();
-    if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا توجد فواتير شراء</div>'; return; }
-    filtered.slice(0, 50).forEach(a => {
-      const d = document.createElement('div');
-      d.className = 'row-card';
-      d.onclick = () => { Achats.load(a.id); openSheet('achats'); };
-      const paid = (a.reglements || []).reduce((a, r) => a + r.amount, 0);
-      d.innerHTML = `<div class="main-info"><div class="name">${a.num}</div><div class="meta">${a.supplier} - ${a.date} | المدفوع: ${paid.toFixed(3)}</div></div><div class="amount">${a.total.toFixed(3)} د.ت</div>`;
-      list.appendChild(d);
-    });
-  },
-
-  shareWhatsapp() {
-    if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; }
-    const rec = achats.find(a => a.id === this.editingId);
-    if (!rec) return;
-    const supplier = fournisseurs.find(s => s.name === rec.supplier);
-    const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0);
-    let text = `*فاتورة شراء ${rec.num}*\nالتاريخ: ${rec.date}\nالمورد: ${rec.supplier}\n`;
-    if (rec.supplierTaxId) text += `MF: ${rec.supplierTaxId}\n`;
-    rec.lines.forEach(l => { text += `${l.name}  x${l.qty}  ${l.total.toFixed(3)} د.ت\n`; });
-    text += `\nالمجموع: ${rec.total.toFixed(3)} د.ت\nالمدفوع: ${paid.toFixed(3)} د.ت\nالمتبقي: ${(rec.total - paid).toFixed(3)} د.ت`;
-    const phone = supplier ? supplier.phone.replace(/\D/g, '') : '';
-    const url = 'https://wa.me/' + (phone ? '216' + phone : '') + '?text=' + encodeURIComponent(text);
-    window.open(url, '_blank');
-  },
-
-  printInvoice() {
-    if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; }
-    const rec = achats.find(a => a.id === this.editingId);
-    if (!rec) return;
-    const supplier = fournisseurs.find(s => s.name === rec.supplier);
-    const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0);
-    const prevBalance = rec.prevBalance || (supplier ? supplier.balance - (rec.total - paid) : 0);
-    const currentBalance = prevBalance + rec.total - paid;
-    _invoiceData = { title: 'فاتورة شراء', num: rec.num, date: rec.date, partyLabel: 'المورد', partyName: rec.supplier, partyAddr: rec.supplierAddress || (supplier ? supplier.address : ''), partyPhone: supplier ? supplier.phone : '', partyTaxId: rec.supplierTaxId || (supplier ? supplier.taxId : ''), lines: rec.lines || [], total: rec.total, paid: paid, prevBalance: prevBalance, currentBalance: currentBalance };
-    renderInvoice();
-    $('printOverlay').classList.add('show');
-  },
-
-  printBluetooth() {
-    if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; }
-    const rec = achats.find(a => a.id === this.editingId);
-    if (!rec) return;
-    const supplier = fournisseurs.find(s => s.name === rec.supplier);
-    const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0);
-    let text = `${companyInfo.name}\n${companyInfo.address}\n${companyInfo.phone1}\n----------------\nفاتورة شراء: ${rec.num}\nالتاريخ: ${rec.date}\nالمورد: ${rec.supplier}\n`;
-    if (rec.supplierTaxId) text += `MF: ${rec.supplierTaxId}\n`;
-    text += `----------------\n`;
-    rec.lines.forEach(l => { text += `${l.name}  ${l.qty} x ${l.price.toFixed(3)} = ${l.total.toFixed(3)}\n`; });
-    text += `----------------\nالمجموع: ${rec.total.toFixed(3)}\nالمدفوع: ${paid.toFixed(3)}\nالمتبقي: ${(rec.total - paid).toFixed(3)}\nشكراً لكم\n`;
-    if (!navigator.bluetooth) { showToast('متصفحك لا يدعم Bluetooth'); return; }
-    navigator.bluetooth.requestDevice({ filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }], optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] })
-      .then(device => device.gatt.connect())
-      .then(server => server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb'))
-      .then(service => service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb'))
-      .then(characteristic => { characteristic.writeValue(new TextEncoder().encode(text)); showToast('✅ تم الإرسال إلى الطابعة'); })
-      .catch(err => { console.error(err); showToast('❌ فشل الاتصال بالطابعة: ' + err.message); });
-  }
+  remove() { if (this.editingId == null) { showToast('اختر فاتورة لحذفها'); return; } const rec = achats.find(a => a.id === this.editingId); if (rec) { const supplier = fournisseurs.find(s => s.name === rec.supplier); const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0); if (supplier) supplier.balance -= (rec.total - paid); rec.lines.forEach(l => { const article = articles.find(a => a.name === l.name); if (article) article.stock = (article.stock || 0) - l.qty; }); } achats = achats.filter(a => a.id !== this.editingId); saveState(); this.render(); closeSheet(); showToast('🗑️ تم الحذف'); },
+  load(id) { const r = achats.find(a => a.id === id); if (!r) return; this.editingId = id; $('pNum').value = r.num; $('pDate').value = r.date; const opt = [...$('pSupplier').options].find(o => o.textContent === r.supplier); if (opt) $('pSupplier').value = opt.value; const s = fournisseurs.find(f => f.name === r.supplier); const paid = (r.reglements || []).reduce((a, rr) => a + rr.amount, 0); this.originalSupplierBalance = r.prevBalance || (s ? s.balance - (r.total - paid) : 0); this.originalSupplierId = s ? s.id : null; this.supplierTaxId = r.supplierTaxId || (s ? s.taxId || '' : ''); this.supplierAddress = r.supplierAddress || (s ? s.address || '' : ''); $('pPhone').value = s ? s.phone : ''; this.lines = [...r.lines]; this.reglements = r.reglements ? [...r.reglements] : []; this.renderLines(); this.refreshArticleOptions(); this.renderReglements(); this.updateAccountSummary(); openSheet('achats'); },
+  render() { const q = $('aSearchP').value.trim().toLowerCase(); const list = $('achatsList'); list.innerHTML = ''; const filtered = achats.filter(a => !q || a.num.toLowerCase().includes(q) || a.supplier.toLowerCase().includes(q)).reverse(); if (!filtered.length) { list.innerHTML = '<div class="empty-msg">لا توجد فواتير شراء</div>'; return; } filtered.slice(0, 50).forEach(a => { const d = document.createElement('div'); d.className = 'row-card'; d.onclick = () => { Achats.load(a.id); openSheet('achats'); }; const paid = (a.reglements || []).reduce((aa, r) => aa + r.amount, 0); d.innerHTML = `<div class="main-info"><div class="name">${a.num}</div><div class="meta">${a.supplier} - ${a.date} | المدفوع: ${paid.toFixed(3)}</div></div><div class="amount">${a.total.toFixed(3)} د.ت</div>`; list.appendChild(d); }); },
+  shareWhatsapp() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = achats.find(a => a.id === this.editingId); if (!rec) return; const supplier = fournisseurs.find(s => s.name === rec.supplier); const paid = (rec.reglements || []).reduce((aa, r) => aa + r.amount, 0); let text = `*فاتورة شراء ${rec.num}*\nالتاريخ: ${rec.date}\nالمورد: ${rec.supplier}\n`; if (rec.supplierTaxId) text += `MF: ${rec.supplierTaxId}\n`; rec.lines.forEach(l => { text += `${l.name}  x${l.qty}  ${l.total.toFixed(3)} د.ت\n`; }); text += `\nالمجموع: ${rec.total.toFixed(3)} د.ت\nالمدفوع: ${paid.toFixed(3)} د.ت\nالمتبقي: ${(rec.total - paid).toFixed(3)} د.ت`; const phone = supplier ? supplier.phone.replace(/\D/g, '') : ''; const url = 'https://wa.me/' + (phone ? '216' + phone : '') + '?text=' + encodeURIComponent(text); window.open(url, '_blank'); },
+  printInvoice() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = achats.find(a => a.id === this.editingId); if (!rec) return; const supplier = fournisseurs.find(s => s.name === rec.supplier); const paid = (rec.reglements || []).reduce((aa, r) => aa + r.amount, 0); const prevBalance = rec.prevBalance || (supplier ? supplier.balance - (rec.total - paid) : 0); const currentBalance = prevBalance + rec.total - paid; _invoiceData = { title: 'فاتورة شراء', num: rec.num, date: rec.date, partyLabel: 'المورد', partyName: rec.supplier, partyAddr: rec.supplierAddress || (supplier ? supplier.address : ''), partyPhone: supplier ? supplier.phone : '', partyTaxId: rec.supplierTaxId || (supplier ? supplier.taxId : ''), lines: rec.lines || [], total: rec.total, paid: paid, prevBalance: prevBalance, currentBalance: currentBalance }; renderInvoice(); $('printOverlay').classList.add('show'); },
+  printBluetooth() { if (this.editingId == null) { showToast('احفظ الفاتورة أولا'); return; } const rec = achats.find(a => a.id === this.editingId); if (!rec) return; const supplier = fournisseurs.find(s => s.name === rec.supplier); const paid = (rec.reglements || []).reduce((aa, r) => aa + r.amount, 0); let text = `${companyInfo.name}\n${companyInfo.address}\n${companyInfo.phone1}\n----------------\nفاتورة شراء: ${rec.num}\nالتاريخ: ${rec.date}\nالمورد: ${rec.supplier}\n`; if (rec.supplierTaxId) text += `MF: ${rec.supplierTaxId}\n`; text += `----------------\n`; rec.lines.forEach(l => { text += `${l.name}  ${l.qty} x ${l.price.toFixed(3)} = ${l.total.toFixed(3)}\n`; }); text += `----------------\nالمجموع: ${rec.total.toFixed(3)}\nالمدفوع: ${paid.toFixed(3)}\nالمتبقي: ${(rec.total - paid).toFixed(3)}\nشكراً لكم\n`; if (!navigator.bluetooth) { showToast('متصفحك لا يدعم Bluetooth'); return; } navigator.bluetooth.requestDevice({ filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }], optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] }).then(device => device.gatt.connect()).then(server => server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb')).then(service => service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb')).then(characteristic => { characteristic.writeValue(new TextEncoder().encode(text)); showToast('✅ تم الإرسال إلى الطابعة'); }).catch(err => { console.error(err); showToast('❌ فشل الاتصال بالطابعة: ' + err.message); }); }
 };
 
 // ===== PRINT FUNCTIONS =====
 function closePrintOverlay() { $('printOverlay').classList.remove('show'); }
-
 function renderInvoice() {
   if (!_invoiceData) return;
   const size = $('paperSizeSelect').value;
@@ -2048,30 +1493,14 @@ function renderInvoice() {
   const data = _invoiceData;
   const lines = data.lines.map((l, i) => `<tr><td>${i+1}</td><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td></tr>`).join('');
   const totalQty = data.lines.reduce((a, l) => a + l.qty, 0);
-  const partyInfo = `
-    <div><strong>${data.partyName}</strong><br><span class="label">${data.partyLabel}</span></div>
-    <div>${data.partyPhone || '-'}<br><span class="label">الهاتف</span></div>
-    <div>${data.partyTaxId || '-'}<br><span class="label">MF</span></div>
-  `;
+  const partyInfo = `<div><strong>${data.partyName}</strong><br><span class="label">${data.partyLabel}</span></div><div>${data.partyPhone || '-'}<br><span class="label">الهاتف</span></div><div>${data.partyTaxId || '-'}<br><span class="label">MF</span></div>`;
   doc.innerHTML = `
-    <div class="inv-top">
-      <div class="inv-datetime">${new Date().toLocaleDateString('en-GB')}<br>${new Date().toLocaleTimeString('en-US')}</div>
-      <div class="inv-company">${companyInfo.name}<br>${companyInfo.address||''}<br>${companyInfo.phone1||''}${companyInfo.taxId ? '<br>MF: '+companyInfo.taxId : ''}</div>
-    </div>
+    <div class="inv-top"><div class="inv-datetime">${new Date().toLocaleDateString('en-GB')}<br>${new Date().toLocaleTimeString('en-US')}</div><div class="inv-company">${companyInfo.name}<br>${companyInfo.address||''}<br>${companyInfo.phone1||''}${companyInfo.taxId ? '<br>MF: '+companyInfo.taxId : ''}</div></div>
     <div class="inv-title">${data.title}</div>
     <div class="inv-meta"><b>الرقم:</b> ${data.num} &nbsp; <b>التاريخ:</b> ${data.date}</div>
     <div class="inv-partybar">${partyInfo}</div>
-    <table class="inv-items">
-      <thead><tr><th>#</th><th>المنتج</th><th>السعر</th><th>الكمية</th><th>الإجمالي</th></tr></thead>
-      <tbody>${lines}</tbody>
-      <tfoot><tr class="inv-totalrow"><td colspan="2">المبلغ بالحروف: ${amountInWords(data.total)}</td><td></td><td>${totalQty}</td><td>${data.total.toFixed(3)}</td></tr></tfoot>
-    </table>
-    <table class="inv-summary">
-      <tr><td class="label">الرصيد السابق</td><td class="value">${data.prevBalance.toFixed(3)}</td></tr>
-      <tr class="total"><td class="label">إجمالي الفاتورة</td><td class="value">${data.total.toFixed(3)}</td></tr>
-      <tr><td class="label">المدفوع</td><td class="value">${data.paid.toFixed(3)}</td></tr>
-      <tr class="highlight"><td class="label">الرصيد الحالي</td><td class="value">${data.currentBalance.toFixed(3)}</td></tr>
-    </table>
+    <table class="inv-items"><thead><tr><th>#</th><th>المنتج</th><th>السعر</th><th>الكمية</th><th>الإجمالي</th></tr></thead><tbody>${lines}</tbody><tfoot><tr class="inv-totalrow"><td colspan="2">المبلغ بالحروف: ${amountInWords(data.total)}</td><td></td><td>${totalQty}</td><td>${data.total.toFixed(3)}</td></tr></tfoot></table>
+    <table class="inv-summary"><tr><td class="label">الرصيد السابق</td><td class="value">${data.prevBalance.toFixed(3)}</td></tr><tr class="total"><td class="label">إجمالي الفاتورة</td><td class="value">${data.total.toFixed(3)}</td></tr><tr><td class="label">المدفوع</td><td class="value">${data.paid.toFixed(3)}</td></tr><tr class="highlight"><td class="label">الرصيد الحالي</td><td class="value">${data.currentBalance.toFixed(3)}</td></tr></table>
   `;
 }
 $('paperSizeSelect').addEventListener('change', renderInvoice);
@@ -2169,7 +1598,6 @@ function exportBackup() {
   URL.revokeObjectURL(url);
   showToast('تم التصدير');
 }
-
 function exportBackupToDrive() {
   if (!currentUser) { showToast('يجب تسجيل الدخول'); return; }
   const provider = new firebase.auth.GoogleAuthProvider();
@@ -2205,7 +1633,6 @@ function exportBackupToDrive() {
     } else showToast('تعذر الحصول على إذن');
   });
 }
-
 function importBackupFile(input) {
   const file = input.files[0];
   if (!file) return;
