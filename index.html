@@ -649,42 +649,44 @@
   .inv-summary tr.highlight td{background:#fbdcc9;}
   .inv-summary tr.total td.value{color:#c0392b; font-weight:800;}
 
-  /* ===== سجل العميل ===== */
+  /* ===== سجل العميل - مصغر ومنظم ===== */
   .history-item{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    padding:4px 8px;
+    padding:2px 4px;
     background:var(--panel);
     border-bottom:1px solid var(--border);
-    font-size:10px;
+    font-size:9px;
   }
-  .history-item .h-date{color:var(--muted); width:80px; flex-shrink:0;}
-  .history-item .h-desc{flex:1; margin:0 4px; font-weight:600;}
-  .history-item .h-debit{color:var(--danger); font-weight:700; width:70px; text-align:left; flex-shrink:0;}
-  .history-item .h-credit{color:var(--success); font-weight:700; width:70px; text-align:left; flex-shrink:0;}
-  .history-item .h-balance{font-weight:800; color:var(--navy); width:70px; text-align:left; flex-shrink:0;}
+  .history-item .h-date{color:var(--muted); width:60px; flex-shrink:0; font-size:8px;}
+  .history-item .h-desc{flex:1; margin:0 2px; font-weight:600; font-size:9px;}
+  .history-item .h-debit{color:var(--danger); font-weight:700; width:55px; text-align:left; flex-shrink:0; font-size:9px;}
+  .history-item .h-credit{color:var(--success); font-weight:700; width:55px; text-align:left; flex-shrink:0; font-size:9px;}
+  .history-item .h-balance{font-weight:800; color:var(--navy); width:60px; text-align:left; flex-shrink:0; font-size:9px;}
+  
   .history-header{
     display:flex;
     justify-content:space-between;
     background:var(--navy);
     color:#fff;
-    padding:3px 8px;
-    font-size:9px;
+    padding:2px 4px;
+    font-size:8px;
     font-weight:700;
     border-radius:3px 3px 0 0;
   }
-  .history-header span{width:70px; text-align:left; flex-shrink:0;}
+  .history-header span{width:60px; text-align:left; flex-shrink:0;}
   .history-header .h-desc{flex:1; text-align:center;}
+  
   .client-balance-big{
-    font-size:16px;
+    font-size:14px;
     font-weight:800;
-    padding:8px;
+    padding:6px;
     text-align:center;
     background:var(--panel);
     border:1px solid var(--border);
     border-radius:6px;
-    margin-bottom:8px;
+    margin-bottom:6px;
   }
 </style>
 </head>
@@ -975,7 +977,7 @@ function $(id) { return document.getElementById(id); }
 function showToast(msg) { const t = $('toast'); if (!t) return; t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 3000); }
 
 // ===== PERSISTENCE =====
-const STORAGE_KEY = 'gtrpos_data_v14';
+const STORAGE_KEY = 'gtrpos_data_v15';
 function saveState() {
   try { const data = { clients, fournisseurs, articles, ventes, caisseClients, nextId, companyInfo }; localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
   if (storageMode === 'cloud' && currentUser) {
@@ -1178,7 +1180,7 @@ const ClientHistory = {
     const clientVentes = ventes.filter(v => v.client === client.name);
     const clientReglements = caisseClients.filter(r => r.clientName === client.name);
     
-    // 2. بناء قائمة الحركات مرتبة حسب التاريخ، مع ربط التسديدات بالفواتير
+    // 2. بناء قائمة الحركات مرتبة حسب التاريخ
     let history = [];
     
     // فرز الفواتير حسب التاريخ
@@ -1273,6 +1275,8 @@ const ClientHistory = {
         const debitDisplay = h.debit > 0 ? h.debit.toFixed(3) : '-';
         const creditDisplay = h.credit > 0 ? h.credit.toFixed(3) : '-';
         const icon = h.type === 'فاتورة' ? '📄' : '💰';
+        // عرض فقط إذا كان المبلغ أكبر من 0 أو كان الفاتورة
+        if (h.type === 'تسديد' && h.credit <= 0) return;
         html += `<div class="history-item">
           <span class="h-date">${h.date}</span>
           <span class="h-desc">${icon} ${h.desc}</span>
