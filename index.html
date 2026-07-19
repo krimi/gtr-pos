@@ -111,6 +111,99 @@
   .storage-selector .btn{flex:1; padding:5px; font-size:11px; margin:0; background:#eee; color:#333; border:1px solid var(--border);}
   .storage-selector .btn.active{background:var(--blue-accent); color:#fff; border-color:var(--blue-accent);}
   
+  /* ===== FINANCE STYLES ===== */
+  .finance-kpi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 5px;
+    margin-bottom: 8px;
+  }
+  .finance-kpi-grid .kpi-card {
+    min-height: 44px;
+    padding: 4px 2px;
+  }
+  .finance-kpi-grid .kpi-card .val {
+    font-size: 12px;
+  }
+  .finance-kpi-grid .kpi-card .lbl {
+    font-size: 7px;
+  }
+
+  .finance-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: #fff;
+  }
+  .finance-table {
+    width: 100%;
+    min-width: 700px;
+    border-collapse: collapse;
+    font-size: 10px;
+    direction: rtl;
+    background: #fff;
+  }
+  .finance-table th {
+    background: var(--navy);
+    color: #fff;
+    padding: 4px 3px;
+    font-weight: 700;
+    white-space: nowrap;
+    text-align: center;
+    font-size: 8px;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  .finance-table td {
+    padding: 3px 2px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+    white-space: nowrap;
+    font-size: 9px;
+    background: #fff;
+  }
+  .finance-table td input {
+    width: 60px;
+    padding: 1px 2px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-size: 9px;
+    text-align: center;
+    font-family: 'Cairo', sans-serif;
+    background: #fafbfd;
+  }
+  .finance-table td input.date-input {
+    width: 70px;
+  }
+  .finance-table td input:focus {
+    border-color: var(--blue-accent);
+    outline: none;
+    background: #fff;
+  }
+  .finance-table .row-del {
+    cursor: pointer;
+    color: var(--danger);
+    font-weight: 800;
+    font-size: 12px;
+    background: none;
+    border: none;
+    padding: 0 4px;
+  }
+  .finance-table .row-del:hover {
+    opacity: 0.7;
+  }
+  .finance-table .total-row td {
+    background: #eef2f9;
+    font-weight: 800;
+    border-top: 2px solid var(--navy);
+  }
+  .finance-table .total-row td input {
+    background: #eef2f9;
+    font-weight: 800;
+  }
+  
   .account-item{background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:4px 6px; margin-bottom:4px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:2px; font-size:10px;}
   .account-item .email{font-weight:600; flex:1;}
   .account-item .status{font-size:8px; padding:1px 6px; border-radius:8px; color:#fff; white-space:nowrap;}
@@ -150,7 +243,6 @@
   .save-row{background:var(--success); color:#fff; border:none; border-radius:3px; padding:1px 5px; font-size:7px; cursor:pointer; margin-left:3px;}
   .cancel-row{background:var(--muted); color:#fff; border:none; border-radius:3px; padding:1px 5px; font-size:7px; cursor:pointer; margin-left:3px;}
   
-  /* ===== PRINT OVERLAY ===== */
   .print-overlay{position:fixed; inset:0; background:#525659; z-index:200; display:none; overflow-y:auto; padding:10px;}
   .print-overlay.show{display:block;}
   .print-actions{position:sticky; top:0; display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin-bottom:8px; z-index:2; background:#525659; padding:4px 0;}
@@ -186,7 +278,6 @@
   .inv-summary tr.highlight td{background:#fbdcc9;}
   .inv-summary tr.total td.value{color:#c0392b; font-weight:800;}
   
-  /* ===== HISTORY TABLE ===== */
   .history-table-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -393,6 +484,58 @@
       <div class="section-title">✅ موافق عليها</div>
       <div id="approvedAccountsList"></div>
     </div>
+
+    <!-- ===== FINANCE SECTION ===== -->
+    <div class="section" id="sec-finance">
+      <div class="section-title">📊 المؤشرات المالية</div>
+      
+      <!-- KPI Summary Cards -->
+      <div class="finance-kpi-grid">
+        <div class="kpi-card"><div class="val" id="finTotalClientBalance">0.000</div><div class="lbl">إجمالي رصيد العملاء</div></div>
+        <div class="kpi-card"><div class="val" id="finTotalStockValue">0.000</div><div class="lbl">قيمة المخزون</div></div>
+        <div class="kpi-card"><div class="val" id="finTotalCash">0.000</div><div class="lbl">إجمالي الخزينة</div></div>
+        <div class="kpi-card"><div class="val" id="finTotalSupplierBalance">0.000</div><div class="lbl">رصيد الموردين</div></div>
+        <div class="kpi-card"><div class="val" id="finNetWorth">0.000</div><div class="lbl">صافي رأس المال</div></div>
+        <div class="kpi-card"><div class="val" id="finProfit">0.000</div><div class="lbl">الأرباح</div></div>
+      </div>
+
+      <div class="section-title" style="margin-top:12px;">📋 جدول البيانات المالية</div>
+      <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px;">
+        <button class="btn save small" style="width:auto; padding:3px 12px;" onclick="FinanceTable.addRow()">➕ إضافة صف</button>
+        <button class="btn print small" style="width:auto; padding:3px 12px;" onclick="FinanceTable.printTable()">🖨️ طباعة</button>
+        <button class="btn outline small" style="width:auto; padding:3px 12px;" onclick="FinanceTable.exportCSV()">📥 CSV</button>
+        <button class="btn del small" style="width:auto; padding:3px 12px;" onclick="if(confirm('حذف كل البيانات؟')) FinanceTable.clearAll()">🗑️ مسح الكل</button>
+        <button class="btn edit small" style="width:auto; padding:3px 12px;" id="financeSyncBtn" onclick="FinanceTable.syncWithApp(); FinanceTable.render();">🔄 مزامنة</button>
+      </div>
+
+      <div class="finance-table-wrapper">
+        <table class="finance-table" id="financeTable">
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>رصيد العميل</th>
+              <th>قيمة المخزون</th>
+              <th>خزينة البداية</th>
+              <th>خزينة العميل</th>
+              <th>تسديد المورد</th>
+              <th>إجمالي المصاريف</th>
+              <th>الخزينة</th>
+              <th>رصيد المورد</th>
+              <th>رأس المال</th>
+              <th>الأرباح</th>
+              <th style="min-width:40px;">🔄</th>
+            </tr>
+          </thead>
+          <tbody id="financeTableBody">
+          </tbody>
+        </table>
+      </div>
+      <div style="font-size:9px;color:var(--muted);text-align:center;margin-top:4px;">
+        💾 يتم الحفظ تلقائياً في المتصفح
+      </div>
+    </div>
+    <!-- ===== END FINANCE SECTION ===== -->
+
   </div>
   <button class="fab" id="fabBtn">＋</button>
   <div class="tabbar">
@@ -406,6 +549,7 @@
     <div class="tab-item" data-section="achats"><span class="ic">🛒</span><span>المشتريات</span></div>
     <div class="tab-item" data-section="expenses"><span class="ic">💸</span><span>المصاريف</span></div>
     <div class="tab-item" data-section="accounts" id="tabAccounts" style="display:none;"><span class="ic">👤</span><span>الحسابات</span></div>
+    <div class="tab-item" data-section="finance"><span class="ic">💰</span><span>المالية</span></div>
   </div>
   <div class="sheet-overlay" id="overlay"></div>
   
@@ -658,6 +802,12 @@ function showSection(sectionId) {
   const pageName = activeTab ? activeTab.querySelector('span:last-child').textContent : 'الرئيسية';
   $('pageTitle').textContent = pageName;
   currentSection = sectionId;
+  
+  // تحميل بيانات المالية عند التبديل إليها
+  if (sectionId === 'finance') {
+    FinanceTable.load();
+    FinanceTable.render();
+  }
 }
 document.querySelectorAll('.tab-item').forEach(tab => {
   tab.addEventListener('click', function() {
@@ -767,6 +917,393 @@ function recalculateFournisseurBalance(supplierName) {
 }
 
 // =====================================================
+// ===== FINANCE TABLE =====
+// =====================================================
+const FINANCE_STORAGE_KEY = 'gtrpos_finance_data_v1';
+
+const FinanceTable = {
+  data: [],
+
+  load() {
+    try {
+      const raw = localStorage.getItem(FINANCE_STORAGE_KEY);
+      if (raw) {
+        this.data = JSON.parse(raw);
+        return;
+      }
+    } catch (e) {}
+    // Default data from the image
+    this.data = [
+      {
+        date: '18/07/2026',
+        clientBalance: 4934180.000,
+        stockValue: 1519730.450,
+        cashStart: 81144.740,
+        cashClient: 166560.000,
+        supplierPayment: 9000000.000,
+        totalExpense: 100000.000,
+        cash: 238604.740,
+        supplierBalance: 6608106.900,
+        capital: 84408.290,
+        profit: 0.000
+      },
+      {
+        date: '19/07/2026',
+        clientBalance: 4034350.000,
+        stockValue: 1519730.450,
+        cashStart: 238604.740,
+        cashClient: 900000.000,
+        supplierPayment: 500000.000,
+        totalExpense: 50000.000,
+        cash: 638554.740,
+        supplierBalance: 6108106.900,
+        capital: 84528.290,
+        profit: 120000.000
+      }
+    ];
+    this.save();
+  },
+
+  save() {
+    try {
+      localStorage.setItem(FINANCE_STORAGE_KEY, JSON.stringify(this.data));
+    } catch (e) {}
+    this.render();
+    this.updateKPIs();
+  },
+
+  render() {
+    const tbody = document.getElementById('financeTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (this.data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:12px;color:var(--muted);font-size:11px;">لا توجد بيانات مالية. أضف صفاً جديداً.</td></tr>`;
+      return;
+    }
+
+    this.data.forEach((row, index) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input class="date-input" type="text" value="${row.date || ''}" data-field="date" data-index="${index}" placeholder="DD/MM/YYYY"></td>
+        <td><input type="number" step="0.001" value="${row.clientBalance ?? 0}" data-field="clientBalance" data-index="${index}"></td>
+        <td><input type="number" step="0.001" value="${row.stockValue ?? 0}" data-field="stockValue" data-index="${index}"></td>
+        <td><input type="number" step="0.001" value="${row.cashStart ?? 0}" data-field="cashStart" data-index="${index}"></td>
+        <td><input type="number" step="0.001" value="${row.cashClient ?? 0}" data-field="cashClient" data-index="${index}"></td>
+        <td><input type="number" step="0.001" value="${row.supplierPayment ?? 0}" data-field="supplierPayment" data-index="${index}"></td>
+        <td><input type="number" step="0.001" value="${row.totalExpense ?? 0}" data-field="totalExpense" data-index="${index}"></td>
+        <td><input type="number" step="0.001" value="${row.cash ?? 0}" data-field="cash" data-index="${index}"></td>
+        <td><input type="number" step="0.001" value="${row.supplierBalance ?? 0}" data-field="supplierBalance" data-index="${index}"></td>
+        <td><input type="number" step="0.001" value="${row.capital ?? 0}" data-field="capital" data-index="${index}"></td>
+        <td><input type="number" step="0.001" value="${row.profit ?? 0}" data-field="profit" data-index="${index}"></td>
+        <td><button class="row-del" onclick="FinanceTable.deleteRow(${index})">✕</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    tbody.querySelectorAll('input').forEach(input => {
+      input.addEventListener('input', function() {
+        const index = parseInt(this.dataset.index);
+        const field = this.dataset.field;
+        let val = this.value;
+        if (field !== 'date') {
+          val = parseFloat(val) || 0;
+        }
+        FinanceTable.data[index][field] = val;
+        FinanceTable.save();
+        FinanceTable.updateKPIs();
+        FinanceTable.renderTotals();
+      });
+    });
+
+    this.renderTotals();
+  },
+
+  renderTotals() {
+    const tbody = document.getElementById('financeTableBody');
+    if (!tbody) return;
+    const oldTotal = tbody.querySelector('.total-row');
+    if (oldTotal) oldTotal.remove();
+
+    if (this.data.length === 0) return;
+
+    const totals = {
+      clientBalance: 0,
+      stockValue: 0,
+      cashStart: 0,
+      cashClient: 0,
+      supplierPayment: 0,
+      totalExpense: 0,
+      cash: 0,
+      supplierBalance: 0,
+      capital: 0,
+      profit: 0
+    };
+
+    this.data.forEach(row => {
+      totals.clientBalance += row.clientBalance || 0;
+      totals.stockValue += row.stockValue || 0;
+      totals.cashStart += row.cashStart || 0;
+      totals.cashClient += row.cashClient || 0;
+      totals.supplierPayment += row.supplierPayment || 0;
+      totals.totalExpense += row.totalExpense || 0;
+      totals.cash += row.cash || 0;
+      totals.supplierBalance += row.supplierBalance || 0;
+      totals.capital += row.capital || 0;
+      totals.profit += row.profit || 0;
+    });
+
+    const tr = document.createElement('tr');
+    tr.className = 'total-row';
+    tr.innerHTML = `
+      <td style="font-size:8px;">المجموع</td>
+      <td>${totals.clientBalance.toFixed(3)}</td>
+      <td>${totals.stockValue.toFixed(3)}</td>
+      <td>${totals.cashStart.toFixed(3)}</td>
+      <td>${totals.cashClient.toFixed(3)}</td>
+      <td>${totals.supplierPayment.toFixed(3)}</td>
+      <td>${totals.totalExpense.toFixed(3)}</td>
+      <td>${totals.cash.toFixed(3)}</td>
+      <td>${totals.supplierBalance.toFixed(3)}</td>
+      <td>${totals.capital.toFixed(3)}</td>
+      <td>${totals.profit.toFixed(3)}</td>
+      <td></td>
+    `;
+    tbody.appendChild(tr);
+  },
+
+  addRow() {
+    const today = new Date();
+    const dateStr = String(today.getDate()).padStart(2, '0') + '/' +
+                    String(today.getMonth() + 1).padStart(2, '0') + '/' +
+                    today.getFullYear();
+    this.data.push({
+      date: dateStr,
+      clientBalance: 0,
+      stockValue: 0,
+      cashStart: 0,
+      cashClient: 0,
+      supplierPayment: 0,
+      totalExpense: 0,
+      cash: 0,
+      supplierBalance: 0,
+      capital: 0,
+      profit: 0
+    });
+    this.save();
+    setTimeout(() => {
+      const tbody = document.getElementById('financeTableBody');
+      if (tbody) {
+        const lastInput = tbody.querySelector('tr:last-child input');
+        if (lastInput) lastInput.focus();
+      }
+    }, 50);
+  },
+
+  deleteRow(index) {
+    if (this.data.length <= 1) {
+      if (!confirm('هذا هو الصف الوحيد. هل تريد حذفه؟')) return;
+    }
+    this.data.splice(index, 1);
+    this.save();
+  },
+
+  clearAll() {
+    this.data = [];
+    this.save();
+  },
+
+  updateKPIs() {
+    if (this.data.length === 0) {
+      document.getElementById('finTotalClientBalance').textContent = '0.000';
+      document.getElementById('finTotalStockValue').textContent = '0.000';
+      document.getElementById('finTotalCash').textContent = '0.000';
+      document.getElementById('finTotalSupplierBalance').textContent = '0.000';
+      document.getElementById('finNetWorth').textContent = '0.000';
+      document.getElementById('finProfit').textContent = '0.000';
+      return;
+    }
+    const last = this.data[this.data.length - 1];
+    document.getElementById('finTotalClientBalance').textContent = (last.clientBalance || 0).toFixed(3);
+    document.getElementById('finTotalStockValue').textContent = (last.stockValue || 0).toFixed(3);
+    document.getElementById('finTotalCash').textContent = (last.cash || 0).toFixed(3);
+    document.getElementById('finTotalSupplierBalance').textContent = (last.supplierBalance || 0).toFixed(3);
+    document.getElementById('finNetWorth').textContent = (last.capital || 0).toFixed(3);
+    document.getElementById('finProfit').textContent = (last.profit || 0).toFixed(3);
+  },
+
+  printTable() {
+    if (this.data.length === 0) {
+      showToast('لا توجد بيانات للطباعة');
+      return;
+    }
+    let rows = '';
+    this.data.forEach(row => {
+      rows += `<tr>
+        <td>${row.date || ''}</td>
+        <td>${(row.clientBalance ?? 0).toFixed(3)}</td>
+        <td>${(row.stockValue ?? 0).toFixed(3)}</td>
+        <td>${(row.cashStart ?? 0).toFixed(3)}</td>
+        <td>${(row.cashClient ?? 0).toFixed(3)}</td>
+        <td>${(row.supplierPayment ?? 0).toFixed(3)}</td>
+        <td>${(row.totalExpense ?? 0).toFixed(3)}</td>
+        <td>${(row.cash ?? 0).toFixed(3)}</td>
+        <td>${(row.supplierBalance ?? 0).toFixed(3)}</td>
+        <td>${(row.capital ?? 0).toFixed(3)}</td>
+        <td>${(row.profit ?? 0).toFixed(3)}</td>
+      </tr>`;
+    });
+
+    const printWindow = window.open('', '_blank', 'width=900,height=600');
+    printWindow.document.write(`
+      <html dir="rtl">
+      <head>
+        <title>البيانات المالية</title>
+        <style>
+          body { font-family: 'Cairo', sans-serif; padding: 20px; direction: rtl; background: #fff; }
+          h2 { text-align: center; color: #1e2f66; }
+          table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 10px; }
+          th { background: #1e2f66; color: #fff; padding: 6px 4px; border: 1px solid #999; text-align: center; }
+          td { padding: 4px; border: 1px solid #999; text-align: center; }
+          .total-row { background: #eef2f9; font-weight: 800; }
+          .footer { text-align: center; margin-top: 15px; color: #666; font-size: 9px; border-top: 1px solid #ddd; padding-top: 8px; }
+          @media print { body { padding: 10px; } }
+        </style>
+      </head>
+      <body>
+        <h2>📊 البيانات المالية</h2>
+        <p style="text-align:center;font-size:11px;color:#666;">${companyInfo.name || 'GTR POS'} | ${new Date().toLocaleDateString()}</p>
+        <table>
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>رصيد العميل</th>
+              <th>قيمة المخزون</th>
+              <th>خزينة البداية</th>
+              <th>خزينة العميل</th>
+              <th>تسديد المورد</th>
+              <th>إجمالي المصاريف</th>
+              <th>الخزينة</th>
+              <th>رصيد المورد</th>
+              <th>رأس المال</th>
+              <th>الأرباح</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div class="footer">${companyInfo.name} - ${companyInfo.address || ''} - ${companyInfo.phone1 || ''}</div>
+        <script>
+          window.onload = function() { window.print(); setTimeout(function() { window.close(); }, 500); };
+        <\/script>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
+  },
+
+  exportCSV() {
+    if (this.data.length === 0) {
+      showToast('لا توجد بيانات للتصدير');
+      return;
+    }
+    const headers = ['التاريخ', 'رصيد العميل', 'قيمة المخزون', 'خزينة البداية', 'خزينة العميل', 'تسديد المورد', 'إجمالي المصاريف', 'الخزينة', 'رصيد المورد', 'رأس المال', 'الأرباح'];
+    let csv = headers.join(',') + '\n';
+    this.data.forEach(row => {
+      csv += [
+        row.date || '',
+        (row.clientBalance ?? 0).toFixed(3),
+        (row.stockValue ?? 0).toFixed(3),
+        (row.cashStart ?? 0).toFixed(3),
+        (row.cashClient ?? 0).toFixed(3),
+        (row.supplierPayment ?? 0).toFixed(3),
+        (row.totalExpense ?? 0).toFixed(3),
+        (row.cash ?? 0).toFixed(3),
+        (row.supplierBalance ?? 0).toFixed(3),
+        (row.capital ?? 0).toFixed(3),
+        (row.profit ?? 0).toFixed(3)
+      ].join(',') + '\n';
+    });
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'البيانات_المالية_' + new Date().toISOString().slice(0,10) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('✅ تم التصدير');
+  },
+
+  syncWithApp() {
+    if (this.data.length === 0) {
+      // إضافة صف افتراضي إذا كانت البيانات فارغة
+      const today = new Date();
+      const dateStr = String(today.getDate()).padStart(2, '0') + '/' +
+                      String(today.getMonth() + 1).padStart(2, '0') + '/' +
+                      today.getFullYear();
+      this.data.push({
+        date: dateStr,
+        clientBalance: 0,
+        stockValue: 0,
+        cashStart: 0,
+        cashClient: 0,
+        supplierPayment: 0,
+        totalExpense: 0,
+        cash: 0,
+        supplierBalance: 0,
+        capital: 0,
+        profit: 0
+      });
+    }
+    
+    const lastIndex = this.data.length - 1;
+    const last = this.data[lastIndex];
+
+    // تحديث رصيد العملاء
+    const totalClientBal = clients.reduce((sum, c) => sum + (c.balance || 0), 0);
+    last.clientBalance = totalClientBal;
+
+    // تحديث قيمة المخزون
+    const totalStockVal = articles.reduce((sum, a) => sum + ((a.stock || 0) * (a.costPrice || a.price || 0)), 0);
+    last.stockValue = totalStockVal;
+
+    // تحديث خزينة العميل
+    const totalCashClient = caisseClients.reduce((sum, c) => sum + (c.amount || 0), 0);
+    last.cashClient = totalCashClient;
+
+    // تحديث تسديد المورد
+    const totalSupplierPay = caisseFournisseurs.reduce((sum, c) => sum + (c.amount || 0), 0);
+    last.supplierPayment = totalSupplierPay;
+
+    // تحديث إجمالي المصاريف
+    const totalExp = expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+    last.totalExpense = totalExp;
+
+    // تحديث رصيد الموردين
+    const totalSupplierBal = fournisseurs.reduce((sum, f) => sum + (f.balance || 0), 0);
+    last.supplierBalance = totalSupplierBal;
+
+    // الخزينة = خزينة البداية + خزينة العميل - تسديد المورد - المصاريف
+    last.cash = (last.cashStart || 0) + (last.cashClient || 0) - (last.supplierPayment || 0) - (last.totalExpense || 0);
+
+    // رأس المال = الخزينة + رصيد العميل + قيمة المخزون - رصيد المورد
+    last.capital = (last.cash || 0) + (last.clientBalance || 0) + (last.stockValue || 0) - (last.supplierBalance || 0);
+
+    // الأرباح = رأس المال الحالي - رأس المال السابق
+    if (this.data.length > 1) {
+      const prev = this.data[lastIndex - 1];
+      last.profit = (last.capital || 0) - (prev.capital || 0);
+    } else {
+      last.profit = 0;
+    }
+
+    this.save();
+    showToast('🔄 تم مزامنة البيانات من التطبيق');
+  }
+};
+
+// =====================================================
 // ===== CLIENTS =====
 // =====================================================
 const Clients = {
@@ -806,7 +1343,6 @@ const Clients = {
       const idx = clients.findIndex(c => c.id === this.editingId); 
       if (idx !== -1) clients[idx] = rec; 
     } else clients.push(rec); 
-    // إعادة حساب الرصيد بعد الحفظ (للتأكد من الصحة)
     recalculateClientBalance(rec.name);
     saveState(); 
     this.render(); 
@@ -966,7 +1502,6 @@ const ClientHistory = {
     const client = clients.find(c => c.id === clientId);
     if (!client) { result.innerHTML = '<div class="empty-msg">العميل غير موجود</div>'; return; }
 
-    // إعادة حساب الرصيد للتأكد من الدقة
     recalculateClientBalance(client.name);
 
     const clientVentes = ventes.filter(v => v.client === client.name);
@@ -1527,7 +2062,6 @@ const Ventes = {
     const cRec = { id: nextId.caisseClients++, date, clientId: client ? client.id : null, clientName: clientName, type: 'in', amount, regType: method, description: 'تسديد من فاتورة ' + $('vNum').value, invoiceId: this.editingId ? this.editingId : null, invoiceNum: $('vNum').value }; 
     caisseClients.push(cRec); 
     saveState(); 
-    // إعادة حساب رصيد العميل
     if (client) recalculateClientBalance(clientName);
     this.renderReglements(); 
     this.updateAccountSummary(); 
@@ -1567,7 +2101,6 @@ const Ventes = {
         else ventes.push(rec);
       } else { ventes.push(rec); }
       saveState();
-      // إعادة حساب الرصيد
       recalculateClientBalance(clientName);
       this.render();
       this.editingId = rec.id;
@@ -1581,17 +2114,13 @@ const Ventes = {
     if (this.editingId == null) { showToast('اختر فاتورة لحذفها'); return; } 
     const rec = ventes.find(v => v.id === this.editingId); 
     if (rec) { 
-      // إعادة المخزون
       rec.lines.forEach(l => { 
         const article = articles.find(a => a.name === l.name); 
         if (article) article.stock = (article.stock || 0) + l.qty; 
       }); 
-      // حذف التسديدات المرتبطة
       caisseClients = caisseClients.filter(c => c.invoiceId !== this.editingId);
-      // حذف الفاتورة
       ventes = ventes.filter(v => v.id !== this.editingId); 
       saveState(); 
-      // إعادة حساب رصيد العميل
       recalculateClientBalance(rec.client);
       this.render(); 
       closeSheet(); 
@@ -2202,7 +2731,6 @@ function initAll() {
     if (currentUser.email === 'krimi.neji@gmail.com') {
       document.getElementById('tabAccounts').style.display = '';
     }
-    // إعادة حساب جميع الأرصدة للتأكد من صحتها عند التحميل
     clients.forEach(c => recalculateClientBalance(c.name));
     fournisseurs.forEach(f => recalculateFournisseurBalance(f.name));
     
@@ -2220,6 +2748,8 @@ function initAll() {
     Achats.render();
     Expenses.render();
     Accounts.render();
+    FinanceTable.load();
+    FinanceTable.render();
     document.getElementById('loginOverlay').classList.add('hide');
     document.getElementById('pendingOverlay').classList.add('hide');
     showSection('dashboard');
