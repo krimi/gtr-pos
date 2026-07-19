@@ -12,7 +12,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <style>
-  /* ===== جميع الأنماط السابقة ===== */
+  /* ===== جميع الأنماط ===== */
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; margin:0; padding:0;}
   html,body{height:100%; font-family:'Cairo',sans-serif; background:#0e142e; font-size:14px; overflow:hidden;}
   
@@ -502,10 +502,11 @@
       <div class="section-title" style="margin-top:12px;">📋 جدول البيانات المالية</div>
       <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px;">
         <button class="btn save small" style="width:auto; padding:3px 12px;" onclick="FinanceTable.addRow()">➕ إضافة صف</button>
-        <button class="btn print small" style="width:auto; padding:3px 12px;" onclick="FinanceTable.printTable()">🖨️ طباعة</button>
+        <button class="btn print small" style="width:auto; padding:3px 12px;" onclick="FinanceTable.printTable()">🖨️ طباعة الجدول</button>
         <button class="btn outline small" style="width:auto; padding:3px 12px;" onclick="FinanceTable.exportCSV()">📥 CSV</button>
         <button class="btn del small" style="width:auto; padding:3px 12px;" onclick="if(confirm('حذف كل البيانات؟')) FinanceTable.clearAll()">🗑️ مسح الكل</button>
-        <button class="btn edit small" style="width:auto; padding:3px 12px;" id="financeSyncBtn" onclick="FinanceTable.syncWithApp(); FinanceTable.render();">🔄 مزامنة</button>
+        <button class="btn edit small" style="width:auto; padding:3px 12px;" onclick="FinanceTable.syncWithApp(); FinanceTable.render();">🔄 مزامنة</button>
+        <button class="btn print small" style="width:auto; padding:3px 12px; background:linear-gradient(180deg,#6c7ae0,#4a56b0);" onclick="FinanceTable.printFullReport()">📄 تقرير شامل</button>
       </div>
 
       <div class="finance-table-wrapper">
@@ -803,7 +804,6 @@ function showSection(sectionId) {
   $('pageTitle').textContent = pageName;
   currentSection = sectionId;
   
-  // تحميل بيانات المالية عند التبديل إليها
   if (sectionId === 'finance') {
     FinanceTable.load();
     FinanceTable.render();
@@ -932,7 +932,6 @@ const FinanceTable = {
         return;
       }
     } catch (e) {}
-    // Default data from the image
     this.data = [
       {
         date: '18/07/2026',
@@ -1237,7 +1236,6 @@ const FinanceTable = {
 
   syncWithApp() {
     if (this.data.length === 0) {
-      // إضافة صف افتراضي إذا كانت البيانات فارغة
       const today = new Date();
       const dateStr = String(today.getDate()).padStart(2, '0') + '/' +
                       String(today.getMonth() + 1).padStart(2, '0') + '/' +
@@ -1260,37 +1258,29 @@ const FinanceTable = {
     const lastIndex = this.data.length - 1;
     const last = this.data[lastIndex];
 
-    // تحديث رصيد العملاء
     const totalClientBal = clients.reduce((sum, c) => sum + (c.balance || 0), 0);
     last.clientBalance = totalClientBal;
 
-    // تحديث قيمة المخزون
     const totalStockVal = articles.reduce((sum, a) => sum + ((a.stock || 0) * (a.costPrice || a.price || 0)), 0);
     last.stockValue = totalStockVal;
 
-    // تحديث خزينة العميل
     const totalCashClient = caisseClients.reduce((sum, c) => sum + (c.amount || 0), 0);
     last.cashClient = totalCashClient;
 
-    // تحديث تسديد المورد
     const totalSupplierPay = caisseFournisseurs.reduce((sum, c) => sum + (c.amount || 0), 0);
     last.supplierPayment = totalSupplierPay;
 
-    // تحديث إجمالي المصاريف
     const totalExp = expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
     last.totalExpense = totalExp;
 
-    // تحديث رصيد الموردين
     const totalSupplierBal = fournisseurs.reduce((sum, f) => sum + (f.balance || 0), 0);
     last.supplierBalance = totalSupplierBal;
 
-    // الخزينة = خزينة البداية + خزينة العميل - تسديد المورد - المصاريف
-    last.cash = (last.cashStart || 0) + (last.cashClient || 0) - (last.supplierPayment || 0) - (last.totalExpense || 0);
+    const cashStart = parseFloat(last.cashStart) || 0;
+    last.cash = cashStart + totalCashClient - totalSupplierPay - totalExp;
 
-    // رأس المال = الخزينة + رصيد العميل + قيمة المخزون - رصيد المورد
-    last.capital = (last.cash || 0) + (last.clientBalance || 0) + (last.stockValue || 0) - (last.supplierBalance || 0);
+    last.capital = (last.cash || 0) + totalClientBal + totalStockVal - totalSupplierBal;
 
-    // الأرباح = رأس المال الحالي - رأس المال السابق
     if (this.data.length > 1) {
       const prev = this.data[lastIndex - 1];
       last.profit = (last.capital || 0) - (prev.capital || 0);
@@ -1300,6 +1290,409 @@ const FinanceTable = {
 
     this.save();
     showToast('🔄 تم مزامنة البيانات من التطبيق');
+  },
+
+  // ===== FULL REPORT =====
+  printFullReport() {
+    // ===== حساب الإجماليات =====
+    let totalClientBalance = clients.reduce((sum, c) => sum + (c.balance || 0), 0);
+    let totalFournisseurBalance = fournisseurs.reduce((sum, f) => sum + (f.balance || 0), 0);
+    let totalStockValue = articles.reduce((sum, a) => sum + ((a.stock || 0) * (a.costPrice || a.price || 0)), 0);
+    
+    let totalCash = 0;
+    if (this.data.length > 0) {
+      totalCash = this.data[this.data.length - 1].cash || 0;
+    }
+    
+    let totalProfit = 0;
+    if (this.data.length > 0) {
+      totalProfit = this.data[this.data.length - 1].profit || 0;
+    }
+
+    // ===== بناء قائمة العملاء =====
+    const sortedClients = [...clients].sort((a, b) => (b.balance || 0) - (a.balance || 0));
+    let clientsRows = '';
+    sortedClients.forEach((c, i) => {
+      const bal = c.balance || 0;
+      const color = bal > 0 ? '#27ae60' : bal < 0 ? '#e74c3c' : '#888';
+      const icon = bal > 0 ? '▲' : bal < 0 ? '▼' : '•';
+      clientsRows += `<tr>
+        <td>${i + 1}</td>
+        <td style="text-align:right;font-weight:600;">${c.name}</td>
+        <td>${c.phone || '-'}</td>
+        <td style="color:${color};font-weight:${bal !== 0 ? '800' : '400'};font-size:${Math.abs(bal) > 1000 ? '12px' : '10px'};">
+          ${icon} ${bal.toFixed(3)}
+        </td>
+      </tr>`;
+    });
+
+    // ===== بناء قائمة الموردين =====
+    const sortedFournisseurs = [...fournisseurs].sort((a, b) => (b.balance || 0) - (a.balance || 0));
+    let fournisseursRows = '';
+    sortedFournisseurs.forEach((f, i) => {
+      const bal = f.balance || 0;
+      const color = bal > 0 ? '#27ae60' : bal < 0 ? '#e74c3c' : '#888';
+      const icon = bal > 0 ? '▲' : bal < 0 ? '▼' : '•';
+      fournisseursRows += `<tr>
+        <td>${i + 1}</td>
+        <td style="text-align:right;font-weight:600;">${f.name}</td>
+        <td>${f.phone || '-'}</td>
+        <td style="color:${color};font-weight:${bal !== 0 ? '800' : '400'};font-size:${Math.abs(bal) > 1000 ? '12px' : '10px'};">
+          ${icon} ${bal.toFixed(3)}
+        </td>
+      </tr>`;
+    });
+
+    // ===== بناء قائمة المخزون =====
+    const sortedArticles = [...articles].sort((a, b) => 
+      ((b.stock || 0) * (b.costPrice || b.price || 0)) - 
+      ((a.stock || 0) * (a.costPrice || a.price || 0))
+    );
+    let stockRows = '';
+    sortedArticles.forEach((a, i) => {
+      const qty = a.stock || 0;
+      const price = a.costPrice || a.price || 0;
+      const value = qty * price;
+      let status = '🟢 جيد';
+      let statusColor = '#27ae60';
+      if (qty <= 0) { status = '🔴 نفذ'; statusColor = '#e74c3c'; }
+      else if (qty < (a.minStock || 5)) { status = '🟠 منخفض'; statusColor = '#f39c12'; }
+      stockRows += `<tr>
+        <td>${i + 1}</td>
+        <td style="text-align:right;font-weight:600;">${a.name}</td>
+        <td style="font-weight:${qty > 0 ? '700' : '400'};color:${qty > 0 ? '#2c3e50' : '#e74c3c'};">${qty}</td>
+        <td>${price.toFixed(3)}</td>
+        <td style="color:${value > 1000 ? '#2980b9' : value > 100 ? '#2c3e50' : '#888'};font-weight:${value > 100 ? '700' : '400'};">${value.toFixed(3)}</td>
+        <td style="color:${statusColor};font-weight:600;">${status}</td>
+      </tr>`;
+    });
+
+    // ===== إنشاء نافذة الطباعة =====
+    const printWindow = window.open('', '_blank', 'width=1000,height=800');
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('ar-TN') + ' ' + now.toLocaleTimeString('ar-TN');
+
+    printWindow.document.write(`
+      <html dir="rtl">
+      <head>
+        <title>تقرير شامل - ${companyInfo.name}</title>
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { 
+            font-family: 'Cairo', 'Arial', sans-serif; 
+            padding: 12px; 
+            direction: rtl; 
+            background: #f5f7fc; 
+            font-size: 11px;
+            color: #1a1a2e;
+          }
+          
+          .report-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+          }
+          
+          .report-header {
+            text-align: center;
+            border-bottom: 3px double #1e2f66;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #f8f9fc 0%, #e8ecf4 100%);
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+          }
+          .report-header h1 {
+            color: #1e2f66;
+            font-size: 22px;
+            margin-bottom: 3px;
+            letter-spacing: 1px;
+          }
+          .report-header .sub {
+            color: #555;
+            font-size: 12px;
+            font-weight: 600;
+          }
+          .report-header .date {
+            color: #888;
+            font-size: 10px;
+            margin-top: 3px;
+          }
+          
+          .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+          }
+          .summary-grid .card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 10px 6px;
+            text-align: center;
+            border: 2px solid #e8ecf4;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+          }
+          .summary-grid .card .num {
+            font-size: 18px;
+            font-weight: 800;
+          }
+          .summary-grid .card .lbl {
+            font-size: 9px;
+            color: #888;
+            margin-top: 2px;
+            font-weight: 600;
+          }
+          .summary-grid .card.client .num { color: #2980b9; }
+          .summary-grid .card.client { border-color: #2980b9; background: #f0f7ff; }
+          .summary-grid .card.fournisseur .num { color: #8e44ad; }
+          .summary-grid .card.fournisseur { border-color: #8e44ad; background: #f7f0ff; }
+          .summary-grid .card.stock .num { color: #27ae60; }
+          .summary-grid .card.stock { border-color: #27ae60; background: #f0fff4; }
+          .summary-grid .card.cash .num { color: #f39c12; }
+          .summary-grid .card.cash { border-color: #f39c12; background: #fffcf0; }
+          .summary-grid .card.profit .num { color: #e74c3c; }
+          .summary-grid .card.profit { border-color: #e74c3c; background: #fff0f0; }
+          .summary-grid .card.profit.positive .num { color: #27ae60; }
+          .summary-grid .card.profit.positive { border-color: #27ae60; background: #f0fff4; }
+          
+          .section-title {
+            background: linear-gradient(135deg, #1e2f66, #2b3f8c);
+            color: #fff;
+            padding: 6px 14px;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 6px;
+            margin: 12px 0 6px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+          .section-title .badge {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+          }
+          .section-title .total-badge {
+            background: rgba(255,255,255,0.15);
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 800;
+          }
+          
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+            margin-bottom: 6px;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+          }
+          table th {
+            background: #e8ecf4;
+            color: #1a1a2e;
+            padding: 5px 8px;
+            border: 1px solid #d0d5e0;
+            text-align: center;
+            font-weight: 700;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          table td {
+            padding: 4px 8px;
+            border: 1px solid #dde1ec;
+            text-align: center;
+            font-size: 10px;
+          }
+          table tr:nth-child(even) td {
+            background: #fafbfd;
+          }
+          table tr:hover td {
+            background: #f0f4ff;
+          }
+          table .total-row td {
+            background: #d9e2f0 !important;
+            font-weight: 800;
+            border-top: 3px solid #1e2f66;
+            font-size: 11px;
+          }
+          table .total-row .highlight {
+            color: #1e2f66;
+            font-size: 13px;
+          }
+          
+          .footer {
+            text-align: center;
+            margin-top: 18px;
+            padding-top: 10px;
+            border-top: 2px solid #e8ecf4;
+            color: #999;
+            font-size: 8px;
+            background: #f8f9fc;
+            padding: 8px;
+            border-radius: 0 0 8px 8px;
+          }
+          
+          @media print {
+            body { background: #fff; padding: 5px; }
+            .report-container { box-shadow: none; padding: 10px; border-radius: 0; }
+            .summary-grid .card { border: 1px solid #ddd; box-shadow: none; }
+            table { box-shadow: none; }
+            .section-title { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .summary-grid .card { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            table .total-row td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .report-header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          }
+          
+          @media (max-width: 600px) {
+            .summary-grid { grid-template-columns: repeat(3, 1fr); }
+            .summary-grid .card .num { font-size: 14px; }
+            table { font-size: 8px; }
+            table td, table th { padding: 2px 4px; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="report-container">
+          <div class="report-header">
+            <h1>📊 التقرير المالي الشامل</h1>
+            <div class="sub">${companyInfo.name || 'GTR POS'}</div>
+            <div class="sub">${companyInfo.address || ''} ${companyInfo.phone1 ? '📞 ' + companyInfo.phone1 : ''}</div>
+            <div class="date">📅 ${dateStr}</div>
+          </div>
+
+          <div class="summary-grid">
+            <div class="card client">
+              <div class="num">${totalClientBalance.toFixed(3)}</div>
+              <div class="lbl">👥 إجمالي رصيد العملاء</div>
+            </div>
+            <div class="card fournisseur">
+              <div class="num">${totalFournisseurBalance.toFixed(3)}</div>
+              <div class="lbl">🤝 إجمالي رصيد الموردين</div>
+            </div>
+            <div class="card stock">
+              <div class="num">${totalStockValue.toFixed(3)}</div>
+              <div class="lbl">📦 قيمة المخزون</div>
+            </div>
+            <div class="card cash">
+              <div class="num">${totalCash.toFixed(3)}</div>
+              <div class="lbl">💵 الخزينة</div>
+            </div>
+            <div class="card profit ${totalProfit >= 0 ? 'positive' : ''}">
+              <div class="num">${totalProfit.toFixed(3)}</div>
+              <div class="lbl">📈 الأرباح</div>
+            </div>
+          </div>
+
+          <div class="section-title">
+            <span>👥 أرصدة العملاء</span>
+            <span>
+              <span class="badge">${clients.length} عميل</span>
+              <span class="total-badge">المجموع: ${totalClientBalance.toFixed(3)} د.ت</span>
+            </span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:40px;">#</th>
+                <th style="text-align:right;">اسم العميل</th>
+                <th>الهاتف</th>
+                <th style="min-width:80px;">الرصيد (د.ت)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${clients.length === 0 ? 
+                '<tr><td colspan="4" style="text-align:center;color:#999;padding:10px;">📭 لا يوجد عملاء</td></tr>' : 
+                clientsRows}
+              <tr class="total-row">
+                <td colspan="3">🔹 الإجمالي</td>
+                <td class="highlight">${totalClientBalance.toFixed(3)}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="section-title">
+            <span>🤝 أرصدة الموردين</span>
+            <span>
+              <span class="badge">${fournisseurs.length} مورد</span>
+              <span class="total-badge">المجموع: ${totalFournisseurBalance.toFixed(3)} د.ت</span>
+            </span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:40px;">#</th>
+                <th style="text-align:right;">اسم المورد</th>
+                <th>الهاتف</th>
+                <th style="min-width:80px;">الرصيد (د.ت)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${fournisseurs.length === 0 ? 
+                '<tr><td colspan="4" style="text-align:center;color:#999;padding:10px;">📭 لا يوجد موردين</td></tr>' : 
+                fournisseursRows}
+              <tr class="total-row">
+                <td colspan="3">🔹 الإجمالي</td>
+                <td class="highlight">${totalFournisseurBalance.toFixed(3)}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="section-title">
+            <span>📦 المخزون</span>
+            <span>
+              <span class="badge">${articles.length} صنف</span>
+              <span class="total-badge">القيمة: ${totalStockValue.toFixed(3)} د.ت</span>
+            </span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:35px;">#</th>
+                <th style="text-align:right;">اسم الصنف</th>
+                <th>الكمية</th>
+                <th>سعر الشراء</th>
+                <th style="min-width:80px;">القيمة الإجمالية</th>
+                <th>الحالة</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${articles.length === 0 ? 
+                '<tr><td colspan="6" style="text-align:center;color:#999;padding:10px;">📦 لا توجد أصناف</td></tr>' : 
+                stockRows}
+              <tr class="total-row">
+                <td colspan="4">🔹 الإجمالي</td>
+                <td class="highlight">${totalStockValue.toFixed(3)}</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="footer">
+            ${companyInfo.name} - ${companyInfo.address || ''} ${companyInfo.phone1 ? '📞 ' + companyInfo.phone1 : ''} ${companyInfo.taxId ? 'MF: ' + companyInfo.taxId : ''}
+            <br>تم إنشاء التقرير بواسطة <strong>GTR POS</strong> V 0.6.0
+          </div>
+        </div>
+        
+        <script>
+          window.onload = function() { 
+            setTimeout(function() { window.print(); }, 400);
+            setTimeout(function() { window.close(); }, 3500);
+          };
+        <\/script>
+      </body>
+      </html>
+    `);
+    printWindow.document.close();
   }
 };
 
