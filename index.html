@@ -6,17 +6,14 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1e2f66">
-<title>GTR POS V 0.7.1</title>
+<title>GTR POS V 0.7.3</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
-<!-- jsPDF for PDF generation -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<!-- html2canvas for image capture -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<!-- QRCode Generator -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <style>
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0;}
@@ -271,7 +268,7 @@
 <div class="login-overlay" id="loginOverlay">
   <div class="login-box">
     <div class="login-logo-icon"><span class="gtr">GTR</span><span class="badge">POS</span></div>
-    <div class="login-logo">GTR POS <span style="font-size:12px;opacity:.6;font-weight:400;">V 0.7.1</span></div>
+    <div class="login-logo">GTR POS <span style="font-size:12px;opacity:.6;font-weight:400;">V 0.7.3</span></div>
     <div class="login-sub" id="loginModeLabel">تسجيل الدخول لحسابك</div>
     <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" autocomplete="email">
     <div class="password-wrapper">
@@ -311,7 +308,7 @@
       <div class="logo-icon">G</div>
       <div>
         <div class="title" id="pageTitle">الرئيسية</div>
-        <div class="sub" id="appVersionSub" onclick="openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">V 0.7.1</span></div>
+        <div class="sub" id="appVersionSub" onclick="openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">V 0.7.3</span></div>
       </div>
     </div>
     <div style="display:flex;gap:4px;">
@@ -532,19 +529,29 @@
     <div class="field"><label>البيان</label><input id="exDesc" placeholder="ملاحظات"></div>
   </div><div class="sheet-footer"><button class="btn save" onclick="Expenses.save()">💾 حفظ</button><button class="btn edit" onclick="Expenses.edit()">✏️ تعديل</button><button class="btn del" onclick="Expenses.remove()">🗑 حذف</button></div></div>
   <div class="sheet" id="sheet-company"><div class="sheet-handle"></div><div class="sheet-header"><h3>بيانات المؤسسة</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body">
-    <div class="field"><label>اسم المؤسسة</label><input id="cpyName"></div>
-    <div class="field"><label>العنوان</label><input id="cpyAddress"></div>
-    <div class="field"><label>الهاتف</label><input id="cpyPhone1"></div>
-    <div class="field"><label>الرقم الجبائي (MF)</label><input id="cpyTaxId"></div>
+    <div class="field"><label>🏢 اسم المؤسسة</label><input id="cpyName"></div>
+    <div class="field"><label>📍 العنوان</label><input id="cpyAddress"></div>
+    <div class="field"><label>📞 الهاتف</label><input id="cpyPhone1"></div>
+    <div class="field"><label>🆔 الرقم الجبائي (MF)</label><input id="cpyTaxId"></div>
+    <div class="field" style="border-top:1px dashed var(--border);padding-top:6px;margin-top:6px;">
+      <label>💰 رصيد الخزينة الافتتاحي (د.ت)</label>
+      <input id="cpyCashOpening" type="number" step="0.001" value="0">
+      <span style="font-size:7px;color:var(--muted);">⏺ يستخدم لحساب الخزينة في المالية</span>
+    </div>
     <button class="btn save" onclick="CompanyInfo.save()">💾 حفظ</button>
-    <div class="section-title">حجم النص</div>
-    <div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:4px;"><button class="btn outline small" style="margin:0;flex:1;font-size:10px;padding:3px;" onclick="UiScale.set(0.85)">صغير</button><button class="btn outline small" style="margin:0;flex:1;font-size:10px;padding:3px;" onclick="UiScale.set(1)">عادي</button><button class="btn outline small" style="margin:0;flex:1;font-size:10px;padding:3px;" onclick="UiScale.set(1.15)">كبير</button><button class="btn outline small" style="margin:0;flex:1;font-size:10px;padding:3px;" onclick="UiScale.set(1.3)">أكبر</button></div>
-    <div class="section-title">النسخ الاحتياطي</div>
+    <div class="section-title">🔍 حجم النص</div>
+    <div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:4px;">
+      <button class="btn outline small" style="margin:0;flex:1;font-size:10px;padding:3px;" onclick="UiScale.set(0.85)">صغير</button>
+      <button class="btn outline small" style="margin:0;flex:1;font-size:10px;padding:3px;" onclick="UiScale.set(1)">عادي</button>
+      <button class="btn outline small" style="margin:0;flex:1;font-size:10px;padding:3px;" onclick="UiScale.set(1.15)">كبير</button>
+      <button class="btn outline small" style="margin:0;flex:1;font-size:10px;padding:3px;" onclick="UiScale.set(1.3)">أكبر</button>
+    </div>
+    <div class="section-title">💾 النسخ الاحتياطي</div>
     <button class="btn outline small" onclick="exportBackup()">⬇️ تصدير</button>
     <button class="btn outline small" onclick="exportBackupToDrive()">☁️ Google Drive</button>
     <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importBackupFile(this)"><button class="btn outline small" onclick="document.getElementById('importFileInput').click()">⬆️ استيراد</button>
     <div style="font-size:9px;color:var(--muted);margin-top:4px;">💡 لتثبيت التطبيق: ⋮ في المتصفح ← إضافة إلى الشاشة الرئيسية</div>
-    <div class="section-title">الحساب</div>
+    <div class="section-title">👤 الحساب</div>
     <div id="accountEmailDisplay" style="font-size:11px;color:var(--muted);margin-bottom:3px;"></div>
     <button class="btn del" onclick="doLogout()">🚪 تسجيل الخروج</button>
   </div></div>
@@ -594,7 +601,7 @@
 </div>
 <script>
 // ===== VERSION =====
-const APP_VERSION_STRING = 'V 0.7.1';
+const APP_VERSION_STRING = 'V 0.7.3';
 
 // ===== FIREBASE =====
 const firebaseConfig = {
@@ -709,7 +716,7 @@ let caisseClients = [];
 let caisseFournisseurs = [];
 let financeData = [];
 let nextId = { clients: 1, fournisseurs: 1, articles: 1, ventes: 1, achats: 1, expenses: 1, caisseClients: 1, caisseFournisseurs: 1, reglements: 1 };
-let companyInfo = { name: 'GTR POS', address: '', phone1: '', taxId: '' };
+let companyInfo = { name: 'GTR POS', address: '', phone1: '', taxId: '', cashOpening: 0 };
 let toastTimer;
 let _invoiceData = null;
 let _statementData = null;
@@ -746,6 +753,7 @@ function loadState() {
     if (data.nextId) nextId = data.nextId;
     if (data.companyInfo) companyInfo = data.companyInfo;
     if (data.financeData) financeData = data.financeData;
+    if (!companyInfo.cashOpening) companyInfo.cashOpening = 0;
     return true;
   } catch(e) { console.warn('Load local error', e); return false; }
 }
@@ -763,7 +771,8 @@ function loadStateFromFirestore(uid) {
       caisseClients = d.caisseClients || [];
       caisseFournisseurs = d.caisseFournisseurs || [];
       nextId = d.nextId || { clients:1, fournisseurs:1, articles:1, ventes:1, achats:1, expenses:1, caisseClients:1, caisseFournisseurs:1, reglements:1 };
-      companyInfo = d.companyInfo || { name:'GTR POS', address:'', phone1:'', taxId:'' };
+      companyInfo = d.companyInfo || { name:'GTR POS', address:'', phone1:'', taxId:'', cashOpening:0 };
+      if (!companyInfo.cashOpening) companyInfo.cashOpening = 0;
       financeData = d.financeData || [];
       saveState();
       showToast('✅ تم تحميل البيانات من السحابة');
@@ -850,10 +859,18 @@ $('fabBtn').addEventListener('click', function() {
   else { showToast('اختر قسم العملاء، الموردين، الأصناف، المبيعات، المشتريات أو المصاريف'); }
 });
 
-// ===== UI SCALE =====
+// ===== UI SCALE (fixed) =====
 const UiScale = { 
-  set(s) { const phone = document.querySelector('.phone'); if (phone) { phone.style.transform = 'scale(' + s + ')'; phone.style.transformOrigin = 'top center'; phone.style.height = (100 / s) + 'dvh'; } try { localStorage.setItem('gtrpos_ui_scale', String(s)); } catch (e) {} }, 
-  init() { let s = 1; try { const v = localStorage.getItem('gtrpos_ui_scale'); if (v) s = parseFloat(v); } catch(e) {} this.set(s); } 
+  set(s) { 
+    const html = document.documentElement;
+    html.style.fontSize = (14 * s) + 'px';
+    try { localStorage.setItem('gtrpos_ui_scale', String(s)); } catch (e) {}
+  }, 
+  init() { 
+    let s = 1; 
+    try { const v = localStorage.getItem('gtrpos_ui_scale'); if (v) s = parseFloat(v); } catch(e) {} 
+    this.set(s); 
+  } 
 };
 
 // ===== DASHBOARD =====
@@ -914,15 +931,14 @@ function recalculateFournisseurBalance(supplierName) {
 }
 
 // =====================================================
-// ===== FINANCE TABLE =====
+// ===== FINANCE TABLE (with corrected cash & capital) =====
 // =====================================================
 const FinanceTable = {
   data: [],
   load() {
     if (financeData.length === 0) {
       financeData = [
-        { date: '24/06/2026', clientBalance: 5000, stockValue: 5000, cash: 2500, supplierBalance: 10000, capital: 2500, profit: 0 },
-        { date: '25/06/2026', clientBalance: 5500, stockValue: 5000, cash: 5500, supplierBalance: 10000, capital: 3000, profit: 500 }
+        { date: '26/07/2026', clientBalance: 2500, stockValue: 2500, cash: 0, supplierBalance: 2500, capital: 2500, profit: 0 }
       ];
       saveState();
     }
@@ -1135,6 +1151,8 @@ const FinanceTable = {
     URL.revokeObjectURL(url);
     showToast('✅ تم التصدير');
   },
+
+  // ===== SYNC WITH APP (CORRECTED CASH & CAPITAL) =====
   syncWithApp() {
     if (this.data.length === 0) {
       const today = new Date();
@@ -1143,27 +1161,39 @@ const FinanceTable = {
     }
     const lastIndex = this.data.length - 1;
     const last = this.data[lastIndex];
+    
+    // Calculate values from the app
     const totalClientBal = clients.reduce((s, c) => s + (c.balance || 0), 0);
     const totalStockVal = articles.reduce((s, a) => s + ((a.stock || 0) * (a.costPrice || a.price || 0)), 0);
     const totalCashClient = caisseClients.reduce((s, c) => s + (c.amount || 0), 0);
     const totalSupplierPay = caisseFournisseurs.reduce((s, c) => s + (c.amount || 0), 0);
     const totalExp = expenses.reduce((s, e) => s + (e.amount || 0), 0);
     const totalSupplierBal = fournisseurs.reduce((s, f) => s + (f.balance || 0), 0);
+    
+    // Update fields
     last.clientBalance = totalClientBal;
     last.stockValue = totalStockVal;
     last.supplierBalance = totalSupplierBal;
-    const cashStart = parseFloat(last.cash) || 0;
-    last.cash = cashStart + totalCashClient - totalSupplierPay - totalExp;
-    last.capital = (last.cash || 0) + totalStockVal - totalSupplierBal;
+    
+    // ✅ CORRECTED CASH: Opening Cash + Client Payments - Supplier Payments - Expenses
+    const cashOpening = companyInfo.cashOpening || 0;
+    last.cash = cashOpening + totalCashClient - totalSupplierPay - totalExp;
+    
+    // ✅ CORRECTED CAPITAL: ClientBalance + StockValue + Cash - SupplierBalance
+    last.capital = totalClientBal + totalStockVal + (last.cash || 0) - totalSupplierBal;
+    
+    // Calculate profit (difference between current and previous capital)
     if (this.data.length > 1) {
       const prev = this.data[lastIndex - 1];
       last.profit = (last.capital || 0) - (prev.capital || 0);
     } else {
       last.profit = 0;
     }
+    
     this.save();
     showToast('🔄 تم مزامنة البيانات من التطبيق');
   },
+
   printFullReport() {
     const w = window.open('', '_blank', 'width=1000,height=800');
     const now = new Date();
@@ -1187,7 +1217,7 @@ const FinanceTable = {
 };
 
 // =====================================================
-// ===== CLIENTS =====
+// ===== CLIENTS (with lock icon) =====
 // =====================================================
 const Clients = {
   editingId: null, specialPrices: [],
@@ -1205,7 +1235,7 @@ const Clients = {
 };
 
 // =====================================================
-// ===== FOURNISSEURS =====
+// ===== FOURNISSEURS (with lock icon) =====
 // =====================================================
 const Fournisseurs = {
   editingId: null,
@@ -1218,7 +1248,7 @@ const Fournisseurs = {
 };
 
 // =====================================================
-// ===== ARTICLES =====
+// ===== ARTICLES (with lock icon) =====
 // =====================================================
 const Articles = {
   editingId: null,
@@ -1231,7 +1261,7 @@ const Articles = {
 };
 
 // =====================================================
-// ===== CLIENT HISTORY =====
+// ===== CLIENT HISTORY (unchanged) =====
 // =====================================================
 const ClientHistory = {
   currentClientId: null,
@@ -1306,7 +1336,7 @@ const ClientHistory = {
 };
 
 // =====================================================
-// ===== FOURNISSEUR HISTORY =====
+// ===== FOURNISSEUR HISTORY (unchanged) =====
 // =====================================================
 const FournisseurHistory = {
   currentFournisseurId: null,
@@ -1381,7 +1411,7 @@ const FournisseurHistory = {
 };
 
 // =====================================================
-// ===== ARTICLE HISTORY =====
+// ===== ARTICLE HISTORY (unchanged) =====
 // =====================================================
 const ArticleHistory = {
   currentArticleId: null,
@@ -1461,7 +1491,7 @@ const ArticleHistory = {
 };
 
 // =====================================================
-// ===== VENTES - WITH FIXED INVOICE FORMAT =====
+// ===== VENTES (with WhatsApp image share) =====
 // =====================================================
 const Ventes = {
   editingId: null, lines:[], reglements:[], originalClientBalance:0, originalClientId:null, editingRowIndex:null,
@@ -1500,16 +1530,12 @@ const Ventes = {
     }
     showToast('⏳ جاري إنشاء الصورة...');
     
-    // توليد HTML للفاتورة
     const htmlContent = this.generateInvoiceHTML(rec, 'vente');
-    
-    // إنشاء عنصر مؤقت لعرض الفاتورة
     const tempDiv = document.createElement('div');
     tempDiv.style.cssText = 'position:fixed;left:-9999px;top:0;width:400px;background:#fff;padding:20px;font-family:Arial,sans-serif;direction:rtl;z-index:9999;';
     tempDiv.innerHTML = htmlContent;
     document.body.appendChild(tempDiv);
     
-    // استخدام html2canvas لتحويل إلى صورة
     html2canvas(tempDiv, {
       scale: 2,
       useCORS: true,
@@ -1517,7 +1543,6 @@ const Ventes = {
       logging: false
     }).then(canvas => {
       document.body.removeChild(tempDiv);
-      // تحويل إلى JPG
       const imageDataUrl = canvas.toDataURL('image/jpeg', 0.95);
       this.shareImageViaWhatsApp(rec, imageDataUrl);
     }).catch(err => {
@@ -1527,7 +1552,6 @@ const Ventes = {
     });
   },
 
-  // ===== GENERATE INVOICE HTML =====
   generateInvoiceHTML(invoice, type) {
     const partyLabel = type === 'vente' ? 'العميل' : 'المورد';
     const partyName = type === 'vente' ? invoice.client : invoice.supplier;
@@ -1618,14 +1642,12 @@ const Ventes = {
     `;
   },
 
-  // ===== SHARE IMAGE VIA WHATSAPP =====
   shareImageViaWhatsApp(invoice, imageDataUrl) {
     const type = invoice.client ? 'بيع' : 'شراء';
     const partyName = invoice.client || invoice.supplier;
     const paid = (invoice.reglements || []).reduce((sum, r) => sum + r.amount, 0);
     const remaining = invoice.total - paid;
     
-    // توليد نص للواتساب
     let text = `📄 *فاتورة ${type} - ${invoice.num}*\n`;
     text += `📅 التاريخ: ${invoice.date}\n`;
     text += `👤 ${invoice.client ? 'العميل' : 'المورد'}: ${partyName}\n`;
@@ -1640,11 +1662,9 @@ const Ventes = {
       : '';
     const formattedPhone = phone.replace(/\D/g, '');
     
-    // نفتح واتساب مع النص، ونقوم بتنزيل الصورة بجانبها
     const url = 'https://wa.me/' + (formattedPhone ? '216' + formattedPhone : '') + '?text=' + encodeURIComponent(text);
     window.open(url, '_blank');
     
-    // تحميل الصورة للمستخدم ليشاركها يدوياً في واتساب
     const link = document.createElement('a');
     link.href = imageDataUrl;
     link.download = `فاتورة_${invoice.num}_${new Date().toISOString().slice(0,10)}.jpg`;
@@ -1671,7 +1691,7 @@ const Ventes = {
 };
 
 // =====================================================
-// ===== ACHATS - WITH FIXED INVOICE FORMAT =====
+// ===== ACHATS (with WhatsApp image share) =====
 // =====================================================
 const Achats = {
   editingId: null, lines:[], reglements:[], originalSupplierBalance:0, originalSupplierId:null, editingRowIndex:null,
@@ -1708,15 +1728,11 @@ const Achats = {
       return;
     }
     showToast('⏳ جاري إنشاء الصورة...');
-    
-    // استخدام نفس دالة Ventes لتوليد HTML
     const htmlContent = Ventes.generateInvoiceHTML(rec, 'achat');
-    
     const tempDiv = document.createElement('div');
     tempDiv.style.cssText = 'position:fixed;left:-9999px;top:0;width:400px;background:#fff;padding:20px;font-family:Arial,sans-serif;direction:rtl;z-index:9999;';
     tempDiv.innerHTML = htmlContent;
     document.body.appendChild(tempDiv);
-    
     html2canvas(tempDiv, {
       scale: 2,
       useCORS: true,
@@ -1738,7 +1754,7 @@ const Achats = {
 };
 
 // =====================================================
-// ===== EXPENSES =====
+// ===== EXPENSES (unchanged) =====
 // =====================================================
 const Expenses = {
   editingId: null,
@@ -1776,7 +1792,7 @@ const Expenses = {
 };
 
 // =====================================================
-// ===== CAISSE HISTORY =====
+// ===== CAISSE HISTORY (unchanged) =====
 // =====================================================
 const CaisseHistory = {
   render() {
@@ -1825,7 +1841,7 @@ const CaisseHistory = {
 };
 
 // =====================================================
-// ===== ACCOUNTS =====
+// ===== ACCOUNTS (unchanged) =====
 // =====================================================
 const Accounts = {
   render(){ 
@@ -1881,22 +1897,39 @@ const Accounts = {
 };
 
 // =====================================================
-// ===== COMPANY INFO =====
+// ===== COMPANY INFO (with cash opening) =====
 // =====================================================
 const CompanyInfo = {
-  load(){ $('cpyName').value=companyInfo.name; $('cpyAddress').value=companyInfo.address||''; $('cpyPhone1').value=companyInfo.phone1||''; $('cpyTaxId').value=companyInfo.taxId||''; },
-  save(){ companyInfo={name:$('cpyName').value.trim()||'GTR POS', address:$('cpyAddress').value.trim(), phone1:$('cpyPhone1').value.trim(), taxId:$('cpyTaxId').value.trim()}; saveState(); showToast('تم حفظ بيانات المؤسسة'); closeSheet(); }
+  load(){ 
+    $('cpyName').value = companyInfo.name; 
+    $('cpyAddress').value = companyInfo.address || ''; 
+    $('cpyPhone1').value = companyInfo.phone1 || ''; 
+    $('cpyTaxId').value = companyInfo.taxId || ''; 
+    $('cpyCashOpening').value = companyInfo.cashOpening || 0; 
+  },
+  save(){ 
+    companyInfo = {
+      name: $('cpyName').value.trim() || 'GTR POS', 
+      address: $('cpyAddress').value.trim(), 
+      phone1: $('cpyPhone1').value.trim(), 
+      taxId: $('cpyTaxId').value.trim(),
+      cashOpening: parseFloat($('cpyCashOpening').value) || 0
+    }; 
+    saveState(); 
+    showToast('تم حفظ بيانات المؤسسة'); 
+    closeSheet(); 
+  }
 };
 
 // =====================================================
-// ===== BACKUP =====
+// ===== BACKUP (unchanged) =====
 // =====================================================
 function exportBackup(){ const data={clients,fournisseurs,articles,ventes,achats,expenses,caisseClients,caisseFournisseurs,nextId,companyInfo,financeData,exportedAt:new Date().toISOString()}; const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='gtrpos_backup_'+new Date().toISOString().slice(0,10)+'.json'; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); showToast('تم التصدير'); }
 function exportBackupToDrive(){ if(!currentUser){ showToast('يجب تسجيل الدخول'); return; } const provider=new firebase.auth.GoogleAuthProvider(); provider.addScope('https://www.googleapis.com/auth/drive.file'); showToast('جاري فتح Google...'); const upload=(token)=>{ if(!token){ showToast('تعذر الحصول على إذن'); return; } const data={clients,fournisseurs,articles,ventes,achats,expenses,caisseClients,caisseFournisseurs,nextId,companyInfo,financeData,exportedAt:new Date().toISOString()}; const fileName='gtrpos_backup_'+new Date().toISOString().slice(0,10)+'.json'; const metadata={name:fileName,mimeType:'application/json'}; const boundary='-------gtrpos314159'; const delimiter="\r\n--"+boundary+"\r\n"; const closeDelim="\r\n--"+boundary+"--"; const body=delimiter+'Content-Type: application/json\r\n\r\n'+JSON.stringify(metadata)+delimiter+'Content-Type: application/json\r\n\r\n'+JSON.stringify(data,null,2)+closeDelim; fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'multipart/related; boundary='+boundary},body}).then(res=>res.json()).then(json=>{ if(json.id) showToast('تم الرفع إلى Drive'); else showToast('حدث خطأ'); }).catch(()=>showToast('حدث خطأ')); }; currentUser.linkWithPopup(provider).then(result=>{ const cred=firebase.auth.GoogleAuthProvider.credentialFromResult(result); upload(cred.accessToken); }).catch(err=>{ if(err.code==='auth/credential-already-in-use'||err.code==='auth/provider-already-linked'){ currentUser.reauthenticateWithPopup(provider).then(result=>{ const cred=firebase.auth.GoogleAuthProvider.credentialFromResult(result); upload(cred.accessToken); }).catch(()=>showToast('تعذر الحصول على إذن')); } else showToast('تعذر الحصول على إذن'); }); }
 function importBackupFile(input){ const file=input.files[0]; if(!file) return; const reader=new FileReader(); reader.onload=e=>{ try { const data=JSON.parse(e.target.result); if(data.clients) clients=data.clients; if(data.fournisseurs) fournisseurs=data.fournisseurs; if(data.articles) articles=data.articles; if(data.ventes) ventes=data.ventes; if(data.achats) achats=data.achats; if(data.expenses) expenses=data.expenses; if(data.caisseClients) caisseClients=data.caisseClients; if(data.caisseFournisseurs) caisseFournisseurs=data.caisseFournisseurs; if(data.nextId) nextId=data.nextId; if(data.companyInfo) companyInfo=data.companyInfo; if(data.financeData) financeData=data.financeData; saveState(); initAll(); showToast('تم الاستيراد'); } catch(err){ showToast('ملف غير صالح: '+err.message); } }; reader.readAsText(file); input.value=''; }
 
 // =====================================================
-// ===== PRINT FUNCTIONS =====
+// ===== PRINT FUNCTIONS (unchanged) =====
 // =====================================================
 function closePrintOverlay(){ $('printOverlay').classList.remove('show'); }
 
@@ -1907,7 +1940,6 @@ function renderInvoice() {
   doc.className = 'invoice-doc paper-' + size;
   const data = _invoiceData;
 
-  // Generate QR Code
   let qrImg = '';
   try {
     const qrContent = `Facture: ${data.num}\nDate: ${data.date}\nTotal: ${data.total.toFixed(3)} TND`;
@@ -1921,15 +1953,12 @@ function renderInvoice() {
     }
   } catch (e) { console.warn('QR preview error:', e); }
 
-  // Build items table
   let linesHtml = '';
   data.lines.forEach((l, i) => {
     linesHtml += `<tr><td>${i + 1}</td><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td></tr>`;
   });
-  const totalQty = data.lines.reduce((a, l) => a + l.qty, 0);
   const words = amountInWords(data.total);
 
-  // Party info
   const partyHtml = `
     <div style="display:flex;justify-content:space-between;font-size:9px;border:1px solid #999;padding:3px;margin:3px 0;">
       <span><strong>${data.partyLabel}:</strong> ${data.partyName}</span>
@@ -2038,7 +2067,7 @@ function initAll() {
 }
 
 // =====================================================
-// ===== AUTH =====
+// ===== AUTH (unchanged) =====
 // =====================================================
 const ADMIN_EMAIL = 'krimi.neji@gmail.com';
 auth.onAuthStateChanged(user => {
