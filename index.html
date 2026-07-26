@@ -11,6 +11,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<!-- jsPDF for PDF generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0;}
   html,body{height:100%;font-family:'Cairo',sans-serif;background:#0e142e;font-size:14px;overflow:hidden;}
@@ -579,6 +582,7 @@ const firebaseConfig = {
 try { firebase.initializeApp(firebaseConfig); } catch(e) { console.warn('Firebase already initialized'); }
 const auth = firebase.auth();
 const db = firebase.firestore();
+const storage = firebase.storage();
 
 // ===== PASSWORD FUNCTIONS =====
 function togglePasswordVisibility(inputId, toggleBtnId) {
@@ -1357,7 +1361,7 @@ const ArticleHistory = {
 };
 
 // =====================================================
-// ===== VENTES =====
+// ===== VENTES - with PDF WhatsApp sharing =====
 // =====================================================
 const Ventes = {
   editingId: null, lines:[], reglements:[], originalClientBalance:0, originalClientId:null, editingRowIndex:null,
@@ -1382,13 +1386,230 @@ const Ventes = {
   remove(){ if(this.editingId==null){ showToast('اختر فاتورة لحذفها'); return; } const rec=ventes.find(v=>v.id===this.editingId); if(rec){ rec.lines.forEach(l=>{ const article=articles.find(a=>a.name===l.name); if(article) article.stock=(article.stock||0)+l.qty; }); caisseClients=caisseClients.filter(c=>c.invoiceId!==this.editingId); ventes=ventes.filter(v=>v.id!==this.editingId); saveState(); recalculateClientBalance(rec.client); this.render(); closeSheet(); showToast('🗑️ تم الحذف'); } else { showToast('الفاتورة غير موجودة'); } },
   load(id){ const r=ventes.find(v=>v.id===id); if(!r) return; this.editingId=id; $('vNum').value=r.num; $('vDate').value=r.date; const opt=[...$('vClient').options].find(o=>o.textContent===r.client); if(opt) $('vClient').value=opt.value; const c=clients.find(x=>x.name===r.client); const paid=(r.reglements||[]).reduce((a,rr)=>a+rr.amount,0); this.originalClientBalance=r.prevBalance!==undefined?r.prevBalance:(c?c.balance-(r.total-paid):0); this.originalClientId=c?c.id:null; this.clientTaxId=r.clientTaxId||(c?c.taxId||'':''); this.clientAddress=r.clientAddress||(c?c.address||'':''); this.clientSpecialPrices=(c&&c.specialPrices)?[...c.specialPrices]:[]; $('vPhone').value=c?c.phone:''; this.lines=[...r.lines]; this.reglements=r.reglements?[...r.reglements]:[]; this.editingRowIndex=null; this.renderLines(); this.refreshArticleOptions(); this.renderReglements(); this.updateAccountSummary(); openSheet('ventes'); },
   render(){ const q=$('vSearch').value.trim().toLowerCase(); const list=$('ventesList'); list.innerHTML=''; const filtered=ventes.filter(v=>!q||v.num.toLowerCase().includes(q)||v.client.toLowerCase().includes(q)).reverse(); if(!filtered.length){ list.innerHTML='<div class="empty-msg">لا توجد فواتير بيع</div>'; return; } filtered.slice(0,50).forEach(v=>{ const d=document.createElement('div'); d.className='row-card'; d.onclick=()=>{ Ventes.load(v.id); openSheet('ventes'); }; const paid=(v.reglements||[]).reduce((a,r)=>a+r.amount,0); d.innerHTML=`<div class="main-info"><div class="name">${v.num}</div><div class="meta">${v.client} - ${v.date} | المدفوع: ${paid.toFixed(3)}</div></div><div class="amount">${v.total.toFixed(3)} د.ت</div>`; list.appendChild(d); }); },
-  shareWhatsapp(){ if(this.editingId==null){ showToast('احفظ الفاتورة أولا'); return; } const rec=ventes.find(v=>v.id===this.editingId); if(!rec) return; const client=clients.find(c=>c.name===rec.client); const paid=(rec.reglements||[]).reduce((a,r)=>a+r.amount,0); let text=`*فاتورة ${rec.num}*\nالتاريخ: ${rec.date}\nالعميل: ${rec.client}\n`; if(rec.clientTaxId) text+=`MF: ${rec.clientTaxId}\n`; rec.lines.forEach(l=>{ text+=`${l.name}  x${l.qty}  ${l.total.toFixed(3)} د.ت\n`; }); text+=`\nالمجموع: ${rec.total.toFixed(3)} د.ت\nالمدفوع: ${paid.toFixed(3)} د.ت\nالمتبقي: ${(rec.total-paid).toFixed(3)} د.ت`; const phone=client?client.phone.replace(/\D/g,''):''; const url='https://wa.me/'+(phone?'216'+phone:'')+'?text='+encodeURIComponent(text); window.open(url,'_blank'); },
+  
+  // ===== SHARE WHATSAPP WITH PDF =====
+  shareWhatsapp() {
+    if (this.editingId == null) { showToast('⚠️ احفظ الفاتورة أولا'); return; }
+    const rec = ventes.find(v => v.id === this.editingId);
+    if (!rec) return;
+    
+    // Generate PDF and share
+    this.generateInvoicePDF(rec, 'vente').then(pdfDataUrl => {
+      this.uploadPDFAndShare(pdfDataUrl, rec);
+    }).catch(err => {
+      console.error(err);
+      showToast('❌ فشل إنشاء PDF');
+    });
+  },
+
+  // ===== GENERATE INVOICE PDF =====
+  generateInvoicePDF(invoice, type) {
+    return new Promise((resolve, reject) => {
+      try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = 210;
+        const margin = 15;
+        let y = margin;
+        
+        // Company header
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.text(companyInfo.name || 'GTR POS', pageWidth/2, y, { align: 'center' });
+        y += 6;
+        
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        if (companyInfo.address) {
+          doc.text(companyInfo.address, pageWidth/2, y, { align: 'center' });
+          y += 5;
+        }
+        if (companyInfo.phone1) {
+          doc.text('📞 ' + companyInfo.phone1, pageWidth/2, y, { align: 'center' });
+          y += 5;
+        }
+        if (companyInfo.taxId) {
+          doc.text('MF: ' + companyInfo.taxId, pageWidth/2, y, { align: 'center' });
+          y += 5;
+        }
+        
+        doc.line(margin, y, pageWidth - margin, y);
+        y += 6;
+        
+        // Invoice title
+        const title = type === 'vente' ? 'فاتورة بيع' : 'فاتورة شراء';
+        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');
+        doc.text(title, pageWidth/2, y, { align: 'center' });
+        y += 7;
+        
+        // Invoice info
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text('رقم الفاتورة: ' + invoice.num, margin, y);
+        doc.text('التاريخ: ' + invoice.date, pageWidth - margin - 30, y, { align: 'right' });
+        y += 6;
+        
+        const partyLabel = type === 'vente' ? 'العميل' : 'المورد';
+        const partyName = type === 'vente' ? invoice.client : invoice.supplier;
+        const taxId = type === 'vente' ? invoice.clientTaxId : invoice.supplierTaxId;
+        const partyAddr = type === 'vente' ? invoice.clientAddress : invoice.supplierAddress;
+        const phone = type === 'vente' ? (clients.find(c => c.name === invoice.client)?.phone || '') : (fournisseurs.find(f => f.name === invoice.supplier)?.phone || '');
+        
+        doc.text(partyLabel + ': ' + partyName, margin, y);
+        if (taxId) doc.text('MF: ' + taxId, pageWidth - margin - 20, y, { align: 'right' });
+        y += 5;
+        if (phone) doc.text('الهاتف: ' + phone, margin, y);
+        if (partyAddr) doc.text('العنوان: ' + partyAddr, pageWidth - margin - 20, y, { align: 'right' });
+        y += 6;
+        
+        // Separator line
+        doc.line(margin, y, pageWidth - margin, y);
+        y += 4;
+        
+        // Items table
+        const col1 = 15, col2 = 70, col3 = 100, col4 = 135, col5 = 170;
+        const rowHeight = 8;
+        
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.text('#', col1, y);
+        doc.text('الصنف', col2, y);
+        doc.text('السعر', col3, y);
+        doc.text('الكمية', col4, y);
+        doc.text('الإجمالي', col5, y);
+        y += 3;
+        doc.line(margin, y, pageWidth - margin, y);
+        y += 3;
+        
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        invoice.lines.forEach((line, i) => {
+          if (y > 270) {
+            doc.addPage();
+            y = margin;
+          }
+          doc.text(String(i + 1), col1, y);
+          doc.text(line.name.substring(0, 20), col2, y);
+          doc.text(line.price.toFixed(3), col3, y);
+          doc.text(String(line.qty), col4, y);
+          doc.text(line.total.toFixed(3), col5, y);
+          y += rowHeight;
+        });
+        
+        // Separator line
+        y += 2;
+        doc.line(margin, y, pageWidth - margin, y);
+        y += 4;
+        
+        // Totals
+        const paid = (invoice.reglements || []).reduce((sum, r) => sum + r.amount, 0);
+        const remaining = invoice.total - paid;
+        const prevBalance = invoice.prevBalance || 0;
+        const currentBalance = prevBalance + invoice.total - paid;
+        
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text('المجموع: ' + invoice.total.toFixed(3) + ' د.ت', pageWidth - margin - 50, y, { align: 'right' });
+        y += 6;
+        doc.text('المدفوع: ' + paid.toFixed(3) + ' د.ت', pageWidth - margin - 50, y, { align: 'right' });
+        y += 6;
+        doc.text('المتبقي: ' + remaining.toFixed(3) + ' د.ت', pageWidth - margin - 50, y, { align: 'right' });
+        y += 6;
+        doc.setFont('helvetica', 'italic');
+        doc.text('الرصيد السابق: ' + prevBalance.toFixed(3) + ' د.ت', pageWidth - margin - 50, y, { align: 'right' });
+        y += 6;
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(remaining > 0 ? '#c0392b' : '#27ae60');
+        doc.text('الرصيد الحالي: ' + currentBalance.toFixed(3) + ' د.ت', pageWidth - margin - 50, y, { align: 'right' });
+        doc.setTextColor('#000000');
+        
+        // Footer
+        y += 8;
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(8);
+        doc.text('شكراً لكم على ثقتكم', pageWidth/2, y, { align: 'center' });
+        
+        // Convert to Data URL
+        const pdfDataUrl = doc.output('datauristring');
+        resolve(pdfDataUrl);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  },
+
+  // ===== UPLOAD PDF AND SHARE =====
+  uploadPDFAndShare(pdfDataUrl, invoice) {
+    // Convert Data URL to Blob
+    const byteString = atob(pdfDataUrl.split(',')[1]);
+    const mimeType = pdfDataUrl.split(',')[0].split(':')[1].split(';')[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    const blob = new Blob([ab], { type: mimeType });
+    
+    // Create temporary URL for the file
+    const url = URL.createObjectURL(blob);
+    
+    // If user is logged in, upload to Firebase Storage
+    if (currentUser) {
+      const storageRef = storage.ref();
+      const fileName = 'facture_' + invoice.num + '_' + Date.now() + '.pdf';
+      const fileRef = storageRef.child('factures/' + currentUser.uid + '/' + fileName);
+      
+      fileRef.put(blob).then(snapshot => {
+        return snapshot.ref.getDownloadURL();
+      }).then(downloadURL => {
+        // Share the link via WhatsApp
+        this.sendWhatsAppWithLink(invoice, downloadURL);
+      }).catch(err => {
+        console.error('Upload error:', err);
+        // In case of failure, share the temporary URL
+        this.sendWhatsAppWithLink(invoice, url);
+      });
+    } else {
+      // Without login, share the temporary URL
+      this.sendWhatsAppWithLink(invoice, url);
+    }
+  },
+
+  // ===== SEND VIA WHATSAPP WITH PDF LINK =====
+  sendWhatsAppWithLink(invoice, pdfUrl) {
+    const type = invoice.client ? 'بيع' : 'شراء';
+    const partyName = invoice.client || invoice.supplier;
+    const partyLabel = invoice.client ? 'العميل' : 'المورد';
+    const paid = (invoice.reglements || []).reduce((sum, r) => sum + r.amount, 0);
+    const remaining = invoice.total - paid;
+    
+    let text = `📄 *فاتورة ${type} - ${invoice.num}*\n`;
+    text += `📅 التاريخ: ${invoice.date}\n`;
+    text += `👤 ${partyLabel}: ${partyName}\n`;
+    text += `💰 المبلغ: ${invoice.total.toFixed(3)} د.ت\n`;
+    text += `💳 المدفوع: ${paid.toFixed(3)} د.ت\n`;
+    text += `📊 المتبقي: ${remaining.toFixed(3)} د.ت\n\n`;
+    text += `📎 رابط PDF: ${pdfUrl}\n\n`;
+    text += `━━━━━━━━━━━━━━━━━━\n`;
+    text += `${companyInfo.name || 'GTR POS'}`;
+    
+    // Open WhatsApp with the text
+    const phone = partyName ? (clients.find(c => c.name === partyName)?.phone || fournisseurs.find(f => f.name === partyName)?.phone || '') : '';
+    const formattedPhone = phone.replace(/\D/g, '');
+    const url = 'https://wa.me/' + (formattedPhone ? '216' + formattedPhone : '') + '?text=' + encodeURIComponent(text);
+    window.open(url, '_blank');
+    
+    showToast('✅ تم مشاركة الفاتورة عبر واتساب');
+  },
+
+  // ===== ORIGINAL PRINT FUNCTIONS =====
   printInvoice(){ if(this.editingId==null){ showToast('احفظ الفاتورة أولا'); return; } const rec=ventes.find(v=>v.id===this.editingId); if(!rec) return; const client=clients.find(c=>c.name===rec.client); const paid=(rec.reglements||[]).reduce((a,r)=>a+r.amount,0); const prevBalance=rec.prevBalance!==undefined?rec.prevBalance:(client?client.balance-(rec.total-paid):0); const currentBalance=prevBalance+rec.total-paid; _invoiceData={title:'فاتورة بيع',num:rec.num,date:rec.date,partyLabel:'العميل',partyName:rec.client,partyAddr:rec.clientAddress||(client?client.address:''),partyPhone:client?client.phone:'',partyTaxId:rec.clientTaxId||(client?client.taxId:''),lines:rec.lines||[],total:rec.total,paid,prevBalance,currentBalance}; renderInvoice(); $('printOverlay').classList.add('show'); },
   printBluetooth(){ if(this.editingId==null){ showToast('احفظ الفاتورة أولا'); return; } const rec=ventes.find(v=>v.id===this.editingId); if(!rec) return; const client=clients.find(c=>c.name===rec.client); const paid=(rec.reglements||[]).reduce((a,r)=>a+r.amount,0); let text=`${companyInfo.name}\n${companyInfo.address}\n${companyInfo.phone1}\n----------------\nفاتورة بيع: ${rec.num}\nالتاريخ: ${rec.date}\nالعميل: ${rec.client}\n`; if(rec.clientTaxId) text+=`MF: ${rec.clientTaxId}\n`; text+=`----------------\n`; rec.lines.forEach(l=>{ text+=`${l.name}  ${l.qty} x ${l.price.toFixed(3)} = ${l.total.toFixed(3)}\n`; }); text+=`----------------\nالمجموع: ${rec.total.toFixed(3)}\nالمدفوع: ${paid.toFixed(3)}\nالمتبقي: ${(rec.total-paid).toFixed(3)}\nشكراً لكم\n`; if(!navigator.bluetooth){ showToast('متصفحك لا يدعم Bluetooth'); return; } navigator.bluetooth.requestDevice({filters:[{services:['000018f0-0000-1000-8000-00805f9b34fb']}],optionalServices:['000018f0-0000-1000-8000-00805f9b34fb']}).then(device=>device.gatt.connect()).then(server=>server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb')).then(service=>service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb')).then(characteristic=>{ characteristic.writeValue(new TextEncoder().encode(text)); showToast('✅ تم الإرسال إلى الطابعة'); }).catch(err=>{ console.error(err); showToast('❌ فشل الاتصال بالطابعة: '+err.message); }); }
 };
 
 // =====================================================
-// ===== ACHATS =====
+// ===== ACHATS - with PDF WhatsApp sharing =====
 // =====================================================
 const Achats = {
   editingId: null, lines:[], reglements:[], originalSupplierBalance:0, originalSupplierId:null, editingRowIndex:null,
@@ -1413,7 +1634,23 @@ const Achats = {
   remove(){ if(this.editingId==null){ showToast('اختر فاتورة لحذفها'); return; } const rec=achats.find(a=>a.id===this.editingId); if(rec){ rec.lines.forEach(l=>{ const article=articles.find(a=>a.name===l.name); if(article) article.stock=(article.stock||0)-l.qty; }); caisseFournisseurs=caisseFournisseurs.filter(c=>c.invoiceId!==this.editingId); achats=achats.filter(a=>a.id!==this.editingId); saveState(); recalculateFournisseurBalance(rec.supplier); this.render(); closeSheet(); showToast('🗑️ تم الحذف'); } else { showToast('الفاتورة غير موجودة'); } },
   load(id){ const r=achats.find(a=>a.id===id); if(!r) return; this.editingId=id; $('pNum').value=r.num; $('pDate').value=r.date; const opt=[...$('pSupplier').options].find(o=>o.textContent===r.supplier); if(opt) $('pSupplier').value=opt.value; const s=fournisseurs.find(f=>f.name===r.supplier); const paid=(r.reglements||[]).reduce((a,rr)=>a+rr.amount,0); this.originalSupplierBalance=r.prevBalance!==undefined?r.prevBalance:(s?s.balance-(r.total-paid):0); this.originalSupplierId=s?s.id:null; this.supplierTaxId=r.supplierTaxId||(s?s.taxId||'':''); this.supplierAddress=r.supplierAddress||(s?s.address||'':''); $('pPhone').value=s?s.phone:''; this.lines=[...r.lines]; this.reglements=r.reglements?[...r.reglements]:[]; this.editingRowIndex=null; this.renderLines(); this.refreshArticleOptions(); this.renderReglements(); this.updateAccountSummary(); openSheet('achats'); },
   render(){ const q=$('aSearchP').value.trim().toLowerCase(); const list=$('achatsList'); list.innerHTML=''; const filtered=achats.filter(a=>!q||a.num.toLowerCase().includes(q)||a.supplier.toLowerCase().includes(q)).reverse(); if(!filtered.length){ list.innerHTML='<div class="empty-msg">لا توجد فواتير شراء</div>'; return; } filtered.slice(0,50).forEach(a=>{ const d=document.createElement('div'); d.className='row-card'; d.onclick=()=>{ Achats.load(a.id); openSheet('achats'); }; const paid=(a.reglements||[]).reduce((aa,r)=>aa+r.amount,0); d.innerHTML=`<div class="main-info"><div class="name">${a.num}</div><div class="meta">${a.supplier} - ${a.date} | المدفوع: ${paid.toFixed(3)}</div></div><div class="amount">${a.total.toFixed(3)} د.ت</div>`; list.appendChild(d); }); },
-  shareWhatsapp(){ if(this.editingId==null){ showToast('احفظ الفاتورة أولا'); return; } const rec=achats.find(a=>a.id===this.editingId); if(!rec) return; const supplier=fournisseurs.find(s=>s.name===rec.supplier); const paid=(rec.reglements||[]).reduce((aa,r)=>aa+r.amount,0); let text=`*فاتورة شراء ${rec.num}*\nالتاريخ: ${rec.date}\nالمورد: ${rec.supplier}\n`; if(rec.supplierTaxId) text+=`MF: ${rec.supplierTaxId}\n`; rec.lines.forEach(l=>{ text+=`${l.name}  x${l.qty}  ${l.total.toFixed(3)} د.ت\n`; }); text+=`\nالمجموع: ${rec.total.toFixed(3)} د.ت\nالمدفوع: ${paid.toFixed(3)} د.ت\nالمتبقي: ${(rec.total-paid).toFixed(3)} د.ت`; const phone=supplier?supplier.phone.replace(/\D/g,''):''; const url='https://wa.me/'+(phone?'216'+phone:'')+'?text='+encodeURIComponent(text); window.open(url,'_blank'); },
+  
+  // ===== SHARE WHATSAPP WITH PDF (SAME AS VENTES) =====
+  shareWhatsapp() {
+    if (this.editingId == null) { showToast('⚠️ احفظ الفاتورة أولا'); return; }
+    const rec = achats.find(a => a.id === this.editingId);
+    if (!rec) return;
+    
+    // Use Ventes' PDF generator (works for both types)
+    Ventes.generateInvoicePDF(rec, 'achat').then(pdfDataUrl => {
+      Ventes.uploadPDFAndShare(pdfDataUrl, rec);
+    }).catch(err => {
+      console.error(err);
+      showToast('❌ فشل إنشاء PDF');
+    });
+  },
+
+  // ===== ORIGINAL PRINT FUNCTIONS =====
   printInvoice(){ if(this.editingId==null){ showToast('احفظ الفاتورة أولا'); return; } const rec=achats.find(a=>a.id===this.editingId); if(!rec) return; const supplier=fournisseurs.find(s=>s.name===rec.supplier); const paid=(rec.reglements||[]).reduce((aa,r)=>aa+r.amount,0); const prevBalance=rec.prevBalance!==undefined?rec.prevBalance:(supplier?supplier.balance-(rec.total-paid):0); const currentBalance=prevBalance+rec.total-paid; _invoiceData={title:'فاتورة شراء',num:rec.num,date:rec.date,partyLabel:'المورد',partyName:rec.supplier,partyAddr:rec.supplierAddress||(supplier?supplier.address:''),partyPhone:supplier?supplier.phone:'',partyTaxId:rec.supplierTaxId||(supplier?supplier.taxId:''),lines:rec.lines||[],total:rec.total,paid,prevBalance,currentBalance}; renderInvoice(); $('printOverlay').classList.add('show'); },
   printBluetooth(){ if(this.editingId==null){ showToast('احفظ الفاتورة أولا'); return; } const rec=achats.find(a=>a.id===this.editingId); if(!rec) return; const supplier=fournisseurs.find(s=>s.name===rec.supplier); const paid=(rec.reglements||[]).reduce((aa,r)=>aa+r.amount,0); let text=`${companyInfo.name}\n${companyInfo.address}\n${companyInfo.phone1}\n----------------\nفاتورة شراء: ${rec.num}\nالتاريخ: ${rec.date}\nالمورد: ${rec.supplier}\n`; if(rec.supplierTaxId) text+=`MF: ${rec.supplierTaxId}\n`; text+=`----------------\n`; rec.lines.forEach(l=>{ text+=`${l.name}  ${l.qty} x ${l.price.toFixed(3)} = ${l.total.toFixed(3)}\n`; }); text+=`----------------\nالمجموع: ${rec.total.toFixed(3)}\nالمدفوع: ${paid.toFixed(3)}\nالمتبقي: ${(rec.total-paid).toFixed(3)}\nشكراً لكم\n`; if(!navigator.bluetooth){ showToast('متصفحك لا يدعم Bluetooth'); return; } navigator.bluetooth.requestDevice({filters:[{services:['000018f0-0000-1000-8000-00805f9b34fb']}],optionalServices:['000018f0-0000-1000-8000-00805f9b34fb']}).then(device=>device.gatt.connect()).then(server=>server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb')).then(service=>service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb')).then(characteristic=>{ characteristic.writeValue(new TextEncoder().encode(text)); showToast('✅ تم الإرسال إلى الطابعة'); }).catch(err=>{ console.error(err); showToast('❌ فشل الاتصال بالطابعة: '+err.message); }); }
 };
