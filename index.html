@@ -14,6 +14,8 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <!-- jsPDF for PDF generation -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- QRCode Generator -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <style>
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0;}
   html,body{height:100%;font-family:'Cairo',sans-serif;background:#0e142e;font-size:14px;overflow:hidden;}
@@ -119,13 +121,11 @@
   .finance-table{width:100%;min-width:600px;border-collapse:collapse;font-size:10px;direction:rtl;background:#fff;}
   .finance-table th{background:var(--navy);color:#fff;padding:4px 3px;font-weight:700;white-space:nowrap;text-align:center;font-size:8px;position:sticky;top:0;z-index:2;}
   .finance-table td{padding:3px 2px;border-bottom:1px solid var(--border);text-align:center;white-space:nowrap;font-size:9px;background:#fff;}
-  .finance-table td input{width:60px;padding:1px 2px;border:1px solid var(--border);border-radius:3px;font-size:9px;text-align:center;font-family:'Cairo',sans-serif;background:#fafbfd;}
-  .finance-table td input.date-input{width:70px;}
-  .finance-table td input:focus{border-color:var(--blue-accent);outline:none;background:#fff;}
+  .finance-table td .finance-label{display:inline-block;padding:2px 4px;font-weight:600;color:var(--text);font-size:9px;}
+  .finance-table td .finance-input{width:70px;padding:2px 3px;border:1px solid var(--border);border-radius:3px;font-size:9px;text-align:center;font-family:'Cairo',sans-serif;background:#fafbfd;}
+  .finance-table td .finance-input:focus{border-color:var(--blue-accent);outline:none;background:#fff;}
   .finance-table .row-del{cursor:pointer;color:var(--danger);font-weight:800;font-size:12px;background:none;border:none;padding:0 4px;}
   .finance-table .row-del:hover{opacity:0.7;}
-  .finance-table .total-row td{background:#eef2f9;font-weight:800;border-top:2px solid var(--navy);}
-  .finance-table .total-row td input{background:#eef2f9;font-weight:800;}
   .account-item{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:4px 6px;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:2px;font-size:10px;}
   .account-item .email{font-weight:600;flex:1;}
   .account-item .status{font-size:8px;padding:1px 6px;border-radius:8px;color:#fff;white-space:nowrap;}
@@ -246,6 +246,8 @@
   .caisse-filter .field label{font-size:8px;}
   .history-table .caisse-in{color:var(--success);font-weight:700;}
   .history-table .caisse-out{color:var(--danger);font-weight:700;}
+  .finance-actions-bar{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;}
+  .finance-actions-bar .btn{width:auto;padding:3px 10px;font-size:10px;margin:0;}
 </style>
 </head>
 <body>
@@ -392,13 +394,13 @@
         <div class="kpi-card"><div class="val" id="finProfit">0.000</div><div class="lbl">الأرباح</div></div>
       </div>
       <div class="section-title" style="margin-top:12px;">📋 جدول البيانات المالية</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-        <button class="btn save small" style="width:auto;padding:3px 12px;" onclick="FinanceTable.addRow()">➕ إضافة صف</button>
-        <button class="btn print small" style="width:auto;padding:3px 12px;" onclick="FinanceTable.printTable()">🖨️ طباعة الجدول</button>
-        <button class="btn outline small" style="width:auto;padding:3px 12px;" onclick="FinanceTable.exportCSV()">📥 CSV</button>
-        <button class="btn del small" style="width:auto;padding:3px 12px;" onclick="if(confirm('حذف كل البيانات؟')) FinanceTable.clearAll()">🗑️ مسح الكل</button>
-        <button class="btn edit small" style="width:auto;padding:3px 12px;" onclick="FinanceTable.syncWithApp(); FinanceTable.render();">🔄 مزامنة</button>
-        <button class="btn print small" style="width:auto;padding:3px 12px;background:linear-gradient(180deg,#6c7ae0,#4a56b0);" onclick="FinanceTable.printFullReport()">📄 تقرير شامل</button>
+      <div class="finance-actions-bar">
+        <button class="btn save small" onclick="FinanceTable.addRow()">➕ إضافة صف</button>
+        <button class="btn print small" onclick="FinanceTable.printTable()">🖨️ طباعة</button>
+        <button class="btn outline small" onclick="FinanceTable.exportCSV()">📥 CSV</button>
+        <button class="btn del small" onclick="if(confirm('حذف كل البيانات؟')) FinanceTable.clearAll()">🗑️ مسح</button>
+        <button class="btn edit small" onclick="FinanceTable.syncWithApp(); FinanceTable.render();">🔄 مزامنة</button>
+        <button class="btn print small" style="background:linear-gradient(180deg,#6c7ae0,#4a56b0);" onclick="FinanceTable.printFullReport()">📄 تقرير</button>
       </div>
       <div class="finance-table-wrapper">
         <table class="finance-table" id="financeTable">
@@ -410,7 +412,7 @@
             <th style="min-width:80px;">رصيد المورد</th>
             <th style="min-width:80px;">رأس المال</th>
             <th style="min-width:70px;">الأرباح</th>
-            <th style="min-width:40px;">🔄</th>
+            <th style="min-width:50px;">إجراء</th>
           </tr></thead>
           <tbody id="financeTableBody"></tbody>
         </table>
@@ -888,15 +890,15 @@ function recalculateFournisseurBalance(supplierName) {
 }
 
 // =====================================================
-// ===== FINANCE TABLE =====
+// ===== FINANCE TABLE - FIXED =====
 // =====================================================
 const FinanceTable = {
   data: [],
   load() {
     if (financeData.length === 0) {
       financeData = [
-        { date: '24/06/2026', clientBalance: 5000000, stockValue: 5000000, cash: 2500000, supplierBalance: 10000000, capital: 2500000, profit: 0 },
-        { date: '25/06/2026', clientBalance: 5500000, stockValue: 5000000, cash: 5500000, supplierBalance: 10000000, capital: 3000000, profit: 500000 }
+        { date: '24/06/2026', clientBalance: 5000, stockValue: 5000, cash: 2500, supplierBalance: 10000, capital: 2500, profit: 0 },
+        { date: '25/06/2026', clientBalance: 5500, stockValue: 5000, cash: 5500, supplierBalance: 10000, capital: 3000, profit: 500 }
       ];
       saveState();
     }
@@ -919,76 +921,150 @@ const FinanceTable = {
     }
     this.data.forEach((row, index) => {
       const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><input class="date-input" type="text" value="${row.date || ''}" data-field="date" data-index="${index}" placeholder="DD/MM/YYYY"></td>
-        <td><input type="number" step="0.001" value="${row.clientBalance ?? 0}" data-field="clientBalance" data-index="${index}"></td>
-        <td><input type="number" step="0.001" value="${row.stockValue ?? 0}" data-field="stockValue" data-index="${index}"></td>
-        <td><input type="number" step="0.001" value="${row.cash ?? 0}" data-field="cash" data-index="${index}"></td>
-        <td><input type="number" step="0.001" value="${row.supplierBalance ?? 0}" data-field="supplierBalance" data-index="${index}"></td>
-        <td><input type="number" step="0.001" value="${row.capital ?? 0}" data-field="capital" data-index="${index}"></td>
-        <td><input type="number" step="0.001" value="${row.profit ?? 0}" data-field="profit" data-index="${index}"></td>
-        <td><button class="row-del" onclick="FinanceTable.deleteRow(${index})">✕</button></td>
-      `;
+      tr.dataset.index = index;
+      // date
+      let dateCell = document.createElement('td');
+      let dateSpan = document.createElement('span');
+      dateSpan.className = 'finance-label';
+      dateSpan.textContent = row.date || '';
+      dateCell.appendChild(dateSpan);
+      tr.appendChild(dateCell);
+
+      // clientBalance
+      let cbCell = document.createElement('td');
+      let cbSpan = document.createElement('span');
+      cbSpan.className = 'finance-label';
+      cbSpan.textContent = (row.clientBalance ?? 0).toFixed(3);
+      cbCell.appendChild(cbSpan);
+      tr.appendChild(cbCell);
+
+      // stockValue
+      let svCell = document.createElement('td');
+      let svSpan = document.createElement('span');
+      svSpan.className = 'finance-label';
+      svSpan.textContent = (row.stockValue ?? 0).toFixed(3);
+      svCell.appendChild(svSpan);
+      tr.appendChild(svCell);
+
+      // cash
+      let cashCell = document.createElement('td');
+      let cashSpan = document.createElement('span');
+      cashSpan.className = 'finance-label';
+      cashSpan.textContent = (row.cash ?? 0).toFixed(3);
+      cashCell.appendChild(cashSpan);
+      tr.appendChild(cashCell);
+
+      // supplierBalance
+      let sbCell = document.createElement('td');
+      let sbSpan = document.createElement('span');
+      sbSpan.className = 'finance-label';
+      sbSpan.textContent = (row.supplierBalance ?? 0).toFixed(3);
+      sbCell.appendChild(sbSpan);
+      tr.appendChild(sbCell);
+
+      // capital
+      let capCell = document.createElement('td');
+      let capSpan = document.createElement('span');
+      capSpan.className = 'finance-label';
+      capSpan.textContent = (row.capital ?? 0).toFixed(3);
+      capCell.appendChild(capSpan);
+      tr.appendChild(capCell);
+
+      // profit
+      let profitCell = document.createElement('td');
+      let profitSpan = document.createElement('span');
+      profitSpan.className = 'finance-label';
+      profitSpan.textContent = (row.profit ?? 0).toFixed(3);
+      profitCell.appendChild(profitSpan);
+      tr.appendChild(profitCell);
+
+      // actions
+      let actionCell = document.createElement('td');
+      let editBtn = document.createElement('button');
+      editBtn.className = 'btn edit small';
+      editBtn.textContent = '✏️';
+      editBtn.style.margin = '0 2px';
+      editBtn.style.padding = '2px 6px';
+      editBtn.style.width = 'auto';
+      editBtn.onclick = (e) => { e.stopPropagation(); FinanceTable.editRow(index); };
+      actionCell.appendChild(editBtn);
+
+      let delBtn = document.createElement('button');
+      delBtn.className = 'btn del small';
+      delBtn.textContent = '✕';
+      delBtn.style.margin = '0 2px';
+      delBtn.style.padding = '2px 6px';
+      delBtn.style.width = 'auto';
+      delBtn.onclick = (e) => { e.stopPropagation(); FinanceTable.deleteRow(index); };
+      actionCell.appendChild(delBtn);
+
+      tr.appendChild(actionCell);
       tbody.appendChild(tr);
     });
-    tbody.querySelectorAll('input').forEach(input => {
-      input.addEventListener('input', function() {
-        const index = parseInt(this.dataset.index);
-        const field = this.dataset.field;
-        let val = this.value;
-        if (field !== 'date') val = parseFloat(val) || 0;
-        FinanceTable.data[index][field] = val;
-        FinanceTable.save();
-        FinanceTable.updateKPIs();
-        FinanceTable.renderTotals();
-      });
-    });
-    this.renderTotals();
   },
-  renderTotals() {
-    const tbody = document.getElementById('financeTableBody');
-    if (!tbody) return;
-    const oldTotal = tbody.querySelector('.total-row');
-    if (oldTotal) oldTotal.remove();
-    if (this.data.length === 0) return;
-    const totals = { clientBalance: 0, stockValue: 0, cash: 0, supplierBalance: 0, capital: 0, profit: 0 };
-    this.data.forEach(row => {
-      totals.clientBalance += row.clientBalance || 0;
-      totals.stockValue += row.stockValue || 0;
-      totals.cash += row.cash || 0;
-      totals.supplierBalance += row.supplierBalance || 0;
-      totals.capital += row.capital || 0;
-      totals.profit += row.profit || 0;
+  editRow(index) {
+    const row = document.querySelector(`#financeTableBody tr[data-index="${index}"]`);
+    if (!row) return;
+    const cells = row.querySelectorAll('td');
+    const fields = ['date', 'clientBalance', 'stockValue', 'cash', 'supplierBalance', 'capital', 'profit'];
+    cells.forEach((cell, i) => {
+      if (i === 7) return; // actions column
+      const span = cell.querySelector('span.finance-label');
+      if (span) {
+        const val = span.textContent;
+        const input = document.createElement('input');
+        input.type = (i === 0) ? 'text' : 'number';
+        input.step = '0.001';
+        input.className = 'finance-input';
+        input.value = val;
+        input.dataset.field = fields[i];
+        cell.replaceChild(input, span);
+        if (i === 0) setTimeout(() => input.focus(), 100);
+      }
     });
-    const tr = document.createElement('tr');
-    tr.className = 'total-row';
-    tr.innerHTML = `
-      <td style="font-size:8px;">المجموع</td>
-      <td>${totals.clientBalance.toFixed(3)}</td>
-      <td>${totals.stockValue.toFixed(3)}</td>
-      <td>${totals.cash.toFixed(3)}</td>
-      <td>${totals.supplierBalance.toFixed(3)}</td>
-      <td>${totals.capital.toFixed(3)}</td>
-      <td>${totals.profit.toFixed(3)}</td>
-      <td></td>
-    `;
-    tbody.appendChild(tr);
+    const actionCell = cells[7];
+    const editBtn = actionCell.querySelector('.btn.edit');
+    if (editBtn) {
+      editBtn.textContent = '💾';
+      editBtn.className = 'btn save small';
+      editBtn.onclick = (e) => { e.stopPropagation(); FinanceTable.saveRow(index); };
+    }
+  },
+  saveRow(index) {
+    const row = document.querySelector(`#financeTableBody tr[data-index="${index}"]`);
+    if (!row) return;
+    const inputs = row.querySelectorAll('input.finance-input');
+    const rowData = this.data[index];
+    inputs.forEach(input => {
+      const field = input.dataset.field;
+      let val = input.value;
+      if (field !== 'date') val = parseFloat(val) || 0;
+      rowData[field] = val;
+    });
+    this.save();
+    this.render();
+    showToast('✅ تم حفظ التعديل');
+  },
+  deleteRow(index) {
+    if (this.data.length <= 1) {
+      if (!confirm('هذا هو الصف الوحيد. هل تريد حذفه؟')) return;
+    }
+    this.data.splice(index, 1);
+    this.save();
   },
   addRow() {
     const today = new Date();
     const dateStr = String(today.getDate()).padStart(2,'0')+'/'+String(today.getMonth()+1).padStart(2,'0')+'/'+today.getFullYear();
     this.data.push({ date: dateStr, clientBalance: 0, stockValue: 0, cash: 0, supplierBalance: 0, capital: 0, profit: 0 });
     this.save();
-    setTimeout(() => { const tbody = document.getElementById('financeTableBody'); if (tbody) { const lastInput = tbody.querySelector('tr:last-child input'); if (lastInput) lastInput.focus(); } }, 50);
+    setTimeout(() => this.render(), 50);
   },
-  deleteRow(index) { 
-    if (this.data.length <= 1) { 
-      if (!confirm('هذا هو الصف الوحيد. هل تريد حذفه؟')) return; 
-    } 
-    this.data.splice(index, 1); 
-    this.save(); 
+  clearAll() {
+    if (this.data.length === 0) return;
+    this.data = [];
+    this.save();
+    showToast('🗑️ تم مسح جميع البيانات');
   },
-  clearAll() { this.data = []; this.save(); },
   updateKPIs() {
     const totalClientBalance = clients.reduce((sum, c) => sum + (c.balance || 0), 0);
     document.getElementById('finTotalClientBalance').textContent = totalClientBalance.toFixed(3);
@@ -1014,7 +1090,7 @@ const FinanceTable = {
       rows += `<tr><td>${row.date || ''}</td><td>${(row.clientBalance ?? 0).toFixed(3)}</td><td>${(row.stockValue ?? 0).toFixed(3)}</td><td>${(row.cash ?? 0).toFixed(3)}</td><td>${(row.supplierBalance ?? 0).toFixed(3)}</td><td>${(row.capital ?? 0).toFixed(3)}</td><td>${(row.profit ?? 0).toFixed(3)}</td></tr>`;
     });
     const w = window.open('', '_blank', 'width=900,height=600');
-    w.document.write(`<html dir="rtl"><head><title>البيانات المالية</title><style>body{font-family:'Cairo',sans-serif;padding:20px;direction:rtl;background:#fff;}h2{text-align:center;color:#1e2f66;}table{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}th{background:#1e2f66;color:#fff;padding:6px 4px;border:1px solid #999;text-align:center;}td{padding:4px;border:1px solid #999;text-align:center;}.total-row{background:#eef2f9;font-weight:800;}.footer{text-align:center;margin-top:15px;color:#666;font-size:9px;border-top:1px solid #ddd;padding-top:8px;}@media print{body{padding:10px;}}</style></head><body><h2>📊 البيانات المالية</h2><p style="text-align:center;font-size:11px;color:#666;">${companyInfo.name || 'GTR POS'} | ${new Date().toLocaleDateString()}</p><table><thead><tr><th>التاريخ</th><th>رصيد العميل</th><th>قيمة المخزون</th><th>الخزينة</th><th>رصيد المورد</th><th>رأس المال</th><th>الأرباح</th></tr></thead><tbody>${rows}</tbody></table><div class="footer">${companyInfo.name} - ${companyInfo.address || ''} - ${companyInfo.phone1 || ''}</div><script>window.onload=function(){window.print();setTimeout(function(){window.close();},500);}<\/script></body></html>`);
+    w.document.write(`<html dir="rtl"><head><title>البيانات المالية</title><style>body{font-family:'Cairo',sans-serif;padding:20px;direction:rtl;background:#fff;}h2{text-align:center;color:#1e2f66;}table{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}th{background:#1e2f66;color:#fff;padding:6px 4px;border:1px solid #999;text-align:center;}td{padding:4px;border:1px solid #999;text-align:center;}.footer{text-align:center;margin-top:15px;color:#666;font-size:9px;border-top:1px solid #ddd;padding-top:8px;}@media print{body{padding:10px;}}</style></head><body><h2>📊 البيانات المالية</h2><p style="text-align:center;font-size:11px;color:#666;">${companyInfo.name || 'GTR POS'} | ${new Date().toLocaleDateString()}</p><table><thead><tr><th>التاريخ</th><th>رصيد العميل</th><th>قيمة المخزون</th><th>الخزينة</th><th>رصيد المورد</th><th>رأس المال</th><th>الأرباح</th></tr></thead><tbody>${rows}</tbody></table><div class="footer">${companyInfo.name} - ${companyInfo.address || ''} - ${companyInfo.phone1 || ''}</div><script>window.onload=function(){window.print();setTimeout(function(){window.close();},500);}<\/script></body></html>`);
     w.document.close();
   },
   exportCSV() {
@@ -1081,7 +1157,7 @@ const FinanceTable = {
     this.data.forEach(row => {
       rows += `<tr><td>${row.date || ''}</td><td>${(row.clientBalance ?? 0).toFixed(3)}</td><td>${(row.stockValue ?? 0).toFixed(3)}</td><td>${(row.cash ?? 0).toFixed(3)}</td><td>${(row.supplierBalance ?? 0).toFixed(3)}</td><td>${(row.capital ?? 0).toFixed(3)}</td><td>${(row.profit ?? 0).toFixed(3)}</td></tr>`;
     });
-    w.document.write(`<html dir="rtl"><head><title>تقرير مالي شامل</title><style>body{font-family:'Cairo',sans-serif;padding:20px;direction:rtl;background:#fff;}.header{text-align:center;border-bottom:3px double #1e2f66;padding-bottom:10px;margin-bottom:15px;}.header h1{color:#1e2f66;font-size:22px;}.summary{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr;gap:6px;margin:10px 0;background:#f0f4ff;padding:12px;border-radius:8px;}.summary .item{text-align:center;}.summary .item .label{font-size:9px;color:#888;display:block;}.summary .item .value{font-size:14px;font-weight:800;}table{width:100%;border-collapse:collapse;font-size:10px;margin-top:10px;}th{background:#1e2f66;color:#fff;padding:6px;border:1px solid #999;}td{padding:4px;border:1px solid #ddd;text-align:center;}.total-row{background:#eef2f9;font-weight:800;border-top:3px solid #1e2f66;}.footer{text-align:center;margin-top:15px;color:#666;font-size:8px;border-top:1px solid #ddd;padding-top:8px;}</style></head><body><div class="header"><h1>📊 التقرير المالي الشامل</h1><div class="sub">${companyInfo.name}</div><div class="sub" style="font-size:10px;">📅 ${dateStr}</div></div><div class="summary"><div class="item"><span class="label">رصيد العميل</span><span class="value" style="color:#2980b9;">${totalClientBalance.toFixed(3)}</span></div><div class="item"><span class="label">قيمة المخزون</span><span class="value" style="color:#27ae60;">${totalStock.toFixed(3)}</span></div><div class="item"><span class="label">الخزينة</span><span class="value" style="color:#f39c12;">${totalCash.toFixed(3)}</span></div><div class="item"><span class="label">رصيد المورد</span><span class="value" style="color:#8e44ad;">${totalSupplier.toFixed(3)}</span></div><div class="item"><span class="label">رأس المال</span><span class="value" style="color:#2980b9;">${totalCapital.toFixed(3)}</span></div><div class="item"><span class="label">الأرباح</span><span class="value" style="color:${totalProfit >= 0 ? '#27ae60' : '#e74c3c'};">${totalProfit.toFixed(3)}</span></div></div><table><thead><tr><th>التاريخ</th><th>رصيد العميل</th><th>قيمة المخزون</th><th>الخزينة</th><th>رصيد المورد</th><th>رأس المال</th><th>الأرباح</th></tr></thead><tbody>${rows || '<tr><td colspan="7" style="text-align:center;color:#999;">لا توجد بيانات</td></tr>'}</tbody></table><div class="footer">${companyInfo.name} - ${companyInfo.address || ''} ${companyInfo.phone1 ? '📞 ' + companyInfo.phone1 : ''}</div><script>window.onload=function(){window.print();setTimeout(function(){window.close();},500);};<\/script></body></html>`);
+    w.document.write(`<html dir="rtl"><head><title>تقرير مالي شامل</title><style>body{font-family:'Cairo',sans-serif;padding:20px;direction:rtl;background:#fff;}.header{text-align:center;border-bottom:3px double #1e2f66;padding-bottom:10px;margin-bottom:15px;}.header h1{color:#1e2f66;font-size:22px;}.summary{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr;gap:6px;margin:10px 0;background:#f0f4ff;padding:12px;border-radius:8px;}.summary .item{text-align:center;}.summary .item .label{font-size:9px;color:#888;display:block;}.summary .item .value{font-size:14px;font-weight:800;}table{width:100%;border-collapse:collapse;font-size:10px;margin-top:10px;}th{background:#1e2f66;color:#fff;padding:6px;border:1px solid #999;}td{padding:4px;border:1px solid #ddd;text-align:center;}.footer{text-align:center;margin-top:15px;color:#666;font-size:8px;border-top:1px solid #ddd;padding-top:8px;}</style></head><body><div class="header"><h1>📊 التقرير المالي الشامل</h1><div class="sub">${companyInfo.name}</div><div class="sub" style="font-size:10px;">📅 ${dateStr}</div></div><div class="summary"><div class="item"><span class="label">رصيد العميل</span><span class="value" style="color:#2980b9;">${totalClientBalance.toFixed(3)}</span></div><div class="item"><span class="label">قيمة المخزون</span><span class="value" style="color:#27ae60;">${totalStock.toFixed(3)}</span></div><div class="item"><span class="label">الخزينة</span><span class="value" style="color:#f39c12;">${totalCash.toFixed(3)}</span></div><div class="item"><span class="label">رصيد المورد</span><span class="value" style="color:#8e44ad;">${totalSupplier.toFixed(3)}</span></div><div class="item"><span class="label">رأس المال</span><span class="value" style="color:#2980b9;">${totalCapital.toFixed(3)}</span></div><div class="item"><span class="label">الأرباح</span><span class="value" style="color:${totalProfit >= 0 ? '#27ae60' : '#e74c3c'};">${totalProfit.toFixed(3)}</span></div></div><table><thead><tr><th>التاريخ</th><th>رصيد العميل</th><th>قيمة المخزون</th><th>الخزينة</th><th>رصيد المورد</th><th>رأس المال</th><th>الأرباح</th></tr></thead><tbody>${rows || '<tr><td colspan="7" style="text-align:center;color:#999;">لا توجد بيانات</td></tr>'}</tbody></table><div class="footer">${companyInfo.name} - ${companyInfo.address || ''} ${companyInfo.phone1 ? '📞 ' + companyInfo.phone1 : ''}</div><script>window.onload=function(){window.print();setTimeout(function(){window.close();},500);};<\/script></body></html>`);
     w.document.close();
   }
 };
@@ -1361,7 +1437,7 @@ const ArticleHistory = {
 };
 
 // =====================================================
-// ===== VENTES - with PDF WhatsApp sharing =====
+// ===== VENTES - with PDF WhatsApp sharing + QR (FIXED) =====
 // =====================================================
 const Ventes = {
   editingId: null, lines:[], reglements:[], originalClientBalance:0, originalClientId:null, editingRowIndex:null,
@@ -1387,26 +1463,35 @@ const Ventes = {
   load(id){ const r=ventes.find(v=>v.id===id); if(!r) return; this.editingId=id; $('vNum').value=r.num; $('vDate').value=r.date; const opt=[...$('vClient').options].find(o=>o.textContent===r.client); if(opt) $('vClient').value=opt.value; const c=clients.find(x=>x.name===r.client); const paid=(r.reglements||[]).reduce((a,rr)=>a+rr.amount,0); this.originalClientBalance=r.prevBalance!==undefined?r.prevBalance:(c?c.balance-(r.total-paid):0); this.originalClientId=c?c.id:null; this.clientTaxId=r.clientTaxId||(c?c.taxId||'':''); this.clientAddress=r.clientAddress||(c?c.address||'':''); this.clientSpecialPrices=(c&&c.specialPrices)?[...c.specialPrices]:[]; $('vPhone').value=c?c.phone:''; this.lines=[...r.lines]; this.reglements=r.reglements?[...r.reglements]:[]; this.editingRowIndex=null; this.renderLines(); this.refreshArticleOptions(); this.renderReglements(); this.updateAccountSummary(); openSheet('ventes'); },
   render(){ const q=$('vSearch').value.trim().toLowerCase(); const list=$('ventesList'); list.innerHTML=''; const filtered=ventes.filter(v=>!q||v.num.toLowerCase().includes(q)||v.client.toLowerCase().includes(q)).reverse(); if(!filtered.length){ list.innerHTML='<div class="empty-msg">لا توجد فواتير بيع</div>'; return; } filtered.slice(0,50).forEach(v=>{ const d=document.createElement('div'); d.className='row-card'; d.onclick=()=>{ Ventes.load(v.id); openSheet('ventes'); }; const paid=(v.reglements||[]).reduce((a,r)=>a+r.amount,0); d.innerHTML=`<div class="main-info"><div class="name">${v.num}</div><div class="meta">${v.client} - ${v.date} | المدفوع: ${paid.toFixed(3)}</div></div><div class="amount">${v.total.toFixed(3)} د.ت</div>`; list.appendChild(d); }); },
   
-  // ===== SHARE WHATSAPP WITH PDF =====
+  // ===== SHARE WHATSAPP WITH PDF + QR (FIXED) =====
   shareWhatsapp() {
-    if (this.editingId == null) { showToast('⚠️ احفظ الفاتورة أولا'); return; }
+    if (this.editingId == null) {
+      showToast('⚠️ احفظ الفاتورة أولا');
+      return;
+    }
     const rec = ventes.find(v => v.id === this.editingId);
-    if (!rec) return;
-    
-    // Generate PDF and share
-    this.generateInvoicePDF(rec, 'vente').then(pdfDataUrl => {
-      this.uploadPDFAndShare(pdfDataUrl, rec);
-    }).catch(err => {
-      console.error(err);
-      showToast('❌ فشل إنشاء PDF');
-    });
+    if (!rec) {
+      showToast('❌ الفاتورة غير موجودة');
+      return;
+    }
+    showToast('⏳ جاري إنشاء PDF...');
+    this.generateInvoicePDF(rec, 'vente')
+      .then(pdfDataUrl => {
+        this.uploadPDFAndShare(pdfDataUrl, rec);
+      })
+      .catch(err => {
+        console.error('PDF generation error:', err);
+        showToast('❌ فشل إنشاء PDF: ' + err.message);
+      });
   },
 
-  // ===== GENERATE INVOICE PDF =====
+  // ===== GENERATE INVOICE PDF WITH QR CODE (FIXED) =====
   generateInvoicePDF(invoice, type) {
     return new Promise((resolve, reject) => {
       try {
         const { jsPDF } = window.jspdf;
+        if (!jsPDF) throw new Error('مكتبة jsPDF غير محملة');
+        
         const doc = new jsPDF('p', 'mm', 'a4');
         const pageWidth = 210;
         const margin = 15;
@@ -1415,21 +1500,21 @@ const Ventes = {
         // Company header
         doc.setFontSize(16);
         doc.setFont('helvetica', 'bold');
-        doc.text(companyInfo.name || 'GTR POS', pageWidth/2, y, { align: 'center' });
+        doc.text(companyInfo.name || 'GTR POS', pageWidth / 2, y, { align: 'center' });
         y += 6;
         
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
         if (companyInfo.address) {
-          doc.text(companyInfo.address, pageWidth/2, y, { align: 'center' });
+          doc.text(companyInfo.address, pageWidth / 2, y, { align: 'center' });
           y += 5;
         }
         if (companyInfo.phone1) {
-          doc.text('📞 ' + companyInfo.phone1, pageWidth/2, y, { align: 'center' });
+          doc.text('📞 ' + companyInfo.phone1, pageWidth / 2, y, { align: 'center' });
           y += 5;
         }
         if (companyInfo.taxId) {
-          doc.text('MF: ' + companyInfo.taxId, pageWidth/2, y, { align: 'center' });
+          doc.text('MF: ' + companyInfo.taxId, pageWidth / 2, y, { align: 'center' });
           y += 5;
         }
         
@@ -1440,7 +1525,7 @@ const Ventes = {
         const title = type === 'vente' ? 'فاتورة بيع' : 'فاتورة شراء';
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
-        doc.text(title, pageWidth/2, y, { align: 'center' });
+        doc.text(title, pageWidth / 2, y, { align: 'center' });
         y += 7;
         
         // Invoice info
@@ -1454,7 +1539,9 @@ const Ventes = {
         const partyName = type === 'vente' ? invoice.client : invoice.supplier;
         const taxId = type === 'vente' ? invoice.clientTaxId : invoice.supplierTaxId;
         const partyAddr = type === 'vente' ? invoice.clientAddress : invoice.supplierAddress;
-        const phone = type === 'vente' ? (clients.find(c => c.name === invoice.client)?.phone || '') : (fournisseurs.find(f => f.name === invoice.supplier)?.phone || '');
+        const phone = type === 'vente'
+          ? (clients.find(c => c.name === invoice.client)?.phone || '')
+          : (fournisseurs.find(f => f.name === invoice.supplier)?.phone || '');
         
         doc.text(partyLabel + ': ' + partyName, margin, y);
         if (taxId) doc.text('MF: ' + taxId, pageWidth - margin - 20, y, { align: 'right' });
@@ -1463,7 +1550,7 @@ const Ventes = {
         if (partyAddr) doc.text('العنوان: ' + partyAddr, pageWidth - margin - 20, y, { align: 'right' });
         y += 6;
         
-        // Separator line
+        // Separator
         doc.line(margin, y, pageWidth - margin, y);
         y += 4;
         
@@ -1485,7 +1572,7 @@ const Ventes = {
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(8);
         invoice.lines.forEach((line, i) => {
-          if (y > 270) {
+          if (y > 250) {
             doc.addPage();
             y = margin;
           }
@@ -1497,12 +1584,11 @@ const Ventes = {
           y += rowHeight;
         });
         
-        // Separator line
+        // Totals
         y += 2;
         doc.line(margin, y, pageWidth - margin, y);
         y += 4;
         
-        // Totals
         const paid = (invoice.reglements || []).reduce((sum, r) => sum + r.amount, 0);
         const remaining = invoice.total - paid;
         const prevBalance = invoice.prevBalance || 0;
@@ -1528,7 +1614,26 @@ const Ventes = {
         y += 8;
         doc.setFont('helvetica', 'italic');
         doc.setFontSize(8);
-        doc.text('شكراً لكم على ثقتكم', pageWidth/2, y, { align: 'center' });
+        doc.text('شكراً لكم على ثقتكم', pageWidth / 2, y, { align: 'center' });
+        
+        // ===== QR CODE - FIXED =====
+        try {
+          const qrContent = `Facture: ${invoice.num}\nDate: ${invoice.date}\nTotal: ${invoice.total.toFixed(3)} TND`;
+          // Use the global QRCode function
+          const QRCodeGen = window.qrcode || window.QRCode;
+          if (QRCodeGen && typeof QRCodeGen === 'function') {
+            const qr = QRCodeGen(0, 'M');
+            qr.addData(qrContent);
+            qr.make();
+            const qrDataURL = qr.createDataURL(8, 8);
+            const qrSize = 25;
+            doc.addImage(qrDataURL, 'PNG', pageWidth - margin - qrSize, y - 10, qrSize, qrSize);
+          } else {
+            console.warn('QRCode library not available - window.qrcode =', window.qrcode);
+          }
+        } catch (qrErr) {
+          console.warn('QR Code generation failed:', qrErr);
+        }
         
         // Convert to Data URL
         const pdfDataUrl = doc.output('datauristring');
@@ -1539,40 +1644,29 @@ const Ventes = {
     });
   },
 
-  // ===== UPLOAD PDF AND SHARE =====
+  // ===== UPLOAD PDF AND SHARE (FIXED - uses temporary URL) =====
   uploadPDFAndShare(pdfDataUrl, invoice) {
-    // Convert Data URL to Blob
-    const byteString = atob(pdfDataUrl.split(',')[1]);
-    const mimeType = pdfDataUrl.split(',')[0].split(':')[1].split(';')[0];
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
-    }
-    const blob = new Blob([ab], { type: mimeType });
-    
-    // Create temporary URL for the file
-    const url = URL.createObjectURL(blob);
-    
-    // If user is logged in, upload to Firebase Storage
-    if (currentUser) {
-      const storageRef = storage.ref();
-      const fileName = 'facture_' + invoice.num + '_' + Date.now() + '.pdf';
-      const fileRef = storageRef.child('factures/' + currentUser.uid + '/' + fileName);
+    try {
+      // Convert Data URL to Blob
+      const byteString = atob(pdfDataUrl.split(',')[1]);
+      const mimeType = pdfDataUrl.split(',')[0].split(':')[1].split(';')[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([ab], { type: mimeType });
       
-      fileRef.put(blob).then(snapshot => {
-        return snapshot.ref.getDownloadURL();
-      }).then(downloadURL => {
-        // Share the link via WhatsApp
-        this.sendWhatsAppWithLink(invoice, downloadURL);
-      }).catch(err => {
-        console.error('Upload error:', err);
-        // In case of failure, share the temporary URL
-        this.sendWhatsAppWithLink(invoice, url);
-      });
-    } else {
-      // Without login, share the temporary URL
+      // Create temporary URL for the file (valid until browser closes)
+      const url = URL.createObjectURL(blob);
+      
+      // Share via WhatsApp
       this.sendWhatsAppWithLink(invoice, url);
+      
+      showToast('✅ تم إنشاء رابط PDF (مؤقت)');
+    } catch (err) {
+      console.error('Upload error:', err);
+      showToast('❌ فشل معالجة PDF: ' + err.message);
     }
   },
 
@@ -1595,12 +1689,14 @@ const Ventes = {
     text += `${companyInfo.name || 'GTR POS'}`;
     
     // Open WhatsApp with the text
-    const phone = partyName ? (clients.find(c => c.name === partyName)?.phone || fournisseurs.find(f => f.name === partyName)?.phone || '') : '';
+    const phone = partyName
+      ? (clients.find(c => c.name === partyName)?.phone || fournisseurs.find(f => f.name === partyName)?.phone || '')
+      : '';
     const formattedPhone = phone.replace(/\D/g, '');
     const url = 'https://wa.me/' + (formattedPhone ? '216' + formattedPhone : '') + '?text=' + encodeURIComponent(text);
     window.open(url, '_blank');
     
-    showToast('✅ تم مشاركة الفاتورة عبر واتساب');
+    showToast('✅ تم فتح واتساب مع رابط PDF');
   },
 
   // ===== ORIGINAL PRINT FUNCTIONS =====
@@ -1609,7 +1705,7 @@ const Ventes = {
 };
 
 // =====================================================
-// ===== ACHATS - with PDF WhatsApp sharing =====
+// ===== ACHATS - with PDF WhatsApp sharing + QR (FIXED) =====
 // =====================================================
 const Achats = {
   editingId: null, lines:[], reglements:[], originalSupplierBalance:0, originalSupplierId:null, editingRowIndex:null,
@@ -1635,19 +1731,26 @@ const Achats = {
   load(id){ const r=achats.find(a=>a.id===id); if(!r) return; this.editingId=id; $('pNum').value=r.num; $('pDate').value=r.date; const opt=[...$('pSupplier').options].find(o=>o.textContent===r.supplier); if(opt) $('pSupplier').value=opt.value; const s=fournisseurs.find(f=>f.name===r.supplier); const paid=(r.reglements||[]).reduce((a,rr)=>a+rr.amount,0); this.originalSupplierBalance=r.prevBalance!==undefined?r.prevBalance:(s?s.balance-(r.total-paid):0); this.originalSupplierId=s?s.id:null; this.supplierTaxId=r.supplierTaxId||(s?s.taxId||'':''); this.supplierAddress=r.supplierAddress||(s?s.address||'':''); $('pPhone').value=s?s.phone:''; this.lines=[...r.lines]; this.reglements=r.reglements?[...r.reglements]:[]; this.editingRowIndex=null; this.renderLines(); this.refreshArticleOptions(); this.renderReglements(); this.updateAccountSummary(); openSheet('achats'); },
   render(){ const q=$('aSearchP').value.trim().toLowerCase(); const list=$('achatsList'); list.innerHTML=''; const filtered=achats.filter(a=>!q||a.num.toLowerCase().includes(q)||a.supplier.toLowerCase().includes(q)).reverse(); if(!filtered.length){ list.innerHTML='<div class="empty-msg">لا توجد فواتير شراء</div>'; return; } filtered.slice(0,50).forEach(a=>{ const d=document.createElement('div'); d.className='row-card'; d.onclick=()=>{ Achats.load(a.id); openSheet('achats'); }; const paid=(a.reglements||[]).reduce((aa,r)=>aa+r.amount,0); d.innerHTML=`<div class="main-info"><div class="name">${a.num}</div><div class="meta">${a.supplier} - ${a.date} | المدفوع: ${paid.toFixed(3)}</div></div><div class="amount">${a.total.toFixed(3)} د.ت</div>`; list.appendChild(d); }); },
   
-  // ===== SHARE WHATSAPP WITH PDF (SAME AS VENTES) =====
+  // ===== SHARE WHATSAPP WITH PDF (FIXED - uses Ventes functions) =====
   shareWhatsapp() {
-    if (this.editingId == null) { showToast('⚠️ احفظ الفاتورة أولا'); return; }
+    if (this.editingId == null) {
+      showToast('⚠️ احفظ الفاتورة أولا');
+      return;
+    }
     const rec = achats.find(a => a.id === this.editingId);
-    if (!rec) return;
-    
-    // Use Ventes' PDF generator (works for both types)
-    Ventes.generateInvoicePDF(rec, 'achat').then(pdfDataUrl => {
-      Ventes.uploadPDFAndShare(pdfDataUrl, rec);
-    }).catch(err => {
-      console.error(err);
-      showToast('❌ فشل إنشاء PDF');
-    });
+    if (!rec) {
+      showToast('❌ الفاتورة غير موجودة');
+      return;
+    }
+    showToast('⏳ جاري إنشاء PDF...');
+    Ventes.generateInvoicePDF(rec, 'achat')
+      .then(pdfDataUrl => {
+        Ventes.uploadPDFAndShare(pdfDataUrl, rec);
+      })
+      .catch(err => {
+        console.error(err);
+        showToast('❌ فشل إنشاء PDF: ' + err.message);
+      });
   },
 
   // ===== ORIGINAL PRINT FUNCTIONS =====
@@ -1826,7 +1929,21 @@ function renderInvoice(){
   const lines=data.lines.map((l,i)=>`<tr><td>${i+1}</td><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td></tr>`).join('');
   const totalQty=data.lines.reduce((a,l)=>a+l.qty,0);
   const partyInfo=`<div><strong>${data.partyName}</strong><br><span class="label">${data.partyLabel}</span></div><div>${data.partyPhone||'-'}<br><span class="label">الهاتف</span></div><div>${data.partyTaxId||'-'}<br><span class="label">MF</span></div>`;
-  doc.innerHTML=`<div class="inv-top"><div class="inv-datetime">${new Date().toLocaleDateString('en-GB')}<br>${new Date().toLocaleTimeString('en-US')}</div><div class="inv-company">${companyInfo.name}<br>${companyInfo.address||''}<br>${companyInfo.phone1||''}${companyInfo.taxId?'<br>MF: '+companyInfo.taxId:''}</div></div><div class="inv-title">${data.title}</div><div class="inv-meta"><b>الرقم:</b> ${data.num} &nbsp; <b>التاريخ:</b> ${data.date}</div><div class="inv-partybar">${partyInfo}</div><table class="inv-items"><thead><tr><th>#</th><th>المنتج</th><th>السعر</th><th>الكمية</th><th>الإجمالي</th></tr></thead><tbody>${lines}</tbody><tfoot><tr class="inv-totalrow"><td colspan="2">المبلغ بالحروف: ${amountInWords(data.total)}</td><td></td><td>${totalQty}</td><td>${data.total.toFixed(3)}</td></tr></tfoot></table><table class="inv-summary"><tr><td class="label">الرصيد السابق</td><td class="value">${data.prevBalance.toFixed(3)}</td></tr><tr class="total"><td class="label">إجمالي الفاتورة</td><td class="value">${data.total.toFixed(3)}</td></tr><tr><td class="label">المدفوع</td><td class="value">${data.paid.toFixed(3)}</td></tr><tr class="highlight"><td class="label">الرصيد الحالي</td><td class="value">${data.currentBalance.toFixed(3)}</td></tr></table>`;
+  
+  let qrImg = '';
+  try {
+    const qrContent = `Facture: ${data.num}\nDate: ${data.date}\nTotal: ${data.total.toFixed(3)} TND`;
+    const QRCodeGen = window.qrcode || window.QRCode;
+    if (QRCodeGen && typeof QRCodeGen === 'function') {
+      const qr = QRCodeGen(0, 'M');
+      qr.addData(qrContent);
+      qr.make();
+      const qrDataURL = qr.createDataURL(8, 8);
+      qrImg = `<div style="text-align:center;margin-top:8px;"><img src="${qrDataURL}" style="width:50px;height:50px;"/><br><span style="font-size:5px;color:#888;">${data.num}</span></div>`;
+    }
+  } catch(e) { console.warn('QR preview error:', e); }
+  
+  doc.innerHTML=`<div class="inv-top"><div class="inv-datetime">${new Date().toLocaleDateString('en-GB')}<br>${new Date().toLocaleTimeString('en-US')}</div><div class="inv-company">${companyInfo.name}<br>${companyInfo.address||''}<br>${companyInfo.phone1||''}${companyInfo.taxId?'<br>MF: '+companyInfo.taxId:''}</div></div><div class="inv-title">${data.title}</div><div class="inv-meta"><b>الرقم:</b> ${data.num} &nbsp; <b>التاريخ:</b> ${data.date}</div><div class="inv-partybar">${partyInfo}</div><table class="inv-items"><thead><tr><th>#</th><th>المنتج</th><th>السعر</th><th>الكمية</th><th>الإجمالي</th></tr></thead><tbody>${lines}</tbody><tfoot><tr class="inv-totalrow"><td colspan="2">المبلغ بالحروف: ${amountInWords(data.total)}</td><td></td><td>${totalQty}</td><td>${data.total.toFixed(3)}</td></tr></tfoot></table><table class="inv-summary"><tr><td class="label">الرصيد السابق</td><td class="value">${data.prevBalance.toFixed(3)}</td></tr><tr class="total"><td class="label">إجمالي الفاتورة</td><td class="value">${data.total.toFixed(3)}</td></tr><tr><td class="label">المدفوع</td><td class="value">${data.paid.toFixed(3)}</td></tr><tr class="highlight"><td class="label">الرصيد الحالي</td><td class="value">${data.currentBalance.toFixed(3)}</td></tr></table>${qrImg}`;
 }
 $('paperSizeSelect').addEventListener('change',function(){ if(_invoiceData) renderInvoice(); else if(_statementData) renderStatement('سجل',''); });
 
