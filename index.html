@@ -23,7 +23,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js">
   </script>
   <style>
-    /* ===== STYLES (inchangés) ===== */
+    /* ===== STYLES ===== */
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
@@ -3930,20 +3930,51 @@
         renderInvoice();
         $('printOverlay').classList.add('show');
       },
+
+      // ===== IMPRESSION BLUETOOTH CORRIGÉE AVEC SOLDE PRÉCÉDENT =====
       printBluetooth() {
         if (this.editingId == null) { showToast('Enregistrez la facture d\'abord'); return; }
         const rec = ventes.find(v => v.id === this.editingId);
         if (!rec) return;
         const client = clients.find(c => c.name === rec.client);
         const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0);
-        let text =
-          `${companyInfo.name}\n${companyInfo.address}\n${companyInfo.phone1}\nMF: ${companyInfo.taxId}\n----------------\nFacture de vente: ${rec.num}\nDate: ${rec.date}\nClient: ${rec.client}\n`;
+        const prevBalance = rec.prevBalance !== undefined ? rec.prevBalance : (client ? client.balance - (rec.total -
+          paid) : 0);
+        const currentBalance = prevBalance + rec.total - paid;
+
+        let text = '';
+        text += `${companyInfo.name || 'GTR POS'}\n`;
+        text += `${companyInfo.address || ''}\n`;
+        text += `Tél: ${companyInfo.phone1 || ''}\n`;
+        text += `MF: ${companyInfo.taxId || '-'}\n`;
+        text += `--------------------------------\n`;
+        text += `FACTURE DE VENTE\n`;
+        text += `N°: ${rec.num}\n`;
+        text += `Date: ${rec.date}\n`;
+        text += `--------------------------------\n`;
+        text += `Client: ${rec.client}\n`;
         if (rec.clientTaxId) text += `MF: ${rec.clientTaxId}\n`;
-        text += `----------------\n`;
+        if (rec.clientAddress) text += `Adresse: ${rec.clientAddress}\n`;
+        text += `Tél: ${client ? client.phone : ''}\n`;
+        text += `--------------------------------\n`;
+        text += `ARTICLES\n`;
+        text += `--------------------------------\n`;
         rec.lines.forEach(l => {
-          text += `${l.name}  ${l.qty} x ${l.price.toFixed(3)} = ${l.total.toFixed(3)}\n`;
+          text += `${l.name}\n`;
+          text += `  ${l.qty} x ${l.price.toFixed(3)} = ${l.total.toFixed(3)} TND\n`;
         });
-        text += `----------------\nTotal: ${rec.total.toFixed(3)}\nPayé: ${paid.toFixed(3)}\nReste: ${(rec.total-paid).toFixed(3)}\nMerci !\n`;
+        text += `--------------------------------\n`;
+        text += `RÉSUMÉ DU COMPTE\n`;
+        text += `--------------------------------\n`;
+        text += `Solde précédent : ${prevBalance.toFixed(3)} TND\n`;
+        text += `Total facture   : ${rec.total.toFixed(3)} TND\n`;
+        text += `Payé            : ${paid.toFixed(3)} TND\n`;
+        text += `--------------------------------\n`;
+        text += `SOLDE ACTUEL    : ${currentBalance.toFixed(3)} TND\n`;
+        text += `================================\n`;
+        text += `Merci de votre confiance !\n`;
+        text += `${companyInfo.name || 'GTR POS'}\n`;
+
         if (!navigator.bluetooth) { showToast('Votre navigateur ne supporte pas Bluetooth'); return; }
         navigator.bluetooth.requestDevice({ filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }],
             optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] })
@@ -4362,21 +4393,51 @@
         renderInvoice();
         $('printOverlay').classList.add('show');
       },
+
+      // ===== IMPRESSION BLUETOOTH CORRIGÉE AVEC SOLDE PRÉCÉDENT =====
       printBluetooth() {
         if (this.editingId == null) { showToast('Enregistrez la facture d\'abord'); return; }
         const rec = achats.find(a => a.id === this.editingId);
         if (!rec) return;
         const supplier = fournisseurs.find(s => s.name === rec.supplier);
         const paid = (rec.reglements || []).reduce((aa, r) => aa + r.amount, 0);
-        let text =
-          `${companyInfo.name}\n${companyInfo.address}\n${companyInfo.phone1}\nMF: ${companyInfo.taxId}\n----------------\nFacture d'achat: ${rec.num}\nDate: ${rec.date}\nFournisseur: ${rec.supplier}\n`;
+        const prevBalance = rec.prevBalance !== undefined ? rec.prevBalance : (supplier ? supplier.balance - (rec
+          .total - paid) : 0);
+        const currentBalance = prevBalance + rec.total - paid;
+
+        let text = '';
+        text += `${companyInfo.name || 'GTR POS'}\n`;
+        text += `${companyInfo.address || ''}\n`;
+        text += `Tél: ${companyInfo.phone1 || ''}\n`;
+        text += `MF: ${companyInfo.taxId || '-'}\n`;
+        text += `--------------------------------\n`;
+        text += `FACTURE D'ACHAT\n`;
+        text += `N°: ${rec.num}\n`;
+        text += `Date: ${rec.date}\n`;
+        text += `--------------------------------\n`;
+        text += `Fournisseur: ${rec.supplier}\n`;
         if (rec.supplierTaxId) text += `MF: ${rec.supplierTaxId}\n`;
-        text += `----------------\n`;
+        if (rec.supplierAddress) text += `Adresse: ${rec.supplierAddress}\n`;
+        text += `Tél: ${supplier ? supplier.phone : ''}\n`;
+        text += `--------------------------------\n`;
+        text += `ARTICLES\n`;
+        text += `--------------------------------\n`;
         rec.lines.forEach(l => {
-          text += `${l.name}  ${l.qty} x ${l.price.toFixed(3)} = ${l.total.toFixed(3)}\n`;
+          text += `${l.name}\n`;
+          text += `  ${l.qty} x ${l.price.toFixed(3)} = ${l.total.toFixed(3)} TND\n`;
         });
-        text +=
-          `----------------\nTotal: ${rec.total.toFixed(3)}\nPayé: ${paid.toFixed(3)}\nReste: ${(rec.total-paid).toFixed(3)}\nMerci !\n`;
+        text += `--------------------------------\n`;
+        text += `RÉSUMÉ DU COMPTE\n`;
+        text += `--------------------------------\n`;
+        text += `Solde précédent : ${prevBalance.toFixed(3)} TND\n`;
+        text += `Total facture   : ${rec.total.toFixed(3)} TND\n`;
+        text += `Payé            : ${paid.toFixed(3)} TND\n`;
+        text += `--------------------------------\n`;
+        text += `SOLDE ACTUEL    : ${currentBalance.toFixed(3)} TND\n`;
+        text += `================================\n`;
+        text += `Merci de votre confiance !\n`;
+        text += `${companyInfo.name || 'GTR POS'}\n`;
+
         if (!navigator.bluetooth) { showToast('Votre navigateur ne supporte pas Bluetooth'); return; }
         navigator.bluetooth.requestDevice({ filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }],
             optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] })
