@@ -23,7 +23,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js">
   </script>
   <style>
-    /* ===== STYLES ===== */
+    /* ===== STYLES (inchangés) ===== */
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
@@ -1732,11 +1732,6 @@
       <!-- Caisse -->
       <div class="section" id="sec-caisse">
         <div class="section-title">💰 Historique des règlements (Caisse)</div>
-        <!-- 🔥 NOUVEAU : Boutons de synchronisation rapide -->
-        <div class="finance-actions-bar" style="margin-bottom:8px;">
-          <button class="btn save small" onclick="FinanceTable.syncWithApp();">🔄 Synchroniser la caisse</button>
-          <button class="btn print small" onclick="FinanceTable.updateKPIs();">📊 Rafraîchir</button>
-        </div>
         <div id="caisseHistoryContent"></div>
       </div>
 
@@ -2163,22 +2158,17 @@
     // ===== PERSISTANCE =====
     const STORAGE_KEY = 'gtrpos_data_v25';
 
-    // 🔥 FONCTION SAVESTATE MODIFIÉE - AJOUT DE L'APPEL AUTOMATIQUE À SYNCWITHAPP
     function saveState() {
       try {
-        const data = { clients, fournisseurs, articles, ventes, achats, expenses, caisseClients, caisseFournisseurs, nextId, companyInfo, financeData };
+        const data = { clients, fournisseurs, articles, ventes, achats, expenses, caisseClients, caisseFournisseurs, nextId,
+          companyInfo, financeData };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         if (storageMode === 'cloud' && currentUser) {
-          // Ajout des données synchronisées pour la caisse
-          const syncData = { ...data };
-          db.collection('users').doc(currentUser.uid).set(syncData).catch(e => {
-            console.error('Firestore save error:', e);
-            showToast('⚠️ Échec de la sauvegarde cloud');
-          });
-        }
-        // 🔥 NOUVEAU : Synchroniser automatiquement la caisse après chaque sauvegarde
-        if (typeof FinanceTable !== 'undefined' && FinanceTable.syncWithApp) {
-          FinanceTable.syncWithApp();
+          const data = { clients, fournisseurs, articles, ventes, achats, expenses, caisseClients, caisseFournisseurs,
+            nextId, companyInfo, financeData };
+          db.collection('users').doc(currentUser.uid).set(data).catch(e => { console.error('Firestore save error:',
+              e);
+            showToast('⚠️ Échec de la sauvegarde cloud'); });
         }
         return true;
       } catch (e) {
@@ -2475,16 +2465,13 @@
       load() {
         if (financeData.length === 0) {
           financeData = [
-            { date: '26/07/2026', clientBalance: 0, stockValue: 0, cash: 0, supplierBalance: 0, capital: 0,
+            { date: '26/07/2026', clientBalance: 2500, stockValue: 2500, cash: 0, supplierBalance: 2500, capital: 2500,
               profit: 0 }
           ];
-          // 🔥 Synchronisation initiale
-          this.syncWithApp();
           saveState();
         }
         this.data = financeData;
         this.render();
-        this.updateKPIs();
       },
       save() {
         financeData = this.data;
@@ -2643,53 +2630,6 @@
         this.save();
         showToast('🗑️ Toutes les données effacées');
       },
-      // 🔥 FONCTION SYNCWITHAPP AMÉLIORÉE - CALCUL CORRECT DE LA CAISSE
-      syncWithApp() {
-        // S'assurer qu'il y a au moins une ligne
-        if (this.data.length === 0) {
-          const today = new Date();
-          const dateStr = String(today.getDate()).padStart(2, '0') + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + today.getFullYear();
-          this.data.push({ date: dateStr, clientBalance: 0, stockValue: 0, cash: 0, supplierBalance: 0, capital: 0, profit: 0 });
-        }
-
-        const lastIndex = this.data.length - 1;
-        const last = this.data[lastIndex];
-
-        // Calcul des indicateurs
-        const totalClientBal = clients.reduce((s, c) => s + (c.balance || 0), 0);
-        const totalStockVal = articles.reduce((s, a) => s + ((a.stock || 0) * (a.costPrice || a.price || 0)), 0);
-        
-        // 🔥 Calcul de la caisse avec la formule correcte
-        // Caisse = Solde caisse d'ouverture + Règlements clients - Règlements fournisseurs - Dépenses
-        const totalCashClient = caisseClients.reduce((s, c) => s + (c.amount || 0), 0);
-        const totalSupplierPay = caisseFournisseurs.reduce((s, c) => s + (c.amount || 0), 0);
-        const totalExp = expenses.reduce((s, e) => s + (e.amount || 0), 0);
-        const cashOpening = companyInfo.cashOpening || 0;
-        const totalCash = cashOpening + totalCashClient - totalSupplierPay - totalExp;
-        
-        const totalSupplierBal = fournisseurs.reduce((s, f) => s + (f.balance || 0), 0);
-
-        // Mise à jour des valeurs
-        last.clientBalance = totalClientBal;
-        last.stockValue = totalStockVal;
-        last.cash = totalCash; // 🔥 Mise à jour de la caisse
-        last.supplierBalance = totalSupplierBal;
-        last.capital = totalClientBal + totalStockVal + totalCash - totalSupplierBal;
-
-        // Calcul du bénéfice par rapport à la ligne précédente
-        if (this.data.length > 1) {
-          const prev = this.data[lastIndex - 1];
-          last.profit = (last.capital || 0) - (prev.capital || 0);
-        } else {
-          last.profit = 0;
-        }
-
-        this.save();
-        this.render();
-        this.updateKPIs();
-        // Afficher un message discret
-        showToast('🔄 Caisse synchronisée : ' + totalCash.toFixed(3) + ' TND');
-      },
       updateKPIs() {
         const totalClientBalance = clients.reduce((sum, c) => sum + (c.balance || 0), 0);
         document.getElementById('finTotalClientBalance').textContent = totalClientBalance.toFixed(3);
@@ -2741,6 +2681,43 @@
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         showToast('✅ Exporté');
+      },
+      syncWithApp() {
+        if (this.data.length === 0) {
+          const today = new Date();
+          const dateStr = String(today.getDate()).padStart(2, '0') + '/' + String(today.getMonth() + 1).padStart(2,
+            '0') + '/' + today.getFullYear();
+          this.data.push({ date: dateStr, clientBalance: 0, stockValue: 0, cash: 0, supplierBalance: 0, capital: 0,
+            profit: 0 });
+        }
+        const lastIndex = this.data.length - 1;
+        const last = this.data[lastIndex];
+
+        const totalClientBal = clients.reduce((s, c) => s + (c.balance || 0), 0);
+        const totalStockVal = articles.reduce((s, a) => s + ((a.stock || 0) * (a.costPrice || a.price || 0)), 0);
+        const totalCashClient = caisseClients.reduce((s, c) => s + (c.amount || 0), 0);
+        const totalSupplierPay = caisseFournisseurs.reduce((s, c) => s + (c.amount || 0), 0);
+        const totalExp = expenses.reduce((s, e) => s + (e.amount || 0), 0);
+        const totalSupplierBal = fournisseurs.reduce((s, f) => s + (f.balance || 0), 0);
+
+        last.clientBalance = totalClientBal;
+        last.stockValue = totalStockVal;
+        last.supplierBalance = totalSupplierBal;
+
+        const cashOpening = companyInfo.cashOpening || 0;
+        last.cash = cashOpening + totalCashClient - totalSupplierPay - totalExp;
+
+        last.capital = totalClientBal + totalStockVal + (last.cash || 0) - totalSupplierBal;
+
+        if (this.data.length > 1) {
+          const prev = this.data[lastIndex - 1];
+          last.profit = (last.capital || 0) - (prev.capital || 0);
+        } else {
+          last.profit = 0;
+        }
+
+        this.save();
+        showToast('🔄 Données synchronisées depuis l\'application');
       },
       printFullReport() {
         const w = window.open('', '_blank', 'width=1000,height=800');
