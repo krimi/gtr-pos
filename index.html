@@ -23,7 +23,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js">
   </script>
   <style>
-    /* ===== STYLES ===== */
+    /* ===== STYLES (inchangés) ===== */
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
@@ -3976,15 +3976,17 @@
         text += `Merci pour votre confiance\n`;
         text += `${companyInfo.name}\n`;
 
+        if (!navigator.bluetooth) {
+          showToast('⚠️ Votre navigateur ne supporte pas le Bluetooth. Utilisez Chrome ou Edge.');
+          return;
+        }
+
         this.sendToBluetooth(text);
       },
 
       sendToBluetooth(text) {
-        if (!navigator.bluetooth) {
-          showToast('⚠️ Votre navigateur ne supporte pas le Bluetooth');
-          return;
-        }
         if (companyInfo.bluetoothDeviceName) {
+          showToast('⏳ Connexion à ' + companyInfo.bluetoothDeviceName + '...');
           navigator.bluetooth.requestDevice({
             filters: [{ name: companyInfo.bluetoothDeviceName }],
             optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
@@ -3993,20 +3995,26 @@
           .then(server => server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb'))
           .then(service => service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb'))
           .then(characteristic => {
-            characteristic.writeValue(new TextEncoder().encode(text));
-            showToast('✅ Envoyé à l\'imprimante');
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
+            return characteristic.writeValue(data);
+          })
+          .then(() => {
+            showToast('✅ Impression envoyée avec succès !');
           })
           .catch(err => {
-            console.error(err);
-            showToast('⚠️ Échec de connexion à l\'imprimante enregistrée, recherche en cours...');
+            console.error('Erreur Bluetooth:', err);
+            showToast('⚠️ Échec avec l\'imprimante enregistrée. Recherche manuelle...');
             this.pairAndPrint(text);
           });
         } else {
+          showToast('🔍 Aucune imprimante enregistrée. Recherche...');
           this.pairAndPrint(text);
         }
       },
 
       pairAndPrint(text) {
+        showToast('🔍 Sélectionnez votre imprimante Bluetooth...');
         navigator.bluetooth.requestDevice({
           filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }],
           optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
@@ -4018,16 +4026,21 @@
           if (typeof CompanyInfo !== 'undefined' && CompanyInfo.updateBluetoothStatus) {
             CompanyInfo.updateBluetoothStatus();
           }
+          showToast('✅ Appareil sélectionné: ' + companyInfo.bluetoothDeviceName);
           return device.gatt.connect();
         })
         .then(server => server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb'))
         .then(service => service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb'))
         .then(characteristic => {
-          characteristic.writeValue(new TextEncoder().encode(text));
-          showToast('✅ Envoyé à l\'imprimante');
+          const encoder = new TextEncoder();
+          const data = encoder.encode(text);
+          return characteristic.writeValue(data);
+        })
+        .then(() => {
+          showToast('✅ Impression envoyée avec succès !');
         })
         .catch(err => {
-          console.error(err);
+          console.error('Erreur d\'appariement/impression:', err);
           showToast('❌ Échec de l\'impression: ' + err.message);
         });
       }
@@ -4471,7 +4484,13 @@
         text += `Merci pour votre confiance\n`;
         text += `${companyInfo.name}\n`;
 
-        Ventes.sendToBluetooth(text); // Utilise la même fonction d'envoi
+        if (!navigator.bluetooth) {
+          showToast('⚠️ Votre navigateur ne supporte pas le Bluetooth. Utilisez Chrome ou Edge.');
+          return;
+        }
+
+        // Réutilisation de la fonction d'envoi de Ventes
+        Ventes.sendToBluetooth(text);
       }
     };
 
