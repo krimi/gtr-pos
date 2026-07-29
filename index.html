@@ -6,7 +6,6 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#1e2f66">
-  <meta http-equiv="Permissions-Policy" content="bluetooth=(self)">
   <title>GTR POS V 0.7.4</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js">
@@ -24,7 +23,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js">
   </script>
   <style>
-    /* ===== STYLES ===== */
+    /* ===== STYLES (inchangés) ===== */
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
@@ -427,9 +426,6 @@
     .btn.whatsapp {
       background: linear-gradient(180deg, #25d366, #128C7E);
     }
-    .btn.bluetooth {
-      background: linear-gradient(180deg, #3498db, #2980b9);
-    }
     .fab {
       position: absolute;
       bottom: 62px;
@@ -501,15 +497,6 @@
     .toast.show {
       opacity: 1;
       transform: translateX(-50%) translateY(0);
-    }
-    .toast.error {
-      background: var(--danger);
-    }
-    .toast.success {
-      background: var(--success);
-    }
-    .toast.warning {
-      background: var(--gold);
     }
     .login-overlay {
       position: fixed;
@@ -1601,33 +1588,6 @@
       font-weight: 700;
       margin: 4px 0;
     }
-    /* Bluetooth status indicator */
-    .bluetooth-status {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      margin-right: 4px;
-    }
-    .bluetooth-status.connected {
-      background: var(--success);
-    }
-    .bluetooth-status.disconnected {
-      background: var(--danger);
-    }
-    .bluetooth-status.searching {
-      background: var(--gold);
-      animation: pulse 1s infinite;
-    }
-    @keyframes pulse {
-      0%,
-      100% {
-        opacity: 1;
-      }
-      50% {
-        opacity: 0.3;
-      }
-    }
   </style>
 </head>
 <body>
@@ -1926,7 +1886,7 @@
         <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">
           <button class="btn whatsapp" style="flex:1;font-size:11px;" onclick="Ventes.shareWhatsapp()">📱 WhatsApp (image)</button>
           <button class="btn outline small" style="flex:1;font-size:11px;" onclick="Ventes.printInvoice()">🖨️ Imprimer</button>
-          <button class="btn bluetooth small" style="flex:1;font-size:11px;" onclick="Ventes.printBluetooth()">🖨️ BT</button>
+          <button class="btn outline small" style="flex:1;font-size:11px;" onclick="Ventes.printBluetooth()">🖨️ BT</button>
         </div>
       </div>
       <div class="sheet-footer"><button class="btn save" onclick="Ventes.save()">💾 Enregistrer</button><button class="btn edit" onclick="Ventes.edit()">✏️ Modifier</button><button class="btn del" onclick="Ventes.remove()">🗑 Supprimer</button></div>
@@ -1954,7 +1914,7 @@
         <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">
           <button class="btn whatsapp" style="flex:1;font-size:11px;" onclick="Achats.shareWhatsapp()">📱 WhatsApp (image)</button>
           <button class="btn outline small" style="flex:1;font-size:11px;" onclick="Achats.printInvoice()">🖨️ Imprimer</button>
-          <button class="btn bluetooth small" style="flex:1;font-size:11px;" onclick="Achats.printBluetooth()">🖨️ BT</button>
+          <button class="btn outline small" style="flex:1;font-size:11px;" onclick="Achats.printBluetooth()">🖨️ BT</button>
         </div>
       </div>
       <div class="sheet-footer"><button class="btn save" onclick="Achats.save()">💾 Enregistrer</button><button class="btn edit" onclick="Achats.edit()">✏️ Modifier</button><button class="btn del" onclick="Achats.remove()">🗑 Supprimer</button></div>
@@ -2074,7 +2034,7 @@
     const db = firebase.firestore();
     const storage = firebase.storage();
 
-    // ===== FONCTIONS UTILES =====
+    // ===== FONCTIONS DE MOT DE PASSE =====
     function togglePasswordVisibility(inputId, toggleBtnId) {
       const input = document.getElementById(inputId);
       if (!input) return;
@@ -2132,7 +2092,7 @@
         .then(() => {
           errorEl.textContent = '';
           closeChangePasswordModal();
-          showToast('✅ Mot de passe changé avec succès', 'success');
+          showToast('✅ Mot de passe changé avec succès');
         })
         .catch(err => {
           if (err.code === 'auth/wrong-password') {
@@ -2186,18 +2146,13 @@
 
     function $(id) { return document.getElementById(id); }
 
-    function showToast(msg, type) {
+    function showToast(msg) {
       const t = $('toast');
       if (!t) return;
       t.textContent = msg;
       t.classList.add('show');
-      t.classList.remove('error', 'success', 'warning');
-      if (type) t.classList.add(type);
       clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => {
-        t.classList.remove('show');
-        t.classList.remove('error', 'success', 'warning');
-      }, 5000);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
     }
 
     // ===== PERSISTANCE =====
@@ -2213,12 +2168,12 @@
             nextId, companyInfo, financeData };
           db.collection('users').doc(currentUser.uid).set(data).catch(e => { console.error('Firestore save error:',
               e);
-            showToast('⚠️ Échec de la sauvegarde cloud', 'error'); });
+            showToast('⚠️ Échec de la sauvegarde cloud'); });
         }
         return true;
       } catch (e) {
         console.warn('Save local error', e);
-        showToast('⚠️ Échec de la sauvegarde locale : ' + e.message, 'error');
+        showToast('⚠️ Échec de la sauvegarde locale : ' + e.message);
         return false;
       }
     }
@@ -2263,7 +2218,7 @@
           if (!companyInfo.cashOpening) companyInfo.cashOpening = 0;
           financeData = d.financeData || [];
           saveState();
-          showToast('✅ Données chargées depuis le cloud', 'success');
+          showToast('✅ Données chargées depuis le cloud');
           FinanceTable.data = financeData;
           FinanceTable.render();
         } else {
@@ -2273,7 +2228,7 @@
           db.collection('users').doc(uid).set(data).catch(e => console.error(e));
         }
       }).catch(e => { console.error('Firestore load error:', e);
-        showToast('⚠️ Impossible de contacter le cloud, utilisation des données locales', 'warning');
+        showToast('⚠️ Impossible de contacter le cloud, utilisation des données locales');
         loadState(); });
     }
 
@@ -2288,7 +2243,7 @@
       saveState();
       auth.signOut();
       closeSheet();
-      showToast('👋 Déconnecté avec succès', 'success');
+      showToast('👋 Déconnecté avec succès');
     }
 
     // ===== CONNEXION =====
@@ -2651,7 +2606,7 @@
         });
         this.save();
         this.render();
-        showToast('✅ Modification enregistrée', 'success');
+        showToast('✅ Modification enregistrée');
       },
       deleteRow(index) {
         if (this.data.length <= 1) {
@@ -2673,7 +2628,7 @@
         if (this.data.length === 0) return;
         this.data = [];
         this.save();
-        showToast('🗑️ Toutes les données effacées', 'warning');
+        showToast('🗑️ Toutes les données effacées');
       },
       updateKPIs() {
         const totalClientBalance = clients.reduce((sum, c) => sum + (c.balance || 0), 0);
@@ -2694,7 +2649,7 @@
         document.getElementById('finProfit').textContent = (last.profit || 0).toFixed(3);
       },
       printTable() {
-        if (this.data.length === 0) { showToast('Aucune donnée à imprimer', 'warning'); return; }
+        if (this.data.length === 0) { showToast('Aucune donnée à imprimer'); return; }
         let rows = '';
         this.data.forEach(row => {
           rows +=
@@ -2707,7 +2662,7 @@
         w.document.close();
       },
       exportCSV() {
-        if (this.data.length === 0) { showToast('Aucune donnée à exporter', 'warning'); return; }
+        if (this.data.length === 0) { showToast('Aucune donnée à exporter'); return; }
         const headers = ['Date', 'Solde client', 'Valeur du stock', 'Caisse', 'Solde fournisseur', 'Capital', 'Bénéfice'];
         let csv = headers.join(',') + '\n';
         this.data.forEach(row => {
@@ -2725,7 +2680,7 @@
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        showToast('✅ Exporté', 'success');
+        showToast('✅ Exporté');
       },
       syncWithApp() {
         if (this.data.length === 0) {
@@ -2762,7 +2717,7 @@
         }
 
         this.save();
-        showToast('🔄 Données synchronisées depuis l\'application', 'success');
+        showToast('🔄 Données synchronisées depuis l\'application');
       },
       printFullReport() {
         const w = window.open('', '_blank', 'width=1000,height=800');
@@ -2814,7 +2769,7 @@
         this.refreshSpArticleOptions();
       },
       save() {
-        if (!$('cName').value.trim()) { showToast('Entrez le nom du client', 'warning'); return; }
+        if (!$('cName').value.trim()) { showToast('Entrez le nom du client'); return; }
         const openingBalance = parseFloat($('cOpeningBalance').value) || 0;
         const rec = {
           id: this.editingId || nextId.clients++,
@@ -2835,14 +2790,14 @@
         saveState();
         this.render();
         closeSheet();
-        showToast(this.editingId ? 'Modifié' : 'Enregistré', 'success');
+        showToast(this.editingId ? 'Modifié' : 'Enregistré');
       },
-      edit() { if (this.editingId == null) { showToast('Choisissez un client à modifier', 'warning'); return; }
+      edit() { if (this.editingId == null) { showToast('Choisissez un client à modifier'); return; }
         this.save(); },
       remove() {
-        if (this.editingId == null) { showToast('Choisissez un client à supprimer', 'warning'); return; }
+        if (this.editingId == null) { showToast('Choisissez un client à supprimer'); return; }
         const client = clients.find(c => c.id === this.editingId);
-        if (!client) { showToast('Client introuvable', 'error'); return; }
+        if (!client) { showToast('Client introuvable'); return; }
         const hasVentes = ventes.some(v => v.client === client.name);
         const hasPayments = caisseClients.some(c => c.clientName === client.name);
         if (hasVentes || hasPayments) {
@@ -2852,8 +2807,7 @@
           if (hasPayments) { const count = caisseClients.filter(c => c.clientName === client.name).length;
             details.push(`💰 ${count} règlement(s)`); }
           showToast(
-            `🚫 Impossible de supprimer le client "${client.name}" car il a des mouvements : ${details.join('， ')}`,
-            'error');
+            `🚫 Impossible de supprimer le client "${client.name}" car il a des mouvements : ${details.join('， ')}`);
           return;
         }
         if (confirm(`Voulez-vous vraiment supprimer le client "${client.name}" ?`)) {
@@ -2861,7 +2815,7 @@
           saveState();
           this.render();
           closeSheet();
-          showToast('Supprimé', 'success');
+          showToast('Supprimé');
         }
       },
       load(id) {
@@ -2914,24 +2868,23 @@
         const priceInput = $('spPriceInput');
         if (!select || !priceInput) return;
         const articleId = parseInt(select.value);
-        if (!articleId) { showToast('Choisissez un article', 'warning'); return; }
+        if (!articleId) { showToast('Choisissez un article'); return; }
         const article = articles.find(a => a.id === articleId);
-        if (!article) { showToast('Article introuvable', 'error'); return; }
+        if (!article) { showToast('Article introuvable'); return; }
         const price = parseFloat(priceInput.value) || 0;
-        if (price <= 0) { showToast('Entrez un prix valide', 'warning'); return; }
-        if (this.specialPrices.find(sp => sp.name === article.name)) { showToast('Cet article existe déjà',
-          'warning'); return; }
+        if (price <= 0) { showToast('Entrez un prix valide'); return; }
+        if (this.specialPrices.find(sp => sp.name === article.name)) { showToast('Cet article existe déjà'); return; }
         this.specialPrices.push({ name: article.name, price });
         this.renderSpecialPrices();
         this.refreshSpArticleOptions();
         priceInput.value = '';
-        showToast('✅ Prix spécial ajouté', 'success');
+        showToast('✅ Prix spécial ajouté');
       },
       removeSpecialPrice(index) {
         this.specialPrices.splice(index, 1);
         this.renderSpecialPrices();
         this.refreshSpArticleOptions();
-        showToast('🗑️ Prix spécial supprimé', 'success');
+        showToast('🗑️ Prix spécial supprimé');
       },
       renderSpecialPrices() {
         const container = $('specialPricesList');
@@ -2975,7 +2928,7 @@
         $('fNotes').value = '';
       },
       save() {
-        if (!$('fName').value.trim()) { showToast('Entrez le nom du fournisseur', 'warning'); return; }
+        if (!$('fName').value.trim()) { showToast('Entrez le nom du fournisseur'); return; }
         const openingBalance = parseFloat($('fOpeningBalance').value) || 0;
         const rec = {
           id: this.editingId || nextId.fournisseurs++,
@@ -2996,14 +2949,14 @@
         saveState();
         this.render();
         closeSheet();
-        showToast(this.editingId ? 'Modifié' : 'Enregistré', 'success');
+        showToast(this.editingId ? 'Modifié' : 'Enregistré');
       },
-      edit() { if (this.editingId == null) { showToast('Choisissez un fournisseur à modifier', 'warning'); return; }
+      edit() { if (this.editingId == null) { showToast('Choisissez un fournisseur à modifier'); return; }
         this.save(); },
       remove() {
-        if (this.editingId == null) { showToast('Choisissez un fournisseur à supprimer', 'warning'); return; }
+        if (this.editingId == null) { showToast('Choisissez un fournisseur à supprimer'); return; }
         const fournisseur = fournisseurs.find(f => f.id === this.editingId);
-        if (!fournisseur) { showToast('Fournisseur introuvable', 'error'); return; }
+        if (!fournisseur) { showToast('Fournisseur introuvable'); return; }
         const hasAchats = achats.some(a => a.supplier === fournisseur.name);
         const hasPayments = caisseFournisseurs.some(c => c.fournisseurName === fournisseur.name);
         if (hasAchats || hasPayments) {
@@ -3014,8 +2967,8 @@
               .length;
             details.push(`💰 ${count} règlement(s)`); }
           showToast(
-            `🚫 Impossible de supprimer le fournisseur "${fournisseur.name}" car il a des mouvements : ${details.join('， ')}`,
-            'error');
+            `🚫 Impossible de supprimer le fournisseur "${fournisseur.name}" car il a des mouvements : ${details.join('， ')}`
+            );
           return;
         }
         if (confirm(`Voulez-vous vraiment supprimer le fournisseur "${fournisseur.name}" ?`)) {
@@ -3023,7 +2976,7 @@
           saveState();
           this.render();
           closeSheet();
-          showToast('Supprimé', 'success');
+          showToast('Supprimé');
         }
       },
       load(id) {
@@ -3077,7 +3030,7 @@
         $('aMinStock').value = '5';
       },
       save() {
-        if (!$('aName').value.trim()) { showToast('Entrez le nom de l\'article', 'warning'); return; }
+        if (!$('aName').value.trim()) { showToast('Entrez le nom de l\'article'); return; }
         const rec = {
           id: this.editingId || nextId.articles++,
           name: $('aName').value.trim(),
@@ -3093,14 +3046,14 @@
         saveState();
         this.render();
         closeSheet();
-        showToast(this.editingId ? 'Modifié' : 'Enregistré', 'success');
+        showToast(this.editingId ? 'Modifié' : 'Enregistré');
       },
-      edit() { if (this.editingId == null) { showToast('Choisissez un article à modifier', 'warning'); return; }
+      edit() { if (this.editingId == null) { showToast('Choisissez un article à modifier'); return; }
         this.save(); },
       remove() {
-        if (this.editingId == null) { showToast('Choisissez un article à supprimer', 'warning'); return; }
+        if (this.editingId == null) { showToast('Choisissez un article à supprimer'); return; }
         const article = articles.find(a => a.id === this.editingId);
-        if (!article) { showToast('Article introuvable', 'error'); return; }
+        if (!article) { showToast('Article introuvable'); return; }
         const inVentes = ventes.some(v => v.lines.some(l => l.name === article.name));
         const inAchats = achats.some(a => a.lines.some(l => l.name === article.name));
         if (inVentes || inAchats) {
@@ -3110,8 +3063,7 @@
           if (inAchats) { const count = achats.filter(a => a.lines.some(l => l.name === article.name)).length;
             details.push(`📄 ${count} facture(s) d'achat`); }
           showToast(
-            `🚫 Impossible de supprimer l'article "${article.name}" car il est utilisé dans : ${details.join('， ')}`,
-            'error');
+            `🚫 Impossible de supprimer l'article "${article.name}" car il est utilisé dans : ${details.join('， ')}`);
           return;
         }
         if (confirm(`Voulez-vous vraiment supprimer l'article "${article.name}" ?`)) {
@@ -3119,7 +3071,7 @@
           saveState();
           this.render();
           closeSheet();
-          showToast('Supprimé', 'success');
+          showToast('Supprimé');
         }
       },
       load(id) {
@@ -3240,7 +3192,7 @@
       },
       showInvoiceDetail(invoiceNum) {
         const invoice = ventes.find(v => v.num === invoiceNum);
-        if (!invoice) { showToast('Facture introuvable', 'error'); return; }
+        if (!invoice) { showToast('Facture introuvable'); return; }
         Ventes.load(invoice.id);
         openSheet('ventes');
       }
@@ -3325,7 +3277,7 @@
       },
       showInvoiceDetail(invoiceNum) {
         const invoice = achats.find(a => a.num === invoiceNum);
-        if (!invoice) { showToast('Facture introuvable', 'error'); return; }
+        if (!invoice) { showToast('Facture introuvable'); return; }
         Achats.load(invoice.id);
         openSheet('achats');
       }
@@ -3527,12 +3479,12 @@
         const name = sel.value ? sel.options[sel.selectedIndex].textContent : '';
         const price = parseFloat($('viPrice').value) || 0;
         const qty = parseFloat($('viQty').value) || 0;
-        if (!name || price <= 0 || qty <= 0) { showToast('Entrez des données valides', 'warning'); return; }
+        if (!name || price <= 0 || qty <= 0) { showToast('Entrez des données valides'); return; }
         const existing = this.lines.find(l => l.name === name);
         if (existing) {
           existing.qty += qty;
           existing.total = existing.price * existing.qty;
-          showToast('Quantité mise à jour', 'success');
+          showToast('Quantité mise à jour');
         } else {
           this.lines.push({ name, price, qty, total: price * qty });
         }
@@ -3569,7 +3521,7 @@
         if (!priceInput || !qtyInput) return;
         const price = parseFloat(priceInput.value) || 0;
         const qty = parseFloat(qtyInput.value) || 0;
-        if (price <= 0 || qty <= 0) { showToast('Valeurs invalides', 'warning'); return; }
+        if (price <= 0 || qty <= 0) { showToast('Valeurs invalides'); return; }
         const oldLine = this.lines[idx];
         const article = articles.find(a => a.name === oldLine.name);
         if (article) { article.stock = (article.stock || 0) + oldLine.qty - qty; }
@@ -3579,7 +3531,7 @@
         this.editingRowIndex = null;
         this.renderLines();
         this.updateAccountSummary();
-        showToast('✅ Article modifié', 'success');
+        showToast('✅ Article modifié');
       },
       cancelEdit() { this.editingRowIndex = null;
         this.renderLines(); },
@@ -3641,7 +3593,7 @@
       },
       addReglement() {
         const amount = parseFloat($('vRegAmount').value) || 0;
-        if (amount <= 0) { showToast('Entrez un montant valide', 'warning'); return; }
+        if (amount <= 0) { showToast('Entrez un montant valide'); return; }
         const method = $('vRegType').value;
         const date = new Date().toISOString().slice(0, 10);
         this.reglements.push({ id: nextId.reglements++, date, amount, method });
@@ -3665,7 +3617,7 @@
         this.renderReglements();
         this.updateAccountSummary();
         $('vRegAmount').value = '';
-        showToast('✅ Règlement ajouté', 'success');
+        showToast('✅ Règlement ajouté');
       },
       deleteReglement(idx) {
         const removed = this.reglements.splice(idx, 1)[0];
@@ -3678,17 +3630,17 @@
           if (client) recalculateClientBalance(clientName);
           this.renderReglements();
           this.updateAccountSummary();
-          showToast('🗑️ Règlement supprimé', 'success');
+          showToast('🗑️ Règlement supprimé');
         }
       },
       save() {
-        if (isSaving) { showToast('⏳ Sauvegarde en cours... Veuillez patienter', 'warning'); return; }
-        if (this.editingRowIndex !== null) { showToast('⚠️ Terminez la modification de l\'article', 'warning'); return; }
-        if (!$('vClient').value) { showToast('⚠️ Choisissez le client', 'warning'); return; }
+        if (isSaving) { showToast('⏳ Sauvegarde en cours... Veuillez patienter'); return; }
+        if (this.editingRowIndex !== null) { showToast('⚠️ Terminez la modification de l\'article'); return; }
+        if (!$('vClient').value) { showToast('⚠️ Choisissez le client'); return; }
         const clientName = $('vClient').options[$('vClient').selectedIndex].textContent;
         const total = this.lines.reduce((a, l) => a + l.total, 0);
         const client = clients.find(c => c.name === clientName);
-        if (!client) { showToast('⚠️ Client introuvable', 'error'); return; }
+        if (!client) { showToast('⚠️ Client introuvable'); return; }
         const paid = this.reglements.reduce((a, r) => a + r.amount, 0);
         const newId = this.editingId || nextId.ventes++;
         const prevBalance = this.originalClientBalance;
@@ -3717,16 +3669,16 @@
           this.editingId = rec.id;
           this.originalClientBalance = client.balance;
           this.updateAccountSummary();
-          showToast(this.editingId ? '✅ Facture modifiée' : '✅ Facture enregistrée', 'success');
+          showToast(this.editingId ? '✅ Facture modifiée' : '✅ Facture enregistrée');
         } catch (e) {
-          showToast('❌ Erreur lors de l\'enregistrement', 'error');
+          showToast('❌ Erreur lors de l\'enregistrement');
           console.error(e);
         } finally { isSaving = false; }
       },
-      edit() { if (this.editingId == null) { showToast('Choisissez une facture à modifier', 'warning'); return; }
+      edit() { if (this.editingId == null) { showToast('Choisissez une facture à modifier'); return; }
         this.save(); },
       remove() {
-        if (this.editingId == null) { showToast('Choisissez une facture à supprimer', 'warning'); return; }
+        if (this.editingId == null) { showToast('Choisissez une facture à supprimer'); return; }
         const rec = ventes.find(v => v.id === this.editingId);
         if (rec) {
           rec.lines.forEach(l => {
@@ -3739,8 +3691,8 @@
           recalculateClientBalance(rec.client);
           this.render();
           closeSheet();
-          showToast('🗑️ Supprimé', 'success');
-        } else { showToast('Facture introuvable', 'error'); }
+          showToast('🗑️ Supprimé');
+        } else { showToast('Facture introuvable'); }
       },
       load(id) {
         const r = ventes.find(v => v.id === id);
@@ -3790,15 +3742,15 @@
       // ===== PARTAGE WHATSAPP AVEC IMAGE =====
       shareWhatsapp() {
         if (this.editingId == null) {
-          showToast('⚠️ Enregistrez la facture d\'abord', 'warning');
+          showToast('⚠️ Enregistrez la facture d\'abord');
           return;
         }
         const rec = ventes.find(v => v.id === this.editingId);
         if (!rec) {
-          showToast('❌ Facture introuvable', 'error');
+          showToast('❌ Facture introuvable');
           return;
         }
-        showToast('⏳ Génération de l\'image...', 'warning');
+        showToast('⏳ Génération de l\'image...');
 
         const htmlContent = this.generateInvoiceHTML(rec, 'vente');
         const tempDiv = document.createElement('div');
@@ -3819,7 +3771,7 @@
         }).catch(err => {
           document.body.removeChild(tempDiv);
           console.error('Image generation error:', err);
-          showToast('❌ Échec de génération de l\'image : ' + err.message, 'error');
+          showToast('❌ Échec de génération de l\'image : ' + err.message);
         });
       },
 
@@ -3948,11 +3900,11 @@
         link.click();
         document.body.removeChild(link);
 
-        showToast('✅ WhatsApp ouvert avec téléchargement de l\'image', 'success');
+        showToast('✅ WhatsApp ouvert avec téléchargement de l\'image');
       },
 
       printInvoice() {
-        if (this.editingId == null) { showToast('Enregistrez la facture d\'abord', 'warning'); return; }
+        if (this.editingId == null) { showToast('Enregistrez la facture d\'abord'); return; }
         const rec = ventes.find(v => v.id === this.editingId);
         if (!rec) return;
         const client = clients.find(c => c.name === rec.client);
@@ -3978,133 +3930,32 @@
         renderInvoice();
         $('printOverlay').classList.add('show');
       },
-
-      // ===== IMPRESSION BLUETOOTH CORRIGÉE - Filtre par service uniquement =====
       printBluetooth() {
-        if (this.editingId == null) {
-          showToast('⚠️ Enregistrez la facture d\'abord', 'warning');
-          return;
-        }
-
-        if (!navigator.bluetooth) {
-          showToast('❌ Bluetooth non disponible sur ce navigateur', 'error');
-          return;
-        }
-
+        if (this.editingId == null) { showToast('Enregistrez la facture d\'abord'); return; }
         const rec = ventes.find(v => v.id === this.editingId);
-        if (!rec) {
-          showToast('❌ Facture introuvable', 'error');
-          return;
-        }
-
+        if (!rec) return;
         const client = clients.find(c => c.name === rec.client);
         const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0);
-        const prevBalance = rec.prevBalance !== undefined ? rec.prevBalance : (client ? client.balance - (rec.total -
-          paid) : 0);
-        const currentBalance = prevBalance + rec.total - paid;
-
-        // Construction du texte du ticket
-        const WIDTH = 42;
-        const SEP = '─'.repeat(WIDTH);
-        const LF = '\x0A';
-
-        function center(text) {
-          const padding = Math.max(0, WIDTH - text.length);
-          const left = Math.floor(padding / 2);
-          const right = padding - left;
-          return ' '.repeat(left) + text + ' '.repeat(right);
-        }
-
-        function right(text) {
-          const padding = Math.max(0, WIDTH - text.length);
-          return ' '.repeat(padding) + text;
-        }
-
-        function left(text) {
-          return text + ' '.repeat(Math.max(0, WIDTH - text.length));
-        }
-
-        let text = '';
-        text += center(companyInfo.name || 'GTR POS') + LF;
-        text += center(companyInfo.address || '') + LF;
-        text += center('Tél: ' + (companyInfo.phone1 || '')) + LF;
-        text += center('MF: ' + (companyInfo.taxId || '-')) + LF;
-        text += SEP + LF;
-        text += center('FACTURE DE VENTE') + LF;
-        text += center('N°: ' + rec.num) + LF;
-        text += center('Date: ' + rec.date) + LF;
-        text += SEP + LF;
-        text += 'Client: ' + rec.client + LF;
-        if (rec.clientTaxId) text += 'MF: ' + rec.clientTaxId + LF;
-        if (rec.clientAddress) text += 'Adr: ' + rec.clientAddress + LF;
-        text += 'Tél: ' + (client ? client.phone : '') + LF;
-        text += SEP + LF;
-        text += left('Article') + right('Qté x Prix = Total') + LF;
+        let text =
+          `${companyInfo.name}\n${companyInfo.address}\n${companyInfo.phone1}\nMF: ${companyInfo.taxId}\n----------------\nFacture de vente: ${rec.num}\nDate: ${rec.date}\nClient: ${rec.client}\n`;
+        if (rec.clientTaxId) text += `MF: ${rec.clientTaxId}\n`;
+        text += `----------------\n`;
         rec.lines.forEach(l => {
-          const name = l.name.length > 18 ? l.name.substring(0, 16) + '..' : l.name;
-          const detail = l.qty + 'x' + l.price.toFixed(3) + '=' + l.total.toFixed(3);
-          text += left(name) + right(detail) + LF;
+          text += `${l.name}  ${l.qty} x ${l.price.toFixed(3)} = ${l.total.toFixed(3)}\n`;
         });
-        text += SEP + LF;
-        text += 'RÉSUMÉ DU COMPTE' + LF;
-        text += 'Solde précédent : ' + prevBalance.toFixed(3) + ' TND' + LF;
-        text += 'Total facture   : ' + rec.total.toFixed(3) + ' TND' + LF;
-        text += 'Payé            : ' + paid.toFixed(3) + ' TND' + LF;
-        text += SEP + LF;
-        text += center('SOLDE ACTUEL') + LF;
-        text += center(currentBalance.toFixed(3) + ' TND') + LF;
-        text += SEP + LF;
-        text += center('Merci de votre confiance !') + LF;
-        text += center(companyInfo.name || 'GTR POS') + LF;
-        text += LF + LF + LF + LF;
-
-        showToast('⏳ Connexion Bluetooth en cours...', 'warning');
-
-        // ✅ CORRECTION : Filtrer par service uniquement (pas namePrefix)
-        navigator.bluetooth.requestDevice({
-            filters: [{
-              services: ['000018f0-0000-1000-8000-00805f9b34fb']
-            }],
-            optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
-          })
-          .then(device => {
-            showToast('✅ Appareil trouvé, connexion...', 'success');
-            return device.gatt.connect();
-          })
-          .then(server => {
-            showToast('✅ Connecté...', 'success');
-            return server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
-          })
-          .then(service => {
-            return service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
-          })
+        text += `----------------\nTotal: ${rec.total.toFixed(3)}\nPayé: ${paid.toFixed(3)}\nReste: ${(rec.total-paid).toFixed(3)}\nMerci !\n`;
+        if (!navigator.bluetooth) { showToast('Votre navigateur ne supporte pas Bluetooth'); return; }
+        navigator.bluetooth.requestDevice({ filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }],
+            optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] })
+          .then(device => device.gatt.connect())
+          .then(server => server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb'))
+          .then(service => service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb'))
           .then(characteristic => {
-            showToast('✅ Envoi du ticket...', 'success');
-            const encoder = new TextEncoder();
-            const data = encoder.encode(text);
-            return characteristic.writeValue(data);
+            characteristic.writeValue(new TextEncoder().encode(text));
+            showToast('✅ Envoyé à l\'imprimante');
           })
-          .then(() => {
-            showToast('✅ Ticket envoyé à l\'imprimante !', 'success');
-          })
-          .catch(err => {
-            console.error('Bluetooth error:', err);
-            let errorMsg = '❌ Échec: ';
-            if (err.message && err.message.includes('permissions policy')) {
-              errorMsg += 'Permission Bluetooth bloquée. Activez Bluetooth dans les paramètres du navigateur.';
-            } else if (err.message && err.message.includes('No devices found')) {
-              errorMsg += 'Aucune imprimante trouvée. Vérifiez que l\'imprimante est allumée et en mode appairage.';
-            } else if (err.message && err.message.includes('GATT Server disconnected')) {
-              errorMsg += 'L\'imprimante s\'est déconnectée. Vérifiez la connexion.';
-            } else if (err.message && err.message.includes('namePrefix')) {
-              errorMsg += 'Problème de compatibilité. Essayez avec une autre imprimante.';
-            } else if (err.message && err.message.includes('User cancelled')) {
-              errorMsg += 'Connexion annulée par l\'utilisateur.';
-            } else {
-              errorMsg += err.message || 'Erreur inconnue';
-            }
-            showToast(errorMsg, 'error');
-          });
+          .catch(err => { console.error(err);
+            showToast('❌ Échec de connexion à l\'imprimante: ' + err.message); });
       }
     };
 
@@ -4192,12 +4043,12 @@
         const name = sel.value ? sel.options[sel.selectedIndex].textContent : '';
         const price = parseFloat($('piPrice').value) || 0;
         const qty = parseFloat($('piQty').value) || 0;
-        if (!name || price <= 0 || qty <= 0) { showToast('Entrez des données valides', 'warning'); return; }
+        if (!name || price <= 0 || qty <= 0) { showToast('Entrez des données valides'); return; }
         const existing = this.lines.find(l => l.name === name);
         if (existing) {
           existing.qty += qty;
           existing.total = existing.price * existing.qty;
-          showToast('Quantité mise à jour', 'success');
+          showToast('Quantité mise à jour');
         } else {
           this.lines.push({ name, price, qty, total: price * qty });
         }
@@ -4234,7 +4085,7 @@
         if (!priceInput || !qtyInput) return;
         const price = parseFloat(priceInput.value) || 0;
         const qty = parseFloat(qtyInput.value) || 0;
-        if (price <= 0 || qty <= 0) { showToast('Valeurs invalides', 'warning'); return; }
+        if (price <= 0 || qty <= 0) { showToast('Valeurs invalides'); return; }
         const oldLine = this.lines[idx];
         const article = articles.find(a => a.name === oldLine.name);
         if (article) { article.stock = (article.stock || 0) - oldLine.qty + qty; }
@@ -4244,7 +4095,7 @@
         this.editingRowIndex = null;
         this.renderLines();
         this.updateAccountSummary();
-        showToast('✅ Article modifié', 'success');
+        showToast('✅ Article modifié');
       },
       cancelEdit() { this.editingRowIndex = null;
         this.renderLines(); },
@@ -4306,7 +4157,7 @@
       },
       addReglement() {
         const amount = parseFloat($('pRegAmount').value) || 0;
-        if (amount <= 0) { showToast('Entrez un montant valide', 'warning'); return; }
+        if (amount <= 0) { showToast('Entrez un montant valide'); return; }
         const method = $('pRegType').value;
         const date = new Date().toISOString().slice(0, 10);
         this.reglements.push({ id: nextId.reglements++, date, amount, method });
@@ -4330,7 +4181,7 @@
         this.renderReglements();
         this.updateAccountSummary();
         $('pRegAmount').value = '';
-        showToast('✅ Règlement ajouté', 'success');
+        showToast('✅ Règlement ajouté');
       },
       deleteReglement(idx) {
         const removed = this.reglements.splice(idx, 1)[0];
@@ -4343,17 +4194,17 @@
           if (supplier) recalculateFournisseurBalance(supplierName);
           this.renderReglements();
           this.updateAccountSummary();
-          showToast('🗑️ Règlement supprimé', 'success');
+          showToast('🗑️ Règlement supprimé');
         }
       },
       save() {
-        if (isSaving) { showToast('⏳ Sauvegarde en cours... Veuillez patienter', 'warning'); return; }
-        if (this.editingRowIndex !== null) { showToast('⚠️ Terminez la modification de l\'article', 'warning'); return; }
-        if (!$('pSupplier').value) { showToast('⚠️ Choisissez le fournisseur', 'warning'); return; }
+        if (isSaving) { showToast('⏳ Sauvegarde en cours... Veuillez patienter'); return; }
+        if (this.editingRowIndex !== null) { showToast('⚠️ Terminez la modification de l\'article'); return; }
+        if (!$('pSupplier').value) { showToast('⚠️ Choisissez le fournisseur'); return; }
         const supplierName = $('pSupplier').options[$('pSupplier').selectedIndex].textContent;
         const total = this.lines.reduce((a, l) => a + l.total, 0);
         const supplier = fournisseurs.find(s => s.name === supplierName);
-        if (!supplier) { showToast('⚠️ Fournisseur introuvable', 'error'); return; }
+        if (!supplier) { showToast('⚠️ Fournisseur introuvable'); return; }
         const paid = this.reglements.reduce((a, r) => a + r.amount, 0);
         const newId = this.editingId || nextId.achats++;
         const prevBalance = this.originalSupplierBalance;
@@ -4382,16 +4233,16 @@
           this.editingId = rec.id;
           this.originalSupplierBalance = supplier.balance;
           this.updateAccountSummary();
-          showToast(this.editingId ? '✅ Facture d\'achat modifiée' : '✅ Facture d\'achat enregistrée', 'success');
+          showToast(this.editingId ? '✅ Facture d\'achat modifiée' : '✅ Facture d\'achat enregistrée');
         } catch (e) {
-          showToast('❌ Erreur lors de l\'enregistrement', 'error');
+          showToast('❌ Erreur lors de l\'enregistrement');
           console.error(e);
         } finally { isSaving = false; }
       },
-      edit() { if (this.editingId == null) { showToast('Choisissez une facture à modifier', 'warning'); return; }
+      edit() { if (this.editingId == null) { showToast('Choisissez une facture à modifier'); return; }
         this.save(); },
       remove() {
-        if (this.editingId == null) { showToast('Choisissez une facture à supprimer', 'warning'); return; }
+        if (this.editingId == null) { showToast('Choisissez une facture à supprimer'); return; }
         const rec = achats.find(a => a.id === this.editingId);
         if (rec) {
           rec.lines.forEach(l => {
@@ -4404,8 +4255,8 @@
           recalculateFournisseurBalance(rec.supplier);
           this.render();
           closeSheet();
-          showToast('🗑️ Supprimé', 'success');
-        } else { showToast('Facture introuvable', 'error'); }
+          showToast('🗑️ Supprimé');
+        } else { showToast('Facture introuvable'); }
       },
       load(id) {
         const r = achats.find(a => a.id === id);
@@ -4453,15 +4304,15 @@
 
       shareWhatsapp() {
         if (this.editingId == null) {
-          showToast('⚠️ Enregistrez la facture d\'abord', 'warning');
+          showToast('⚠️ Enregistrez la facture d\'abord');
           return;
         }
         const rec = achats.find(a => a.id === this.editingId);
         if (!rec) {
-          showToast('❌ Facture introuvable', 'error');
+          showToast('❌ Facture introuvable');
           return;
         }
-        showToast('⏳ Génération de l\'image...', 'warning');
+        showToast('⏳ Génération de l\'image...');
         const htmlContent = Ventes.generateInvoiceHTML(rec, 'achat');
         const tempDiv = document.createElement('div');
         tempDiv.style.cssText =
@@ -4480,12 +4331,12 @@
         }).catch(err => {
           document.body.removeChild(tempDiv);
           console.error('Image generation error:', err);
-          showToast('❌ Échec de génération de l\'image : ' + err.message, 'error');
+          showToast('❌ Échec de génération de l\'image : ' + err.message);
         });
       },
 
       printInvoice() {
-        if (this.editingId == null) { showToast('Enregistrez la facture d\'abord', 'warning'); return; }
+        if (this.editingId == null) { showToast('Enregistrez la facture d\'abord'); return; }
         const rec = achats.find(a => a.id === this.editingId);
         if (!rec) return;
         const supplier = fournisseurs.find(s => s.name === rec.supplier);
@@ -4511,133 +4362,33 @@
         renderInvoice();
         $('printOverlay').classList.add('show');
       },
-
-      // ===== IMPRESSION BLUETOOTH CORRIGÉE - Filtre par service uniquement =====
       printBluetooth() {
-        if (this.editingId == null) {
-          showToast('⚠️ Enregistrez la facture d\'abord', 'warning');
-          return;
-        }
-
-        if (!navigator.bluetooth) {
-          showToast('❌ Bluetooth non disponible sur ce navigateur', 'error');
-          return;
-        }
-
+        if (this.editingId == null) { showToast('Enregistrez la facture d\'abord'); return; }
         const rec = achats.find(a => a.id === this.editingId);
-        if (!rec) {
-          showToast('❌ Facture introuvable', 'error');
-          return;
-        }
-
+        if (!rec) return;
         const supplier = fournisseurs.find(s => s.name === rec.supplier);
         const paid = (rec.reglements || []).reduce((aa, r) => aa + r.amount, 0);
-        const prevBalance = rec.prevBalance !== undefined ? rec.prevBalance : (supplier ? supplier.balance - (rec
-          .total - paid) : 0);
-        const currentBalance = prevBalance + rec.total - paid;
-
-        // Construction du texte du ticket
-        const WIDTH = 42;
-        const SEP = '─'.repeat(WIDTH);
-        const LF = '\x0A';
-
-        function center(text) {
-          const padding = Math.max(0, WIDTH - text.length);
-          const left = Math.floor(padding / 2);
-          const right = padding - left;
-          return ' '.repeat(left) + text + ' '.repeat(right);
-        }
-
-        function right(text) {
-          const padding = Math.max(0, WIDTH - text.length);
-          return ' '.repeat(padding) + text;
-        }
-
-        function left(text) {
-          return text + ' '.repeat(Math.max(0, WIDTH - text.length));
-        }
-
-        let text = '';
-        text += center(companyInfo.name || 'GTR POS') + LF;
-        text += center(companyInfo.address || '') + LF;
-        text += center('Tél: ' + (companyInfo.phone1 || '')) + LF;
-        text += center('MF: ' + (companyInfo.taxId || '-')) + LF;
-        text += SEP + LF;
-        text += center("FACTURE D'ACHAT") + LF;
-        text += center('N°: ' + rec.num) + LF;
-        text += center('Date: ' + rec.date) + LF;
-        text += SEP + LF;
-        text += 'Fournisseur: ' + rec.supplier + LF;
-        if (rec.supplierTaxId) text += 'MF: ' + rec.supplierTaxId + LF;
-        if (rec.supplierAddress) text += 'Adr: ' + rec.supplierAddress + LF;
-        text += 'Tél: ' + (supplier ? supplier.phone : '') + LF;
-        text += SEP + LF;
-        text += left('Article') + right('Qté x Prix = Total') + LF;
+        let text =
+          `${companyInfo.name}\n${companyInfo.address}\n${companyInfo.phone1}\nMF: ${companyInfo.taxId}\n----------------\nFacture d'achat: ${rec.num}\nDate: ${rec.date}\nFournisseur: ${rec.supplier}\n`;
+        if (rec.supplierTaxId) text += `MF: ${rec.supplierTaxId}\n`;
+        text += `----------------\n`;
         rec.lines.forEach(l => {
-          const name = l.name.length > 18 ? l.name.substring(0, 16) + '..' : l.name;
-          const detail = l.qty + 'x' + l.price.toFixed(3) + '=' + l.total.toFixed(3);
-          text += left(name) + right(detail) + LF;
+          text += `${l.name}  ${l.qty} x ${l.price.toFixed(3)} = ${l.total.toFixed(3)}\n`;
         });
-        text += SEP + LF;
-        text += 'RÉSUMÉ DU COMPTE' + LF;
-        text += 'Solde précédent : ' + prevBalance.toFixed(3) + ' TND' + LF;
-        text += 'Total facture   : ' + rec.total.toFixed(3) + ' TND' + LF;
-        text += 'Payé            : ' + paid.toFixed(3) + ' TND' + LF;
-        text += SEP + LF;
-        text += center('SOLDE ACTUEL') + LF;
-        text += center(currentBalance.toFixed(3) + ' TND') + LF;
-        text += SEP + LF;
-        text += center('Merci de votre confiance !') + LF;
-        text += center(companyInfo.name || 'GTR POS') + LF;
-        text += LF + LF + LF + LF;
-
-        showToast('⏳ Connexion Bluetooth en cours...', 'warning');
-
-        // ✅ CORRECTION : Filtrer par service uniquement (pas namePrefix)
-        navigator.bluetooth.requestDevice({
-            filters: [{
-              services: ['000018f0-0000-1000-8000-00805f9b34fb']
-            }],
-            optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
-          })
-          .then(device => {
-            showToast('✅ Appareil trouvé, connexion...', 'success');
-            return device.gatt.connect();
-          })
-          .then(server => {
-            showToast('✅ Connecté...', 'success');
-            return server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
-          })
-          .then(service => {
-            return service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
-          })
+        text +=
+          `----------------\nTotal: ${rec.total.toFixed(3)}\nPayé: ${paid.toFixed(3)}\nReste: ${(rec.total-paid).toFixed(3)}\nMerci !\n`;
+        if (!navigator.bluetooth) { showToast('Votre navigateur ne supporte pas Bluetooth'); return; }
+        navigator.bluetooth.requestDevice({ filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }],
+            optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] })
+          .then(device => device.gatt.connect())
+          .then(server => server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb'))
+          .then(service => service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb'))
           .then(characteristic => {
-            showToast('✅ Envoi du ticket...', 'success');
-            const encoder = new TextEncoder();
-            const data = encoder.encode(text);
-            return characteristic.writeValue(data);
+            characteristic.writeValue(new TextEncoder().encode(text));
+            showToast('✅ Envoyé à l\'imprimante');
           })
-          .then(() => {
-            showToast('✅ Ticket envoyé à l\'imprimante !', 'success');
-          })
-          .catch(err => {
-            console.error('Bluetooth error:', err);
-            let errorMsg = '❌ Échec: ';
-            if (err.message && err.message.includes('permissions policy')) {
-              errorMsg += 'Permission Bluetooth bloquée.';
-            } else if (err.message && err.message.includes('No devices found')) {
-              errorMsg += 'Aucune imprimante trouvée.';
-            } else if (err.message && err.message.includes('GATT Server disconnected')) {
-              errorMsg += 'L\'imprimante s\'est déconnectée.';
-            } else if (err.message && err.message.includes('namePrefix')) {
-              errorMsg += 'Problème de compatibilité.';
-            } else if (err.message && err.message.includes('User cancelled')) {
-              errorMsg += 'Connexion annulée.';
-            } else {
-              errorMsg += err.message || 'Erreur inconnue';
-            }
-            showToast(errorMsg, 'error');
-          });
+          .catch(err => { console.error(err);
+            showToast('❌ Échec de connexion à l\'imprimante: ' + err.message); });
       }
     };
 
@@ -4658,7 +4409,7 @@
       },
       save() {
         const amount = parseFloat($('exAmount').value) || 0;
-        if (amount <= 0) { showToast('⚠️ Entrez un montant valide', 'warning'); return; }
+        if (amount <= 0) { showToast('⚠️ Entrez un montant valide'); return; }
         const category = $('exCategory').options[$('exCategory').selectedIndex].textContent;
         const date = $('exDate').value;
         const desc = $('exDesc').value.trim() || '-';
@@ -4670,27 +4421,27 @@
         if (this.editingId) {
           const idx = expenses.findIndex(e => e.id === this.editingId);
           if (idx !== -1) { expenses[idx] = rec;
-            showToast('✅ Dépense modifiée', 'success'); } else { showToast('❌ Dépense introuvable', 'error'); return; }
+            showToast('✅ Dépense modifiée'); } else { showToast('❌ Dépense introuvable'); return; }
         } else { expenses.push(rec);
-          showToast('✅ Dépense enregistrée', 'success'); }
+          showToast('✅ Dépense enregistrée'); }
         saveState();
         this.render();
         closeSheet();
       },
-      edit() { if (this.editingId == null) { showToast('⚠️ Choisissez une dépense à modifier', 'warning'); return; }
+      edit() { if (this.editingId == null) { showToast('⚠️ Choisissez une dépense à modifier'); return; }
         this.save(); },
       remove() {
-        if (this.editingId == null) { showToast('⚠️ Choisissez une dépense à supprimer', 'warning'); return; }
+        if (this.editingId == null) { showToast('⚠️ Choisissez une dépense à supprimer'); return; }
         const idx = expenses.findIndex(e => e.id === this.editingId);
         if (idx !== -1) { expenses.splice(idx, 1);
           saveState();
           this.render();
           closeSheet();
-          showToast('🗑️ Dépense supprimée', 'success'); } else { showToast('❌ Dépense introuvable', 'error'); }
+          showToast('🗑️ Dépense supprimée'); } else { showToast('❌ Dépense introuvable'); }
       },
       load(id) {
         const e = expenses.find(x => x.id === id);
-        if (!e) { showToast('⚠️ Dépense introuvable', 'error'); return; }
+        if (!e) { showToast('⚠️ Dépense introuvable'); return; }
         this.editingId = id;
         $('exCode').value = e.code || 'EXP-' + String(id).padStart(4, '0');
         $('exDate').value = e.date;
@@ -4854,10 +4605,10 @@
       },
       setApproved(uid, val) {
         db.collection('approvals').doc(uid).update({ approved: val })
-          .then(() => { showToast(val ? '✅ Approuvé' : '🗑️ Annulé', 'success');
+          .then(() => { showToast(val ? '✅ Approuvé' : '🗑️ Annulé');
             Accounts.render();
             Dashboard.render(); })
-          .catch(() => showToast('❌ Erreur', 'error'));
+          .catch(() => showToast('❌ Erreur'));
       }
     };
 
@@ -4874,7 +4625,7 @@
           $('cpyCashOpening').value = companyInfo.cashOpening || 0;
         } catch (e) {
           console.error('Error loading company info:', e);
-          showToast('⚠️ Erreur de chargement des données société', 'error');
+          showToast('⚠️ Erreur de chargement des données société');
         }
       },
       save() {
@@ -4890,14 +4641,14 @@
           const saved = saveState();
 
           if (saved) {
-            showToast('✅ Données société enregistrées', 'success');
+            showToast('✅ Données société enregistrées');
           } else {
-            showToast('⚠️ Enregistré mais possible problème de stockage', 'warning');
+            showToast('⚠️ Enregistré mais possible problème de stockage');
           }
           closeSheet();
         } catch (e) {
           console.error('❌ Error saving company info:', e);
-          showToast('❌ Échec de l\'enregistrement: ' + e.message, 'error');
+          showToast('❌ Échec de l\'enregistrement: ' + e.message);
         }
       }
     };
@@ -4917,16 +4668,16 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast('Exporté', 'success');
+      showToast('Exporté');
     }
 
     function exportBackupToDrive() {
-      if (!currentUser) { showToast('Vous devez être connecté', 'warning'); return; }
+      if (!currentUser) { showToast('Vous devez être connecté'); return; }
       const provider = new firebase.auth.GoogleAuthProvider();
       provider.addScope('https://www.googleapis.com/auth/drive.file');
-      showToast('Ouverture de Google...', 'warning');
+      showToast('Ouverture de Google...');
       const upload = (token) => {
-        if (!token) { showToast('Impossible d\'obtenir l\'autorisation', 'error'); return; }
+        if (!token) { showToast('Impossible d\'obtenir l\'autorisation'); return; }
         const data = { clients, fournisseurs, articles, ventes, achats, expenses, caisseClients, caisseFournisseurs,
           nextId, companyInfo, financeData, exportedAt: new Date().toISOString() };
         const fileName = 'gtrpos_backup_' + new Date().toISOString().slice(0, 10) + '.json';
@@ -4942,9 +4693,9 @@
               boundary },
           body
         }).then(res => res.json()).then(json => {
-          if (json.id) showToast('Uploadé vers Drive', 'success');
-          else showToast('Erreur', 'error');
-        }).catch(() => showToast('Erreur', 'error'));
+          if (json.id) showToast('Uploadé vers Drive');
+          else showToast('Erreur');
+        }).catch(() => showToast('Erreur'));
       };
       currentUser.linkWithPopup(provider).then(result => {
         const cred = firebase.auth.GoogleAuthProvider.credentialFromResult(result);
@@ -4954,8 +4705,8 @@
           currentUser.reauthenticateWithPopup(provider).then(result => {
             const cred = firebase.auth.GoogleAuthProvider.credentialFromResult(result);
             upload(cred.accessToken);
-          }).catch(() => showToast('Impossible d\'obtenir l\'autorisation', 'error'));
-        } else showToast('Impossible d\'obtenir l\'autorisation', 'error');
+          }).catch(() => showToast('Impossible d\'obtenir l\'autorisation'));
+        } else showToast('Impossible d\'obtenir l\'autorisation');
       });
     }
 
@@ -4979,8 +4730,8 @@
           if (data.financeData) financeData = data.financeData;
           saveState();
           initAll();
-          showToast('Importé', 'success');
-        } catch (err) { showToast('Fichier invalide: ' + err.message, 'error'); }
+          showToast('Importé');
+        } catch (err) { showToast('Fichier invalide: ' + err.message); }
       };
       reader.readAsText(file);
       input.value = '';
@@ -5142,10 +4893,10 @@
         document.getElementById('loginOverlay').classList.add('hide');
         document.getElementById('pendingOverlay').classList.add('hide');
         showSection('dashboard');
-        showToast('✅ Mode de stockage : ' + (storageMode === 'cloud' ? 'Cloud' : 'Local'), 'success');
+        showToast('✅ Mode de stockage : ' + (storageMode === 'cloud' ? 'Cloud' : 'Local'));
       } catch (e) {
         console.error('Init error:', e);
-        showToast('⚠️ Erreur d\'initialisation : ' + e.message, 'error');
+        showToast('⚠️ Erreur d\'initialisation : ' + e.message);
       }
     }
 
