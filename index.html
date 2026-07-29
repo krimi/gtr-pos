@@ -3948,6 +3948,9 @@
         if (!rec) return;
         const client = clients.find(c => c.name === rec.client);
         const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0);
+        const prevBalance = rec.prevBalance !== undefined ? rec.prevBalance : (client ? client.balance - (rec.total - paid) : 0);
+        const currentBalance = prevBalance + rec.total - paid;
+        
         let text =
           `${companyInfo.name}\n${companyInfo.address}\n${companyInfo.phone1}\nMF: ${companyInfo.taxId}\n----------------\nFacture de vente: ${rec.num}\nDate: ${rec.date}\nClient: ${rec.client}\n`;
         if (rec.clientTaxId) text += `MF: ${rec.clientTaxId}\n`;
@@ -3955,7 +3958,12 @@
         rec.lines.forEach(l => {
           text += `${l.name}  ${l.qty} x ${l.price.toFixed(3)} = ${l.total.toFixed(3)}\n`;
         });
-        text += `----------------\nTotal: ${rec.total.toFixed(3)}\nPayé: ${paid.toFixed(3)}\nReste: ${(rec.total-paid).toFixed(3)}\nMerci !\n`;
+        text += `----------------\n`;
+        text += `Solde précédent : ${prevBalance.toFixed(3)} TND\n`;
+        text += `Total facture   : ${rec.total.toFixed(3)} TND\n`;
+        text += `Payé            : ${paid.toFixed(3)} TND\n`;
+        text += `Solde actuel    : ${currentBalance.toFixed(3)} TND\n`;
+        text += `----------------\nMerci !\n`;
 
         const savedPrinters = getBtPrinters();
         if (savedPrinters.length === 0) {
@@ -4387,6 +4395,9 @@
         if (!rec) return;
         const supplier = fournisseurs.find(s => s.name === rec.supplier);
         const paid = (rec.reglements || []).reduce((aa, r) => aa + r.amount, 0);
+        const prevBalance = rec.prevBalance !== undefined ? rec.prevBalance : (supplier ? supplier.balance - (rec.total - paid) : 0);
+        const currentBalance = prevBalance + rec.total - paid;
+
         let text =
           `${companyInfo.name}\n${companyInfo.address}\n${companyInfo.phone1}\nMF: ${companyInfo.taxId}\n----------------\nFacture d'achat: ${rec.num}\nDate: ${rec.date}\nFournisseur: ${rec.supplier}\n`;
         if (rec.supplierTaxId) text += `MF: ${rec.supplierTaxId}\n`;
@@ -4394,8 +4405,12 @@
         rec.lines.forEach(l => {
           text += `${l.name}  ${l.qty} x ${l.price.toFixed(3)} = ${l.total.toFixed(3)}\n`;
         });
-        text +=
-          `----------------\nTotal: ${rec.total.toFixed(3)}\nPayé: ${paid.toFixed(3)}\nReste: ${(rec.total-paid).toFixed(3)}\nMerci !\n`;
+        text += `----------------\n`;
+        text += `Solde précédent : ${prevBalance.toFixed(3)} TND\n`;
+        text += `Total facture   : ${rec.total.toFixed(3)} TND\n`;
+        text += `Payé            : ${paid.toFixed(3)} TND\n`;
+        text += `Solde actuel    : ${currentBalance.toFixed(3)} TND\n`;
+        text += `----------------\nMerci !\n`;
 
         const savedPrinters = getBtPrinters();
         if (savedPrinters.length === 0) {
