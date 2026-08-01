@@ -3167,7 +3167,7 @@
     };
 
     // =============================================
-    // ===== VENTES (version simplifiée) =====
+    // ===== VENTES (version avec Bluetooth corrigé) =====
     // =============================================
     const Ventes = {
       editingId: null,
@@ -3687,6 +3687,7 @@
         $('printOverlay').classList.add('show');
       },
       
+      // ===== VERSION CORRIGÉE DE printBluetooth =====
       printBluetooth() {
         if (this.editingId == null) {
           showToast('Enregistrez la facture d\'abord');
@@ -3697,29 +3698,75 @@
           return;
         }
         const rec = ventes.find(v => v.id === this.editingId);
-        if (!rec) return;
+        if (!rec) {
+          showToast('❌ Facture introuvable');
+          return;
+        }
         const client = clients.find(c => c.name === rec.client);
         const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0);
         const prevBalance = rec.prevBalance !== undefined ? rec.prevBalance : (client ? client.balance - (rec.total - paid) : 0);
         const currentBalance = prevBalance + rec.total - paid;
-        let text = `${companyInfo.name}\n${companyInfo.address}\n${companyInfo.phone1}\nMF: ${companyInfo.taxId}\n----------------\nFacture de vente: ${rec.num}\nDate: ${rec.date}\nClient: ${rec.client}\n`;
+
+        let text = `${companyInfo.name}\n${companyInfo.address}\n${companyInfo.phone1}\nMF: ${companyInfo.taxId}\n`;
+        text += `----------------\n`;
+        text += `Facture de vente: ${rec.num}\n`;
+        text += `Date: ${rec.date}\n`;
+        text += `Client: ${rec.client}\n`;
         if (rec.clientTaxId) text += `MF: ${rec.clientTaxId}\n`;
         text += `----------------\n`;
+
         rec.lines.forEach(l => {
           text += `${l.name}  ${l.qty} x ${l.price.toFixed(3)} = ${l.total.toFixed(3)}\n`;
         });
+
         text += `----------------\n`;
         text += `Solde précédent : ${prevBalance.toFixed(3)} TND\n`;
         text += `Total facture   : ${rec.total.toFixed(3)} TND\n`;
         text += `Payé            : ${paid.toFixed(3)} TND\n`;
         text += `Solde actuel    : ${currentBalance.toFixed(3)} TND\n`;
         text += `----------------\nMerci !\n`;
-        showToast('🖨️ Impression Bluetooth envoyée');
+
+        showToast('⏳ Connexion Bluetooth en cours...');
+
+        navigator.bluetooth.requestDevice({
+          filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }],
+          optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+        })
+        .then(device => {
+          console.log('✅ Appareil trouvé:', device.name);
+          return device.gatt.connect();
+        })
+        .then(server => {
+          console.log('✅ GATT connecté');
+          return server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+        })
+        .then(service => {
+          console.log('✅ Service trouvé');
+          return service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+        })
+        .then(characteristic => {
+          console.log('✅ Caractéristique trouvée. Envoi des données...');
+          const encoder = new TextEncoder();
+          const data = encoder.encode(text);
+          return characteristic.writeValue(data);
+        })
+        .then(() => {
+          console.log('✅ Données envoyées avec succès');
+          showToast('✅ Impression envoyée à l\'imprimante');
+        })
+        .catch(err => {
+          console.error('❌ Erreur Bluetooth:', err);
+          let msg = '❌ Erreur Bluetooth';
+          if (err.message.includes('GATT')) msg += ' : Problème de connexion (vérifiez l\'imprimante)';
+          else if (err.message.includes('not found')) msg += ' : Service ou caractéristique introuvable';
+          else msg += ' : ' + err.message;
+          showToast(msg);
+        });
       }
     };
 
     // =============================================
-    // ===== ACHATS (version simplifiée) =====
+    // ===== ACHATS (version avec Bluetooth corrigé) =====
     // =============================================
     const Achats = {
       editingId: null,
@@ -4177,6 +4224,7 @@
         $('printOverlay').classList.add('show');
       },
       
+      // ===== VERSION CORRIGÉE DE printBluetooth =====
       printBluetooth() {
         if (this.editingId == null) {
           showToast('Enregistrez la facture d\'abord');
@@ -4187,24 +4235,70 @@
           return;
         }
         const rec = achats.find(a => a.id === this.editingId);
-        if (!rec) return;
+        if (!rec) {
+          showToast('❌ Facture introuvable');
+          return;
+        }
         const supplier = fournisseurs.find(s => s.name === rec.supplier);
-        const paid = (rec.reglements || []).reduce((aa, r) => aa + r.amount, 0);
+        const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0);
         const prevBalance = rec.prevBalance !== undefined ? rec.prevBalance : (supplier ? supplier.balance - (rec.total - paid) : 0);
         const currentBalance = prevBalance + rec.total - paid;
-        let text = `${companyInfo.name}\n${companyInfo.address}\n${companyInfo.phone1}\nMF: ${companyInfo.taxId}\n----------------\nFacture d'achat: ${rec.num}\nDate: ${rec.date}\nFournisseur: ${rec.supplier}\n`;
+
+        let text = `${companyInfo.name}\n${companyInfo.address}\n${companyInfo.phone1}\nMF: ${companyInfo.taxId}\n`;
+        text += `----------------\n`;
+        text += `Facture d'achat: ${rec.num}\n`;
+        text += `Date: ${rec.date}\n`;
+        text += `Fournisseur: ${rec.supplier}\n`;
         if (rec.supplierTaxId) text += `MF: ${rec.supplierTaxId}\n`;
         text += `----------------\n`;
+
         rec.lines.forEach(l => {
           text += `${l.name}  ${l.qty} x ${l.price.toFixed(3)} = ${l.total.toFixed(3)}\n`;
         });
+
         text += `----------------\n`;
         text += `Solde précédent : ${prevBalance.toFixed(3)} TND\n`;
         text += `Total facture   : ${rec.total.toFixed(3)} TND\n`;
         text += `Payé            : ${paid.toFixed(3)} TND\n`;
         text += `Solde actuel    : ${currentBalance.toFixed(3)} TND\n`;
         text += `----------------\nMerci !\n`;
-        showToast('🖨️ Impression Bluetooth envoyée');
+
+        showToast('⏳ Connexion Bluetooth en cours...');
+
+        navigator.bluetooth.requestDevice({
+          filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }],
+          optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb']
+        })
+        .then(device => {
+          console.log('✅ Appareil trouvé:', device.name);
+          return device.gatt.connect();
+        })
+        .then(server => {
+          console.log('✅ GATT connecté');
+          return server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb');
+        })
+        .then(service => {
+          console.log('✅ Service trouvé');
+          return service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb');
+        })
+        .then(characteristic => {
+          console.log('✅ Caractéristique trouvée. Envoi des données...');
+          const encoder = new TextEncoder();
+          const data = encoder.encode(text);
+          return characteristic.writeValue(data);
+        })
+        .then(() => {
+          console.log('✅ Données envoyées avec succès');
+          showToast('✅ Impression envoyée à l\'imprimante');
+        })
+        .catch(err => {
+          console.error('❌ Erreur Bluetooth:', err);
+          let msg = '❌ Erreur Bluetooth';
+          if (err.message.includes('GATT')) msg += ' : Problème de connexion (vérifiez l\'imprimante)';
+          else if (err.message.includes('not found')) msg += ' : Service ou caractéristique introuvable';
+          else msg += ' : ' + err.message;
+          showToast(msg);
+        });
       }
     };
 
@@ -4405,12 +4499,10 @@
           if (pending) pending.innerHTML = '<div class="empty-msg">Cette section est réservée à l\'administrateur</div>';
           if (approved) approved.innerHTML = '';
           document.getElementById('accountEmailDisplay2').textContent = currentUser ? currentUser.email : '';
-          // Cacher l'icône dans le dashboard
           const dashAccounts = document.getElementById('dashAccounts');
           if (dashAccounts) dashAccounts.style.display = 'none';
           return;
         }
-        // Afficher l'icône dans le dashboard
         const dashAccounts = document.getElementById('dashAccounts');
         if (dashAccounts) dashAccounts.style.display = 'flex';
         
@@ -4774,17 +4866,14 @@
         if (display) display.textContent = currentUser.email || '';
         document.getElementById('accountEmailDisplay2').textContent = currentUser.email || '';
         
-        // Recalculer les soldes
         clients.forEach(c => recalculateClientBalance(c.name));
         fournisseurs.forEach(f => recalculateFournisseurBalance(f.name));
         
-        // Initialiser les options
         Ventes.refreshClientOptions();
         Ventes.refreshArticleOptions();
         Achats.refreshSupplierOptions();
         Achats.refreshArticleOptions();
         
-        // Rendre les vues
         Clients.render();
         ClientHistory.render();
         Fournisseurs.render();
