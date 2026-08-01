@@ -150,15 +150,19 @@
     /* ===== Dashboard Grid ===== */
     .dashboard-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
       gap: 14px;
       padding: 8px 0 4px;
       width: 100%;
+      grid-template-columns: repeat(2, 1fr);
     }
+    .dashboard-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .dashboard-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .dashboard-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+
     .dash-item {
       background: #ffffff;
       border-radius: var(--card-radius);
-      padding: 22px 12px;
+      padding: 16px 8px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -167,7 +171,7 @@
       border: none;
       transition: var(--transition);
       cursor: pointer;
-      min-height: 100px;
+      min-height: 80px;
       position: relative;
       overflow: hidden;
     }
@@ -191,12 +195,15 @@
     }
     .dash-icon {
       font-size: 36px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+      transition: var(--transition);
     }
     .dash-label {
       font-size: 12px;
       font-weight: 700;
       color: var(--text);
+      text-align: center;
+      transition: var(--transition);
     }
     .dash-item:nth-child(1) .dash-icon { color: #4a6cf7; }
     .dash-item:nth-child(2) .dash-icon { color: #8e44ad; }
@@ -1416,7 +1423,7 @@
     <div class="content">
       <!-- ===== DASHBOARD (الصفحة الرئيسية) ===== -->
       <div class="section active" id="sec-dashboard">
-        <div class="dashboard-grid">
+        <div class="dashboard-grid" id="dashboardGrid">
           <div class="dash-item" data-section="clients"><span class="dash-icon">👥</span><span class="dash-label">Clients</span></div>
           <div class="dash-item" data-section="client-history"><span class="dash-icon">📜</span><span class="dash-label">Relevé client</span></div>
           <div class="dash-item" data-section="fournisseurs"><span class="dash-icon">🤝</span><span class="dash-label">Fournisseurs</span></div>
@@ -1678,7 +1685,7 @@
       <div class="sheet-footer"><button class="btn save" onclick="Expenses.save()">💾 Enregistrer</button><button class="btn edit" onclick="Expenses.edit()">✏️ Modifier</button><button class="btn del" onclick="Expenses.remove()">🗑 Supprimer</button></div>
     </div>
 
-    <!-- Sheet Société (sans Bluetooth et Taille du texte) -->
+    <!-- Sheet Société (مع إضافة أزرار حجم الأيقونات) -->
     <div class="sheet" id="sheet-company">
       <div class="sheet-handle"></div>
       <div class="sheet-header"><h3>Données de l'entreprise</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
@@ -1693,6 +1700,15 @@
           <span style="font-size:7px;color:var(--muted);">⏺ Utilisé pour calculer la caisse</span>
         </div>
         <button class="btn save" onclick="CompanyInfo.save()">💾 Enregistrer</button>
+        
+        <!-- ===== قسم التحكم في حجم الأيقونات ===== -->
+        <div class="section-title">📐 حجم الأيقونات</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
+          <button class="btn outline small" onclick="setDashboardColumns(2)" style="flex:1;font-size:11px;">2 أعمدة</button>
+          <button class="btn outline small" onclick="setDashboardColumns(3)" style="flex:1;font-size:11px;">3 أعمدة</button>
+          <button class="btn outline small" onclick="setDashboardColumns(4)" style="flex:1;font-size:11px;">4 أعمدة</button>
+        </div>
+        <div id="colsStatus" style="font-size:10px;color:var(--muted);margin-bottom:6px;">الحالي: 2 أعمدة</div>
         
         <div class="section-title">💾 Sauvegarde</div>
         <button class="btn outline small" onclick="exportBackup()">⬇️ Exporter</button>
@@ -1777,6 +1793,7 @@
     let toastTimer;
     let currentSection = 'dashboard';
     let _invoiceData = null;
+    let dashboardColumns = 2;
     
     // ===== DONNÉES =====
     let clients = [];
@@ -2115,6 +2132,55 @@
       document.documentElement.dir = isAr ? 'ltr' : 'rtl';
       this.textContent = isAr ? 'ع' : 'FR';
     });
+
+    // ===== التحكم في حجم الأيقونات =====
+    function setDashboardColumns(cols) {
+      dashboardColumns = cols;
+      const grid = document.getElementById('dashboardGrid');
+      if (grid) {
+        grid.className = 'dashboard-grid cols-' + cols;
+      }
+      try {
+        localStorage.setItem('gtrpos_dashboard_cols', String(cols));
+      } catch(e) {}
+      const status = document.getElementById('colsStatus');
+      if (status) status.textContent = 'الحالي: ' + cols + ' أعمدة';
+      adjustIconSize(cols);
+    }
+
+    function adjustIconSize(cols) {
+      const items = document.querySelectorAll('.dash-item');
+      let iconSize = 36, labelSize = 12, padding = 16;
+      if (cols === 2) { iconSize = 40; labelSize = 13; padding = 20; }
+      else if (cols === 3) { iconSize = 32; labelSize = 11; padding = 14; }
+      else if (cols === 4) { iconSize = 26; labelSize = 10; padding = 10; }
+      items.forEach(item => {
+        const icon = item.querySelector('.dash-icon');
+        const label = item.querySelector('.dash-label');
+        if (icon) icon.style.fontSize = iconSize + 'px';
+        if (label) label.style.fontSize = labelSize + 'px';
+        item.style.padding = padding + 'px 8px';
+        if (cols === 4) {
+          item.style.minHeight = '60px';
+        } else {
+          item.style.minHeight = '80px';
+        }
+      });
+    }
+
+    function loadDashboardSettings() {
+      try {
+        const saved = localStorage.getItem('gtrpos_dashboard_cols');
+        if (saved) {
+          const cols = parseInt(saved);
+          if (cols >= 2 && cols <= 4) {
+            setDashboardColumns(cols);
+            return;
+          }
+        }
+      } catch(e) {}
+      setDashboardColumns(2);
+    }
 
     // =============================================
     // ===== FINANCE TABLE =====
@@ -3687,7 +3753,6 @@
         $('printOverlay').classList.add('show');
       },
       
-      // ===== VERSION CORRIGÉE DE printBluetooth =====
       printBluetooth() {
         if (this.editingId == null) {
           showToast('Enregistrez la facture d\'abord');
@@ -4224,7 +4289,6 @@
         $('printOverlay').classList.add('show');
       },
       
-      // ===== VERSION CORRIGÉE DE printBluetooth =====
       printBluetooth() {
         if (this.editingId == null) {
           showToast('Enregistrez la facture d\'abord');
@@ -4888,6 +4952,9 @@
         FinanceTable.load();
         FinanceTable.render();
         AutoFinanceRecorder.startAutoRecording();
+        
+        // تحميل إعدادات حجم الأيقونات
+        loadDashboardSettings();
         
         document.getElementById('loginOverlay').classList.add('hide');
         document.getElementById('pendingOverlay').classList.add('hide');
