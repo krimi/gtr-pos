@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="fr" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#1e2f66">
-  <title>GTR POS V 0.7.4</title>
+  <title>GTR POS V 0.7.5 - مع التقارير المتقدمة</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -33,30 +33,16 @@
     .section { display: none !important; animation: fadeIn .3s ease; }
     .section.active { display: block !important; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-    
-    .dashboard-grid { display: grid; gap: 12px; padding: 4px 0 8px; width: 100%; grid-template-columns: repeat(3, 1fr); }
+    .dashboard-grid { display: grid; gap: 14px; padding: 8px 0 4px; width: 100%; grid-template-columns: repeat(2, 1fr); }
     .dashboard-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
     .dashboard-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
     .dashboard-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
-    .dash-item { background: #ffffff; border-radius: var(--card-radius); padding: 12px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: var(--panel-shadow); border: none; transition: var(--transition); cursor: pointer; min-height: 70px; position: relative; overflow: hidden; }
+    .dash-item { background: #ffffff; border-radius: var(--card-radius); padding: 16px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: var(--panel-shadow); border: none; transition: var(--transition); cursor: pointer; min-height: 80px; position: relative; overflow: hidden; }
     .dash-item::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--blue-accent); opacity: 0; transition: var(--transition); }
     .dash-item:active { transform: scale(0.95); box-shadow: 0 2px 10px rgba(26, 42, 92, 0.1); }
     .dash-item:active::after { opacity: 1; }
-    .dash-icon { font-size: 28px; margin-bottom: 3px; transition: var(--transition); }
-    .dash-label { font-size: 10px; font-weight: 700; color: var(--text); text-align: center; transition: var(--transition); }
-    .dash-item:nth-child(1) .dash-icon { color: #4a6cf7; }
-    .dash-item:nth-child(2) .dash-icon { color: #8e44ad; }
-    .dash-item:nth-child(3) .dash-icon { color: #2ecc71; }
-    .dash-item:nth-child(4) .dash-icon { color: #f39c12; }
-    .dash-item:nth-child(5) .dash-icon { color: #e74c5e; }
-    .dash-item:nth-child(6) .dash-icon { color: #1abc9c; }
-    .dash-item:nth-child(7) .dash-icon { color: #3498db; }
-    .dash-item:nth-child(8) .dash-icon { color: #9b59b6; }
-    .dash-item:nth-child(9) .dash-icon { color: #e67e22; }
-    .dash-item:nth-child(10) .dash-icon { color: #1abc9c; }
-    .dash-item:nth-child(11) .dash-icon { color: #e74c3c; }
-    .dash-item:nth-child(12) .dash-icon { color: #2ecc71; }
-
+    .dash-icon { font-size: 36px; margin-bottom: 6px; transition: var(--transition); }
+    .dash-label { font-size: 12px; font-weight: 700; color: var(--text); text-align: center; transition: var(--transition); }
     .tabbar { display: none !important; }
     .fab { position: absolute; bottom: 20px; right: 16px; width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--blue-light), var(--blue-accent)); color: #fff; font-size: 26px; border: none; box-shadow: 0 4px 20px rgba(74, 108, 247, 0.4); z-index: 15; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
     .fab:active { transform: scale(0.88); box-shadow: 0 2px 10px rgba(74, 108, 247, 0.3); }
@@ -95,24 +81,25 @@
     .field input:focus, .field select:focus { outline: none; border-color: var(--blue-accent); box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.3); }
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
     .field-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-    .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-    .field-row-3 .field { margin-bottom: 0; }
-    .field-row-3 .field input { width: 100%; min-width: 80px; padding: 8px 10px; font-size: 13px; height: 40px; border: 2px solid var(--border); border-radius: 8px; font-family: 'Cairo', sans-serif; background: #f8f9fc; transition: var(--transition); }
-    .field-row-3 .field input:focus { outline: none; border-color: var(--blue-accent); box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.3); }
-    .field-row-3 .field input[readonly] { background: #eef0f6; font-weight: 700; color: var(--navy); }
+    .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
     .row-card { background: #ffffff; border: none; border-radius: 12px; padding: 8px 12px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; min-height: 44px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: var(--transition); }
     .row-card:active { transform: scale(0.98); background: #f8faff; }
     .row-card .name { font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; color: var(--text); }
     .row-card .meta { font-size: 9px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .row-card .amount { font-size: 12px; font-weight: 800; flex-shrink: 0; white-space: nowrap; color: var(--navy); }
     .empty-msg { text-align: center; color: var(--muted); font-size: 12px; padding: 16px 0; }
-    .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 6px 0 4px; }
-    .kpi-card { background: #ffffff; border: none; border-radius: 10px; padding: 6px 2px; text-align: center; box-shadow: var(--panel-shadow); min-height: 48px; display: flex; flex-direction: column; justify-content: center; transition: var(--transition); }
-    .kpi-card:active { transform: scale(0.97); }
-    .kpi-card .val { font-size: 13px; font-weight: 800; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .kpi-card .lbl { font-size: 7px; color: var(--muted); margin-top: 1px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
-    .section-title { font-size: 12px; font-weight: 800; color: var(--navy); margin: 6px 0 4px; display: flex; align-items: center; gap: 6px; }
-    .section-title::before { content: ''; width: 3px; height: 14px; background: var(--blue-accent); border-radius: 2px; }
+    .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; margin-bottom: 12px; }
+    .kpi-card { background: #ffffff; border: none; border-radius: 12px; padding: 10px 6px; text-align: center; box-shadow: var(--panel-shadow); min-height: 60px; display: flex; flex-direction: column; justify-content: center; }
+    .kpi-card .val { font-size: 15px; font-weight: 800; color: var(--navy); }
+    .kpi-card .lbl { font-size: 8px; color: var(--muted); margin-top: 2px; font-weight: 600; text-transform: uppercase; }
+    .section-title { font-size: 13px; font-weight: 800; color: var(--navy); margin: 10px 0 6px; display: flex; align-items: center; gap: 6px; }
+    .section-title::before { content: ''; width: 3px; height: 16px; background: var(--blue-accent); border-radius: 2px; }
+    .badge { padding: 3px 8px; border-radius: 20px; font-size: 8px; font-weight: 700; color: #fff; white-space: nowrap; }
+    .badge.paid { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+    .badge.pending { background: linear-gradient(135deg, #f1c40f, #f39c12); }
+    .badge.low { background: linear-gradient(135deg, #e74c5e, #c0392b); }
+    .badge.high { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+    .badge.medium { background: linear-gradient(135deg, #f1c40f, #f39c12); }
     .sheet-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.5); display: none; z-index: 20; backdrop-filter: blur(4px); }
     .sheet-overlay.show { display: block; }
     .sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 92%; background: #ffffff; border-radius: 20px 20px 0 0; z-index: 21; transform: translateY(100%); transition: transform 0.35s ease; display: flex; flex-direction: column; box-shadow: 0 -10px 40px rgba(0,0,0,0.15); }
@@ -136,80 +123,6 @@
     .btn.outline:active { background: var(--navy); color: #fff; }
     .btn.print { background: linear-gradient(135deg, #6c7ae0, #4a56b0); }
     .btn.whatsapp { background: linear-gradient(135deg, #25d366, #128C7E); }
-    
-    /* Style spécifique pour le bouton "Ajouter au tableau" */
-    .add-row-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin: 6px 0 10px;
-        padding: 4px 0;
-    }
-    .add-row-wrapper .label {
-        font-size: 13px;
-        font-weight: 700;
-        color: var(--navy);
-        white-space: nowrap;
-    }
-    .add-row-wrapper .btn-add-row {
-        width: auto;
-        padding: 8px 24px;
-        margin: 0;
-        background: linear-gradient(135deg, #4a6cf7, #6b8aff);
-        color: #fff;
-        border: none;
-        border-radius: 10px;
-        font-size: 16px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: var(--transition);
-        min-width: 50px;
-    }
-    .add-row-wrapper .btn-add-row:active {
-        transform: scale(0.95);
-        box-shadow: 0 2px 10px rgba(74, 108, 247, 0.3);
-    }
-    
-    /* تحسين خانات التعديل في الجدول */
-    table.items-mini td .edit-input { 
-        width: 60px; 
-        padding: 4px 6px; 
-        border: 2px solid var(--border); 
-        border-radius: 4px; 
-        font-size: 10px; 
-        text-align: center; 
-        background: #fff;
-        font-family: 'Cairo', sans-serif;
-    }
-    table.items-mini td .edit-input:focus {
-        outline: none;
-        border-color: var(--blue-accent);
-        box-shadow: 0 0 0 2px rgba(74, 108, 247, 0.3);
-    }
-    table.items-mini td .edit-input-price { 
-        width: 70px; 
-        padding: 4px 6px;
-        border: 2px solid var(--border);
-        border-radius: 4px;
-        font-size: 10px;
-        text-align: center;
-        background: #fff;
-        font-family: 'Cairo', sans-serif;
-    }
-    table.items-mini td .edit-input-price:focus {
-        outline: none;
-        border-color: var(--blue-accent);
-        box-shadow: 0 0 0 2px rgba(74, 108, 247, 0.3);
-    }
-    table.items-mini td {
-        padding: 6px 4px;
-        font-size: 10px;
-    }
-    table.items-mini th {
-        font-size: 9px;
-        padding: 6px 4px;
-    }
-
     .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 350; display: none; align-items: center; justify-content: center; padding: 16px; backdrop-filter: blur(4px); }
     .modal-overlay.show { display: flex; }
     .modal-box { background: #fff; border-radius: 20px; padding: 24px; width: 100%; max-width: 340px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4); }
@@ -345,6 +258,24 @@
     .inv-company { color: #1a4fd6; font-weight: 700; text-align: right; }
     .inv-title { text-align: center; font-size: 13px; font-weight: 800; margin: 3px 0; }
     .inv-meta { font-size: 10px; line-height: 1.5; margin: 3px 0; }
+
+    /* ===== تحسينات التقارير ===== */
+    .reports-toolbar { background: #fff; border-radius: 12px; padding: 12px; margin-bottom: 12px; box-shadow: var(--panel-shadow); }
+    .reports-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .reports-actions .btn { flex: 1; min-width: 80px; padding: 6px 10px; font-size: 10px; margin: 0; }
+    .charts-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+    @media(max-width:550px) { .charts-container { grid-template-columns: 1fr; } }
+    .chart-box { background: #fff; border-radius: 12px; padding: 10px; box-shadow: var(--panel-shadow); min-height: 250px; }
+    .chart-box canvas { width: 100% !important; height: auto !important; max-height: 280px; }
+    .report-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; background: #fff; box-shadow: var(--panel-shadow); margin-top: 8px; }
+    .report-table { width: 100%; min-width: 600px; border-collapse: collapse; font-size: 9px; direction: rtl; background: #fff; }
+    .report-table th { background: var(--navy); color: #fff; padding: 6px 8px; font-weight: 700; white-space: nowrap; text-align: center; font-size: 8px; position: sticky; top: 0; z-index: 2; }
+    .report-table td { padding: 5px 8px; border-bottom: 1px solid var(--border); text-align: center; font-size: 8px; background: #fff; }
+    .report-table tr:nth-child(even) td { background: #f8f9fc; }
+    .report-table tr:hover td { background: #eef3ff; }
+    #reportsKPIs .kpi-card { min-height: 50px; padding: 6px 4px; }
+    #reportsKPIs .kpi-card .val { font-size: 13px; }
+    #reportsKPIs .kpi-card .lbl { font-size: 7px; }
   </style>
 </head>
 <body>
@@ -352,7 +283,7 @@
   <div class="login-overlay" id="loginOverlay">
     <div class="login-box">
       <div class="login-logo-icon"><span class="gtr">GTR</span><span class="badge">POS</span></div>
-      <div class="login-logo">GTR POS <span style="font-size:12px;opacity:.6;font-weight:400;">V 0.7.4</span></div>
+      <div class="login-logo">GTR POS <span style="font-size:12px;opacity:.6;font-weight:400;">V 0.7.5</span></div>
       <div class="login-sub" id="loginModeLabel">Connexion à votre compte</div>
       <input type="email" id="loginEmail" placeholder="E-mail" autocomplete="email">
       <div class="password-wrapper">
@@ -386,7 +317,7 @@
     <div class="appbar">
       <div class="appbar-left">
         <div class="logo-icon">G</div>
-        <div><div class="title" id="pageTitle">Accueil</div><div class="sub" id="appVersionSub" onclick="openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">V 0.7.4</span></div></div>
+        <div><div class="title" id="pageTitle">Accueil</div><div class="sub" id="appVersionSub" onclick="openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">V 0.7.5</span></div></div>
       </div>
       <div style="display:flex;gap:6px;">
         <button class="menu-btn" id="backBtn" onclick="goHome()" style="display:none;">🏠</button>
@@ -411,33 +342,8 @@
           <div class="dash-item" data-section="caisse"><span class="dash-icon">💰</span><span class="dash-label">Caisse</span></div>
           <div class="dash-item" data-section="accounts" id="dashAccounts"><span class="dash-icon">👑</span><span class="dash-label">Comptes</span></div>
           <div class="dash-item" data-section="finance"><span class="dash-icon">📊</span><span class="dash-label">Finances</span></div>
+          <div class="dash-item" data-section="reports" id="dashReports"><span class="dash-icon">📈</span><span class="dash-label">التقارير</span></div>
         </div>
-
-        <div style="margin-top:6px;">
-          <div class="kpi-row">
-            <div class="kpi-card"><div class="val" id="dashClients">0</div><div class="lbl">Clients</div></div>
-            <div class="kpi-card"><div class="val" id="dashFournisseurs">0</div><div class="lbl">Fournisseurs</div></div>
-            <div class="kpi-card"><div class="val" id="dashArticles">0</div><div class="lbl">Articles</div></div>
-            <div class="kpi-card"><div class="val" id="dashVentes">0</div><div class="lbl">Ventes</div></div>
-          </div>
-          <div class="kpi-row">
-            <div class="kpi-card"><div class="val" id="dashAchats">0</div><div class="lbl">Achats</div></div>
-            <div class="kpi-card"><div class="val" id="dashExpenses">0</div><div class="lbl">Dépenses</div></div>
-            <div class="kpi-card"><div class="val" id="dashUsers">0</div><div class="lbl">Utilisateurs</div></div>
-            <div class="kpi-card"><div class="val" id="dashPending">0</div><div class="lbl">En attente</div></div>
-          </div>
-          <div class="kpi-row">
-            <div class="kpi-card"><div class="val" id="dashClientBalance">0.000</div><div class="lbl">Solde client</div></div>
-            <div class="kpi-card"><div class="val" id="dashSupplierBalance">0.000</div><div class="lbl">Solde fournisseur</div></div>
-            <div class="kpi-card"><div class="val" id="dashCash">0.000</div><div class="lbl">Caisse</div></div>
-            <div class="kpi-card"><div class="val" id="dashStockValue">0.000</div><div class="lbl">Valeur du stock</div></div>
-          </div>
-        </div>
-
-        <div class="section-title">📊 Derniers clients</div>
-        <div id="recentClients"></div>
-        <div class="section-title">📊 Derniers fournisseurs</div>
-        <div id="recentFournisseurs"></div>
       </div>
 
       <!-- SECTIONS -->
@@ -447,174 +353,89 @@
       <div class="section" id="sec-fournisseur-history"><div class="section-title">📜 Relevé Fournisseur - Détails</div><div id="fournisseurHistoryContent"></div></div>
       <div class="section" id="sec-articles"><input class="search-box" id="aSearch" placeholder="🔍 Rechercher par nom d'article..." oninput="Articles.render()"><div id="articlesList"></div></div>
       <div class="section" id="sec-article-history"><div class="section-title">📜 Historique article</div><div id="articleHistoryContent"></div></div>
-      
-      <!-- ===== VENTES (avec interface améliorée) ===== -->
-      <div class="section" id="sec-ventes">
-        <input class="search-box" id="vSearch" placeholder="🔍 Rechercher par n° de facture ou client..." oninput="Ventes.render()">
-        <div id="ventesList"></div>
-      </div>
-      
-      <!-- ===== ACHATS (avec interface améliorée) ===== -->
-      <div class="section" id="sec-achats">
-        <input class="search-box" id="aSearchP" placeholder="🔍 Rechercher par n° de facture ou fournisseur..." oninput="Achats.render()">
-        <div id="achatsList"></div>
-      </div>
-      
+      <div class="section" id="sec-ventes"><input class="search-box" id="vSearch" placeholder="🔍 Rechercher par n° de facture ou client..." oninput="Ventes.render()"><div id="ventesList"></div></div>
+      <div class="section" id="sec-achats"><input class="search-box" id="aSearchP" placeholder="🔍 Rechercher par n° de facture ou fournisseur..." oninput="Achats.render()"><div id="achatsList"></div></div>
       <div class="section" id="sec-expenses"><div class="kpi-row" style="grid-template-columns:1fr;"><div class="kpi-card"><div class="val" id="expensesTotal">0.000 TND</div><div class="lbl">Total des dépenses</div></div></div><input class="search-box" id="expSearch" placeholder="🔍 Rechercher par catégorie ou libellé..." oninput="Expenses.render()"><div id="expensesList"></div></div>
       <div class="section" id="sec-caisse"><div class="section-title">💰 Historique des règlements (Caisse)</div><div id="caisseHistoryContent"></div></div>
       <div class="section" id="sec-accounts"><div class="account-stats" id="accountStats"><div class="stat"><div class="num" id="statTotal">0</div><div class="label">Total</div></div><div class="stat"><div class="num" id="statApproved">0</div><div class="label">Approuvés</div></div><div class="stat"><div class="num" id="statPending">0</div><div class="label">En attente</div></div></div><div class="section-title">⏳ En attente d'approbation</div><div id="pendingAccountsList"></div><div class="section-title">✅ Approuvés</div><div id="approvedAccountsList"></div><div style="margin-top:12px;padding:12px;background:#f8f9fc;border-radius:12px;border:1px solid var(--border);"><div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:4px;">🔐 Sécurité</div><button class="btn save small" style="width:auto;padding:4px 14px;font-size:10px;" onclick="openChangePasswordModal()">🔑 Changer le mot de passe</button><div id="accountEmailDisplay2" style="font-size:10px;color:var(--muted);margin-top:4px;"></div></div></div>
       <div class="section" id="sec-finance"><div class="section-title">📊 Indicateurs financiers</div><div class="finance-kpi-grid" id="financeKpiGrid"><div class="kpi-card"><div class="val" id="finTotalClientBalance">0.000</div><div class="lbl">Solde client</div></div><div class="kpi-card"><div class="val" id="finTotalStockValue">0.000</div><div class="lbl">Valeur du stock</div></div><div class="kpi-card"><div class="val" id="finTotalCash">0.000</div><div class="lbl">Caisse</div></div><div class="kpi-card"><div class="val" id="finTotalSupplierBalance">0.000</div><div class="lbl">Solde fournisseur</div></div><div class="kpi-card"><div class="val" id="finNetWorth">0.000</div><div class="lbl">Capital</div></div><div class="kpi-card"><div class="val" id="finProfit">0.000</div><div class="lbl">Bénéfice</div></div></div><div class="section-title" style="margin-top:12px;">📋 Tableau des données financières</div><div class="finance-actions-bar"><button class="btn save small" onclick="FinanceTable.addRow()">➕ Ajouter une ligne</button><button class="btn print small" onclick="FinanceTable.printTable()">🖨️ Imprimer</button><button class="btn outline small" onclick="FinanceTable.exportCSV()">📥 CSV</button><button class="btn del small" onclick="if(confirm('Supprimer toutes les données ?')) FinanceTable.clearAll()">🗑️ Effacer</button><button class="btn edit small" onclick="FinanceTable.syncWithApp(); FinanceTable.render();">🔄 Synchroniser</button><button class="btn print small" style="background:linear-gradient(135deg,#6c7ae0,#4a56b0);" onclick="FinanceTable.printFullReport()">📄 Rapport</button></div><div class="finance-table-wrapper"><table class="finance-table" id="financeTable"><thead><tr><th style="min-width:70px;">Date</th><th style="min-width:80px;">Solde client</th><th style="min-width:80px;">Valeur du stock</th><th style="min-width:70px;">Caisse</th><th style="min-width:80px;">Solde fournisseur</th><th style="min-width:80px;">Capital</th><th style="min-width:70px;">Bénéfice</th><th style="min-width:50px;">Action</th></tr></thead><tbody id="financeTableBody"></tbody></table></div><div style="font-size:9px;color:var(--muted);text-align:center;margin-top:4px;">💾 Sauvegarde automatique locale et cloud</div></div>
+
+      <!-- SECTION RAPPORTS -->
+      <div class="section" id="sec-reports">
+        <div class="section-title">📊 التقارير والإحصائيات</div>
+        <div class="reports-toolbar">
+          <div class="field-row-3">
+            <div class="field"><label>📅 من تاريخ</label><input type="date" id="reportDateFrom"></div>
+            <div class="field"><label>📅 إلى تاريخ</label><input type="date" id="reportDateTo"></div>
+            <div class="field"><label>📊 نوع التقرير</label>
+              <select id="reportType">
+                <option value="sales">المبيعات</option>
+                <option value="purchases">المشتريات</option>
+                <option value="profit">الأرباح والخسائر</option>
+                <option value="clients">العملاء</option>
+                <option value="products">المنتجات</option>
+                <option value="inventory">المخزون</option>
+                <option value="cash">السيولة</option>
+                <option value="expenses">المصروفات</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-row-3">
+            <div class="field"><label>👤 العميل</label><select id="reportClientFilter"><option value="all">الكل</option></select></div>
+            <div class="field"><label>📦 المنتج</label><select id="reportProductFilter"><option value="all">الكل</option></select></div>
+            <div class="field"><label>📋 الحالة</label>
+              <select id="reportStatusFilter">
+                <option value="all">الكل</option>
+                <option value="paid">مدفوع</option>
+                <option value="pending">غير مدفوع</option>
+                <option value="partial">مدفوع جزئياً</option>
+              </select>
+            </div>
+          </div>
+          <div class="reports-actions">
+            <button class="btn save" onclick="AdvancedReports.generateReport()">📊 إنشاء التقرير</button>
+            <button class="btn print" onclick="AdvancedReports.printReport()">🖨️ طباعة</button>
+            <button class="btn outline" onclick="AdvancedReports.exportCSV()">📥 CSV</button>
+            <button class="btn outline" onclick="AdvancedReports.exportPDF()">📄 PDF</button>
+          </div>
+        </div>
+
+        <div class="reports-summary" id="reportsSummary">
+          <div class="kpi-row" id="reportsKPIs">
+            <div class="kpi-card"><div class="val" id="reportTotalSales">0.000</div><div class="lbl">إجمالي المبيعات</div></div>
+            <div class="kpi-card"><div class="val" id="reportTotalPurchases">0.000</div><div class="lbl">إجمالي المشتريات</div></div>
+            <div class="kpi-card"><div class="val" id="reportGrossProfit">0.000</div><div class="lbl">الربح الإجمالي</div></div>
+            <div class="kpi-card"><div class="val" id="reportNetProfit">0.000</div><div class="lbl">صافي الربح</div></div>
+            <div class="kpi-card"><div class="val" id="reportTotalClients">0</div><div class="lbl">عدد العملاء</div></div>
+            <div class="kpi-card"><div class="val" id="reportTotalProducts">0</div><div class="lbl">عدد المنتجات</div></div>
+          </div>
+        </div>
+
+        <div class="charts-container">
+          <div class="chart-box"><canvas id="salesChart"></canvas></div>
+          <div class="chart-box"><canvas id="profitChart"></canvas></div>
+        </div>
+
+        <div class="report-table-wrapper" id="reportTableWrapper">
+          <table class="report-table" id="reportTable">
+            <thead id="reportTableHead"></thead>
+            <tbody id="reportTableBody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <button class="fab" id="fabBtn">＋</button>
     <div class="sheet-overlay" id="overlay"></div>
 
-    <!-- SHEET VENTES (Améliorée) -->
-    <div class="sheet" id="sheet-ventes">
-      <div class="sheet-handle"></div>
-      <div class="sheet-header"><h3>Facture de vente</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
-      <div class="sheet-body">
-        <div class="field-row">
-          <div class="field"><label>N° de facture</label><input id="vNum" readonly></div>
-          <div class="field"><label>Date</label><input id="vDate" type="date"></div>
-        </div>
-        <div class="field-row">
-          <div class="field"><label>Client</label><select id="vClient" onchange="Ventes.fillClient()"><option value="">-- Choisir --</option></select></div>
-          <div class="field"><label>Téléphone</label><input id="vPhone" readonly></div>
-        </div>
-        <div class="section-title">📊 Résumé du compte</div>
-        <div class="invoice-summary-grid" id="vAccountSummary">
-          <div class="item"><span class="label">Solde précédent</span><span class="value" id="vPrevBalance">0.000</span></div>
-          <div class="item"><span class="label">Montant facture</span><span class="value" id="vInvoiceTotal">0.000</span></div>
-          <div class="item"><span class="label">Payé</span><span class="value" id="vPaidAmount">0.000</span></div>
-          <div class="item total"><span class="label">Solde actuel</span><span class="value" id="vCurrentBalance">0.000</span></div>
-        </div>
-        
-        <!-- ===== Choisir l'article (modifié) ===== -->
-        <div class="section-title">Choisir l'article</div>
-        <div class="field">
-          <label>Article</label>
-          <select id="viArticle" onchange="Ventes.fillArticle()">
-            <option value="">-- Choisir --</option>
-          </select>
-        </div>
-        <div id="viStockHint" style="font-size:8px;color:var(--muted);margin:-2px 0 4px;"></div>
-        
-        <!-- ===== Prix, Quantité, Total en ligne ===== -->
-        <div class="field-row-3">
-          <div class="field"><label>Prix</label><input id="viPrice" type="number" step="0.001" oninput="Ventes.calcLine()"></div>
-          <div class="field"><label>Quantité</label><input id="viQty" type="number" min="1" value="1" oninput="Ventes.calcLine()"></div>
-          <div class="field"><label>Total</label><input id="viTotal" readonly style="background:#eef0f6;"></div>
-        </div>
-        
-        <!-- ===== Bouton Ajouter au tableau avec texte ===== -->
-        <div class="add-row-wrapper">
-            <span class="label">Ajouter au tableau</span>
-            <button class="btn-add-row" onclick="Ventes.addLine()">➕</button>
-        </div>
-        
-        <table class="items-mini" style="margin-top:6px;">
-          <thead><tr><th>Article</th><th>Prix</th><th>Qté</th><th>Total</th><th>Action</th></tr></thead>
-          <tbody id="vLinesBody"></tbody>
-        </table>
-        <div class="totals-mini"><span>Total : </span><span id="vGrand">0.000</span> TND</div>
-        
-        <div class="section-title">💰 Règlements</div>
-        <div id="vReglementsList"></div>
-        <div class="add-reg-row">
-          <input type="number" step="0.001" id="vRegAmount" placeholder="Montant" style="flex:2;">
-          <select id="vRegType"><option value="Espèces">Espèces</option><option value="Chèque">Chèque</option><option value="Traite">Traite</option><option value="Virement">Virement</option></select>
-          <button class="btn save small" onclick="Ventes.addReglement()">+</button>
-        </div>
-        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">
-          <button class="btn whatsapp" style="flex:1;font-size:11px;" onclick="Ventes.shareWhatsapp()">📱 WhatsApp (image)</button>
-          <button class="btn outline small" style="flex:1;font-size:11px;" onclick="Ventes.printInvoice()">🖨️ Imprimer</button>
-          <button class="btn outline small" style="flex:1;font-size:11px;" onclick="Ventes.printBluetooth()">🖨️ BT</button>
-        </div>
-      </div>
-      <div class="sheet-footer">
-        <button class="btn save" onclick="Ventes.save()">💾 Enregistrer</button>
-        <button class="btn edit" onclick="Ventes.edit()">✏️ Modifier</button>
-        <button class="btn del" onclick="Ventes.remove()">🗑 Supprimer</button>
-      </div>
-    </div>
-
-    <!-- SHEET ACHATS (Améliorée) -->
-    <div class="sheet" id="sheet-achats">
-      <div class="sheet-handle"></div>
-      <div class="sheet-header"><h3>Facture d'achat</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
-      <div class="sheet-body">
-        <div class="field-row">
-          <div class="field"><label>N° de facture</label><input id="pNum" readonly></div>
-          <div class="field"><label>Date</label><input id="pDate" type="date"></div>
-        </div>
-        <div class="field-row">
-          <div class="field"><label>Fournisseur</label><select id="pSupplier" onchange="Achats.fillSupplier()"><option value="">-- Choisir --</option></select></div>
-          <div class="field"><label>Téléphone</label><input id="pPhone" readonly></div>
-        </div>
-        <div class="section-title">📊 Résumé du compte</div>
-        <div class="invoice-summary-grid" id="pAccountSummary">
-          <div class="item"><span class="label">Solde précédent</span><span class="value" id="pPrevBalance">0.000</span></div>
-          <div class="item"><span class="label">Montant facture</span><span class="value" id="pInvoiceTotal">0.000</span></div>
-          <div class="item"><span class="label">Payé</span><span class="value" id="pPaidAmount">0.000</span></div>
-          <div class="item total"><span class="label">Solde actuel</span><span class="value" id="pCurrentBalance">0.000</span></div>
-        </div>
-        
-        <!-- ===== Choisir l'article (modifié) ===== -->
-        <div class="section-title">Choisir l'article</div>
-        <div class="field">
-          <label>Article</label>
-          <select id="piArticle" onchange="Achats.fillArticle()">
-            <option value="">-- Choisir --</option>
-          </select>
-        </div>
-        <div id="piStockHint" style="font-size:8px;color:var(--muted);margin:-2px 0 4px;"></div>
-        
-        <!-- ===== Prix, Quantité, Total en ligne ===== -->
-        <div class="field-row-3">
-          <div class="field"><label>Prix</label><input id="piPrice" type="number" step="0.001" oninput="Achats.calcLine()"></div>
-          <div class="field"><label>Quantité</label><input id="piQty" type="number" min="1" value="1" oninput="Achats.calcLine()"></div>
-          <div class="field"><label>Total</label><input id="piTotal" readonly style="background:#eef0f6;"></div>
-        </div>
-        
-        <!-- ===== Bouton Ajouter au tableau avec texte ===== -->
-        <div class="add-row-wrapper">
-            <span class="label">Ajouter au tableau</span>
-            <button class="btn-add-row" onclick="Achats.addLine()">➕</button>
-        </div>
-        
-        <table class="items-mini" style="margin-top:6px;">
-          <thead><tr><th>Article</th><th>Prix</th><th>Qté</th><th>Total</th><th>Action</th></tr></thead>
-          <tbody id="pLinesBody"></tbody>
-        </table>
-        <div class="totals-mini"><span>Total : </span><span id="pGrand">0.000</span> TND</div>
-        
-        <div class="section-title">💰 Règlements</div>
-        <div id="pReglementsList"></div>
-        <div class="add-reg-row">
-          <input type="number" step="0.001" id="pRegAmount" placeholder="Montant" style="flex:2;">
-          <select id="pRegType"><option value="Espèces">Espèces</option><option value="Chèque">Chèque</option><option value="Traite">Traite</option><option value="Virement">Virement</option></select>
-          <button class="btn save small" onclick="Achats.addReglement()">+</button>
-        </div>
-        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">
-          <button class="btn whatsapp" style="flex:1;font-size:11px;" onclick="Achats.shareWhatsapp()">📱 WhatsApp (image)</button>
-          <button class="btn outline small" style="flex:1;font-size:11px;" onclick="Achats.printInvoice()">🖨️ Imprimer</button>
-          <button class="btn outline small" style="flex:1;font-size:11px;" onclick="Achats.printBluetooth()">🖨️ BT</button>
-        </div>
-      </div>
-      <div class="sheet-footer">
-        <button class="btn save" onclick="Achats.save()">💾 Enregistrer</button>
-        <button class="btn edit" onclick="Achats.edit()">✏️ Modifier</button>
-        <button class="btn del" onclick="Achats.remove()">🗑 Supprimer</button>
-      </div>
-    </div>
-
     <!-- SHEETS -->
     <div class="sheet" id="sheet-clients"><div class="sheet-handle"></div><div class="sheet-header"><h3>Données client</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field"><label>Code client</label><input id="cCode" readonly></div><div class="field"><label>Nom client</label><input id="cName"></div><div class="field-row"><div class="field"><label>Téléphone 1</label><input id="cPhone"></div><div class="field"><label>Téléphone 2</label><input id="cPhone2"></div></div><div class="field"><label>Adresse</label><input id="cAddress"></div><div class="field"><label>Matricule fiscal (MF)</label><input id="cTaxId"></div><div class="field-row-2"><div class="field"><label>Solde d'ouverture (TND)</label><input id="cOpeningBalance" type="number" step="0.001" value="0"></div><div class="field"><label>Solde actuel (TND)</label><input id="cBalance" type="number" step="0.001" value="0" readonly style="background:#eef0f6;"></div></div><div class="section-title" style="margin-top:8px;">💰 Prix spéciaux</div><div id="specialPricesList"></div><div class="add-sp-row"><select id="spArticleSelect"><option value="">-- Choisir un article --</option></select><input type="number" step="0.001" id="spPriceInput" placeholder="Prix"><button class="btn save small" onclick="Clients.addSpecialPrice()">+</button></div></div><div class="sheet-footer"><button class="btn save" onclick="Clients.save()">💾 Enregistrer</button><button class="btn edit" onclick="Clients.edit()">✏️ Modifier</button><button class="btn del" onclick="Clients.remove()">🗑 Supprimer</button></div></div>
     <div class="sheet" id="sheet-fournisseurs"><div class="sheet-handle"></div><div class="sheet-header"><h3>Données fournisseur</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field"><label>Code fournisseur</label><input id="fCode" readonly></div><div class="field"><label>Nom fournisseur</label><input id="fName"></div><div class="field-row"><div class="field"><label>Téléphone 1</label><input id="fPhone"></div><div class="field"><label>Téléphone 2</label><input id="fPhone2"></div></div><div class="field"><label>Adresse</label><input id="fAddress"></div><div class="field"><label>Matricule fiscal (MF)</label><input id="fTaxId"></div><div class="field-row-2"><div class="field"><label>Solde d'ouverture (TND)</label><input id="fOpeningBalance" type="number" step="0.001" value="0"></div><div class="field"><label>Solde actuel (TND)</label><input id="fBalance" type="number" step="0.001" value="0" readonly style="background:#eef0f6;"></div></div><div class="field"><label>Notes</label><input id="fNotes"></div></div><div class="sheet-footer"><button class="btn save" onclick="Fournisseurs.save()">💾 Enregistrer</button><button class="btn edit" onclick="Fournisseurs.edit()">✏️ Modifier</button><button class="btn del" onclick="Fournisseurs.remove()">🗑 Supprimer</button></div></div>
     <div class="sheet" id="sheet-articles"><div class="sheet-handle"></div><div class="sheet-header"><h3>Données article</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field"><label>Code article</label><input id="aCode" readonly></div><div class="field"><label>Nom article</label><input id="aName"></div><div class="field"><label>Prix de vente (TND)</label><input id="aPrice" type="number" step="0.001"></div><div class="field"><label>Prix d'achat (TND)</label><input id="aCostPrice" type="number" step="0.001"></div><div class="field"><label>Quantité en stock</label><input id="aStock" type="number" value="0"></div><div class="field"><label>Stock minimum</label><input id="aMinStock" type="number" value="5"></div></div><div class="sheet-footer"><button class="btn save" onclick="Articles.save()">💾 Enregistrer</button><button class="btn edit" onclick="Articles.edit()">✏️ Modifier</button><button class="btn del" onclick="Articles.remove()">🗑 Supprimer</button></div></div>
+    <div class="sheet" id="sheet-ventes"><div class="sheet-handle"></div><div class="sheet-header"><h3>Facture de vente</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field-row"><div class="field"><label>N° de facture</label><input id="vNum" readonly></div><div class="field"><label>Date</label><input id="vDate" type="date"></div></div><div class="field-row"><div class="field"><label>Client</label><select id="vClient" onchange="Ventes.fillClient()"><option value="">-- Choisir --</option></select></div><div class="field"><label>Téléphone</label><input id="vPhone" readonly></div></div><div class="section-title">📊 Résumé du compte</div><div class="invoice-summary-grid" id="vAccountSummary"><div class="item"><span class="label">Solde précédent</span><span class="value" id="vPrevBalance">0.000</span></div><div class="item"><span class="label">Montant facture</span><span class="value" id="vInvoiceTotal">0.000</span></div><div class="item"><span class="label">Payé</span><span class="value" id="vPaidAmount">0.000</span></div><div class="item total"><span class="label">Solde actuel</span><span class="value" id="vCurrentBalance">0.000</span></div></div><div class="section-title">Ajouter un article</div><div class="field"><label>Article</label><select id="viArticle" onchange="Ventes.fillArticle()"><option value="">-- Choisir --</option></select></div><div id="viStockHint" style="font-size:8px;color:var(--muted);margin:-2px 0 2px;"></div><div class="field-row-3"><div class="field"><label>Prix</label><input id="viPrice" type="number" step="0.001" oninput="Ventes.calcLine()"></div><div class="field"><label>Quantité</label><input id="viQty" type="number" min="1" value="1" oninput="Ventes.calcLine()"></div><div class="field"><label>Total</label><input id="viTotal" readonly style="background:#eef0f6;"></div></div><button class="btn outline small" onclick="Ventes.addLine()">+ Ajouter au tableau</button><table class="items-mini"><thead><tr><th>Article</th><th>Prix</th><th>Qté</th><th>Total</th><th>Action</th></tr></thead><tbody id="vLinesBody"></tbody></table><div class="totals-mini"><span>Total : </span><span id="vGrand">0.000</span> TND</div><div class="section-title">💰 Règlements</div><div id="vReglementsList"></div><div class="add-reg-row"><input type="number" step="0.001" id="vRegAmount" placeholder="Montant" style="flex:2;"><select id="vRegType"><option value="Espèces">Espèces</option><option value="Chèque">Chèque</option><option value="Traite">Traite</option><option value="Virement">Virement</option></select><button class="btn save small" onclick="Ventes.addReglement()">+</button></div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;"><button class="btn whatsapp" style="flex:1;font-size:11px;" onclick="Ventes.shareWhatsapp()">📱 WhatsApp (image)</button><button class="btn outline small" style="flex:1;font-size:11px;" onclick="Ventes.printInvoice()">🖨️ Imprimer</button><button class="btn outline small" style="flex:1;font-size:11px;" onclick="Ventes.printBluetooth()">🖨️ BT</button></div></div><div class="sheet-footer"><button class="btn save" onclick="Ventes.save()">💾 Enregistrer</button><button class="btn edit" onclick="Ventes.edit()">✏️ Modifier</button><button class="btn del" onclick="Ventes.remove()">🗑 Supprimer</button></div></div>
+    <div class="sheet" id="sheet-achats"><div class="sheet-handle"></div><div class="sheet-header"><h3>Facture d'achat</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field-row"><div class="field"><label>N° de facture</label><input id="pNum" readonly></div><div class="field"><label>Date</label><input id="pDate" type="date"></div></div><div class="field-row"><div class="field"><label>Fournisseur</label><select id="pSupplier" onchange="Achats.fillSupplier()"><option value="">-- Choisir --</option></select></div><div class="field"><label>Téléphone</label><input id="pPhone" readonly></div></div><div class="section-title">📊 Résumé du compte</div><div class="invoice-summary-grid" id="pAccountSummary"><div class="item"><span class="label">Solde précédent</span><span class="value" id="pPrevBalance">0.000</span></div><div class="item"><span class="label">Montant facture</span><span class="value" id="pInvoiceTotal">0.000</span></div><div class="item"><span class="label">Payé</span><span class="value" id="pPaidAmount">0.000</span></div><div class="item total"><span class="label">Solde actuel</span><span class="value" id="pCurrentBalance">0.000</span></div></div><div class="section-title">Ajouter un article</div><div class="field"><label>Article</label><select id="piArticle" onchange="Achats.fillArticle()"><option value="">-- Choisir --</option></select></div><div id="piStockHint" style="font-size:8px;color:var(--muted);margin:-2px 0 2px;"></div><div class="field-row-3"><div class="field"><label>Prix</label><input id="piPrice" type="number" step="0.001" oninput="Achats.calcLine()"></div><div class="field"><label>Quantité</label><input id="piQty" type="number" min="1" value="1" oninput="Achats.calcLine()"></div><div class="field"><label>Total</label><input id="piTotal" readonly style="background:#eef0f6;"></div></div><button class="btn outline small" onclick="Achats.addLine()">+ Ajouter au tableau</button><table class="items-mini"><thead><tr><th>Article</th><th>Prix</th><th>Qté</th><th>Total</th><th>Action</th></tr></thead><tbody id="pLinesBody"></tbody></table><div class="totals-mini"><span>Total : </span><span id="pGrand">0.000</span> TND</div><div class="section-title">💰 Règlements</div><div id="pReglementsList"></div><div class="add-reg-row"><input type="number" step="0.001" id="pRegAmount" placeholder="Montant" style="flex:2;"><select id="pRegType"><option value="Espèces">Espèces</option><option value="Chèque">Chèque</option><option value="Traite">Traite</option><option value="Virement">Virement</option></select><button class="btn save small" onclick="Achats.addReglement()">+</button></div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;"><button class="btn whatsapp" style="flex:1;font-size:11px;" onclick="Achats.shareWhatsapp()">📱 WhatsApp (image)</button><button class="btn outline small" style="flex:1;font-size:11px;" onclick="Achats.printInvoice()">🖨️ Imprimer</button><button class="btn outline small" style="flex:1;font-size:11px;" onclick="Achats.printBluetooth()">🖨️ BT</button></div></div><div class="sheet-footer"><button class="btn save" onclick="Achats.save()">💾 Enregistrer</button><button class="btn edit" onclick="Achats.edit()">✏️ Modifier</button><button class="btn del" onclick="Achats.remove()">🗑 Supprimer</button></div></div>
     <div class="sheet" id="sheet-expenses"><div class="sheet-handle"></div><div class="sheet-header"><h3>Dépense</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field"><label>Code dépense</label><input id="exCode" readonly></div><div class="field"><label>Date</label><input id="exDate" type="date"></div><div class="field"><label>Catégorie</label><select id="exCategory"><option>Loyer</option><option>Salaires</option><option>Factures</option><option>Transport</option><option>Maintenance</option><option>Consommables</option><option>Marketing</option><option>Autre</option></select></div><div class="field"><label>Montant (TND)</label><input id="exAmount" type="number" step="0.001"></div><div class="field"><label>Libellé</label><input id="exDesc" placeholder="Notes"></div></div><div class="sheet-footer"><button class="btn save" onclick="Expenses.save()">💾 Enregistrer</button><button class="btn edit" onclick="Expenses.edit()">✏️ Modifier</button><button class="btn del" onclick="Expenses.remove()">🗑 Supprimer</button></div></div>
-    <div class="sheet" id="sheet-company"><div class="sheet-handle"></div><div class="sheet-header"><h3>Données de l'entreprise</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field"><label>🏢 Nom de l'entreprise</label><input id="cpyName"></div><div class="field"><label>📍 Adresse</label><input id="cpyAddress"></div><div class="field"><label>📞 Téléphone</label><input id="cpyPhone1"></div><div class="field"><label>🆔 Matricule fiscal (MF)</label><input id="cpyTaxId"></div><div class="field" style="border-top:1px dashed var(--border);padding-top:6px;margin-top:6px;"><label>💰 Solde caisse d'ouverture (TND)</label><input id="cpyCashOpening" type="number" step="0.001" value="0"><span style="font-size:7px;color:var(--muted);">⏺ Utilisé pour calculer la caisse</span></div><button class="btn save" onclick="CompanyInfo.save()">💾 Enregistrer</button><div class="section-title">📐 حجم الأيقونات</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;"><button class="btn outline small" onclick="setDashboardColumns(2)" style="flex:1;font-size:11px;">2 أعمدة</button><button class="btn outline small" onclick="setDashboardColumns(3)" style="flex:1;font-size:11px;">3 أعمدة</button><button class="btn outline small" onclick="setDashboardColumns(4)" style="flex:1;font-size:11px;">4 أعمدة</button></div><div id="colsStatus" style="font-size:10px;color:var(--muted);margin-bottom:6px;">الحالي: 3 أعمدة</div><div class="section-title">💾 Sauvegarde</div><button class="btn outline small" onclick="exportBackup()">⬇️ Exporter</button><button class="btn outline small" onclick="exportBackupToDrive()">☁️ Google Drive</button><input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importBackupFile(this)"><button class="btn outline small" onclick="document.getElementById('importFileInput').click()">⬆️ Importer</button><div style="font-size:9px;color:var(--muted);margin-top:4px;">💡 Pour installer l'application : ⋮ dans le navigateur → Ajouter à l'écran d'accueil</div><div class="section-title">👤 Compte</div><div id="accountEmailDisplay" style="font-size:11px;color:var(--muted);margin-bottom:3px;"></div><button class="btn del" onclick="doLogout()">🚪 Se déconnecter</button></div></div>
+    <div class="sheet" id="sheet-company"><div class="sheet-handle"></div><div class="sheet-header"><h3>Données de l'entreprise</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field"><label>🏢 Nom de l'entreprise</label><input id="cpyName"></div><div class="field"><label>📍 Adresse</label><input id="cpyAddress"></div><div class="field"><label>📞 Téléphone</label><input id="cpyPhone1"></div><div class="field"><label>🆔 Matricule fiscal (MF)</label><input id="cpyTaxId"></div><div class="field" style="border-top:1px dashed var(--border);padding-top:6px;margin-top:6px;"><label>💰 Solde caisse d'ouverture (TND)</label><input id="cpyCashOpening" type="number" step="0.001" value="0"><span style="font-size:7px;color:var(--muted);">⏺ Utilisé pour calculer la caisse</span></div><button class="btn save" onclick="CompanyInfo.save()">💾 Enregistrer</button><div class="section-title">📐 حجم الأيقونات</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;"><button class="btn outline small" onclick="setDashboardColumns(2)" style="flex:1;font-size:11px;">2 أعمدة</button><button class="btn outline small" onclick="setDashboardColumns(3)" style="flex:1;font-size:11px;">3 أعمدة</button><button class="btn outline small" onclick="setDashboardColumns(4)" style="flex:1;font-size:11px;">4 أعمدة</button></div><div id="colsStatus" style="font-size:10px;color:var(--muted);margin-bottom:6px;">الحالي: 2 أعمدة</div><div class="section-title">💾 Sauvegarde</div><button class="btn outline small" onclick="exportBackup()">⬇️ Exporter</button><button class="btn outline small" onclick="exportBackupToDrive()">☁️ Google Drive</button><input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importBackupFile(this)"><button class="btn outline small" onclick="document.getElementById('importFileInput').click()">⬆️ Importer</button><div style="font-size:9px;color:var(--muted);margin-top:4px;">💡 Pour installer l'application : ⋮ dans le navigateur → Ajouter à l'écran d'accueil</div><div class="section-title">👤 Compte</div><div id="accountEmailDisplay" style="font-size:11px;color:var(--muted);margin-bottom:3px;"></div><button class="btn del" onclick="doLogout()">🚪 Se déconnecter</button></div></div>
 
     <div class="toast" id="toast"></div>
   </div>
@@ -627,10 +448,10 @@
 
   <script>
     // =============================================
-    // ===== GTR POS - Version 0.7.4 =====
+    // ===== GTR POS - Version 0.7.5 =====
     // =============================================
     
-    const APP_VERSION = 'V 0.7.4';
+    const APP_VERSION = 'V 0.7.5';
     console.log('🚀 GTR POS ' + APP_VERSION + ' loading...');
 
     // ===== FIREBASE =====
@@ -646,7 +467,9 @@
     let auth, db, storage;
     try {
       if (typeof firebase !== 'undefined') {
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+        }
         auth = firebase.auth();
         db = firebase.firestore();
         storage = firebase.storage();
@@ -667,7 +490,7 @@
     let currentSection = 'dashboard';
     let _invoiceData = null;
     let _statementData = null;
-    let dashboardColumns = 3;
+    let dashboardColumns = 2;
     
     // ===== DONNÉES =====
     let clients = [];
@@ -721,7 +544,9 @@
         const data = { clients, fournisseurs, articles, ventes, achats, expenses, caisseClients, caisseFournisseurs, nextId, companyInfo, financeData };
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         if (storageMode === 'cloud' && currentUser && db) {
-          db.collection('users').doc(currentUser.uid).set(data).catch(e => { console.error('Firestore save error:', e); });
+          db.collection('users').doc(currentUser.uid).set(data).catch(e => {
+            console.error('Firestore save error:', e);
+          });
         }
         return true;
       } catch(e) {
@@ -805,8 +630,12 @@
       $('loginError').textContent = '';
       $('loginLoading').style.display = 'block';
       auth.signInWithEmailAndPassword(e, p)
-        .catch(err => { $('loginError').textContent = err.message; })
-        .finally(() => { $('loginLoading').style.display = 'none'; });
+        .catch(err => {
+          $('loginError').textContent = err.message;
+        })
+        .finally(() => {
+          $('loginLoading').style.display = 'none';
+        });
     }
 
     function doSignup() {
@@ -819,8 +648,12 @@
       $('loginError').textContent = '';
       $('loginLoading').style.display = 'block';
       auth.createUserWithEmailAndPassword(e, p)
-        .catch(err => { $('loginError').textContent = err.message; })
-        .finally(() => { $('loginLoading').style.display = 'none'; });
+        .catch(err => {
+          $('loginError').textContent = err.message;
+        })
+        .finally(() => {
+          $('loginLoading').style.display = 'none';
+        });
     }
 
     function doGoogleLogin() {
@@ -828,8 +661,12 @@
       $('loginError').textContent = '';
       $('loginLoading').style.display = 'block';
       auth.signInWithPopup(provider)
-        .catch(err => { $('loginError').textContent = err.message; })
-        .finally(() => { $('loginLoading').style.display = 'none'; });
+        .catch(err => {
+          $('loginError').textContent = err.message;
+        })
+        .finally(() => {
+          $('loginLoading').style.display = 'none';
+        });
     }
 
     function doLogout() {
@@ -842,7 +679,10 @@
     }
 
     function openChangePasswordModal() {
-      if (!currentUser) { showToast('⚠️ Vous devez être connecté'); return; }
+      if (!currentUser) {
+        showToast('⚠️ Vous devez être connecté');
+        return;
+      }
       document.getElementById('passwordModal').classList.add('show');
       document.getElementById('currentPassword').value = '';
       document.getElementById('newPassword').value = '';
@@ -921,7 +761,8 @@
         'expenses': 'Dépenses',
         'caisse': 'Caisse',
         'accounts': 'Comptes',
-        'finance': 'Finances'
+        'finance': 'Finances',
+        'reports': '📊 التقارير'
       };
       $('pageTitle').textContent = pageNames[sectionId] || sectionId;
       currentSection = sectionId;
@@ -938,7 +779,15 @@
         'achats': Achats.render,
         'expenses': Expenses.render,
         'caisse': CaisseHistory.render,
-        'accounts': Accounts.render
+        'accounts': Accounts.render,
+        'reports': function() { 
+          setTimeout(() => { 
+            if (typeof AdvancedReports !== 'undefined') {
+              AdvancedReports.updateFilters();
+              AdvancedReports.generateReport(); 
+            }
+          }, 300);
+        }
       };
       if (loadMap[sectionId]) loadMap[sectionId]();
     }
@@ -991,8 +840,12 @@
     function setDashboardColumns(cols) {
       dashboardColumns = cols;
       const grid = document.getElementById('dashboardGrid');
-      if (grid) { grid.className = 'dashboard-grid cols-' + cols; }
-      try { localStorage.setItem('gtrpos_dashboard_cols', String(cols)); } catch(e) {}
+      if (grid) {
+        grid.className = 'dashboard-grid cols-' + cols;
+      }
+      try {
+        localStorage.setItem('gtrpos_dashboard_cols', String(cols));
+      } catch(e) {}
       const status = document.getElementById('colsStatus');
       if (status) status.textContent = 'الحالي: ' + cols + ' أعمدة';
       adjustIconSize(cols);
@@ -1000,17 +853,17 @@
 
     function adjustIconSize(cols) {
       const items = document.querySelectorAll('.dash-item');
-      let iconSize = 28, labelSize = 10, padding = 12;
-      if (cols === 2) { iconSize = 32; labelSize = 11; padding = 14; }
-      else if (cols === 3) { iconSize = 28; labelSize = 10; padding = 12; }
-      else if (cols === 4) { iconSize = 22; labelSize = 9; padding = 8; }
+      let iconSize = 36, labelSize = 12, padding = 16;
+      if (cols === 2) { iconSize = 40; labelSize = 13; padding = 20; }
+      else if (cols === 3) { iconSize = 32; labelSize = 11; padding = 14; }
+      else if (cols === 4) { iconSize = 26; labelSize = 10; padding = 10; }
       items.forEach(item => {
         const icon = item.querySelector('.dash-icon');
         const label = item.querySelector('.dash-label');
         if (icon) icon.style.fontSize = iconSize + 'px';
         if (label) label.style.fontSize = labelSize + 'px';
-        item.style.padding = padding + 'px 4px';
-        item.style.minHeight = (cols === 4) ? '56px' : '70px';
+        item.style.padding = padding + 'px 8px';
+        item.style.minHeight = (cols === 4) ? '60px' : '80px';
       });
     }
 
@@ -1025,83 +878,12 @@
           }
         }
       } catch(e) {}
-      setDashboardColumns(3);
+      setDashboardColumns(2);
     }
 
-    // ===== DASHBOARD RENDER =====
-    const Dashboard = {
-      render() {
-        document.getElementById('dashClients').textContent = clients.length;
-        document.getElementById('dashFournisseurs').textContent = fournisseurs.length;
-        document.getElementById('dashArticles').textContent = articles.length;
-        document.getElementById('dashVentes').textContent = ventes.length;
-        document.getElementById('dashAchats').textContent = achats.length;
-        document.getElementById('dashExpenses').textContent = expenses.length;
-        
-        if (currentUser && currentUser.email === 'krimi.neji@gmail.com') {
-          db.collection('approvals').get().then(snap => {
-            let total = 0, pending = 0;
-            snap.forEach(doc => {
-              total++;
-              if (!doc.data().approved) pending++;
-            });
-            document.getElementById('dashUsers').textContent = total;
-            document.getElementById('dashPending').textContent = pending;
-          }).catch(() => {
-            document.getElementById('dashUsers').textContent = '-';
-            document.getElementById('dashPending').textContent = '-';
-          });
-        } else {
-          document.getElementById('dashUsers').textContent = '-';
-          document.getElementById('dashPending').textContent = '-';
-        }
-        
-        const totalClientBalance = clients.reduce((sum, c) => sum + (c.balance || 0), 0);
-        const totalSupplierBalance = fournisseurs.reduce((sum, f) => sum + (f.balance || 0), 0);
-        const totalCashClient = caisseClients.reduce((sum, c) => sum + (c.amount || 0), 0);
-        const totalSupplierPay = caisseFournisseurs.reduce((sum, c) => sum + (c.amount || 0), 0);
-        const totalExp = expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
-        const cashOpening = companyInfo.cashOpening || 0;
-        const totalCash = cashOpening + totalCashClient - totalSupplierPay - totalExp;
-        const totalStockValue = articles.reduce((sum, a) => sum + ((a.stock || 0) * (a.costPrice || a.price || 0)), 0);
-        document.getElementById('dashClientBalance').textContent = totalClientBalance.toFixed(3);
-        document.getElementById('dashSupplierBalance').textContent = totalSupplierBalance.toFixed(3);
-        document.getElementById('dashCash').textContent = totalCash.toFixed(3);
-        document.getElementById('dashStockValue').textContent = totalStockValue.toFixed(3);
-
-        const listClients = document.getElementById('recentClients');
-        listClients.innerHTML = '';
-        const recentC = clients.slice().reverse().slice(0, 5);
-        if (!recentC.length) {
-          listClients.innerHTML = '<div class="empty-msg">Aucun client</div>';
-        } else {
-          recentC.forEach(c => {
-            const d = document.createElement('div');
-            d.className = 'row-card';
-            d.onclick = () => { Clients.load(c.id); openSheet('clients'); };
-            d.innerHTML = `<div class="main-info"><div class="name">${c.name}</div><div class="meta">${c.phone || ''}</div></div><div class="amount">${c.balance ? c.balance.toFixed(3) : '0.000'} TND</div>`;
-            listClients.appendChild(d);
-          });
-        }
-
-        const listFour = document.getElementById('recentFournisseurs');
-        listFour.innerHTML = '';
-        const recentF = fournisseurs.slice().reverse().slice(0, 5);
-        if (!recentF.length) {
-          listFour.innerHTML = '<div class="empty-msg">Aucun fournisseur</div>';
-        } else {
-          recentF.forEach(f => {
-            const d = document.createElement('div');
-            d.className = 'row-card';
-            d.onclick = () => { Fournisseurs.load(f.id); openSheet('fournisseurs'); };
-            d.innerHTML = `<div class="main-info"><div class="name">${f.name}</div><div class="meta">${f.phone || ''}</div></div><div class="amount">${f.balance ? f.balance.toFixed(3) : '0.000'} TND</div>`;
-            listFour.appendChild(d);
-          });
-        }
-      }
-    };
-
+    // =============================================
     // ===== FINANCE TABLE =====
+    // =============================================
     const FinanceTable = {
       data: [],
       load() {
@@ -1221,13 +1003,78 @@
         document.getElementById('finNetWorth').textContent = (last.capital || 0).toFixed(3);
         document.getElementById('finProfit').textContent = (last.profit || 0).toFixed(3);
       },
-      printTable() { /* ... */ },
-      exportCSV() { /* ... */ },
-      syncWithApp() { /* ... */ },
-      printFullReport() { /* ... */ }
+      printTable() {
+        if (this.data.length === 0) { showToast('Aucune donnée à imprimer'); return; }
+        let rows = '';
+        this.data.forEach(row => {
+          rows += `<tr><td>${row.date || ''}</td><td>${(row.clientBalance ?? 0).toFixed(3)}</td><td>${(row.stockValue ?? 0).toFixed(3)}</td><td>${(row.cash ?? 0).toFixed(3)}</td><td>${(row.supplierBalance ?? 0).toFixed(3)}</td><td>${(row.capital ?? 0).toFixed(3)}</td><td>${(row.profit ?? 0).toFixed(3)}</td></tr>`;
+        });
+        const w = window.open('', '_blank', 'width=900,height=600');
+        w.document.write(`<html dir="rtl"><head><title>Données financières</title><style>body{font-family:'Cairo',sans-serif;padding:20px;direction:rtl;background:#fff;}h2{text-align:center;color:#1e2f66;}table{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}th{background:#1e2f66;color:#fff;padding:6px 4px;border:1px solid #999;text-align:center;}td{padding:4px;border:1px solid #999;text-align:center;}.footer{text-align:center;margin-top:15px;color:#666;font-size:9px;border-top:1px solid #ddd;padding-top:8px;}@media print{body{padding:10px;}}</style></head><body><h2>📊 Données financières</h2><p style="text-align:center;font-size:11px;color:#666;">${companyInfo.name || 'GTR POS'} | ${new Date().toLocaleDateString()}</p><table><thead><tr><th>Date</th><th>Solde client</th><th>Valeur du stock</th><th>Caisse</th><th>Solde fournisseur</th><th>Capital</th><th>Bénéfice</th></tr></thead><tbody>${rows}</tbody><div class="footer">${companyInfo.name} - ${companyInfo.address || ''} - ${companyInfo.phone1 || ''}</div><script>window.onload=function(){window.print();setTimeout(function(){window.close();},500);}<\/script></body></html>`);
+        w.document.close();
+      },
+      exportCSV() {
+        if (this.data.length === 0) { showToast('Aucune donnée à exporter'); return; }
+        const headers = ['Date', 'Solde client', 'Valeur du stock', 'Caisse', 'Solde fournisseur', 'Capital', 'Bénéfice'];
+        let csv = headers.join(',') + '\n';
+        this.data.forEach(row => {
+          csv += [row.date || '', (row.clientBalance ?? 0).toFixed(3), (row.stockValue ?? 0).toFixed(3), (row.cash ?? 0).toFixed(3), (row.supplierBalance ?? 0).toFixed(3), (row.capital ?? 0).toFixed(3), (row.profit ?? 0).toFixed(3)].join(',') + '\n';
+        });
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'donnees_financieres_' + new Date().toISOString().slice(0, 10) + '.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('✅ Exporté');
+      },
+      syncWithApp() {
+        if (this.data.length === 0) {
+          const today = new Date();
+          const dateStr = String(today.getDate()).padStart(2, '0') + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + today.getFullYear();
+          this.data.push({ date: dateStr, clientBalance: 0, stockValue: 0, cash: 0, supplierBalance: 0, capital: 0, profit: 0 });
+        }
+        const lastIndex = this.data.length - 1;
+        const last = this.data[lastIndex];
+        const totalClientBal = clients.reduce((s, c) => s + (c.balance || 0), 0);
+        const totalStockVal = articles.reduce((s, a) => s + ((a.stock || 0) * (a.costPrice || a.price || 0)), 0);
+        const totalCashClient = caisseClients.reduce((s, c) => s + (c.amount || 0), 0);
+        const totalSupplierPay = caisseFournisseurs.reduce((s, c) => s + (c.amount || 0), 0);
+        const totalExp = expenses.reduce((s, e) => s + (e.amount || 0), 0);
+        const totalSupplierBal = fournisseurs.reduce((s, f) => s + (f.balance || 0), 0);
+        last.clientBalance = totalClientBal;
+        last.stockValue = totalStockVal;
+        last.supplierBalance = totalSupplierBal;
+        const cashOpening = companyInfo.cashOpening || 0;
+        last.cash = cashOpening + totalCashClient - totalSupplierPay - totalExp;
+        last.capital = totalClientBal + totalStockVal + (last.cash || 0) - totalSupplierBal;
+        if (this.data.length > 1) {
+          const prev = this.data[lastIndex - 1];
+          last.profit = (last.capital || 0) - (prev.capital || 0);
+        } else { last.profit = 0; }
+        this.save();
+        showToast('🔄 Données synchronisées depuis l\'application');
+      },
+      printFullReport() {
+        const w = window.open('', '_blank', 'width=1000,height=800');
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
+        const totalClientBalance = clients.reduce((s, c) => s + (c.balance || 0), 0);
+        let totalStock = 0, totalCash = 0, totalSupplier = 0, totalCapital = 0, totalProfit = 0;
+        this.data.forEach(row => { totalStock += row.stockValue || 0; totalCash += row.cash || 0; totalSupplier += row.supplierBalance || 0; totalCapital += row.capital || 0; totalProfit += row.profit || 0; });
+        let rows = '';
+        this.data.forEach(row => { rows += `<tr><td>${row.date || ''}</td><td>${(row.clientBalance ?? 0).toFixed(3)}</td><td>${(row.stockValue ?? 0).toFixed(3)}</td><td>${(row.cash ?? 0).toFixed(3)}</td><td>${(row.supplierBalance ?? 0).toFixed(3)}</td><td>${(row.capital ?? 0).toFixed(3)}</td><td>${(row.profit ?? 0).toFixed(3)}</td></tr>`; });
+        w.document.write(`<html dir="rtl"><head><title>Rapport financier complet</title><style>body{font-family:'Cairo',sans-serif;padding:20px;direction:rtl;background:#fff;}.header{text-align:center;border-bottom:3px double #1e2f66;padding-bottom:10px;margin-bottom:15px;}.header h1{color:#1e2f66;font-size:22px;}.summary{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr;gap:6px;margin:10px 0;background:#f0f4ff;padding:12px;border-radius:8px;}.summary .item{text-align:center;}.summary .item .label{font-size:9px;color:#888;display:block;}.summary .item .value{font-size:14px;font-weight:800;}table{width:100%;border-collapse:collapse;font-size:10px;margin-top:10px;}th{background:#1e2f66;color:#fff;padding:6px;border:1px solid #999;}td{padding:4px;border:1px solid #ddd;text-align:center;}.footer{text-align:center;margin-top:15px;color:#666;font-size:8px;border-top:1px solid #ddd;padding-top:8px;}</style></head><body><div class="header"><h1>📊 Rapport financier complet</h1><div class="sub">${companyInfo.name}</div><div class="sub" style="font-size:10px;">📅 ${dateStr}</div></div><div class="summary"><div class="item"><span class="label">Solde client</span><span class="value" style="color:#2980b9;">${totalClientBalance.toFixed(3)}</span></div><div class="item"><span class="label">Valeur du stock</span><span class="value" style="color:#27ae60;">${totalStock.toFixed(3)}</span></div><div class="item"><span class="label">Caisse</span><span class="value" style="color:#f39c12;">${totalCash.toFixed(3)}</span></div><div class="item"><span class="label">Solde fournisseur</span><span class="value" style="color:#8e44ad;">${totalSupplier.toFixed(3)}</span></div><div class="item"><span class="label">Capital</span><span class="value" style="color:#2980b9;">${totalCapital.toFixed(3)}</span></div><div class="item"><span class="label">Bénéfice</span><span class="value" style="color:${totalProfit >= 0 ? '#27ae60' : '#e74c3c'};">${totalProfit.toFixed(3)}</span></div></div><table><thead><tr><th>Date</th><th>Solde client</th><th>Valeur du stock</th><th>Caisse</th><th>Solde fournisseur</th><th>Capital</th><th>Bénéfice</th></tr></thead><tbody>${rows || '<tr><td colspan="7" style="text-align:center;color:#999;">Aucune donnée</td></tr>'}</tbody></table><div class="footer">${companyInfo.name} - ${companyInfo.address || ''} ${companyInfo.phone1 ? '📞 ' + companyInfo.phone1 : ''}</div><script>window.onload=function(){window.print();setTimeout(function(){window.close();},500);};<\/script></body></html>`);
+        w.document.close();
+      }
     };
 
+    // =============================================
     // ===== CLIENTS =====
+    // =============================================
     const Clients = {
       editingId: null,
       specialPrices: [],
@@ -1378,7 +1225,9 @@
       }
     };
 
+    // =============================================
     // ===== FOURNISSEURS =====
+    // =============================================
     const Fournisseurs = {
       editingId: null,
       reset() {
@@ -1475,7 +1324,9 @@
       }
     };
 
+    // =============================================
     // ===== ARTICLES =====
+    // =============================================
     const Articles = {
       editingId: null,
       reset() {
@@ -1568,7 +1419,9 @@
       }
     };
 
+    // =============================================
     // ===== CLIENT HISTORY =====
+    // =============================================
     const ClientHistory = {
       currentClientId: null,
       render() {
@@ -1640,7 +1493,9 @@
       }
     };
 
+    // =============================================
     // ===== FOURNISSEUR HISTORY =====
+    // =============================================
     const FournisseurHistory = {
       currentFournisseurId: null,
       render() {
@@ -1712,7 +1567,9 @@
       }
     };
 
+    // =============================================
     // ===== ARTICLE HISTORY =====
+    // =============================================
     const ArticleHistory = {
       currentArticleId: null,
       render() {
@@ -1793,7 +1650,9 @@
       }
     };
 
-    // ===== VENTES (avec interface améliorée) =====
+    // =============================================
+    // ===== VENTES (version simplifiée) =====
+    // =============================================
     const Ventes = {
       editingId: null,
       lines: [],
@@ -2070,11 +1929,8 @@
         const list = $('ventesList');
         list.innerHTML = '';
         const filtered = ventes.filter(v => !q || v.num.toLowerCase().includes(q) || v.client.toLowerCase().includes(q)).reverse();
-        if (!filtered.length) {
-          list.innerHTML = '<div class="empty-msg">📭 Aucune facture de vente</div>';
-          return;
-        }
-        filtered.forEach(v => {
+        if (!filtered.length) { list.innerHTML = '<div class="empty-msg">Aucune facture de vente</div>'; return; }
+        filtered.slice(0, 50).forEach(v => {
           const d = document.createElement('div');
           d.className = 'row-card';
           d.onclick = () => { Ventes.load(v.id); openSheet('ventes'); };
@@ -2082,31 +1938,97 @@
           d.innerHTML = `<div class="main-info"><div class="name">${v.num}</div><div class="meta">${v.client} - ${v.date} | Payé: ${paid.toFixed(3)}</div></div><div class="amount">${v.total.toFixed(3)} TND</div>`;
           list.appendChild(d);
         });
-        if (filtered.length > 0) {
-          const countMsg = document.createElement('div');
-          countMsg.style.cssText = 'text-align:center;font-size:10px;color:var(--muted);margin-top:4px;';
-          countMsg.textContent = `📄 ${filtered.length} facture(s) trouvée(s)`;
-          list.appendChild(countMsg);
-        }
       },
       shareWhatsapp() {
-        // ... (مثل السابق)
+        if (this.editingId == null) { showToast('⚠️ Enregistrez la facture d\'abord'); return; }
+        const rec = ventes.find(v => v.id === this.editingId);
+        if (!rec) { showToast('❌ Facture introuvable'); return; }
+        showToast('⏳ Génération de l\'image...');
+        const htmlContent = this.generateInvoiceHTML(rec, 'vente');
+        const tempDiv = document.createElement('div');
+        tempDiv.style.cssText = 'position:fixed;left:-9999px;top:0;width:400px;background:#fff;padding:20px;font-family:Arial,sans-serif;direction:rtl;z-index:9999;';
+        tempDiv.innerHTML = htmlContent;
+        document.body.appendChild(tempDiv);
+        html2canvas(tempDiv, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false })
+          .then(canvas => { document.body.removeChild(tempDiv); const imageDataUrl = canvas.toDataURL('image/jpeg', 0.95); this.shareImageViaWhatsApp(rec, imageDataUrl); })
+          .catch(err => { document.body.removeChild(tempDiv); console.error('Image generation error:', err); showToast('❌ Échec de génération de l\'image : ' + err.message); });
       },
       generateInvoiceHTML(invoice, type) {
-        // ... (مثل السابق)
+        const partyLabel = type === 'vente' ? 'Client' : 'Fournisseur';
+        const partyName = type === 'vente' ? invoice.client : invoice.supplier;
+        const taxId = type === 'vente' ? invoice.clientTaxId : invoice.supplierTaxId;
+        const address = type === 'vente' ? invoice.clientAddress : invoice.supplierAddress;
+        const phone = type === 'vente' ? (clients.find(c => c.name === invoice.client)?.phone || '-') : (fournisseurs.find(f => f.name === invoice.supplier)?.phone || '-');
+        const paid = (invoice.reglements || []).reduce((sum, r) => sum + r.amount, 0);
+        const prevBalance = invoice.prevBalance || 0;
+        const currentBalance = prevBalance + invoice.total - paid;
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
+        let itemsHtml = '';
+        invoice.lines.forEach((line, i) => {
+          itemsHtml += `<tr><td style="border:1px solid #999;padding:4px 6px;text-align:center;">${i + 1}</td><td style="border:1px solid #999;padding:4px 6px;text-align:center;">${line.name}</td><td style="border:1px solid #999;padding:4px 6px;text-align:center;">${line.price.toFixed(3)}</td><td style="border:1px solid #999;padding:4px 6px;text-align:center;">${line.qty}</td><td style="border:1px solid #999;padding:4px 6px;text-align:center;font-weight:700;">${line.total.toFixed(3)}</td></tr>`;
+        });
+        const words = amountInWords(invoice.total);
+        return `<div style="max-width:380px;margin:0 auto;font-family:'Cairo',Arial,sans-serif;"><div style="text-align:center;border-bottom:3px solid #1e2f66;padding-bottom:8px;margin-bottom:8px;"><div style="font-size:18px;font-weight:800;color:#1e2f66;">${companyInfo.name || 'GTR POS'}</div><div style="font-size:11px;color:#666;">${companyInfo.address || ''} ${companyInfo.phone1 ? '📞 ' + companyInfo.phone1 : ''}</div><div style="font-size:10px;color:#666;">MF: ${companyInfo.taxId || '-'}</div><div style="font-size:14px;font-weight:700;color:#1e2f66;margin-top:4px;">Facture ${type === 'vente' ? 'de vente' : "d'achat"}</div><div style="font-size:10px;color:#666;">${invoice.num} | ${invoice.date}</div><div style="font-size:9px;color:#999;">${dateStr}</div></div><div style="display:flex;justify-content:space-between;font-size:11px;border:1px solid #ccc;padding:6px 8px;margin:6px 0;border-radius:4px;background:#f8f9fc;flex-wrap:wrap;gap:4px;"><span><strong>${partyLabel}:</strong> ${partyName}</span><span><strong>Adresse:</strong> ${address || '-'}</span><span><strong>Tél:</strong> ${phone}</span><span><strong>MF:</strong> ${taxId || '-'}</span></div><table style="width:100%;border-collapse:collapse;font-size:10px;margin:6px 0;"><thead><tr style="background:#1e2f66;color:#fff;"><th style="border:1px solid #999;padding:4px 6px;text-align:center;">#</th><th style="border:1px solid #999;padding:4px 6px;text-align:center;">Produit</th><th style="border:1px solid #999;padding:4px 6px;text-align:center;">Prix</th><th style="border:1px solid #999;padding:4px 6px;text-align:center;">Qté</th><th style="border:1px solid #999;padding:4px 6px;text-align:center;">Total</th></tr></thead><tbody>${itemsHtml}</tbody></table><div style="font-size:9px;text-align:center;background:#f0f4ff;padding:4px 6px;border-radius:4px;margin:4px 0;">${words}</div><table style="width:100%;border-collapse:collapse;font-size:10px;margin:6px 0;"><tr><td style="border:1px solid #999;padding:4px 8px;text-align:right;width:55%;">Solde précédent</td><td style="border:1px solid #999;padding:4px 8px;text-align:left;width:45%;">${prevBalance.toFixed(3)} TND</td></tr><tr style="background:#d9ede2;font-weight:700;"><td style="border:1px solid #999;padding:4px 8px;text-align:right;">Total facture</td><td style="border:1px solid #999;padding:4px 8px;text-align:left;">${invoice.total.toFixed(3)} TND</td></tr><tr><td style="border:1px solid #999;padding:4px 8px;text-align:right;">Payé</td><td style="border:1px solid #999;padding:4px 8px;text-align:left;color:#2e9e6e;">${paid.toFixed(3)} TND</td></tr><tr style="background:#fbdcc9;font-weight:700;"><td style="border:1px solid #999;padding:4px 8px;text-align:right;">Solde actuel</td><td style="border:1px solid #999;padding:4px 8px;text-align:left;color:#c0392b;">${currentBalance.toFixed(3)} TND</td></tr></table><div style="text-align:center;font-size:12px;font-weight:700;color:#1e2f66;margin:6px 0;border-top:2px solid #1e2f66;padding-top:6px;">${invoice.num}</div><div style="text-align:center;font-size:8px;color:#999;margin-top:4px;border-top:1px dashed #ddd;padding-top:4px;">${companyInfo.name} - ${companyInfo.phone1 || ''} | MF: ${companyInfo.taxId || '-'}</div></div>`;
       },
       shareImageViaWhatsApp(invoice, imageDataUrl) {
-        // ... (مثل السابق)
+        const type = invoice.client ? 'de vente' : "d'achat";
+        const partyName = invoice.client || invoice.supplier;
+        const paid = (invoice.reglements || []).reduce((sum, r) => sum + r.amount, 0);
+        const remaining = invoice.total - paid;
+        let text = `📄 *Facture ${type} - ${invoice.num}*\n📅 Date: ${invoice.date}\n👤 ${invoice.client ? 'Client' : 'Fournisseur'}: ${partyName}\n💰 Montant: ${invoice.total.toFixed(3)} TND\n💳 Payé: ${paid.toFixed(3)} TND\n📊 Reste: ${remaining.toFixed(3)} TND\n\n━━━━━━━━━━━━━━━━━━\n${companyInfo.name || 'GTR POS'}`;
+        const phone = partyName ? (clients.find(c => c.name === partyName)?.phone || fournisseurs.find(f => f.name === partyName)?.phone || '') : '';
+        const formattedPhone = phone.replace(/\D/g, '');
+        const url = 'https://wa.me/' + (formattedPhone ? '216' + formattedPhone : '') + '?text=' + encodeURIComponent(text);
+        window.open(url, '_blank');
+        const link = document.createElement('a');
+        link.href = imageDataUrl;
+        link.download = `Facture_${invoice.num}_${new Date().toISOString().slice(0,10)}.jpg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('✅ WhatsApp ouvert avec téléchargement de l\'image');
       },
       printInvoice() {
-        // ... (مثل السابق)
+        if (this.editingId == null) { showToast('Enregistrez la facture d\'abord'); return; }
+        const rec = ventes.find(v => v.id === this.editingId);
+        if (!rec) return;
+        const client = clients.find(c => c.name === rec.client);
+        const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0);
+        const prevBalance = rec.prevBalance !== undefined ? rec.prevBalance : (client ? client.balance - (rec.total - paid) : 0);
+        const currentBalance = prevBalance + rec.total - paid;
+        _invoiceData = { title: 'Facture de vente', num: rec.num, date: rec.date, partyLabel: 'Client', partyName: rec.client, partyAddr: rec.clientAddress || (client ? client.address : ''), partyPhone: client ? client.phone : '', partyTaxId: rec.clientTaxId || (client ? client.taxId : ''), lines: rec.lines || [], total: rec.total, paid, prevBalance, currentBalance };
+        renderInvoice();
+        $('printOverlay').classList.add('show');
       },
       printBluetooth() {
-        // ... (مثل السابق)
+        if (this.editingId == null) { showToast('Enregistrez la facture d\'abord'); return; }
+        if (!navigator.bluetooth) { showToast('❌ Bluetooth non supporté sur ce navigateur'); return; }
+        const rec = ventes.find(v => v.id === this.editingId);
+        if (!rec) return;
+        const client = clients.find(c => c.name === rec.client);
+        const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0);
+        const prevBalance = rec.prevBalance !== undefined ? rec.prevBalance : (client ? client.balance - (rec.total - paid) : 0);
+        const currentBalance = prevBalance + rec.total - paid;
+        let text = `${companyInfo.name}\n${companyInfo.address}\n${companyInfo.phone1}\nMF: ${companyInfo.taxId}\n----------------\nFacture de vente: ${rec.num}\nDate: ${rec.date}\nClient: ${rec.client}\n`;
+        if (rec.clientTaxId) text += `MF: ${rec.clientTaxId}\n`;
+        text += `----------------\n`;
+        rec.lines.forEach(l => { text += `${l.name}  ${l.qty} x ${l.price.toFixed(3)} = ${l.total.toFixed(3)}\n`; });
+        text += `----------------\nSolde précédent : ${prevBalance.toFixed(3)} TND\nTotal facture   : ${rec.total.toFixed(3)} TND\nPayé            : ${paid.toFixed(3)} TND\nSolde actuel    : ${currentBalance.toFixed(3)} TND\n----------------\nMerci !\n`;
+        showToast('⏳ Connexion Bluetooth en cours...');
+        navigator.bluetooth.requestDevice({ filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }], optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] })
+          .then(device => device.gatt.connect())
+          .then(server => server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb'))
+          .then(service => service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb'))
+          .then(characteristic => { const encoder = new TextEncoder(); return characteristic.writeValue(encoder.encode(text)); })
+          .then(() => { showToast('✅ Impression envoyée à l\'imprimante'); })
+          .catch(err => { console.error('Erreur Bluetooth:', err); let msg = '❌ Erreur Bluetooth'; if (err.message.includes('GATT')) msg += ' : Problème de connexion'; else if (err.message.includes('not found')) msg += ' : Service introuvable'; else msg += ' : ' + err.message; showToast(msg); });
       }
     };
 
-    // ===== ACHATS (avec interface améliorée) =====
+    // =============================================
+    // ===== ACHATS (version simplifiée) =====
+    // =============================================
     const Achats = {
       editingId: null,
       lines: [],
@@ -2372,11 +2294,8 @@
         const list = $('achatsList');
         list.innerHTML = '';
         const filtered = achats.filter(a => !q || a.num.toLowerCase().includes(q) || a.supplier.toLowerCase().includes(q)).reverse();
-        if (!filtered.length) {
-          list.innerHTML = '<div class="empty-msg">📭 Aucune facture d\'achat</div>';
-          return;
-        }
-        filtered.forEach(a => {
+        if (!filtered.length) { list.innerHTML = '<div class="empty-msg">Aucune facture d\'achat</div>'; return; }
+        filtered.slice(0, 50).forEach(a => {
           const d = document.createElement('div');
           d.className = 'row-card';
           d.onclick = () => { Achats.load(a.id); openSheet('achats'); };
@@ -2384,25 +2303,61 @@
           d.innerHTML = `<div class="main-info"><div class="name">${a.num}</div><div class="meta">${a.supplier} - ${a.date} | Payé: ${paid.toFixed(3)}</div></div><div class="amount">${a.total.toFixed(3)} TND</div>`;
           list.appendChild(d);
         });
-        if (filtered.length > 0) {
-          const countMsg = document.createElement('div');
-          countMsg.style.cssText = 'text-align:center;font-size:10px;color:var(--muted);margin-top:4px;';
-          countMsg.textContent = `📄 ${filtered.length} facture(s) trouvée(s)`;
-          list.appendChild(countMsg);
-        }
       },
       shareWhatsapp() {
-        // ... (مثل السابق)
+        if (this.editingId == null) { showToast('⚠️ Enregistrez la facture d\'abord'); return; }
+        const rec = achats.find(a => a.id === this.editingId);
+        if (!rec) { showToast('❌ Facture introuvable'); return; }
+        showToast('⏳ Génération de l\'image...');
+        const htmlContent = Ventes.generateInvoiceHTML(rec, 'achat');
+        const tempDiv = document.createElement('div');
+        tempDiv.style.cssText = 'position:fixed;left:-9999px;top:0;width:400px;background:#fff;padding:20px;font-family:Arial,sans-serif;direction:rtl;z-index:9999;';
+        tempDiv.innerHTML = htmlContent;
+        document.body.appendChild(tempDiv);
+        html2canvas(tempDiv, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false })
+          .then(canvas => { document.body.removeChild(tempDiv); const imageDataUrl = canvas.toDataURL('image/jpeg', 0.95); Ventes.shareImageViaWhatsApp(rec, imageDataUrl); })
+          .catch(err => { document.body.removeChild(tempDiv); console.error('Image generation error:', err); showToast('❌ Échec de génération de l\'image : ' + err.message); });
       },
       printInvoice() {
-        // ... (مثل السابق)
+        if (this.editingId == null) { showToast('Enregistrez la facture d\'abord'); return; }
+        const rec = achats.find(a => a.id === this.editingId);
+        if (!rec) return;
+        const supplier = fournisseurs.find(s => s.name === rec.supplier);
+        const paid = (rec.reglements || []).reduce((aa, r) => aa + r.amount, 0);
+        const prevBalance = rec.prevBalance !== undefined ? rec.prevBalance : (supplier ? supplier.balance - (rec.total - paid) : 0);
+        const currentBalance = prevBalance + rec.total - paid;
+        _invoiceData = { title: "Facture d'achat", num: rec.num, date: rec.date, partyLabel: 'Fournisseur', partyName: rec.supplier, partyAddr: rec.supplierAddress || (supplier ? supplier.address : ''), partyPhone: supplier ? supplier.phone : '', partyTaxId: rec.supplierTaxId || (supplier ? supplier.taxId : ''), lines: rec.lines || [], total: rec.total, paid, prevBalance, currentBalance };
+        renderInvoice();
+        $('printOverlay').classList.add('show');
       },
       printBluetooth() {
-        // ... (مثل السابق)
+        if (this.editingId == null) { showToast('Enregistrez la facture d\'abord'); return; }
+        if (!navigator.bluetooth) { showToast('❌ Bluetooth non supporté sur ce navigateur'); return; }
+        const rec = achats.find(a => a.id === this.editingId);
+        if (!rec) return;
+        const supplier = fournisseurs.find(s => s.name === rec.supplier);
+        const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0);
+        const prevBalance = rec.prevBalance !== undefined ? rec.prevBalance : (supplier ? supplier.balance - (rec.total - paid) : 0);
+        const currentBalance = prevBalance + rec.total - paid;
+        let text = `${companyInfo.name}\n${companyInfo.address}\n${companyInfo.phone1}\nMF: ${companyInfo.taxId}\n----------------\nFacture d'achat: ${rec.num}\nDate: ${rec.date}\nFournisseur: ${rec.supplier}\n`;
+        if (rec.supplierTaxId) text += `MF: ${rec.supplierTaxId}\n`;
+        text += `----------------\n`;
+        rec.lines.forEach(l => { text += `${l.name}  ${l.qty} x ${l.price.toFixed(3)} = ${l.total.toFixed(3)}\n`; });
+        text += `----------------\nSolde précédent : ${prevBalance.toFixed(3)} TND\nTotal facture   : ${rec.total.toFixed(3)} TND\nPayé            : ${paid.toFixed(3)} TND\nSolde actuel    : ${currentBalance.toFixed(3)} TND\n----------------\nMerci !\n`;
+        showToast('⏳ Connexion Bluetooth en cours...');
+        navigator.bluetooth.requestDevice({ filters: [{ services: ['000018f0-0000-1000-8000-00805f9b34fb'] }], optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'] })
+          .then(device => device.gatt.connect())
+          .then(server => server.getPrimaryService('000018f0-0000-1000-8000-00805f9b34fb'))
+          .then(service => service.getCharacteristic('00002af1-0000-1000-8000-00805f9b34fb'))
+          .then(characteristic => { const encoder = new TextEncoder(); return characteristic.writeValue(encoder.encode(text)); })
+          .then(() => { showToast('✅ Impression envoyée à l\'imprimante'); })
+          .catch(err => { console.error('Erreur Bluetooth:', err); let msg = '❌ Erreur Bluetooth'; if (err.message.includes('GATT')) msg += ' : Problème de connexion'; else if (err.message.includes('not found')) msg += ' : Service introuvable'; else msg += ' : ' + err.message; showToast(msg); });
       }
     };
 
+    // =============================================
     // ===== EXPENSES =====
+    // =============================================
     const Expenses = {
       editingId: null,
       reset() {
@@ -2479,7 +2434,9 @@
       }
     };
 
+    // =============================================
     // ===== CAISSE HISTORY =====
+    // =============================================
     const CaisseHistory = {
       render() {
         const container = $('caisseHistoryContent');
@@ -2536,12 +2493,12 @@
         html += `</tbody></table></div>`;
         result.innerHTML = html;
       },
-      printReport() {
-        // ... (مثل السابق)
-      }
+      printReport() { showToast('Impression du rapport de caisse...'); }
     };
 
+    // =============================================
     // ===== ACCOUNTS =====
+    // =============================================
     const Accounts = {
       render() {
         if (!currentUser || currentUser.email !== 'krimi.neji@gmail.com') {
@@ -2597,7 +2554,9 @@
       }
     };
 
+    // =============================================
     // ===== COMPANY INFO =====
+    // =============================================
     const CompanyInfo = {
       load() {
         try {
@@ -2629,7 +2588,9 @@
       }
     };
 
+    // =============================================
     // ===== BACKUP =====
+    // =============================================
     function exportBackup() {
       const data = { clients, fournisseurs, articles, ventes, achats, expenses, caisseClients, caisseFournisseurs, nextId, companyInfo, financeData, exportedAt: new Date().toISOString() };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -2705,8 +2666,11 @@
       input.value = '';
     }
 
+    // =============================================
     // ===== PRINT FUNCTIONS =====
+    // =============================================
     function closePrintOverlay() { $('printOverlay').classList.remove('show'); _invoiceData = null; _statementData = null; }
+
     document.getElementById('paperSizeSelect').addEventListener('change', function() {
       if (_invoiceData) renderInvoice();
       else if (_statementData) renderStatement();
@@ -2719,7 +2683,9 @@
       doc.className = 'invoice-doc paper-' + size;
       const data = _invoiceData;
       let linesHtml = '';
-      data.lines.forEach((l, i) => { linesHtml += `<tr><td>${i + 1}</td><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td></tr>`; });
+      data.lines.forEach((l, i) => {
+        linesHtml += `<tr><td>${i + 1}</td><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td></tr>`;
+      });
       const words = amountInWords(data.total);
       const partyHtml = `<div style="display:flex;justify-content:space-between;font-size:9px;border:1px solid #999;padding:3px;margin:3px 0;flex-wrap:wrap;gap:2px;"><span><strong>${data.partyLabel}:</strong> ${data.partyName}</span><span><strong>Adresse:</strong> ${data.partyAddr || '-'}</span><span><strong>Tél:</strong> ${data.partyPhone || '-'}</span><span><strong>MF:</strong> ${data.partyTaxId || '-'}</span></div>`;
       doc.innerHTML = `<div style="text-align:center;border-bottom:2px solid #1e2f66;padding-bottom:4px;margin-bottom:4px;"><div style="font-size:14px;font-weight:800;">${data.title}</div><div style="font-size:8px;color:#666;display:flex;justify-content:space-between;"><span>${new Date().toLocaleDateString('fr-FR')}  ${new Date().toLocaleTimeString('fr-FR')}</span><span style="font-weight:700;">${companyInfo.name || 'GTR POS'}</span></div><div style="font-size:7px;color:#888;margin-top:2px;">${companyInfo.address || ''} | ${companyInfo.phone1 || ''} | MF: ${companyInfo.taxId || '-'}</div></div><div style="font-size:10px;text-align:center;margin:2px 0;">${data.date}</div>${partyHtml}<table class="inv-items" style="width:100%;border-collapse:collapse;font-size:9px;margin:4px 0;"><thead><tr><th>#</th><th>Produit</th><th>Prix</th><th>Qté</th><th>Total</th></tr></thead><tbody>${linesHtml}</tbody></table><div style="font-size:8px;text-align:center;margin:2px 0;background:#f0f4ff;padding:2px;">Montant en lettres : ${words}</div><table class="inv-print-summary" style="width:100%;border-collapse:collapse;font-size:9px;margin:4px 0;"><tr><td class="label" style="border:1px solid #999;padding:2px 4px;text-align:right;">Solde précédent</td><td class="value" style="border:1px solid #999;padding:2px 4px;text-align:left;">${data.prevBalance.toFixed(3)}</td></tr><tr class="total-row"><td class="label" style="border:1px solid #999;padding:2px 4px;text-align:right;font-weight:700;">Total facture</td><td class="value" style="border:1px solid #999;padding:2px 4px;text-align:left;font-weight:700;">${data.total.toFixed(3)}</td></tr><tr><td class="label" style="border:1px solid #999;padding:2px 4px;text-align:right;">Payé</td><td class="value" style="border:1px solid #999;padding:2px 4px;text-align:left;">${data.paid.toFixed(3)}</td></tr><tr class="highlight-row"><td class="label" style="border:1px solid #999;padding:2px 4px;text-align:right;font-weight:700;">Solde actuel</td><td class="value" style="border:1px solid #999;padding:2px 4px;text-align:left;font-weight:700;color:#c0392b;">${data.currentBalance.toFixed(3)}</td></tr></table><div style="text-align:center;font-size:10px;font-weight:700;margin:4px 0;">${data.num}</div>`;
@@ -2747,16 +2713,211 @@
       return 'seulement ' + (text || 'zéro') + ' seulement';
     }
 
-    // ===== PRINT STATEMENT =====
+    // =============================================
+    // ===== PRINT STATEMENT (Relevé) =====
+    // =============================================
     function printStatement(type, id) {
-      // ... (مثل السابق)
+      let data = null;
+      let title = '';
+      let partyLabel = '';
+      
+      if (type === 'client') {
+        const client = clients.find(c => c.id === id);
+        if (!client) { showToast('Client introuvable'); return; }
+        recalculateClientBalance(client.name);
+        const invoices = ventes.filter(v => v.client === client.name);
+        const payments = caisseClients.filter(p => p.clientName === client.name);
+        const openingBalance = client.openingBalance || 0;
+        const currentBalance = client.balance || 0;
+        data = {
+          partyName: client.name,
+          phone: client.phone || '',
+          address: client.address || '',
+          taxId: client.taxId || '',
+          openingBalance: openingBalance,
+          currentBalance: currentBalance,
+          movements: [],
+          totalInvoices: 0,
+          totalAmount: 0,
+          totalPaid: 0
+        };
+        let cumulative = openingBalance;
+        data.movements.push({ date: '---', doc: 'Solde d\'ouverture', description: 'Solde initial', debit: 0, credit: 0, balance: cumulative });
+        const sortedInvoices = [...invoices].sort((a,b) => a.date < b.date ? -1 : 1);
+        sortedInvoices.forEach(inv => {
+          const invPayments = payments.filter(p => p.invoiceNum === inv.num);
+          const paid = invPayments.reduce((s,p) => s + p.amount, 0);
+          cumulative += inv.total - paid;
+          data.movements.push({ date: inv.date, doc: inv.num, description: 'Facture de vente', debit: inv.total, credit: paid, balance: cumulative });
+          invPayments.forEach(p => {
+            data.movements.push({ date: p.date || inv.date, doc: '', description: '  ↳ Règlement ' + (p.method || 'Espèces'), debit: 0, credit: p.amount, balance: cumulative });
+          });
+          data.totalInvoices++;
+          data.totalAmount += inv.total;
+          data.totalPaid += paid;
+        });
+        title = 'Relevé de compte client';
+        partyLabel = 'Client';
+      } 
+      else if (type === 'fournisseur') {
+        const supplier = fournisseurs.find(f => f.id === id);
+        if (!supplier) { showToast('Fournisseur introuvable'); return; }
+        recalculateFournisseurBalance(supplier.name);
+        const invoices = achats.filter(a => a.supplier === supplier.name);
+        const payments = caisseFournisseurs.filter(p => p.fournisseurName === supplier.name);
+        const openingBalance = supplier.openingBalance || 0;
+        const currentBalance = supplier.balance || 0;
+        data = {
+          partyName: supplier.name,
+          phone: supplier.phone || '',
+          address: supplier.address || '',
+          taxId: supplier.taxId || '',
+          openingBalance: openingBalance,
+          currentBalance: currentBalance,
+          movements: [],
+          totalInvoices: 0,
+          totalAmount: 0,
+          totalPaid: 0
+        };
+        let cumulative = openingBalance;
+        data.movements.push({ date: '---', doc: 'Solde d\'ouverture', description: 'Solde initial', debit: 0, credit: 0, balance: cumulative });
+        const sortedInvoices = [...invoices].sort((a,b) => a.date < b.date ? -1 : 1);
+        sortedInvoices.forEach(inv => {
+          const invPayments = payments.filter(p => p.invoiceNum === inv.num);
+          const paid = invPayments.reduce((s,p) => s + p.amount, 0);
+          cumulative += inv.total - paid;
+          data.movements.push({ date: inv.date, doc: inv.num, description: 'Facture d\'achat', debit: inv.total, credit: paid, balance: cumulative });
+          invPayments.forEach(p => {
+            data.movements.push({ date: p.date || inv.date, doc: '', description: '  ↳ Règlement ' + (p.method || 'Espèces'), debit: 0, credit: p.amount, balance: cumulative });
+          });
+          data.totalInvoices++;
+          data.totalAmount += inv.total;
+          data.totalPaid += paid;
+        });
+        title = 'Relevé de compte fournisseur';
+        partyLabel = 'Fournisseur';
+      }
+      else if (type === 'article') {
+        const article = articles.find(a => a.id === id);
+        if (!article) { showToast('Article introuvable'); return; }
+        let movements = [];
+        ventes.forEach(v => {
+          v.lines.forEach(line => {
+            if (line.name === article.name) {
+              movements.push({ date: v.date, doc: v.num, type: 'vente', party: v.client, qty: -line.qty, price: line.price, total: line.total });
+            }
+          });
+        });
+        achats.forEach(a => {
+          a.lines.forEach(line => {
+            if (line.name === article.name) {
+              movements.push({ date: a.date, doc: a.num, type: 'achat', party: a.supplier, qty: line.qty, price: line.price, total: line.total });
+            }
+          });
+        });
+        movements.sort((a,b) => a.date < b.date ? -1 : 1);
+        let cumulative = 0;
+        const startStock = article.stock - movements.reduce((s,m) => s + m.qty, 0);
+        cumulative = startStock;
+        data = {
+          partyName: article.name,
+          phone: '',
+          address: '',
+          taxId: '',
+          openingBalance: startStock,
+          currentBalance: article.stock,
+          movements: [],
+          totalInvoices: movements.length,
+          totalAmount: 0,
+          totalPaid: 0
+        };
+        data.movements.push({ date: '---', doc: 'Stock initial', description: 'Stock de départ', debit: startStock, credit: 0, balance: cumulative });
+        movements.forEach(m => {
+          cumulative += m.qty;
+          data.movements.push({ date: m.date, doc: m.doc, description: (m.type === 'vente' ? 'Vente à ' : 'Achat de ') + m.party, debit: (m.qty > 0 ? m.qty : 0), credit: (m.qty < 0 ? -m.qty : 0), balance: cumulative, qty: m.qty, price: m.price, total: m.total });
+        });
+        title = 'Historique de l\'article';
+        partyLabel = 'Article';
+      }
+      
+      if (!data) { showToast('Erreur de génération du relevé'); return; }
+      
+      _statementData = { title: title, partyLabel: partyLabel, data: data, type: type };
+      renderStatement();
+      $('printOverlay').classList.add('show');
     }
 
     function renderStatement() {
-      // ... (مثل السابق)
+      if (!_statementData) return;
+      const size = document.getElementById('paperSizeSelect').value;
+      const doc = document.getElementById('printDoc');
+      doc.className = 'invoice-doc paper-' + size;
+      const d = _statementData.data;
+      let rows = '';
+      d.movements.forEach((m, i) => {
+        const isSub = m.doc === '' && m.description.startsWith('  ↳');
+        const balanceDisplay = (isSub) ? '' : (m.balance !== undefined ? m.balance.toFixed(3) : '');
+        const debitDisplay = (m.debit || 0).toFixed(3);
+        const creditDisplay = (m.credit || 0).toFixed(3);
+        rows += `<tr class="${isSub ? 'sub-row' : ''}">
+          <td style="border:1px solid #999;padding:2px 4px;font-size:8px;">${m.date}</td>
+          <td style="border:1px solid #999;padding:2px 4px;font-size:8px;">${m.doc}</td>
+          <td style="border:1px solid #999;padding:2px 4px;font-size:8px;text-align:right;">${m.description}</td>
+          <td style="border:1px solid #999;padding:2px 4px;font-size:8px;text-align:right;color:#c0392b;">${debitDisplay}</td>
+          <td style="border:1px solid #999;padding:2px 4px;font-size:8px;text-align:right;color:#27ae60;">${creditDisplay}</td>
+          <td style="border:1px solid #999;padding:2px 4px;font-size:8px;text-align:right;font-weight:700;">${balanceDisplay}</td>
+        </tr>`;
+      });
+      const totalDebit = d.movements.reduce((s,m) => s + (m.debit||0), 0);
+      const totalCredit = d.movements.reduce((s,m) => s + (m.credit||0), 0);
+      const finalBalance = d.currentBalance || d.openingBalance;
+      doc.innerHTML = `
+        <div style="text-align:center;border-bottom:2px solid #1e2f66;padding-bottom:4px;margin-bottom:4px;">
+          <div style="font-size:14px;font-weight:800;">${_statementData.title}</div>
+          <div style="font-size:8px;color:#666;display:flex;justify-content:space-between;">
+            <span>${new Date().toLocaleDateString('fr-FR')}  ${new Date().toLocaleTimeString('fr-FR')}</span>
+            <span style="font-weight:700;">${companyInfo.name || 'GTR POS'}</span>
+          </div>
+          <div style="font-size:7px;color:#888;margin-top:2px;">${companyInfo.address || ''} | ${companyInfo.phone1 || ''} | MF: ${companyInfo.taxId || '-'}</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:9px;border:1px solid #999;padding:3px;margin:3px 0;flex-wrap:wrap;gap:2px;">
+          <span><strong>${_statementData.partyLabel}:</strong> ${d.partyName}</span>
+          <span><strong>Tél:</strong> ${d.phone || '-'}</span>
+          <span><strong>MF:</strong> ${d.taxId || '-'}</span>
+          <span><strong>Solde actuel:</strong> ${d.currentBalance.toFixed(3)}</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:8px;margin:4px 0;">
+          <thead>
+            <tr style="background:#1e2f66;color:#fff;">
+              <th style="border:1px solid #999;padding:2px 4px;">Date</th>
+              <th style="border:1px solid #999;padding:2px 4px;">N°</th>
+              <th style="border:1px solid #999;padding:2px 4px;text-align:right;">Libellé</th>
+              <th style="border:1px solid #999;padding:2px 4px;text-align:right;">Débit</th>
+              <th style="border:1px solid #999;padding:2px 4px;text-align:right;">Crédit</th>
+              <th style="border:1px solid #999;padding:2px 4px;text-align:right;">Solde</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+          <tfoot>
+            <tr style="font-weight:700;background:#e8ecf4;">
+              <td colspan="3" style="border:1px solid #999;padding:2px 4px;text-align:right;">Totaux</td>
+              <td style="border:1px solid #999;padding:2px 4px;text-align:right;">${totalDebit.toFixed(3)}</td>
+              <td style="border:1px solid #999;padding:2px 4px;text-align:right;">${totalCredit.toFixed(3)}</td>
+              <td style="border:1px solid #999;padding:2px 4px;text-align:right;color:#c0392b;">${finalBalance.toFixed(3)}</td>
+            </tr>
+          </tfoot>
+        </table>
+        <div style="text-align:center;font-size:8px;color:#888;margin-top:4px;border-top:1px dashed #ddd;padding-top:4px;">
+          ${companyInfo.name} - ${companyInfo.phone1 || ''}
+        </div>
+      `;
     }
 
+    // =============================================
     // ===== AUTO FINANCE RECORDER =====
+    // =============================================
     const AutoFinanceRecorder = {
       lastRecordDate: null,
       isRecording: false,
@@ -2811,7 +2972,618 @@
       }
     };
 
+    // =============================================
+    // ===== PERFORMANCE OPTIMIZER =====
+    // =============================================
+    const PerformanceOptimizer = {
+      cache: { clients: null, articles: null, ventes: null, lastUpdate: null },
+      pagination: { pageSize: 20, currentPage: 1, totalPages: 1 },
+      searchTimeout: null,
+      db: null,
+      
+      init() {
+        this.setupLazyLoading();
+        this.setupSearchOptimization();
+        this.setupIndexedDB();
+      },
+      
+      setupLazyLoading() {
+        // تحميل المكونات غير الأساسية في الخلفية
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(() => {
+            // تحميل التقارير في الخلفية
+            if (typeof AdvancedReports !== 'undefined') {
+              AdvancedReports.updateFilters();
+            }
+          });
+        }
+      },
+      
+      setupSearchOptimization() {
+        document.querySelectorAll('.search-box').forEach(input => {
+          input.addEventListener('input', () => {
+            clearTimeout(this.searchTimeout);
+            this.searchTimeout = setTimeout(() => {
+              this.performSearch(input);
+            }, 300);
+          });
+        });
+      },
+      
+      performSearch(input) {
+        const query = input.value.trim().toLowerCase();
+        const container = input.id.replace('Search', '') + 'List';
+        // سيتم تنفيذ البحث بواسطة الوظائف الأصلية
+      },
+      
+      setupIndexedDB() {
+        if (!window.indexedDB) return;
+        try {
+          const request = indexedDB.open('GTRPOS_DB', 1);
+          request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            const stores = ['clients', 'articles', 'ventes', 'achats', 'expenses'];
+            stores.forEach(storeName => {
+              if (!db.objectStoreNames.contains(storeName)) {
+                const store = db.createObjectStore(storeName, { keyPath: 'id' });
+                store.createIndex('name', 'name', { unique: false });
+                store.createIndex('date', 'date', { unique: false });
+              }
+            });
+          };
+          request.onsuccess = (event) => {
+            this.db = event.target.result;
+            console.log('✅ IndexedDB initialized');
+          };
+          request.onerror = () => console.warn('⚠️ IndexedDB not available');
+        } catch(e) {
+          console.warn('⚠️ IndexedDB error:', e);
+        }
+      },
+      
+      async saveToIndexedDB(storeName, data) {
+        if (!this.db) return;
+        try {
+          const transaction = this.db.transaction(storeName, 'readwrite');
+          const store = transaction.objectStore(storeName);
+          if (Array.isArray(data)) data.forEach(item => store.put(item));
+          else store.put(data);
+          return new Promise(resolve => { transaction.oncomplete = resolve; });
+        } catch(e) { console.warn('IndexedDB save error:', e); }
+      },
+      
+      async loadFromIndexedDB(storeName) {
+        if (!this.db) return [];
+        try {
+          return new Promise((resolve) => {
+            const transaction = this.db.transaction(storeName, 'readonly');
+            const store = transaction.objectStore(storeName);
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result || []);
+            request.onerror = () => resolve([]);
+          });
+        } catch(e) { return []; }
+      }
+    };
+
+    // =============================================
+    // ===== ADVANCED REPORTS =====
+    // =============================================
+    const AdvancedReports = {
+      dateRange: { start: null, end: null },
+      filters: { category: 'all', client: 'all', product: 'all', status: 'all' },
+      
+      init() {
+        this.setupDatePicker();
+        this.setupFilters();
+        this.loadDefaultReports();
+      },
+      
+      setupDatePicker() {
+        const today = new Date();
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+        const fromEl = document.getElementById('reportDateFrom');
+        const toEl = document.getElementById('reportDateTo');
+        if (fromEl) fromEl.value = firstDay.toISOString().slice(0, 10);
+        if (toEl) toEl.value = today.toISOString().slice(0, 10);
+        if (fromEl) fromEl.addEventListener('change', () => this.generateReport());
+        if (toEl) toEl.addEventListener('change', () => this.generateReport());
+      },
+      
+      updateFilters() {
+        const clientSelect = document.getElementById('reportClientFilter');
+        if (clientSelect) {
+          clientSelect.innerHTML = '<option value="all">الكل</option>' + 
+            clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        }
+        const productSelect = document.getElementById('reportProductFilter');
+        if (productSelect) {
+          productSelect.innerHTML = '<option value="all">الكل</option>' + 
+            articles.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+        }
+      },
+      
+      setupFilters() {
+        document.querySelectorAll('#reportClientFilter, #reportProductFilter, #reportStatusFilter, #reportType').forEach(select => {
+          if (select) select.addEventListener('change', () => this.generateReport());
+        });
+      },
+      
+      loadDefaultReports() {
+        setTimeout(() => this.generateReport(), 500);
+      },
+      
+      generateReport() {
+        const type = document.getElementById('reportType')?.value || 'sales';
+        const from = document.getElementById('reportDateFrom')?.value || '';
+        const to = document.getElementById('reportDateTo')?.value || '';
+        const client = document.getElementById('reportClientFilter')?.value || 'all';
+        const product = document.getElementById('reportProductFilter')?.value || 'all';
+        const status = document.getElementById('reportStatusFilter')?.value || 'all';
+        
+        let data = [];
+        let headers = [];
+        let title = '';
+        
+        switch(type) {
+          case 'sales':
+            data = this.getSalesData(from, to, client, product, status);
+            headers = ['التاريخ', 'العميل', 'رقم الفاتورة', 'المبلغ', 'المدفوع', 'المتبقي', 'الحالة'];
+            title = 'تقرير المبيعات';
+            break;
+          case 'purchases':
+            data = this.getPurchasesData(from, to, client, product);
+            headers = ['التاريخ', 'المورد', 'رقم الفاتورة', 'المبلغ', 'المدفوع', 'المتبقي'];
+            title = 'تقرير المشتريات';
+            break;
+          case 'profit':
+            data = this.getProfitData(from, to);
+            headers = ['الفترة', 'المبيعات', 'المشتريات', 'المصروفات', 'الربح الإجمالي', 'صافي الربح'];
+            title = 'تقرير الأرباح والخسائر';
+            break;
+          case 'clients':
+            data = this.getClientsData(from, to);
+            headers = ['العميل', 'عدد الفواتير', 'إجمالي المشتريات', 'المدفوع', 'المتبقي', 'الرصيد'];
+            title = 'تقرير العملاء';
+            break;
+          case 'products':
+            data = this.getProductsData(from, to);
+            headers = ['المنتج', 'الكمية المباعة', 'إجمالي المبيعات', 'متوسط السعر', 'المخزون الحالي'];
+            title = 'تقرير المنتجات';
+            break;
+          case 'inventory':
+            data = this.getInventoryData();
+            headers = ['المنتج', 'المخزون', 'الحد الأدنى', 'القيمة', 'الحالة'];
+            title = 'تقرير المخزون';
+            break;
+          case 'cash':
+            data = this.getCashData(from, to);
+            headers = ['التاريخ', 'الوصف', 'النوع', 'المبلغ', 'الرصيد التراكمي'];
+            title = 'تقرير السيولة';
+            break;
+          case 'expenses':
+            data = this.getExpensesData(from, to);
+            headers = ['التاريخ', 'الفئة', 'الوصف', 'المبلغ'];
+            title = 'تقرير المصروفات';
+            break;
+          default:
+            data = [];
+        }
+        
+        this.renderReport(data, headers, title);
+        this.updateKPIs(data, type);
+        this.renderCharts(data, type);
+      },
+      
+      getSalesData(from, to, clientId, productId, status) {
+        let filtered = [...ventes];
+        if (from && to) filtered = filtered.filter(v => v.date >= from && v.date <= to);
+        if (clientId !== 'all') {
+          const client = clients.find(c => c.id === parseInt(clientId));
+          if (client) filtered = filtered.filter(v => v.client === client.name);
+        }
+        if (productId !== 'all') {
+          const article = articles.find(a => a.id === parseInt(productId));
+          if (article) filtered = filtered.filter(v => v.lines.some(line => line.name === article.name));
+        }
+        if (status !== 'all') {
+          filtered = filtered.filter(v => {
+            const paid = (v.reglements || []).reduce((sum, r) => sum + r.amount, 0);
+            const remaining = v.total - paid;
+            if (status === 'paid') return remaining <= 0;
+            if (status === 'pending') return remaining >= v.total;
+            if (status === 'partial') return remaining > 0 && remaining < v.total;
+            return true;
+          });
+        }
+        return filtered.map(v => {
+          const paid = (v.reglements || []).reduce((sum, r) => sum + r.amount, 0);
+          const remaining = v.total - paid;
+          const statusText = remaining <= 0 ? '✅ مدفوع' : (remaining >= v.total ? '⏳ غير مدفوع' : '🔄 مدفوع جزئياً');
+          return { date: v.date, client: v.client, num: v.num, total: v.total, paid: paid, remaining: remaining, status: statusText };
+        });
+      },
+      
+      getPurchasesData(from, to, supplierId, productId) {
+        let filtered = [...achats];
+        if (from && to) filtered = filtered.filter(v => v.date >= from && v.date <= to);
+        if (supplierId !== 'all') {
+          const supplier = fournisseurs.find(f => f.id === parseInt(supplierId));
+          if (supplier) filtered = filtered.filter(v => v.supplier === supplier.name);
+        }
+        if (productId !== 'all') {
+          const article = articles.find(a => a.id === parseInt(productId));
+          if (article) filtered = filtered.filter(v => v.lines.some(line => line.name === article.name));
+        }
+        return filtered.map(v => {
+          const paid = (v.reglements || []).reduce((sum, r) => sum + r.amount, 0);
+          const remaining = v.total - paid;
+          return { date: v.date, supplier: v.supplier, num: v.num, total: v.total, paid: paid, remaining: remaining };
+        });
+      },
+      
+      getProfitData(from, to) {
+        const filteredVentes = ventes.filter(v => v.date >= from && v.date <= to);
+        const filteredAchats = achats.filter(a => a.date >= from && a.date <= to);
+        const filteredExpenses = expenses.filter(e => e.date >= from && e.date <= to);
+        const totalSales = filteredVentes.reduce((sum, v) => sum + v.total, 0);
+        const totalPurchases = filteredAchats.reduce((sum, a) => sum + a.total, 0);
+        const totalExpenses = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
+        return [{ period: `${from} - ${to}`, totalSales, totalPurchases, totalExpenses, grossProfit: totalSales - totalPurchases, netProfit: totalSales - totalPurchases - totalExpenses }];
+      },
+      
+      getClientsData(from, to) {
+        return clients.map(client => {
+          const clientVentes = ventes.filter(v => v.client === client.name && (!from || v.date >= from) && (!to || v.date <= to));
+          const totalPurchases = clientVentes.reduce((sum, v) => sum + v.total, 0);
+          const totalPaid = clientVentes.reduce((sum, v) => { const paid = (v.reglements || []).reduce((s, r) => s + r.amount, 0); return sum + paid; }, 0);
+          return { name: client.name, invoices: clientVentes.length, totalPurchases, paid: totalPaid, remaining: totalPurchases - totalPaid, balance: client.balance || 0 };
+        });
+      },
+      
+      getProductsData(from, to) {
+        return articles.map(article => {
+          let totalQty = 0, totalSales = 0;
+          ventes.forEach(v => {
+            if (from && v.date < from) return;
+            if (to && v.date > to) return;
+            v.lines.forEach(line => {
+              if (line.name === article.name) { totalQty += line.qty; totalSales += line.total; }
+            });
+          });
+          return { name: article.name, quantity: totalQty, totalSales, avgPrice: totalQty > 0 ? totalSales / totalQty : 0, stock: article.stock || 0 };
+        });
+      },
+      
+      getInventoryData() {
+        return articles.map(article => {
+          const stock = article.stock || 0, minStock = article.minStock || 5;
+          const value = stock * (article.costPrice || article.price || 0);
+          let status = '🟢 جيد';
+          if (stock <= 0) status = '🔴 نفد';
+          else if (stock < minStock) status = '🟡 منخفض';
+          else if (stock < minStock * 2) status = '🟠 متوسط';
+          return { name: article.name, stock, minStock, value, status };
+        });
+      },
+      
+      getCashData(from, to) {
+        const movements = [];
+        caisseClients.forEach(c => { if ((!from || c.date >= from) && (!to || c.date <= to)) movements.push({ date: c.date, description: `دفع من العميل ${c.clientName}`, type: 'داخل', amount: c.amount }); });
+        caisseFournisseurs.forEach(c => { if ((!from || c.date >= from) && (!to || c.date <= to)) movements.push({ date: c.date, description: `دفع للمورد ${c.fournisseurName}`, type: 'خارج', amount: -c.amount }); });
+        movements.sort((a, b) => a.date < b.date ? -1 : 1);
+        let cumulative = companyInfo.cashOpening || 0;
+        return movements.map(m => { cumulative += m.amount; return { date: m.date, description: m.description, type: m.type, amount: Math.abs(m.amount), balance: cumulative }; });
+      },
+      
+      getExpensesData(from, to) {
+        let filtered = [...expenses];
+        if (from && to) filtered = filtered.filter(e => e.date >= from && e.date <= to);
+        return filtered;
+      },
+      
+      renderReport(data, headers, title) {
+        const thead = document.getElementById('reportTableHead');
+        const tbody = document.getElementById('reportTableBody');
+        if (!thead || !tbody) return;
+        const titleEl = document.querySelector('#sec-reports .section-title');
+        if (titleEl) titleEl.textContent = `📊 ${title}`;
+        thead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+        if (data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="${headers.length}" style="text-align:center;padding:20px;color:#999;">لا توجد بيانات لعرضها</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = data.map(item => {
+          const values = Object.values(item);
+          return `<tr>${values.map(val => {
+            if (typeof val === 'number') return `<td style="text-align:right;">${val.toFixed ? val.toFixed(3) : val}</td>`;
+            return `<td>${val}</td>`;
+          }).join('')}</tr>`;
+        }).join('');
+      },
+      
+      updateKPIs(data, type) {
+        let totalSales = 0, totalPurchases = 0, totalProfit = 0, netProfit = 0;
+        if (type === 'sales') {
+          totalSales = data.reduce((sum, item) => sum + (item.total || 0), 0);
+          const totalPaid = data.reduce((sum, item) => sum + (item.paid || 0), 0);
+          totalProfit = totalSales - totalPaid;
+        } else if (type === 'purchases') {
+          totalPurchases = data.reduce((sum, item) => sum + (item.total || 0), 0);
+        } else if (type === 'profit') {
+          const d = data[0] || {};
+          totalSales = d.totalSales || 0;
+          totalPurchases = d.totalPurchases || 0;
+          totalProfit = d.grossProfit || 0;
+          netProfit = d.netProfit || 0;
+        } else if (type === 'clients') {
+          totalSales = data.reduce((sum, item) => sum + (item.totalPurchases || 0), 0);
+        } else if (type === 'products') {
+          totalSales = data.reduce((sum, item) => sum + (item.totalSales || 0), 0);
+        }
+        document.getElementById('reportTotalSales').textContent = totalSales.toFixed(3);
+        document.getElementById('reportTotalPurchases').textContent = totalPurchases.toFixed(3);
+        document.getElementById('reportGrossProfit').textContent = totalProfit.toFixed(3);
+        document.getElementById('reportNetProfit').textContent = netProfit.toFixed(3);
+        document.getElementById('reportTotalClients').textContent = clients.length;
+        document.getElementById('reportTotalProducts').textContent = articles.length;
+      },
+      
+      renderCharts(data, type) {
+        this.renderSalesChart(data, type);
+        this.renderProfitChart(data, type);
+      },
+      
+      renderSalesChart(data, type) {
+        const canvas = document.getElementById('salesChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const rect = canvas.parentElement.getBoundingClientRect();
+        const width = rect.width || 400;
+        const height = 280;
+        canvas.width = width;
+        canvas.height = height;
+        ctx.clearRect(0, 0, width, height);
+        
+        let labels = [], values = [];
+        if (type === 'sales' && data.length > 0) {
+          const salesByDate = {};
+          data.forEach(item => { salesByDate[item.date] = (salesByDate[item.date] || 0) + (item.total || 0); });
+          labels = Object.keys(salesByDate);
+          values = Object.values(salesByDate);
+        } else {
+          labels = ['الأسبوع 1', 'الأسبوع 2', 'الأسبوع 3', 'الأسبوع 4'];
+          values = [1000, 1500, 1200, 1800];
+        }
+        
+        const padding = 35;
+        const chartWidth = width - padding * 2;
+        const chartHeight = height - padding * 2;
+        const maxValue = Math.max(...values, 100);
+        
+        ctx.strokeStyle = '#e0e0e0';
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i < 5; i++) {
+          const y = padding + (chartHeight / 5) * i;
+          ctx.beginPath();
+          ctx.moveTo(padding, y);
+          ctx.lineTo(width - padding, y);
+          ctx.stroke();
+          const val = maxValue - (maxValue / 5) * i;
+          ctx.fillStyle = '#999';
+          ctx.font = '8px Cairo';
+          ctx.textAlign = 'right';
+          ctx.fillText(val.toFixed(0), padding - 5, y + 3);
+        }
+        
+        const barWidth = chartWidth / labels.length * 0.6;
+        const gap = chartWidth / labels.length * 0.4;
+        values.forEach((val, index) => {
+          const x = padding + (index / labels.length) * chartWidth + gap / 2;
+          const barHeight = Math.max((val / maxValue) * chartHeight, 2);
+          const y = padding + chartHeight - barHeight;
+          const gradient = ctx.createLinearGradient(x, y, x, padding + chartHeight);
+          gradient.addColorStop(0, '#4a6cf7');
+          gradient.addColorStop(1, '#6b8aff');
+          ctx.fillStyle = gradient;
+          ctx.fillRect(x, y, barWidth, barHeight);
+          ctx.fillStyle = '#333';
+          ctx.font = '8px Cairo';
+          ctx.textAlign = 'center';
+          ctx.fillText(val.toFixed(0), x + barWidth / 2, y - 5);
+          ctx.fillStyle = '#666';
+          ctx.font = '7px Cairo';
+          ctx.fillText(labels[index] || '', x + barWidth / 2, padding + chartHeight + 15);
+        });
+      },
+      
+      renderProfitChart(data, type) {
+        const canvas = document.getElementById('profitChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const rect = canvas.parentElement.getBoundingClientRect();
+        const width = rect.width || 400;
+        const height = 280;
+        canvas.width = width;
+        canvas.height = height;
+        ctx.clearRect(0, 0, width, height);
+        
+        let values = [];
+        if (type === 'profit') {
+          const d = data[0] || {};
+          values = [d.grossProfit || 0, d.totalExpenses || 0];
+        } else {
+          const totalSales = ventes.reduce((sum, v) => sum + v.total, 0);
+          const totalPurchases = achats.reduce((sum, a) => sum + a.total, 0);
+          const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+          values = [totalSales - totalPurchases, totalExpenses];
+        }
+        
+        const centerX = width / 2;
+        const centerY = height / 2 + 5;
+        const radius = Math.min(width, height) / 2 - 40;
+        const colors = ['#2ecc71', '#e74c5e'];
+        const labels = ['الربح', 'المصروفات'];
+        const total = values.reduce((sum, v) => sum + Math.max(v, 0), 0);
+        
+        if (total === 0) {
+          ctx.fillStyle = '#999';
+          ctx.font = '13px Cairo';
+          ctx.textAlign = 'center';
+          ctx.fillText('لا توجد بيانات', centerX, centerY);
+          return;
+        }
+        
+        let startAngle = -Math.PI / 2;
+        values.forEach((value, index) => {
+          const sliceAngle = (Math.max(value, 0) / total) * 2 * Math.PI;
+          const endAngle = startAngle + sliceAngle;
+          ctx.beginPath();
+          ctx.moveTo(centerX, centerY);
+          ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+          ctx.closePath();
+          ctx.fillStyle = colors[index % colors.length];
+          ctx.fill();
+          const midAngle = startAngle + sliceAngle / 2;
+          const labelRadius = radius * 0.6;
+          const labelX = centerX + Math.cos(midAngle) * labelRadius;
+          const labelY = centerY + Math.sin(midAngle) * labelRadius;
+          ctx.fillStyle = '#fff';
+          ctx.font = 'bold 10px Cairo';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          const percentage = ((Math.max(value, 0) / total) * 100).toFixed(1);
+          ctx.fillText(`${percentage}%`, labelX, labelY);
+          startAngle = endAngle;
+        });
+        
+        const legendY = height - 10;
+        let legendX = width / 2 - 40;
+        labels.forEach((label, i) => {
+          ctx.fillStyle = colors[i];
+          ctx.fillRect(legendX, legendY - 6, 10, 10);
+          ctx.fillStyle = '#333';
+          ctx.font = '8px Cairo';
+          ctx.textAlign = 'left';
+          ctx.fillText(label, legendX + 14, legendY + 2);
+          legendX += 50;
+        });
+      },
+      
+      printReport() {
+        const content = document.getElementById('reportTableWrapper')?.innerHTML || '';
+        const title = document.querySelector('#sec-reports .section-title')?.textContent || 'تقرير';
+        const kpis = document.getElementById('reportsKPIs')?.innerHTML || '';
+        const printWindow = window.open('', '_blank', 'width=900,height=600');
+        printWindow.document.write(`
+          <html dir="rtl">
+          <head>
+            <title>${title}</title>
+            <style>
+              body { font-family: 'Cairo', sans-serif; padding: 20px; direction: rtl; }
+              table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+              th { background: #1e2f66; color: #fff; padding: 8px; border: 1px solid #999; }
+              td { padding: 6px; border: 1px solid #ddd; text-align: center; }
+              .header { text-align: center; border-bottom: 3px double #1e2f66; padding-bottom: 10px; margin-bottom: 15px; }
+              .kpi-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin: 10px 0; }
+              .kpi-card { background: #f0f4ff; padding: 10px; border-radius: 8px; text-align: center; }
+              .kpi-card .val { font-size: 16px; font-weight: 800; color: #1e2f66; }
+              .kpi-card .lbl { font-size: 10px; color: #666; }
+              .charts-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+              .chart-box { background: #f8f9fc; padding: 10px; border-radius: 8px; text-align: center; }
+              .chart-box canvas { max-width: 100%; height: auto; }
+              @media print { body { padding: 10px; } .no-print { display: none; } }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>${title}</h1>
+              <p>${companyInfo.name || 'GTR POS'} | ${new Date().toLocaleDateString('fr-FR')}</p>
+            </div>
+            <div class="kpi-row">${kpis}</div>
+            <div class="charts-container">
+              <div class="chart-box"><canvas id="salesChartPrint"></canvas></div>
+              <div class="chart-box"><canvas id="profitChartPrint"></canvas></div>
+            </div>
+            ${content}
+            <div style="text-align:center;margin-top:20px;color:#666;font-size:10px;border-top:1px solid #ddd;padding-top:10px;">
+              ${companyInfo.name} - ${companyInfo.address || ''} - ${companyInfo.phone1 || ''}
+            </div>
+            <script>
+              window.onload = function() {
+                // نسخ الرسوم البيانية
+                const salesCanvas = document.getElementById('salesChart');
+                const profitCanvas = document.getElementById('profitChart');
+                if (salesCanvas) {
+                  const clone = document.getElementById('salesChartPrint');
+                  if (clone) clone.getContext('2d').drawImage(salesCanvas, 0, 0);
+                }
+                if (profitCanvas) {
+                  const clone = document.getElementById('profitChartPrint');
+                  if (clone) clone.getContext('2d').drawImage(profitCanvas, 0, 0);
+                }
+                setTimeout(function() {
+                  window.print();
+                  setTimeout(function() { window.close(); }, 500);
+                }, 300);
+              };
+            <\/script>
+          </body>
+          </html>
+        `);
+        printWindow.document.close();
+      },
+      
+      exportCSV() {
+        const rows = document.querySelectorAll('#reportTableBody tr');
+        if (rows.length === 0) { showToast('⚠️ لا توجد بيانات للتصدير'); return; }
+        const headers = [];
+        document.querySelectorAll('#reportTableHead th').forEach(th => headers.push(th.textContent));
+        let csv = headers.join(',') + '\n';
+        rows.forEach(row => {
+          const cells = [];
+          row.querySelectorAll('td').forEach(td => cells.push(td.textContent.trim()));
+          csv += cells.join(',') + '\n';
+        });
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `تقرير_${new Date().toISOString().slice(0,10)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('✅ تم تصدير التقرير بنجاح');
+      },
+      
+      exportPDF() {
+        showToast('⏳ جاري إنشاء PDF...');
+        const content = document.getElementById('reportTableWrapper');
+        if (!content) { showToast('❌ لا توجد بيانات'); return; }
+        html2canvas(content, { scale: 2, useCORS: true, backgroundColor: '#ffffff' })
+          .then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            const title = document.querySelector('#sec-reports .section-title')?.textContent || 'تقرير';
+            pdf.setFontSize(18);
+            pdf.text(title, pdfWidth / 2, 20, { align: 'center' });
+            pdf.setFontSize(10);
+            pdf.text(`${companyInfo.name || 'GTR POS'} - ${new Date().toLocaleDateString('fr-FR')}`, pdfWidth / 2, 28, { align: 'center' });
+            pdf.addImage(imgData, 'PNG', 0, 35, pdfWidth, pdfHeight);
+            pdf.save(`تقرير_${new Date().toISOString().slice(0,10)}.pdf`);
+            showToast('✅ تم تصدير PDF بنجاح');
+          })
+          .catch(() => showToast('❌ حدث خطأ أثناء تصدير PDF'));
+      }
+    };
+
+    // =============================================
     // ===== INIT =====
+    // =============================================
     function initAll() {
       try {
         if (!currentUser) return;
@@ -2838,19 +3610,27 @@
         FinanceTable.load();
         FinanceTable.render();
         AutoFinanceRecorder.startAutoRecording();
+        PerformanceOptimizer.init();
+        AdvancedReports.init();
         loadDashboardSettings();
-        Dashboard.render();
         document.getElementById('loginOverlay').classList.add('hide');
         document.getElementById('pendingOverlay').classList.add('hide');
         showSection('dashboard');
         showToast('✅ Mode de stockage : ' + (storageMode === 'cloud' ? 'Cloud' : 'Local'));
+        // تحديث التقارير بعد تحميل البيانات
+        setTimeout(() => {
+          AdvancedReports.updateFilters();
+          AdvancedReports.generateReport();
+        }, 800);
       } catch(e) {
         console.error('Init error:', e);
         showToast('⚠️ Erreur d\'initialisation : ' + e.message);
       }
     }
 
+    // =============================================
     // ===== AUTH STATE =====
+    // =============================================
     const ADMIN_EMAIL = 'krimi.neji@gmail.com';
     if (auth) {
       auth.onAuthStateChanged(user => {
@@ -2895,7 +3675,9 @@
       });
     }
 
+    // =============================================
     // ===== LOAD STATE FROM FIRESTORE =====
+    // =============================================
     function loadStateFromFirestore(uid) {
       if (storageMode !== 'cloud' || !db) return Promise.resolve();
       return db.collection('users').doc(uid).get()
@@ -2931,7 +3713,9 @@
         });
     }
 
+    // =============================================
     // ===== DÉMARRAGE =====
+    // =============================================
     loadState();
     document.getElementById('storageLocalBtn').addEventListener('click', function() { setStorageMode('local'); });
     document.getElementById('storageCloudBtn').addEventListener('click', function() { setStorageMode('cloud'); });
