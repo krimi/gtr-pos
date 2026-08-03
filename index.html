@@ -6,7 +6,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#1e2f66">
-  <title>GTR POS V 0.7.5 - مع التقارير المتقدمة</title>
+  <title>GTR POS V 0.7.6 - مع البريد الإلكتروني</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -123,6 +123,7 @@
     .btn.outline:active { background: var(--navy); color: #fff; }
     .btn.print { background: linear-gradient(135deg, #6c7ae0, #4a56b0); }
     .btn.whatsapp { background: linear-gradient(135deg, #25d366, #128C7E); }
+    .btn.email { background: linear-gradient(135deg, #3498db, #2980b9); }
     .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 350; display: none; align-items: center; justify-content: center; padding: 16px; backdrop-filter: blur(4px); }
     .modal-overlay.show { display: flex; }
     .modal-box { background: #fff; border-radius: 20px; padding: 24px; width: 100%; max-width: 340px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4); }
@@ -283,7 +284,7 @@
   <div class="login-overlay" id="loginOverlay">
     <div class="login-box">
       <div class="login-logo-icon"><span class="gtr">GTR</span><span class="badge">POS</span></div>
-      <div class="login-logo">GTR POS <span style="font-size:12px;opacity:.6;font-weight:400;">V 0.7.5</span></div>
+      <div class="login-logo">GTR POS <span style="font-size:12px;opacity:.6;font-weight:400;">V 0.7.6</span></div>
       <div class="login-sub" id="loginModeLabel">Connexion à votre compte</div>
       <input type="email" id="loginEmail" placeholder="E-mail" autocomplete="email">
       <div class="password-wrapper">
@@ -317,7 +318,7 @@
     <div class="appbar">
       <div class="appbar-left">
         <div class="logo-icon">G</div>
-        <div><div class="title" id="pageTitle">Accueil</div><div class="sub" id="appVersionSub" onclick="openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">V 0.7.5</span></div></div>
+        <div><div class="title" id="pageTitle">Accueil</div><div class="sub" id="appVersionSub" onclick="openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">V 0.7.6</span></div></div>
       </div>
       <div style="display:flex;gap:6px;">
         <button class="menu-btn" id="backBtn" onclick="goHome()" style="display:none;">🏠</button>
@@ -429,11 +430,22 @@
     <div class="sheet-overlay" id="overlay"></div>
 
     <!-- SHEETS -->
-    <div class="sheet" id="sheet-clients"><div class="sheet-handle"></div><div class="sheet-header"><h3>Données client</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field"><label>Code client</label><input id="cCode" readonly></div><div class="field"><label>Nom client</label><input id="cName"></div><div class="field-row"><div class="field"><label>Téléphone 1</label><input id="cPhone"></div><div class="field"><label>Téléphone 2</label><input id="cPhone2"></div></div><div class="field"><label>Adresse</label><input id="cAddress"></div><div class="field"><label>Matricule fiscal (MF)</label><input id="cTaxId"></div><div class="field-row-2"><div class="field"><label>Solde d'ouverture (TND)</label><input id="cOpeningBalance" type="number" step="0.001" value="0"></div><div class="field"><label>Solde actuel (TND)</label><input id="cBalance" type="number" step="0.001" value="0" readonly style="background:#eef0f6;"></div></div><div class="section-title" style="margin-top:8px;">💰 Prix spéciaux</div><div id="specialPricesList"></div><div class="add-sp-row"><select id="spArticleSelect"><option value="">-- Choisir un article --</option></select><input type="number" step="0.001" id="spPriceInput" placeholder="Prix"><button class="btn save small" onclick="Clients.addSpecialPrice()">+</button></div></div><div class="sheet-footer"><button class="btn save" onclick="Clients.save()">💾 Enregistrer</button><button class="btn edit" onclick="Clients.edit()">✏️ Modifier</button><button class="btn del" onclick="Clients.remove()">🗑 Supprimer</button></div></div>
+    <div class="sheet" id="sheet-clients"><div class="sheet-handle"></div><div class="sheet-header"><h3>Données client</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field"><label>Code client</label><input id="cCode" readonly></div><div class="field"><label>Nom client</label><input id="cName"></div><div class="field-row"><div class="field"><label>Téléphone 1</label><input id="cPhone"></div><div class="field"><label>Téléphone 2</label><input id="cPhone2"></div></div>
+        <!-- ✅ حقل البريد الإلكتروني للعميل مع التحقق -->
+        <div class="field"><label>📧 البريد الإلكتروني</label><input id="cEmail" type="email" placeholder="exemple@email.com" style="direction:ltr;text-align:right;"><div id="cEmailError" style="font-size:8px;color:var(--danger);min-height:12px;"></div></div>
+        <div class="field"><label>Adresse</label><input id="cAddress"></div><div class="field"><label>Matricule fiscal (MF)</label><input id="cTaxId"></div><div class="field-row-2"><div class="field"><label>Solde d'ouverture (TND)</label><input id="cOpeningBalance" type="number" step="0.001" value="0"></div><div class="field"><label>Solde actuel (TND)</label><input id="cBalance" type="number" step="0.001" value="0" readonly style="background:#eef0f6;"></div></div><div class="section-title" style="margin-top:8px;">💰 Prix spéciaux</div><div id="specialPricesList"></div><div class="add-sp-row"><select id="spArticleSelect"><option value="">-- Choisir un article --</option></select><input type="number" step="0.001" id="spPriceInput" placeholder="Prix"><button class="btn save small" onclick="Clients.addSpecialPrice()">+</button></div></div><div class="sheet-footer"><button class="btn save" onclick="Clients.save()">💾 Enregistrer</button><button class="btn edit" onclick="Clients.edit()">✏️ Modifier</button><button class="btn del" onclick="Clients.remove()">🗑 Supprimer</button></div></div>
     <div class="sheet" id="sheet-fournisseurs"><div class="sheet-handle"></div><div class="sheet-header"><h3>Données fournisseur</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field"><label>Code fournisseur</label><input id="fCode" readonly></div><div class="field"><label>Nom fournisseur</label><input id="fName"></div><div class="field-row"><div class="field"><label>Téléphone 1</label><input id="fPhone"></div><div class="field"><label>Téléphone 2</label><input id="fPhone2"></div></div><div class="field"><label>Adresse</label><input id="fAddress"></div><div class="field"><label>Matricule fiscal (MF)</label><input id="fTaxId"></div><div class="field-row-2"><div class="field"><label>Solde d'ouverture (TND)</label><input id="fOpeningBalance" type="number" step="0.001" value="0"></div><div class="field"><label>Solde actuel (TND)</label><input id="fBalance" type="number" step="0.001" value="0" readonly style="background:#eef0f6;"></div></div><div class="field"><label>Notes</label><input id="fNotes"></div></div><div class="sheet-footer"><button class="btn save" onclick="Fournisseurs.save()">💾 Enregistrer</button><button class="btn edit" onclick="Fournisseurs.edit()">✏️ Modifier</button><button class="btn del" onclick="Fournisseurs.remove()">🗑 Supprimer</button></div></div>
     <div class="sheet" id="sheet-articles"><div class="sheet-handle"></div><div class="sheet-header"><h3>Données article</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field"><label>Code article</label><input id="aCode" readonly></div><div class="field"><label>Nom article</label><input id="aName"></div><div class="field"><label>Prix de vente (TND)</label><input id="aPrice" type="number" step="0.001"></div><div class="field"><label>Prix d'achat (TND)</label><input id="aCostPrice" type="number" step="0.001"></div><div class="field"><label>Quantité en stock</label><input id="aStock" type="number" value="0"></div><div class="field"><label>Stock minimum</label><input id="aMinStock" type="number" value="5"></div></div><div class="sheet-footer"><button class="btn save" onclick="Articles.save()">💾 Enregistrer</button><button class="btn edit" onclick="Articles.edit()">✏️ Modifier</button><button class="btn del" onclick="Articles.remove()">🗑 Supprimer</button></div></div>
-    <div class="sheet" id="sheet-ventes"><div class="sheet-handle"></div><div class="sheet-header"><h3>Facture de vente</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field-row"><div class="field"><label>N° de facture</label><input id="vNum" readonly></div><div class="field"><label>Date</label><input id="vDate" type="date"></div></div><div class="field-row"><div class="field"><label>Client</label><select id="vClient" onchange="Ventes.fillClient()"><option value="">-- Choisir --</option></select></div><div class="field"><label>Téléphone</label><input id="vPhone" readonly></div></div><div class="section-title">📊 Résumé du compte</div><div class="invoice-summary-grid" id="vAccountSummary"><div class="item"><span class="label">Solde précédent</span><span class="value" id="vPrevBalance">0.000</span></div><div class="item"><span class="label">Montant facture</span><span class="value" id="vInvoiceTotal">0.000</span></div><div class="item"><span class="label">Payé</span><span class="value" id="vPaidAmount">0.000</span></div><div class="item total"><span class="label">Solde actuel</span><span class="value" id="vCurrentBalance">0.000</span></div></div><div class="section-title">Ajouter un article</div><div class="field"><label>Article</label><select id="viArticle" onchange="Ventes.fillArticle()"><option value="">-- Choisir --</option></select></div><div id="viStockHint" style="font-size:8px;color:var(--muted);margin:-2px 0 2px;"></div><div class="field-row-3"><div class="field"><label>Prix</label><input id="viPrice" type="number" step="0.001" oninput="Ventes.calcLine()"></div><div class="field"><label>Quantité</label><input id="viQty" type="number" min="1" value="1" oninput="Ventes.calcLine()"></div><div class="field"><label>Total</label><input id="viTotal" readonly style="background:#eef0f6;"></div></div><button class="btn outline small" onclick="Ventes.addLine()">+ Ajouter au tableau</button><table class="items-mini"><thead><tr><th>Article</th><th>Prix</th><th>Qté</th><th>Total</th><th>Action</th></tr></thead><tbody id="vLinesBody"></tbody></table><div class="totals-mini"><span>Total : </span><span id="vGrand">0.000</span> TND</div><div class="section-title">💰 Règlements</div><div id="vReglementsList"></div><div class="add-reg-row"><input type="number" step="0.001" id="vRegAmount" placeholder="Montant" style="flex:2;"><select id="vRegType"><option value="Espèces">Espèces</option><option value="Chèque">Chèque</option><option value="Traite">Traite</option><option value="Virement">Virement</option></select><button class="btn save small" onclick="Ventes.addReglement()">+</button></div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;"><button class="btn whatsapp" style="flex:1;font-size:11px;" onclick="Ventes.shareWhatsapp()">📱 WhatsApp (image)</button><button class="btn outline small" style="flex:1;font-size:11px;" onclick="Ventes.printInvoice()">🖨️ Imprimer</button><button class="btn outline small" style="flex:1;font-size:11px;" onclick="Ventes.printBluetooth()">🖨️ BT</button></div></div><div class="sheet-footer"><button class="btn save" onclick="Ventes.save()">💾 Enregistrer</button><button class="btn edit" onclick="Ventes.edit()">✏️ Modifier</button><button class="btn del" onclick="Ventes.remove()">🗑 Supprimer</button></div></div>
-    <div class="sheet" id="sheet-achats"><div class="sheet-handle"></div><div class="sheet-header"><h3>Facture d'achat</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field-row"><div class="field"><label>N° de facture</label><input id="pNum" readonly></div><div class="field"><label>Date</label><input id="pDate" type="date"></div></div><div class="field-row"><div class="field"><label>Fournisseur</label><select id="pSupplier" onchange="Achats.fillSupplier()"><option value="">-- Choisir --</option></select></div><div class="field"><label>Téléphone</label><input id="pPhone" readonly></div></div><div class="section-title">📊 Résumé du compte</div><div class="invoice-summary-grid" id="pAccountSummary"><div class="item"><span class="label">Solde précédent</span><span class="value" id="pPrevBalance">0.000</span></div><div class="item"><span class="label">Montant facture</span><span class="value" id="pInvoiceTotal">0.000</span></div><div class="item"><span class="label">Payé</span><span class="value" id="pPaidAmount">0.000</span></div><div class="item total"><span class="label">Solde actuel</span><span class="value" id="pCurrentBalance">0.000</span></div></div><div class="section-title">Ajouter un article</div><div class="field"><label>Article</label><select id="piArticle" onchange="Achats.fillArticle()"><option value="">-- Choisir --</option></select></div><div id="piStockHint" style="font-size:8px;color:var(--muted);margin:-2px 0 2px;"></div><div class="field-row-3"><div class="field"><label>Prix</label><input id="piPrice" type="number" step="0.001" oninput="Achats.calcLine()"></div><div class="field"><label>Quantité</label><input id="piQty" type="number" min="1" value="1" oninput="Achats.calcLine()"></div><div class="field"><label>Total</label><input id="piTotal" readonly style="background:#eef0f6;"></div></div><button class="btn outline small" onclick="Achats.addLine()">+ Ajouter au tableau</button><table class="items-mini"><thead><tr><th>Article</th><th>Prix</th><th>Qté</th><th>Total</th><th>Action</th></tr></thead><tbody id="pLinesBody"></tbody></table><div class="totals-mini"><span>Total : </span><span id="pGrand">0.000</span> TND</div><div class="section-title">💰 Règlements</div><div id="pReglementsList"></div><div class="add-reg-row"><input type="number" step="0.001" id="pRegAmount" placeholder="Montant" style="flex:2;"><select id="pRegType"><option value="Espèces">Espèces</option><option value="Chèque">Chèque</option><option value="Traite">Traite</option><option value="Virement">Virement</option></select><button class="btn save small" onclick="Achats.addReglement()">+</button></div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;"><button class="btn whatsapp" style="flex:1;font-size:11px;" onclick="Achats.shareWhatsapp()">📱 WhatsApp (image)</button><button class="btn outline small" style="flex:1;font-size:11px;" onclick="Achats.printInvoice()">🖨️ Imprimer</button><button class="btn outline small" style="flex:1;font-size:11px;" onclick="Achats.printBluetooth()">🖨️ BT</button></div></div><div class="sheet-footer"><button class="btn save" onclick="Achats.save()">💾 Enregistrer</button><button class="btn edit" onclick="Achats.edit()">✏️ Modifier</button><button class="btn del" onclick="Achats.remove()">🗑 Supprimer</button></div></div>
+    <div class="sheet" id="sheet-ventes"><div class="sheet-handle"></div><div class="sheet-header"><h3>Facture de vente</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field-row"><div class="field"><label>N° de facture</label><input id="vNum" readonly></div><div class="field"><label>Date</label><input id="vDate" type="date"></div></div><div class="field-row"><div class="field"><label>Client</label><select id="vClient" onchange="Ventes.fillClient()"><option value="">-- Choisir --</option></select></div><div class="field"><label>Téléphone</label><input id="vPhone" readonly></div></div>
+        <!-- ✅ عرض البريد الإلكتروني للعميل في الفاتورة -->
+        <div class="field-row"><div class="field"><label>📧 البريد الإلكتروني</label><input id="vEmail" readonly style="background:#eef0f6;"></div><div class="field"><label>MF</label><input id="vTaxId" readonly style="background:#eef0f6;"></div></div>
+        <div class="section-title">📊 Résumé du compte</div><div class="invoice-summary-grid" id="vAccountSummary"><div class="item"><span class="label">Solde précédent</span><span class="value" id="vPrevBalance">0.000</span></div><div class="item"><span class="label">Montant facture</span><span class="value" id="vInvoiceTotal">0.000</span></div><div class="item"><span class="label">Payé</span><span class="value" id="vPaidAmount">0.000</span></div><div class="item total"><span class="label">Solde actuel</span><span class="value" id="vCurrentBalance">0.000</span></div></div><div class="section-title">Ajouter un article</div><div class="field"><label>Article</label><select id="viArticle" onchange="Ventes.fillArticle()"><option value="">-- Choisir --</option></select></div><div id="viStockHint" style="font-size:8px;color:var(--muted);margin:-2px 0 2px;"></div><div class="field-row-3"><div class="field"><label>Prix</label><input id="viPrice" type="number" step="0.001" oninput="Ventes.calcLine()"></div><div class="field"><label>Quantité</label><input id="viQty" type="number" min="1" value="1" oninput="Ventes.calcLine()"></div><div class="field"><label>Total</label><input id="viTotal" readonly style="background:#eef0f6;"></div></div><button class="btn outline small" onclick="Ventes.addLine()">+ Ajouter au tableau</button><table class="items-mini"><thead><tr><th>Article</th><th>Prix</th><th>Qté</th><th>Total</th><th>Action</th></tr></thead><tbody id="vLinesBody"></tbody></table><div class="totals-mini"><span>Total : </span><span id="vGrand">0.000</span> TND</div><div class="section-title">💰 Règlements</div><div id="vReglementsList"></div><div class="add-reg-row"><input type="number" step="0.001" id="vRegAmount" placeholder="Montant" style="flex:2;"><select id="vRegType"><option value="Espèces">Espèces</option><option value="Chèque">Chèque</option><option value="Traite">Traite</option><option value="Virement">Virement</option></select><button class="btn save small" onclick="Ventes.addReglement()">+</button></div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;">
+          <button class="btn whatsapp" style="flex:1;font-size:11px;" onclick="Ventes.shareWhatsapp()">📱 WhatsApp</button>
+          <button class="btn email" style="flex:1;font-size:11px;" onclick="Ventes.sendEmail()">✉️ Envoyer par email</button>
+          <button class="btn outline small" style="flex:1;font-size:11px;" onclick="Ventes.printInvoice()">🖨️ Imprimer</button>
+          <button class="btn outline small" style="flex:1;font-size:11px;" onclick="Ventes.printBluetooth()">🖨️ BT</button>
+        </div></div><div class="sheet-footer"><button class="btn save" onclick="Ventes.save()">💾 Enregistrer</button><button class="btn edit" onclick="Ventes.edit()">✏️ Modifier</button><button class="btn del" onclick="Ventes.remove()">🗑 Supprimer</button></div></div>
+    <div class="sheet" id="sheet-achats"><div class="sheet-handle"></div><div class="sheet-header"><h3>Facture d'achat</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field-row"><div class="field"><label>N° de facture</label><input id="pNum" readonly></div><div class="field"><label>Date</label><input id="pDate" type="date"></div></div><div class="field-row"><div class="field"><label>Fournisseur</label><select id="pSupplier" onchange="Achats.fillSupplier()"><option value="">-- Choisir --</option></select></div><div class="field"><label>Téléphone</label><input id="pPhone" readonly></div></div><div class="section-title">📊 Résumé du compte</div><div class="invoice-summary-grid" id="pAccountSummary"><div class="item"><span class="label">Solde précédent</span><span class="value" id="pPrevBalance">0.000</span></div><div class="item"><span class="label">Montant facture</span><span class="value" id="pInvoiceTotal">0.000</span></div><div class="item"><span class="label">Payé</span><span class="value" id="pPaidAmount">0.000</span></div><div class="item total"><span class="label">Solde actuel</span><span class="value" id="pCurrentBalance">0.000</span></div></div><div class="section-title">Ajouter un article</div><div class="field"><label>Article</label><select id="piArticle" onchange="Achats.fillArticle()"><option value="">-- Choisir --</option></select></div><div id="piStockHint" style="font-size:8px;color:var(--muted);margin:-2px 0 2px;"></div><div class="field-row-3"><div class="field"><label>Prix</label><input id="piPrice" type="number" step="0.001" oninput="Achats.calcLine()"></div><div class="field"><label>Quantité</label><input id="piQty" type="number" min="1" value="1" oninput="Achats.calcLine()"></div><div class="field"><label>Total</label><input id="piTotal" readonly style="background:#eef0f6;"></div></div><button class="btn outline small" onclick="Achats.addLine()">+ Ajouter au tableau</button><table class="items-mini"><thead><tr><th>Article</th><th>Prix</th><th>Qté</th><th>Total</th><th>Action</th></tr></thead><tbody id="pLinesBody"></tbody></table><div class="totals-mini"><span>Total : </span><span id="pGrand">0.000</span> TND</div><div class="section-title">💰 Règlements</div><div id="pReglementsList"></div><div class="add-reg-row"><input type="number" step="0.001" id="pRegAmount" placeholder="Montant" style="flex:2;"><select id="pRegType"><option value="Espèces">Espèces</option><option value="Chèque">Chèque</option><option value="Traite">Traite</option><option value="Virement">Virement</option></select><button class="btn save small" onclick="Achats.addReglement()">+</button></div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;"><button class="btn whatsapp" style="flex:1;font-size:11px;" onclick="Achats.shareWhatsapp()">📱 WhatsApp</button><button class="btn outline small" style="flex:1;font-size:11px;" onclick="Achats.printInvoice()">🖨️ Imprimer</button><button class="btn outline small" style="flex:1;font-size:11px;" onclick="Achats.printBluetooth()">🖨️ BT</button></div></div><div class="sheet-footer"><button class="btn save" onclick="Achats.save()">💾 Enregistrer</button><button class="btn edit" onclick="Achats.edit()">✏️ Modifier</button><button class="btn del" onclick="Achats.remove()">🗑 Supprimer</button></div></div>
     <div class="sheet" id="sheet-expenses"><div class="sheet-handle"></div><div class="sheet-header"><h3>Dépense</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field"><label>Code dépense</label><input id="exCode" readonly></div><div class="field"><label>Date</label><input id="exDate" type="date"></div><div class="field"><label>Catégorie</label><select id="exCategory"><option>Loyer</option><option>Salaires</option><option>Factures</option><option>Transport</option><option>Maintenance</option><option>Consommables</option><option>Marketing</option><option>Autre</option></select></div><div class="field"><label>Montant (TND)</label><input id="exAmount" type="number" step="0.001"></div><div class="field"><label>Libellé</label><input id="exDesc" placeholder="Notes"></div></div><div class="sheet-footer"><button class="btn save" onclick="Expenses.save()">💾 Enregistrer</button><button class="btn edit" onclick="Expenses.edit()">✏️ Modifier</button><button class="btn del" onclick="Expenses.remove()">🗑 Supprimer</button></div></div>
     <div class="sheet" id="sheet-company"><div class="sheet-handle"></div><div class="sheet-header"><h3>Données de l'entreprise</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="sheet-body"><div class="field"><label>🏢 Nom de l'entreprise</label><input id="cpyName"></div><div class="field"><label>📍 Adresse</label><input id="cpyAddress"></div><div class="field"><label>📞 Téléphone</label><input id="cpyPhone1"></div><div class="field"><label>🆔 Matricule fiscal (MF)</label><input id="cpyTaxId"></div><div class="field" style="border-top:1px dashed var(--border);padding-top:6px;margin-top:6px;"><label>💰 Solde caisse d'ouverture (TND)</label><input id="cpyCashOpening" type="number" step="0.001" value="0"><span style="font-size:7px;color:var(--muted);">⏺ Utilisé pour calculer la caisse</span></div><button class="btn save" onclick="CompanyInfo.save()">💾 Enregistrer</button><div class="section-title">📐 حجم الأيقونات</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;"><button class="btn outline small" onclick="setDashboardColumns(2)" style="flex:1;font-size:11px;">2 أعمدة</button><button class="btn outline small" onclick="setDashboardColumns(3)" style="flex:1;font-size:11px;">3 أعمدة</button><button class="btn outline small" onclick="setDashboardColumns(4)" style="flex:1;font-size:11px;">4 أعمدة</button></div><div id="colsStatus" style="font-size:10px;color:var(--muted);margin-bottom:6px;">الحالي: 2 أعمدة</div><div class="section-title">💾 Sauvegarde</div><button class="btn outline small" onclick="exportBackup()">⬇️ Exporter</button><button class="btn outline small" onclick="exportBackupToDrive()">☁️ Google Drive</button><input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importBackupFile(this)"><button class="btn outline small" onclick="document.getElementById('importFileInput').click()">⬆️ Importer</button><div style="font-size:9px;color:var(--muted);margin-top:4px;">💡 Pour installer l'application : ⋮ dans le navigateur → Ajouter à l'écran d'accueil</div><div class="section-title">👤 Compte</div><div id="accountEmailDisplay" style="font-size:11px;color:var(--muted);margin-bottom:3px;"></div><button class="btn del" onclick="doLogout()">🚪 Se déconnecter</button></div></div>
 
@@ -446,12 +458,20 @@
   <!-- PRINT OVERLAY -->
   <div class="print-overlay" id="printOverlay"><div class="print-actions"><div class="paper-selector"><span>📄 Format papier :</span><select id="paperSizeSelect"><option value="a4">Normal</option><option value="80" selected>80mm</option><option value="56">56mm</option></select></div><button class="btn-close" onclick="closePrintOverlay()">✕ Fermer</button><button class="btn-print" onclick="window.print()">🖨️ Imprimer</button></div><div style="text-align:center;color:#aaa;font-size:10px;margin-bottom:3px;">💡 Choisissez l'imprimante (Bluetooth/USB) dans la liste d'impression</div><div class="invoice-doc paper-80" id="printDoc"></div></div>
 
+  <!-- EMAIL MODAL -->
+  <div class="modal-overlay" id="emailModal"><div class="modal-box"><h3>✉️ Envoyer la facture par email</h3>
+    <div class="field"><label>📧 Adresse email du client</label><input type="email" id="emailRecipient" placeholder="exemple@email.com" style="direction:ltr;text-align:right;"></div>
+    <div class="field"><label>📝 Message</label><textarea id="emailMessage" rows="2" placeholder="Message optionnel..." style="width:100%;padding:6px 10px;border:2px solid var(--border);border-radius:8px;font-family:'Cairo',sans-serif;font-size:11px;background:#f8f9fc;resize:vertical;"></textarea></div>
+    <div class="modal-error" id="emailError"></div>
+    <div class="modal-actions"><button class="btn save" onclick="Ventes.sendEmailNow()">✉️ Envoyer</button><button class="btn del" onclick="closeEmailModal()">Annuler</button></div>
+  </div></div>
+
   <script>
     // =============================================
-    // ===== GTR POS - Version 0.7.5 =====
+    // ===== GTR POS - Version 0.7.6 =====
     // =============================================
     
-    const APP_VERSION = 'V 0.7.5';
+    const APP_VERSION = 'V 0.7.6';
     console.log('🚀 GTR POS ' + APP_VERSION + ' loading...');
 
     // ===== FIREBASE =====
@@ -517,6 +537,11 @@
       toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
     }
 
+    // ===== التحقق من البريد الإلكتروني =====
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
     // ===== FONCTIONS DE RECALCUL DES SOLDES =====
     function recalculateClientBalance(clientName) {
       const client = clients.find(c => c.name === clientName);
@@ -537,7 +562,7 @@
     }
 
     // ===== STOCKAGE =====
-    const STORAGE_KEY = 'gtrpos_data_v25';
+    const STORAGE_KEY = 'gtrpos_data_v26';
 
     function saveState() {
       try {
@@ -1085,21 +1110,35 @@
         $('cName').value = '';
         $('cPhone').value = '';
         $('cPhone2').value = '';
+        $('cEmail').value = '';
         $('cAddress').value = '';
         $('cTaxId').value = '';
         $('cOpeningBalance').value = '0';
         $('cBalance').value = '0';
+        document.getElementById('cEmailError').textContent = '';
         this.renderSpecialPrices();
         this.refreshSpArticleOptions();
       },
+      validateEmail() {
+        const email = $('cEmail').value.trim();
+        const errorEl = document.getElementById('cEmailError');
+        if (email && !isValidEmail(email)) {
+          errorEl.textContent = '⚠️ البريد الإلكتروني غير صحيح';
+          return false;
+        }
+        errorEl.textContent = '';
+        return true;
+      },
       save() {
         if (!$('cName').value.trim()) { showToast('Entrez le nom du client'); return; }
+        if (!this.validateEmail()) { showToast('⚠️ البريد الإلكتروني غير صحيح'); return; }
         const openingBalance = parseFloat($('cOpeningBalance').value) || 0;
         const rec = {
           id: this.editingId || nextId.clients++,
           name: $('cName').value.trim(),
           phone: $('cPhone').value,
           phone2: $('cPhone2').value,
+          email: $('cEmail').value.trim(),
           address: $('cAddress').value,
           taxId: $('cTaxId').value,
           openingBalance: openingBalance,
@@ -1150,10 +1189,12 @@
         $('cName').value = c.name;
         $('cPhone').value = c.phone || '';
         $('cPhone2').value = c.phone2 || '';
+        $('cEmail').value = c.email || '';
         $('cAddress').value = c.address || '';
         $('cTaxId').value = c.taxId || '';
         $('cOpeningBalance').value = c.openingBalance || 0;
         $('cBalance').value = c.balance || 0;
+        document.getElementById('cEmailError').textContent = '';
         this.renderSpecialPrices();
         this.refreshSpArticleOptions();
         openSheet('clients');
@@ -1162,7 +1203,7 @@
         const q = $('cSearch').value.trim().toLowerCase();
         const list = $('clientsList');
         list.innerHTML = '';
-        const filtered = clients.filter(c => !q || c.name.toLowerCase().includes(q) || (c.phone || '').includes(q));
+        const filtered = clients.filter(c => !q || c.name.toLowerCase().includes(q) || (c.phone || '').includes(q) || (c.email || '').toLowerCase().includes(q));
         if (!filtered.length) { list.innerHTML = '<div class="empty-msg">Aucun client</div>'; return; }
         filtered.forEach(c => {
           const d = document.createElement('div');
@@ -1171,7 +1212,8 @@
           const spCount = (c.specialPrices && c.specialPrices.length) ? '⭐' + c.specialPrices.length : '';
           const hasActivity = ventes.some(v => v.client === c.name) || caisseClients.some(ca => ca.clientName === c.name);
           const lockIcon = hasActivity ? '🔒 ' : '';
-          d.innerHTML = `<div class="main-info"><div class="name">${lockIcon}${c.name}</div><div class="meta">${c.phone||''} ${spCount}</div></div><div class="amount">${c.balance ? c.balance.toFixed(3) : '0.000'} TND</div>`;
+          const emailIcon = c.email ? '📧 ' : '';
+          d.innerHTML = `<div class="main-info"><div class="name">${lockIcon}${emailIcon}${c.name}</div><div class="meta">${c.phone||''} ${c.email ? '| ' + c.email : ''} ${spCount}</div></div><div class="amount">${c.balance ? c.balance.toFixed(3) : '0.000'} TND</div>`;
           list.appendChild(d);
         });
       },
@@ -1453,6 +1495,7 @@
         let html = `<div class="client-summary-card"><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;">
           <div><span class="label">👤 Client :</span> <span class="value">${client.name}</span></div>
           <div><span class="label">📞 Téléphone :</span> <span class="value">${client.phone || '-'}</span></div>
+          <div><span class="label">📧 Email :</span> <span class="value">${client.email || '-'}</span></div>
           <div><span class="label">📄 Nombre de factures :</span> <span class="value">${totalInvoices}</span></div>
           <div><span class="label">💰 Total des achats :</span> <span class="value positive">${totalPurchases.toFixed(3)} TND</span></div>
           <div><span class="label">💳 Total payé :</span> <span class="value" style="color:#5c7cf0;">${totalPaid.toFixed(3)} TND</span></div>
@@ -1651,7 +1694,7 @@
     };
 
     // =============================================
-    // ===== VENTES (version simplifiée) =====
+    // ===== VENTES =====
     // =============================================
     const Ventes = {
       editingId: null,
@@ -1662,6 +1705,7 @@
       editingRowIndex: null,
       clientTaxId: '',
       clientAddress: '',
+      clientEmail: '',
       clientSpecialPrices: [],
       reset() {
         this.editingId = null;
@@ -1672,11 +1716,14 @@
         this.editingRowIndex = null;
         this.clientTaxId = '';
         this.clientAddress = '';
+        this.clientEmail = '';
         this.clientSpecialPrices = [];
         $('vNum').value = 'VTE-' + String(nextId.ventes).padStart(4, '0');
         $('vDate').value = new Date().toISOString().slice(0, 10);
         $('vClient').value = '';
         $('vPhone').value = '';
+        $('vEmail').value = '';
+        $('vTaxId').value = '';
         $('viArticle').value = '';
         $('viPrice').value = '';
         $('viQty').value = 1;
@@ -1687,6 +1734,9 @@
         this.refreshArticleOptions();
         this.updateAccountSummary();
         this.refreshClientOptions();
+        document.getElementById('emailRecipient').value = '';
+        document.getElementById('emailMessage').value = '';
+        document.getElementById('emailError').textContent = '';
       },
       refreshClientOptions() {
         const s = $('vClient');
@@ -1702,17 +1752,23 @@
         const c = clients.find(x => x.id == $('vClient').value);
         if (c) {
           $('vPhone').value = c.phone || '';
+          $('vEmail').value = c.email || '';
+          $('vTaxId').value = c.taxId || '';
           this.originalClientId = c.id;
           this.originalClientBalance = c.balance;
           this.clientTaxId = c.taxId || '';
           this.clientAddress = c.address || '';
+          this.clientEmail = c.email || '';
           this.clientSpecialPrices = c.specialPrices ? [...c.specialPrices] : [];
         } else {
           $('vPhone').value = '';
+          $('vEmail').value = '';
+          $('vTaxId').value = '';
           this.originalClientId = null;
           this.originalClientBalance = 0;
           this.clientTaxId = '';
           this.clientAddress = '';
+          this.clientEmail = '';
           this.clientSpecialPrices = [];
         }
         this.updateAccountSummary();
@@ -1864,7 +1920,7 @@
         const paid = this.reglements.reduce((a, r) => a + r.amount, 0);
         const newId = this.editingId || nextId.ventes++;
         const prevBalance = this.originalClientBalance;
-        const rec = { id: newId, num: $('vNum').value, date: $('vDate').value, client: clientName, lines: [...this.lines], total, reglements: [...this.reglements], prevBalance, clientTaxId: client.taxId || '', clientAddress: client.address || '' };
+        const rec = { id: newId, num: $('vNum').value, date: $('vDate').value, client: clientName, lines: [...this.lines], total, reglements: [...this.reglements], prevBalance, clientTaxId: client.taxId || '', clientAddress: client.address || '', clientEmail: client.email || '' };
         isSaving = true;
         try {
           if (this.editingId) {
@@ -1913,8 +1969,11 @@
         this.originalClientId = c ? c.id : null;
         this.clientTaxId = r.clientTaxId || (c ? c.taxId || '' : '');
         this.clientAddress = r.clientAddress || (c ? c.address || '' : '');
+        this.clientEmail = r.clientEmail || (c ? c.email || '' : '');
         this.clientSpecialPrices = (c && c.specialPrices) ? [...c.specialPrices] : [];
         $('vPhone').value = c ? c.phone : '';
+        $('vEmail').value = this.clientEmail;
+        $('vTaxId').value = this.clientTaxId;
         this.lines = [...r.lines];
         this.reglements = r.reglements ? [...r.reglements] : [];
         this.editingRowIndex = null;
@@ -1935,7 +1994,8 @@
           d.className = 'row-card';
           d.onclick = () => { Ventes.load(v.id); openSheet('ventes'); };
           const paid = (v.reglements || []).reduce((a, r) => a + r.amount, 0);
-          d.innerHTML = `<div class="main-info"><div class="name">${v.num}</div><div class="meta">${v.client} - ${v.date} | Payé: ${paid.toFixed(3)}</div></div><div class="amount">${v.total.toFixed(3)} TND</div>`;
+          const emailIcon = v.clientEmail ? '📧 ' : '';
+          d.innerHTML = `<div class="main-info"><div class="name">${emailIcon}${v.num}</div><div class="meta">${v.client} - ${v.date} | Payé: ${paid.toFixed(3)}</div></div><div class="amount">${v.total.toFixed(3)} TND</div>`;
           list.appendChild(d);
         });
       },
@@ -1958,6 +2018,7 @@
         const partyName = type === 'vente' ? invoice.client : invoice.supplier;
         const taxId = type === 'vente' ? invoice.clientTaxId : invoice.supplierTaxId;
         const address = type === 'vente' ? invoice.clientAddress : invoice.supplierAddress;
+        const email = type === 'vente' ? invoice.clientEmail : '';
         const phone = type === 'vente' ? (clients.find(c => c.name === invoice.client)?.phone || '-') : (fournisseurs.find(f => f.name === invoice.supplier)?.phone || '-');
         const paid = (invoice.reglements || []).reduce((sum, r) => sum + r.amount, 0);
         const prevBalance = invoice.prevBalance || 0;
@@ -1969,7 +2030,7 @@
           itemsHtml += `<tr><td style="border:1px solid #999;padding:4px 6px;text-align:center;">${i + 1}</td><td style="border:1px solid #999;padding:4px 6px;text-align:center;">${line.name}</td><td style="border:1px solid #999;padding:4px 6px;text-align:center;">${line.price.toFixed(3)}</td><td style="border:1px solid #999;padding:4px 6px;text-align:center;">${line.qty}</td><td style="border:1px solid #999;padding:4px 6px;text-align:center;font-weight:700;">${line.total.toFixed(3)}</td></tr>`;
         });
         const words = amountInWords(invoice.total);
-        return `<div style="max-width:380px;margin:0 auto;font-family:'Cairo',Arial,sans-serif;"><div style="text-align:center;border-bottom:3px solid #1e2f66;padding-bottom:8px;margin-bottom:8px;"><div style="font-size:18px;font-weight:800;color:#1e2f66;">${companyInfo.name || 'GTR POS'}</div><div style="font-size:11px;color:#666;">${companyInfo.address || ''} ${companyInfo.phone1 ? '📞 ' + companyInfo.phone1 : ''}</div><div style="font-size:10px;color:#666;">MF: ${companyInfo.taxId || '-'}</div><div style="font-size:14px;font-weight:700;color:#1e2f66;margin-top:4px;">Facture ${type === 'vente' ? 'de vente' : "d'achat"}</div><div style="font-size:10px;color:#666;">${invoice.num} | ${invoice.date}</div><div style="font-size:9px;color:#999;">${dateStr}</div></div><div style="display:flex;justify-content:space-between;font-size:11px;border:1px solid #ccc;padding:6px 8px;margin:6px 0;border-radius:4px;background:#f8f9fc;flex-wrap:wrap;gap:4px;"><span><strong>${partyLabel}:</strong> ${partyName}</span><span><strong>Adresse:</strong> ${address || '-'}</span><span><strong>Tél:</strong> ${phone}</span><span><strong>MF:</strong> ${taxId || '-'}</span></div><table style="width:100%;border-collapse:collapse;font-size:10px;margin:6px 0;"><thead><tr style="background:#1e2f66;color:#fff;"><th style="border:1px solid #999;padding:4px 6px;text-align:center;">#</th><th style="border:1px solid #999;padding:4px 6px;text-align:center;">Produit</th><th style="border:1px solid #999;padding:4px 6px;text-align:center;">Prix</th><th style="border:1px solid #999;padding:4px 6px;text-align:center;">Qté</th><th style="border:1px solid #999;padding:4px 6px;text-align:center;">Total</th></tr></thead><tbody>${itemsHtml}</tbody></table><div style="font-size:9px;text-align:center;background:#f0f4ff;padding:4px 6px;border-radius:4px;margin:4px 0;">${words}</div><table style="width:100%;border-collapse:collapse;font-size:10px;margin:6px 0;"><tr><td style="border:1px solid #999;padding:4px 8px;text-align:right;width:55%;">Solde précédent</td><td style="border:1px solid #999;padding:4px 8px;text-align:left;width:45%;">${prevBalance.toFixed(3)} TND</td></tr><tr style="background:#d9ede2;font-weight:700;"><td style="border:1px solid #999;padding:4px 8px;text-align:right;">Total facture</td><td style="border:1px solid #999;padding:4px 8px;text-align:left;">${invoice.total.toFixed(3)} TND</td></tr><tr><td style="border:1px solid #999;padding:4px 8px;text-align:right;">Payé</td><td style="border:1px solid #999;padding:4px 8px;text-align:left;color:#2e9e6e;">${paid.toFixed(3)} TND</td></tr><tr style="background:#fbdcc9;font-weight:700;"><td style="border:1px solid #999;padding:4px 8px;text-align:right;">Solde actuel</td><td style="border:1px solid #999;padding:4px 8px;text-align:left;color:#c0392b;">${currentBalance.toFixed(3)} TND</td></tr></table><div style="text-align:center;font-size:12px;font-weight:700;color:#1e2f66;margin:6px 0;border-top:2px solid #1e2f66;padding-top:6px;">${invoice.num}</div><div style="text-align:center;font-size:8px;color:#999;margin-top:4px;border-top:1px dashed #ddd;padding-top:4px;">${companyInfo.name} - ${companyInfo.phone1 || ''} | MF: ${companyInfo.taxId || '-'}</div></div>`;
+        return `<div style="max-width:380px;margin:0 auto;font-family:'Cairo',Arial,sans-serif;"><div style="text-align:center;border-bottom:3px solid #1e2f66;padding-bottom:8px;margin-bottom:8px;"><div style="font-size:18px;font-weight:800;color:#1e2f66;">${companyInfo.name || 'GTR POS'}</div><div style="font-size:11px;color:#666;">${companyInfo.address || ''} ${companyInfo.phone1 ? '📞 ' + companyInfo.phone1 : ''}</div><div style="font-size:10px;color:#666;">MF: ${companyInfo.taxId || '-'}</div><div style="font-size:14px;font-weight:700;color:#1e2f66;margin-top:4px;">Facture ${type === 'vente' ? 'de vente' : "d'achat"}</div><div style="font-size:10px;color:#666;">${invoice.num} | ${invoice.date}</div><div style="font-size:9px;color:#999;">${dateStr}</div></div><div style="display:flex;justify-content:space-between;font-size:11px;border:1px solid #ccc;padding:6px 8px;margin:6px 0;border-radius:4px;background:#f8f9fc;flex-wrap:wrap;gap:4px;"><span><strong>${partyLabel}:</strong> ${partyName}</span><span><strong>Adresse:</strong> ${address || '-'}</span><span><strong>Tél:</strong> ${phone}</span>${email ? `<span><strong>📧:</strong> ${email}</span>` : ''}<span><strong>MF:</strong> ${taxId || '-'}</span></div><table style="width:100%;border-collapse:collapse;font-size:10px;margin:6px 0;"><thead><tr style="background:#1e2f66;color:#fff;"><th style="border:1px solid #999;padding:4px 6px;text-align:center;">#</th><th style="border:1px solid #999;padding:4px 6px;text-align:center;">Produit</th><th style="border:1px solid #999;padding:4px 6px;text-align:center;">Prix</th><th style="border:1px solid #999;padding:4px 6px;text-align:center;">Qté</th><th style="border:1px solid #999;padding:4px 6px;text-align:center;">Total</th></tr></thead><tbody>${itemsHtml}</tbody></table><div style="font-size:9px;text-align:center;background:#f0f4ff;padding:4px 6px;border-radius:4px;margin:4px 0;">${words}</div><table style="width:100%;border-collapse:collapse;font-size:10px;margin:6px 0;"><tr><td style="border:1px solid #999;padding:4px 8px;text-align:right;width:55%;">Solde précédent</td><td style="border:1px solid #999;padding:4px 8px;text-align:left;width:45%;">${prevBalance.toFixed(3)} TND</td></tr><tr style="background:#d9ede2;font-weight:700;"><td style="border:1px solid #999;padding:4px 8px;text-align:right;">Total facture</td><td style="border:1px solid #999;padding:4px 8px;text-align:left;">${invoice.total.toFixed(3)} TND</td></tr><tr><td style="border:1px solid #999;padding:4px 8px;text-align:right;">Payé</td><td style="border:1px solid #999;padding:4px 8px;text-align:left;color:#2e9e6e;">${paid.toFixed(3)} TND</td></tr><tr style="background:#fbdcc9;font-weight:700;"><td style="border:1px solid #999;padding:4px 8px;text-align:right;">Solde actuel</td><td style="border:1px solid #999;padding:4px 8px;text-align:left;color:#c0392b;">${currentBalance.toFixed(3)} TND</td></tr></table><div style="text-align:center;font-size:12px;font-weight:700;color:#1e2f66;margin:6px 0;border-top:2px solid #1e2f66;padding-top:6px;">${invoice.num}</div><div style="text-align:center;font-size:8px;color:#999;margin-top:4px;border-top:1px dashed #ddd;padding-top:4px;">${companyInfo.name} - ${companyInfo.phone1 || ''} | MF: ${companyInfo.taxId || '-'}</div></div>`;
       },
       shareImageViaWhatsApp(invoice, imageDataUrl) {
         const type = invoice.client ? 'de vente' : "d'achat";
@@ -1988,6 +2049,80 @@
         link.click();
         document.body.removeChild(link);
         showToast('✅ WhatsApp ouvert avec téléchargement de l\'image');
+      },
+      // =============================================
+      // ===== إرسال الفاتورة عبر البريد الإلكتروني =====
+      // =============================================
+      sendEmail() {
+        if (this.editingId == null) { showToast('⚠️ Enregistrez la facture d\'abord'); return; }
+        const rec = ventes.find(v => v.id === this.editingId);
+        if (!rec) { showToast('❌ Facture introuvable'); return; }
+        const client = clients.find(c => c.name === rec.client);
+        const email = rec.clientEmail || (client ? client.email : '');
+        if (!email || !isValidEmail(email)) {
+          showToast('⚠️ البريد الإلكتروني للعميل غير صحيح أو غير موجود');
+          return;
+        }
+        document.getElementById('emailRecipient').value = email;
+        document.getElementById('emailMessage').value = `Bonjour ${rec.client},\n\nVeuillez trouver ci-joint la facture ${rec.num} du ${rec.date}.\n\nMontant total: ${rec.total.toFixed(3)} TND\nPayé: ${(rec.reglements || []).reduce((s, r) => s + r.amount, 0).toFixed(3)} TND\nReste: ${(rec.total - (rec.reglements || []).reduce((s, r) => s + r.amount, 0)).toFixed(3)} TND\n\nCordialement,\n${companyInfo.name || 'GTR POS'}`;
+        document.getElementById('emailError').textContent = '';
+        document.getElementById('emailModal').classList.add('show');
+      },
+      sendEmailNow() {
+        const recipient = document.getElementById('emailRecipient').value.trim();
+        const message = document.getElementById('emailMessage').value.trim();
+        const errorEl = document.getElementById('emailError');
+        if (!recipient || !isValidEmail(recipient)) {
+          errorEl.textContent = '⚠️ البريد الإلكتروني غير صحيح';
+          return;
+        }
+        errorEl.textContent = '⏳ جاري إنشاء PDF وإرسال...';
+        const rec = ventes.find(v => v.id === this.editingId);
+        if (!rec) { errorEl.textContent = '❌ Facture introuvable'; return; }
+        const htmlContent = this.generateInvoiceHTML(rec, 'vente');
+        const tempDiv = document.createElement('div');
+        tempDiv.style.cssText = 'position:fixed;left:-9999px;top:0;width:400px;background:#fff;padding:20px;font-family:Arial,sans-serif;direction:rtl;z-index:9999;';
+        tempDiv.innerHTML = htmlContent;
+        document.body.appendChild(tempDiv);
+        html2canvas(tempDiv, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false })
+          .then(canvas => {
+            document.body.removeChild(tempDiv);
+            const imgData = canvas.toDataURL('image/jpeg', 0.95);
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+            const title = `Facture ${rec.num}`;
+            pdf.setFontSize(18);
+            pdf.text(title, pdfWidth / 2, 20, { align: 'center' });
+            pdf.setFontSize(10);
+            pdf.text(`${companyInfo.name || 'GTR POS'} - ${new Date().toLocaleDateString('fr-FR')}`, pdfWidth / 2, 28, { align: 'center' });
+            pdf.addImage(imgData, 'PNG', 0, 35, pdfWidth, pdfHeight);
+            const pdfBlob = pdf.output('blob');
+            const pdfUrl = URL.createObjectURL(pdfBlob);
+            // Envoyer par email via mailto
+            const subject = encodeURIComponent(`Facture ${rec.num} - ${companyInfo.name || 'GTR POS'}`);
+            const body = encodeURIComponent(message + '\n\n---\nCe message a été généré automatiquement par GTR POS.');
+            const mailtoLink = `mailto:${recipient}?subject=${subject}&body=${body}`;
+            // Télécharger le PDF en plus
+            const link = document.createElement('a');
+            link.href = pdfUrl;
+            link.download = `Facture_${rec.num}_${new Date().toISOString().slice(0,10)}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(pdfUrl), 5000);
+            // Ouvrir le client email
+            window.open(mailtoLink, '_blank');
+            errorEl.textContent = '';
+            closeEmailModal();
+            showToast(`✅ PDF téléchargé et email ouvert pour ${recipient}`);
+          })
+          .catch(err => {
+            document.body.removeChild(tempDiv);
+            console.error('PDF generation error:', err);
+            errorEl.textContent = '❌ Échec de génération du PDF : ' + err.message;
+          });
       },
       printInvoice() {
         if (this.editingId == null) { showToast('Enregistrez la facture d\'abord'); return; }
@@ -2012,6 +2147,7 @@
         const currentBalance = prevBalance + rec.total - paid;
         let text = `${companyInfo.name}\n${companyInfo.address}\n${companyInfo.phone1}\nMF: ${companyInfo.taxId}\n----------------\nFacture de vente: ${rec.num}\nDate: ${rec.date}\nClient: ${rec.client}\n`;
         if (rec.clientTaxId) text += `MF: ${rec.clientTaxId}\n`;
+        if (rec.clientEmail) text += `Email: ${rec.clientEmail}\n`;
         text += `----------------\n`;
         rec.lines.forEach(l => { text += `${l.name}  ${l.qty} x ${l.price.toFixed(3)} = ${l.total.toFixed(3)}\n`; });
         text += `----------------\nSolde précédent : ${prevBalance.toFixed(3)} TND\nTotal facture   : ${rec.total.toFixed(3)} TND\nPayé            : ${paid.toFixed(3)} TND\nSolde actuel    : ${currentBalance.toFixed(3)} TND\n----------------\nMerci !\n`;
@@ -2025,6 +2161,11 @@
           .catch(err => { console.error('Erreur Bluetooth:', err); let msg = '❌ Erreur Bluetooth'; if (err.message.includes('GATT')) msg += ' : Problème de connexion'; else if (err.message.includes('not found')) msg += ' : Service introuvable'; else msg += ' : ' + err.message; showToast(msg); });
       }
     };
+
+    function closeEmailModal() {
+      document.getElementById('emailModal').classList.remove('show');
+      document.getElementById('emailError').textContent = '';
+    }
 
     // =============================================
     // ===== ACHATS (version simplifiée) =====
@@ -2732,6 +2873,7 @@
         data = {
           partyName: client.name,
           phone: client.phone || '',
+          email: client.email || '',
           address: client.address || '',
           taxId: client.taxId || '',
           openingBalance: openingBalance,
@@ -2871,6 +3013,7 @@
       const totalDebit = d.movements.reduce((s,m) => s + (m.debit||0), 0);
       const totalCredit = d.movements.reduce((s,m) => s + (m.credit||0), 0);
       const finalBalance = d.currentBalance || d.openingBalance;
+      const emailDisplay = d.email ? `<span><strong>📧:</strong> ${d.email}</span>` : '';
       doc.innerHTML = `
         <div style="text-align:center;border-bottom:2px solid #1e2f66;padding-bottom:4px;margin-bottom:4px;">
           <div style="font-size:14px;font-weight:800;">${_statementData.title}</div>
@@ -2883,6 +3026,7 @@
         <div style="display:flex;justify-content:space-between;font-size:9px;border:1px solid #999;padding:3px;margin:3px 0;flex-wrap:wrap;gap:2px;">
           <span><strong>${_statementData.partyLabel}:</strong> ${d.partyName}</span>
           <span><strong>Tél:</strong> ${d.phone || '-'}</span>
+          ${emailDisplay}
           <span><strong>MF:</strong> ${d.taxId || '-'}</span>
           <span><strong>Solde actuel:</strong> ${d.currentBalance.toFixed(3)}</span>
         </div>
@@ -2988,10 +3132,8 @@
       },
       
       setupLazyLoading() {
-        // تحميل المكونات غير الأساسية في الخلفية
         if ('requestIdleCallback' in window) {
           requestIdleCallback(() => {
-            // تحميل التقارير في الخلفية
             if (typeof AdvancedReports !== 'undefined') {
               AdvancedReports.updateFilters();
             }
@@ -3013,7 +3155,6 @@
       performSearch(input) {
         const query = input.value.trim().toLowerCase();
         const container = input.id.replace('Search', '') + 'List';
-        // سيتم تنفيذ البحث بواسطة الوظائف الأصلية
       },
       
       setupIndexedDB() {
@@ -3511,7 +3652,6 @@
             </div>
             <script>
               window.onload = function() {
-                // نسخ الرسوم البيانية
                 const salesCanvas = document.getElementById('salesChart');
                 const profitCanvas = document.getElementById('profitChart');
                 if (salesCanvas) {
@@ -3617,7 +3757,6 @@
         document.getElementById('pendingOverlay').classList.add('hide');
         showSection('dashboard');
         showToast('✅ Mode de stockage : ' + (storageMode === 'cloud' ? 'Cloud' : 'Local'));
-        // تحديث التقارير بعد تحميل البيانات
         setTimeout(() => {
           AdvancedReports.updateFilters();
           AdvancedReports.generateReport();
