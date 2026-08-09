@@ -19,7 +19,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        /* ===== CSS complet ===== */
+        /* ===== CSS complet avec toutes les améliorations ===== */
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
@@ -85,6 +85,7 @@
             }
         }
         
+        /* ===== AppBar ===== */
         .appbar {
             background: linear-gradient(135deg, var(--secondary), #2a3f7a);
             color: #fff;
@@ -176,6 +177,7 @@
             font-size: 18px;
         }
         
+        /* ===== Content ===== */
         .content {
             flex: 1;
             overflow-y: auto;
@@ -216,6 +218,7 @@
             }
         }
         
+        /* ===== Dashboard ===== */
         .dashboard-grid {
             display: grid;
             gap: 14px;
@@ -287,6 +290,7 @@
             transition: var(--transition);
         }
         
+        /* ===== Search ===== */
         .search-box {
             width: 100%;
             padding: 8px 14px;
@@ -307,6 +311,7 @@
             box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.3);
         }
         
+        /* ===== Cards ===== */
         .row-card {
             background: var(--panel);
             border: 1px solid var(--border);
@@ -353,6 +358,7 @@
             color: var(--secondary);
         }
         
+        /* ===== Empty ===== */
         .empty-msg {
             text-align: center;
             color: var(--muted);
@@ -360,6 +366,7 @@
             padding: 16px 0;
         }
         
+        /* ===== KPI ===== */
         .kpi-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
@@ -394,6 +401,7 @@
             text-transform: uppercase;
         }
         
+        /* ===== Section Title ===== */
         .section-title {
             font-size: 13px;
             font-weight: 800;
@@ -412,6 +420,7 @@
             border-radius: 2px;
         }
         
+        /* ===== Badges ===== */
         .badge {
             padding: 3px 8px;
             border-radius: 20px;
@@ -437,6 +446,7 @@
             background: linear-gradient(135deg, var(--warning), #f39c12);
         }
         
+        /* ===== Buttons ===== */
         .btn {
             width: 100%;
             padding: 8px;
@@ -501,6 +511,7 @@
             background: linear-gradient(135deg, #4285F4, #2a56c6);
         }
         
+        /* ===== FAB ===== */
         .fab {
             position: absolute;
             bottom: 20px;
@@ -526,6 +537,7 @@
             box-shadow: 0 2px 10px rgba(74, 108, 247, 0.3);
         }
         
+        /* ===== Toast ===== */
         .toast {
             position: absolute;
             top: 64px;
@@ -551,6 +563,7 @@
             transform: translateX(-50%) translateY(0);
         }
         
+        /* ===== Sheet ===== */
         .sheet-overlay {
             position: absolute;
             inset: 0;
@@ -655,6 +668,7 @@
             border-radius: 10px;
         }
         
+        /* ===== Fields ===== */
         .field {
             margin-bottom: 6px;
         }
@@ -718,6 +732,7 @@
             gap: 4px;
         }
         
+        /* ===== Login ===== */
         .login-overlay {
             position: fixed;
             inset: 0;
@@ -924,6 +939,7 @@
             border-color: var(--primary);
         }
         
+        /* ===== Finance Table ===== */
         .finance-table-wrapper {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -976,6 +992,7 @@
             color: var(--text);
         }
         
+        /* ===== Capital Card ===== */
         .capital-card {
             background: linear-gradient(135deg, var(--secondary), #2a3f7a);
             color: #fff;
@@ -1023,6 +1040,7 @@
             font-size: 11px;
         }
         
+        /* ===== BI ===== */
         .bi-kpi-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -1182,6 +1200,7 @@
             margin: 0;
         }
         
+        /* ===== Reports ===== */
         .reports-toolbar {
             background: var(--panel);
             border: 1px solid var(--border);
@@ -1283,6 +1302,7 @@
             background: #eef3ff;
         }
         
+        /* ===== Summary ===== */
         .summary-mini-card {
             background: var(--bg);
             border-radius: 12px;
@@ -1335,6 +1355,7 @@
             color: var(--danger);
         }
         
+        /* ===== Client Summary ===== */
         .client-summary-card {
             background: linear-gradient(135deg, var(--secondary), #2a3f7a);
             color: #fff;
@@ -1367,6 +1388,7 @@
             color: #ff6b6b;
         }
         
+        /* ===== Balance Display ===== */
         .balance-display {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1404,6 +1426,7 @@
             color: var(--danger);
         }
         
+        /* ===== History Table ===== */
         .history-table-wrapper {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -1442,6 +1465,7 @@
             color: var(--text);
         }
         
+        /* ===== Print ===== */
         .print-overlay {
             position: fixed;
             inset: 0;
@@ -1533,6 +1557,7 @@
             font-size: 11px;
         }
         
+        /* ===== Notification Panel ===== */
         .notification-panel {
             position: fixed;
             top: 0;
@@ -1563,6 +1588,7 @@
             color: var(--text);
         }
         
+        /* ===== Modal ===== */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -1619,6 +1645,7 @@
             margin-top: 4px;
         }
         
+        /* ===== Offline Badge ===== */
         .offline-badge {
             background: var(--warning);
             color: #fff;
@@ -1633,6 +1660,7 @@
             display: inline-block;
         }
         
+        /* ===== Keyboard Shortcut Help ===== */
         .shortcut-help {
             position: fixed;
             top: 0;
@@ -1690,6 +1718,7 @@
             border-bottom: 1px solid var(--border);
         }
         
+        /* ===== Améliorations des factures de vente et d'achat ===== */
         .invoice-header-modern {
             background: linear-gradient(135deg, var(--secondary), var(--primary));
             color: #fff;
@@ -2211,6 +2240,7 @@
             background: linear-gradient(135deg, #4a6cf7, #2a4ac7);
         }
         
+        /* ===== Toast Modern ===== */
         .toast-modern {
             position: fixed;
             bottom: 20px;
@@ -2236,6 +2266,7 @@
             transform: translateX(-50%) translateY(0);
         }
         
+        /* ===== Drive Status ===== */
         .drive-status {
             display: flex;
             align-items: center;
@@ -2282,6 +2313,7 @@
             font-size: 8px;
         }
         
+        /* ===== Responsive ===== */
         @media(max-width:550px) {
             .account-summary-modern {
                 grid-template-columns: repeat(2, 1fr);
@@ -3265,7 +3297,7 @@
         <div class="invoice-doc paper-80" id="printDoc"></div>
     </div>
 
-    <!-- ===== JAVASCRIPT COMPLET ===== -->
+    <!-- ===== JAVASCRIPT COMPLET AVEC CORRECTIONS ===== -->
     <script>
         // =============================================
         // ===== GTR POS V 0.8.1 - CODE COMPLET =====
@@ -3330,6 +3362,7 @@
         let autoBackupInterval = null;
         let lastBackupTime = null;
         let driveFolderId = null;
+        let gapiLoaded = false;
 
         // Charger l'état de la connexion Drive
         function loadDriveState() {
@@ -3406,9 +3439,16 @@
                 return;
             }
             
+            // Vérifier si l'API est chargée
             if (typeof gapi === 'undefined') {
                 showToastModern('⏳ Chargement de l\'API Google...', 'info');
                 loadGoogleApi();
+                return;
+            }
+            
+            if (!gapiLoaded) {
+                showToastModern('⏳ Initialisation de l\'API...', 'info');
+                initGapiClient();
                 return;
             }
             
@@ -3418,33 +3458,36 @@
             const API_KEY = 'AIzaSyBG_F8TMY4Mmzb1e2etzPHQTw6upu4dkrs';
             const SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata';
             
-            gapi.load('client:auth2', function() {
-                gapi.client.init({
-                    apiKey: API_KEY,
-                    clientId: CLIENT_ID,
-                    scope: SCOPES,
-                    discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
-                }).then(function() {
-                    const authInstance = gapi.auth2.getAuthInstance();
-                    authInstance.signIn().then(function(googleUser) {
-                        const token = googleUser.getAuthResponse().access_token;
-                        driveToken = token;
-                        updateDriveStatus(true);
-                        createBackupFolder();
-                        showToastModern('✅ Connecté à Google Drive avec succès', 'success');
-                    }).catch(function(err) {
-                        showToastModern('❌ Échec de la connexion: ' + err.message, 'error');
-                    });
-                }).catch(function(err) {
-                    showToastModern('❌ Erreur d\'initialisation: ' + err.message, 'error');
-                });
+            gapi.client.init({
+                apiKey: API_KEY,
+                clientId: CLIENT_ID,
+                scope: SCOPES,
+                discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
+            }).then(function() {
+                const authInstance = gapi.auth2.getAuthInstance();
+                return authInstance.signIn();
+            }).then(function(googleUser) {
+                const token = googleUser.getAuthResponse().access_token;
+                driveToken = token;
+                updateDriveStatus(true);
+                createBackupFolder();
+                showToastModern('✅ Connecté à Google Drive avec succès', 'success');
+                saveDriveState();
+            }).catch(function(err) {
+                showToastModern('❌ Échec de la connexion: ' + err.message, 'error');
             });
         }
 
         function loadGoogleApi() {
+            if (typeof gapi !== 'undefined') {
+                gapiLoaded = true;
+                connectGoogleDrive();
+                return;
+            }
             const script = document.createElement('script');
             script.src = 'https://apis.google.com/js/api.js';
             script.onload = function() {
+                gapiLoaded = true;
                 connectGoogleDrive();
             };
             script.onerror = function() {
@@ -3453,8 +3496,19 @@
             document.head.appendChild(script);
         }
 
+        function initGapiClient() {
+            if (typeof gapi === 'undefined') {
+                loadGoogleApi();
+                return;
+            }
+            gapi.load('client:auth2', function() {
+                gapiLoaded = true;
+                connectGoogleDrive();
+            });
+        }
+
         function createBackupFolder() {
-            if (!driveToken || !gapi) return;
+            if (!driveToken || !gapi || !gapi.client) return;
             
             const metadata = {
                 name: 'GTR_POS_Backups',
@@ -3480,12 +3534,14 @@
                         showToastModern('📁 Dossier de sauvegarde créé', 'success');
                     });
                 }
+            }).catch(function(err) {
+                console.warn('Folder creation error:', err);
             });
         }
 
         function backupToDrive(data, fileName) {
             return new Promise((resolve, reject) => {
-                if (!driveToken || !gapi) {
+                if (!driveToken || !gapi || !gapi.client) {
                     reject(new Error('Google Drive non connecté'));
                     return;
                 }
@@ -3575,7 +3631,6 @@
                     return;
                 }
                 
-                // Afficher une sélection pour choisir le fichier
                 const fileList = files.map((f, i) => 
                     `${i+1}. ${f.name} (${new Date(f.createdTime).toLocaleDateString('fr-FR')})`
                 ).join('\n');
@@ -3669,7 +3724,6 @@
                 autoBackupInterval = null;
             }
             
-            // Effectuer une première sauvegarde immédiate
             setTimeout(() => {
                 if (autoBackupEnabled && driveConnected) {
                     performAutoBackup();
@@ -3680,7 +3734,7 @@
                 if (autoBackupEnabled && driveConnected) {
                     performAutoBackup();
                 }
-            }, 300000); // 5 minutes
+            }, 300000);
         }
 
         function stopAutoBackup() {
