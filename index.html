@@ -2672,7 +2672,7 @@
                     <button class="btn outline small" onclick="setDashboardColumns(3)" style="flex:1;font-size:11px;">3 colonnes</button>
                     <button class="btn outline small" onclick="setDashboardColumns(4)" style="flex:1;font-size:11px;">4 colonnes</button>
                 </div>
-                <div id="colsStatus" style="font-size:10px;color:var(--muted);margin-bottom:6px;">Actuel: 2 colonnes</div>
+                <div id="colsStatus" style="font-size:10px;color:var(--muted);margin-bottom:6px;">Actuel: 4 colonnes</div>
 
                 <div class="section-title">🎨 Thèmes</div>
                 <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;">
@@ -2700,7 +2700,7 @@
                 </div>
                 <div style="font-size:9px;color:var(--muted);margin-top:4px;" id="driveBackupInfo">Dernière sauvegarde : jamais</div>
 
-                <!-- ===== SAUVEGARDE GMAIL (NOUVEAU) ===== -->
+                <!-- ===== SAUVEGARDE GMAIL (CORRIGÉ) ===== -->
                 <div class="section-title">📧 Sauvegarde automatique Gmail</div>
                 <div class="drive-status">
                     <span class="status-dot disconnected" id="gmailStatusDot"></span>
@@ -2770,7 +2770,7 @@
         </div>
     </div>
 
-    <!-- ===== MODAL CONFIGURATION GMAIL (NOUVEAU) ===== -->
+    <!-- ===== MODAL CONFIGURATION GMAIL ===== -->
     <div class="modal-overlay" id="emailBackupModal">
         <div class="modal-box" style="max-width:420px;">
             <h3>📧 Configuration Gmail</h3>
@@ -3476,8 +3476,9 @@
         }
 
         // =============================================
-        // ===== SAUVEGARDE AUTOMATIQUE GMAIL =====
+        // ===== SAUVEGARDE AUTOMATIQUE GMAIL (CORRIGÉ) =====
         // =============================================
+
         let gmailToken = null;
         let gmailConnected = false;
         let emailBackupEnabled = false;
@@ -3522,7 +3523,7 @@
                     enabled: emailBackupEnabled,
                     lastBackup: lastEmailBackupTime ? lastEmailBackupTime.toISOString() : null
                 };
-                localStorage.setItem('trpos_gmail_state', JSON.stringify(state));
+                localStorage.setItem('gtrpos_gmail_state', JSON.stringify(state));
             } catch (e) {
                 console.warn('Gmail state save error:', e);
             }
@@ -3542,61 +3543,122 @@
             updateEmailBackupUI();
         }
 
+        // === Fonction corrigée : utilisation de gapi.auth2.getAuthInstance() ===
         function connectGmail() {
             if (gmailConnected && gmailToken) {
                 showToastModern('✅ Déjà connecté à Gmail', 'success');
                 return;
             }
+
             if (typeof gapi === 'undefined') {
                 showToastModern('⏳ Chargement de l\'API Google...', 'info');
                 loadGoogleApiForGmail();
                 return;
             }
-            if (!gapiLoaded) {
+
+            if (!gapi.client) {
                 showToastModern('⏳ Initialisation de l\'API...', 'info');
                 initGapiClientForGmail();
                 return;
             }
+
             showToastModern('🔐 Connexion à Gmail...', 'info');
-            
+
+            const SCOPES = 'https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/gmail.compose';
+
+            // 1. Essayer de récupérer une instance existante
+            let authInstance = null;
+            try {
+                authInstance = gapi.auth2.getAuthInstance();
+            } catch (e) {
+                // Aucune instance, on va en créer une
+                console.log('No existing auth instance, will initialize.');
+            }
+
+            // 2. Si une instance existe et que l'utilisateur est déjà connecté
+            if (authInstance && authInstance.isSignedIn.get()) {
+                const user = authInstance.currentUser.get();
+                const token = user.getAuthResponse().access_token;
+                gmailToken = token;
+                gmailConnected = true;
+                updateGmailStatus(true);
+                showToastModern('✅ Connexion Gmail rétablie', 'success');
+                saveGmailState();
+                if (emailBackupEnabled && emailBackupRecipient) {
+                    startEmailBackup();
+                }
+                return;
+            }
+
+            // 3. Si instance existe mais pas connecté
+            if (authInstance) {
+                authInstance.signIn({ scope: SCOPES })
+                    .then(function(googleUser) {
+                        const token = googleUser.getAuthResponse().access_token;
+                        gmailToken = token;
+                        gmailConnected = true;
+                        updateGmailStatus(true);
+                        showToastModern('✅ Connexion Gmail réussie', 'success');
+                        saveGmailState();
+                        if (emailBackupEnabled && emailBackupRecipient) {
+                            startEmailBackup();
+                        }
+                    })
+                    .catch(function(err) {
+                        let errorMsg = err.message || err.details || err.error || 'Erreur inconnue';
+                        console.error('Gmail signIn error:', err);
+                        showToastModern('❌ Échec de connexion: ' + errorMsg, 'error');
+                        updateGmailStatus(false);
+                    });
+                return;
+            }
+
+            // 4. Aucune instance : on initialise
             const CLIENT_ID = '611699198002-2m2d80gi30mmejrcu59i0v21m0vs7d7d.apps.googleusercontent.com';
             const API_KEY = 'AIzaSyBG_F8TMY4Mmzb1e2etzPHQTw6upu4dkrs';
-            const SCOPES = 'https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/gmail.compose';
-            
+
             gapi.client.init({
                 apiKey: API_KEY,
                 clientId: CLIENT_ID,
                 scope: SCOPES,
                 discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest']
             }).then(function() {
-                const authInstance = gapi.auth2.getAuthInstance();
-                return authInstance.signIn();
+                const auth = gapi.auth2.getAuthInstance();
+                return auth.signIn();
             }).then(function(googleUser) {
                 const token = googleUser.getAuthResponse().access_token;
                 gmailToken = token;
                 gmailConnected = true;
                 updateGmailStatus(true);
-                showToastModern('✅ Connecté à Gmail avec succès', 'success');
+                showToastModern('✅ Connexion Gmail réussie', 'success');
                 saveGmailState();
                 if (emailBackupEnabled && emailBackupRecipient) {
                     startEmailBackup();
                 }
             }).catch(function(err) {
-                showToastModern('❌ Échec de la connexion: ' + err.message, 'error');
+                let errorMsg = err.message || err.details || err.error || 'Erreur inconnue';
+                console.error('Gmail init error:', err);
+                showToastModern('❌ Échec de connexion: ' + errorMsg, 'error');
+                updateGmailStatus(false);
             });
         }
 
+        // Chargement de l'API (évite la double initialisation)
         function loadGoogleApiForGmail() {
             if (typeof gapi !== 'undefined') {
                 gapiLoaded = true;
-                connectGmail();
+                if (!gapi.client) {
+                    initGapiClientForGmail();
+                } else {
+                    connectGmail();
+                }
                 return;
             }
             const script = document.createElement('script');
             script.src = 'https://apis.google.com/js/api.js';
             script.onload = function() {
                 gapiLoaded = true;
-                connectGmail();
+                initGapiClientForGmail();
             };
             script.onerror = function() {
                 showToastModern('❌ Impossible de charger l\'API Google', 'error');
@@ -3609,9 +3671,29 @@
                 loadGoogleApiForGmail();
                 return;
             }
-            gapi.load('client:auth2', function() {
-                gapiLoaded = true;
+            if (gapi.client) {
                 connectGmail();
+                return;
+            }
+            const CLIENT_ID = '611699198002-2m2d80gi30mmejrcu59i0v21m0vs7d7d.apps.googleusercontent.com';
+            const API_KEY = 'AIzaSyBG_F8TMY4Mmzb1e2etzPHQTw6upu4dkrs';
+            const SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/gmail.compose';
+            
+            gapi.load('client:auth2', function() {
+                gapi.client.init({
+                    apiKey: API_KEY,
+                    clientId: CLIENT_ID,
+                    scope: SCOPES,
+                    discoveryDocs: [
+                        'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest',
+                        'https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest'
+                    ]
+                }).then(function() {
+                    connectGmail();
+                }).catch(function(err) {
+                    console.error('gapi.client.init error:', err);
+                    showToastModern('❌ Erreur d\'initialisation: ' + (err.message || ''), 'error');
+                });
             });
         }
 
@@ -3627,6 +3709,7 @@
             showToastModern('🔌 Déconnecté de Gmail', 'info');
         }
 
+        // Fonction de sauvegarde
         async function performEmailBackup() {
             if (!gmailConnected || !gmailToken) {
                 showToastModern('⚠️ Connectez-vous d\'abord à Gmail', 'warning');
@@ -3634,17 +3717,16 @@
                 return;
             }
             if (!emailBackupRecipient || !isValidEmail(emailBackupRecipient)) {
-                showToastModern('⚠️ Adresse email de sauvegarde invalide', 'warning');
+                showToastModern('⚠️ Adresse email invalide', 'warning');
                 return;
             }
             if (!currentUser) {
-                showToastModern('⚠️ Vous devez être connecté pour la sauvegarde', 'warning');
+                showToastModern('⚠️ Vous devez être connecté', 'warning');
                 return;
             }
             
             try {
-                showToastModern('📧 Envoi de la sauvegarde en cours...', 'info');
-                
+                showToastModern('📧 Envoi de la sauvegarde...', 'info');
                 const backupData = {
                     clients, fournisseurs, articles, ventes, achats, expenses,
                     caisseClients, caisseFournisseurs, nextId, companyInfo, financeData,
@@ -3652,10 +3734,8 @@
                     version: APP_VERSION,
                     user: currentUser.email
                 };
-                
                 const jsonData = JSON.stringify(backupData, null, 2);
                 const base64Data = btoa(unescape(encodeURIComponent(jsonData)));
-                
                 const dateStr = new Date().toLocaleString('fr-FR');
                 const subject = `Sauvegarde GTR POS - ${new Date().toLocaleDateString('fr-FR')}`;
                 
@@ -3666,7 +3746,7 @@
                     `Subject: ${subject}`,
                     '',
                     `Bonjour,\n\nVoici la sauvegarde automatique de votre application GTR POS du ${dateStr}.\n\n`,
-                    `📊 Résumé des données :`,
+                    `📊 Résumé :`,
                     `- Clients : ${clients.length}`,
                     `- Fournisseurs : ${fournisseurs.length}`,
                     `- Articles : ${articles.length}`,
@@ -3675,7 +3755,7 @@
                     `- Dépenses : ${expenses.length}`,
                     `\nVersion: ${APP_VERSION}`,
                     `Utilisateur: ${currentUser.email}`,
-                    `\nLe fichier JSON est joint à cet email.\n\nCordialement,\nGTR POS`
+                    `\nFichier joint.\n\nCordialement,\nGTR POS`
                 ].join('\n');
                 
                 const boundary = 'gtrpos_boundary_' + Date.now();
@@ -3714,9 +3794,7 @@
                         'Authorization': 'Bearer ' + gmailToken,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        raw: encodedMessage
-                    })
+                    body: JSON.stringify({ raw: encodedMessage })
                 });
                 
                 if (response.ok) {
@@ -3727,14 +3805,15 @@
                 } else {
                     const error = await response.json();
                     console.error('Gmail API error:', error);
-                    showToastModern('❌ Erreur Gmail: ' + (error.error?.message || 'Échec de l\'envoi'), 'error');
+                    showToastModern('❌ Erreur Gmail: ' + (error.error?.message || 'Échec'), 'error');
                 }
             } catch (err) {
                 console.error('Email backup error:', err);
-                showToastModern('❌ Erreur de sauvegarde: ' + err.message, 'error');
+                showToastModern('❌ Erreur: ' + err.message, 'error');
             }
         }
 
+        // Autres fonctions (toggle, UI, etc.)
         function updateEmailBackupUI() {
             const statusText = document.getElementById('emailBackupStatusText');
             const statusDot = document.getElementById('emailBackupStatusDot');
@@ -3813,25 +3892,21 @@
         function saveEmailBackupSettings() {
             const recipient = document.getElementById('emailBackupRecipientInput').value.trim();
             const interval = parseInt(document.getElementById('emailBackupIntervalInput').value) || 60;
-            
             if (!recipient || !isValidEmail(recipient)) {
-                showToastModern('⚠️ Veuillez entrer une adresse email valide', 'warning');
+                showToastModern('⚠️ Entrez un email valide', 'warning');
                 return;
             }
             if (interval < 5) {
-                showToastModern('⚠️ L\'intervalle minimum est de 5 minutes', 'warning');
+                showToastModern('⚠️ Minimum 5 minutes', 'warning');
                 return;
             }
-            
             emailBackupRecipient = recipient;
             emailBackupTime = interval;
-            
             if (!gmailConnected) {
-                showToastModern('🔐 Veuillez d\'abord vous connecter à Gmail', 'info');
+                showToastModern('🔐 Connectez-vous d\'abord à Gmail', 'info');
                 connectGmail();
                 return;
             }
-            
             if (!emailBackupEnabled) {
                 emailBackupEnabled = true;
                 startEmailBackup();
@@ -3840,7 +3915,6 @@
                 emailBackupEnabled = true;
                 startEmailBackup();
             }
-            
             saveGmailState();
             updateEmailBackupUI();
             closeEmailBackupSettings();
@@ -3853,7 +3927,6 @@
                 connectGmail();
                 return;
             }
-            
             if (emailBackupEnabled) {
                 stopEmailBackup();
             } else {
@@ -3876,7 +3949,7 @@
                 return;
             }
             if (!emailBackupRecipient) {
-                showToastModern('⚠️ Configurez d\'abord l\'email de sauvegarde', 'warning');
+                showToastModern('⚠️ Configurez l\'email', 'warning');
                 openEmailBackupSettings();
                 return;
             }
@@ -3917,6 +3990,8 @@
             showToastModern('📧 Sauvegarde désactivée', 'info');
         }
 
+        // ===== FIN DE LA PARTIE GMAIL =====
+
         // ===== VARIABLES GLOBALES =====
         let currentUser = null;
         let isSignupMode = false;
@@ -3926,7 +4001,7 @@
         let currentSection = 'dashboard';
         let _invoiceData = null;
         let _statementData = null;
-        let dashboardColumns = 2;
+        let dashboardColumns = 4;
         let isOnline = true;
 
         // ===== DONNÉES =====
@@ -4295,7 +4370,7 @@
                     if (cols >= 2 && cols <= 4) { setDashboardColumns(cols); return; }
                 }
             } catch (e) {}
-            setDashboardColumns(2);
+            setDashboardColumns(4);
         }
 
         // ===== UI CUSTOMIZER =====
@@ -8487,7 +8562,7 @@
         window.disconnectGoogleDrive = disconnectGoogleDrive;
         window.toggleAutoBackup = toggleAutoBackup;
 
-        // Exposer les fonctions Gmail
+        // Exposer les fonctions Gmail (corrigées)
         window.connectGmail = connectGmail;
         window.disconnectGmail = disconnectGmail;
         window.toggleEmailBackup = toggleEmailBackup;
