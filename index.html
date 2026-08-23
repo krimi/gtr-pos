@@ -18,15 +18,16 @@
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
+        /* ===== CSS complet ===== */
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             margin: 0;
             padding: 0;
         }
-        html,
-        body {
+        html, body {
             height: 100%;
             font-family: 'Cairo', sans-serif;
             background: #0e142e;
@@ -191,6 +192,7 @@
             flex-shrink: 0;
             transition: var(--transition);
             position: relative;
+            z-index: 10;
         }
         .appbar .menu-btn:active {
             transform: scale(0.92);
@@ -295,6 +297,7 @@
             -webkit-overflow-scrolling: touch;
             position: relative;
             background: var(--bg);
+            padding-top: 60px;
         }
         .content::-webkit-scrollbar {
             width: 4px;
@@ -314,14 +317,8 @@
             display: block !important;
         }
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .dashboard-grid {
             display: grid;
@@ -330,15 +327,9 @@
             width: 100%;
             grid-template-columns: repeat(2, 1fr);
         }
-        .dashboard-grid.cols-2 {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        .dashboard-grid.cols-3 {
-            grid-template-columns: repeat(3, 1fr);
-        }
-        .dashboard-grid.cols-4 {
-            grid-template-columns: repeat(4, 1fr);
-        }
+        .dashboard-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+        .dashboard-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+        .dashboard-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
         .dash-item {
             background: var(--panel);
             border-radius: var(--card-radius);
@@ -371,9 +362,7 @@
             transform: scale(0.95);
             box-shadow: 0 2px 10px rgba(26, 42, 92, 0.1);
         }
-        .dash-item:active::after {
-            opacity: 1;
-        }
+        .dash-item:active::after { opacity: 1; }
         .dash-icon {
             font-size: 36px;
             margin-bottom: 6px;
@@ -385,6 +374,30 @@
             color: var(--text);
             text-align: center;
             transition: var(--transition);
+        }
+        .fab-top {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6b8aff, var(--primary));
+            color: #fff;
+            font-size: 24px;
+            border: none;
+            box-shadow: 0 4px 16px rgba(74, 108, 247, 0.4);
+            z-index: 15;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        .fab-top.show { display: flex; }
+        .fab-top:active {
+            transform: scale(0.88);
+            box-shadow: 0 2px 10px rgba(74, 108, 247, 0.3);
         }
         .search-box {
             width: 100%;
@@ -398,12 +411,15 @@
             color: var(--text);
             height: 36px;
             transition: var(--transition);
+            position: relative;
+            z-index: 10;
         }
         .search-box:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.3);
         }
+        .list-container { position: relative; z-index: 20; }
         .row-card {
             background: var(--panel);
             border: 1px solid var(--border);
@@ -417,6 +433,8 @@
             min-height: 44px;
             transition: var(--transition);
             color: var(--text);
+            position: relative;
+            z-index: 15;
         }
         .row-card:active {
             transform: scale(0.98);
@@ -505,21 +523,11 @@
             color: #fff;
             white-space: nowrap;
         }
-        .badge.paid {
-            background: linear-gradient(135deg, var(--success), #27ae60);
-        }
-        .badge.pending {
-            background: linear-gradient(135deg, var(--warning), #f39c12);
-        }
-        .badge.low {
-            background: linear-gradient(135deg, var(--danger), #c0392b);
-        }
-        .badge.high {
-            background: linear-gradient(135deg, var(--success), #27ae60);
-        }
-        .badge.medium {
-            background: linear-gradient(135deg, var(--warning), #f39c12);
-        }
+        .badge.paid { background: linear-gradient(135deg, var(--success), #27ae60); }
+        .badge.pending { background: linear-gradient(135deg, var(--warning), #f39c12); }
+        .badge.low { background: linear-gradient(135deg, var(--danger), #c0392b); }
+        .badge.high { background: linear-gradient(135deg, var(--success), #27ae60); }
+        .badge.medium { background: linear-gradient(135deg, var(--warning), #f39c12); }
         .btn {
             width: 100%;
             padding: 8px;
@@ -533,12 +541,8 @@
             margin-bottom: 4px;
             transition: var(--transition);
         }
-        .btn:active {
-            transform: scale(0.97);
-        }
-        .btn {
-            background: linear-gradient(135deg, #6b8aff, var(--primary));
-        }
+        .btn:active { transform: scale(0.97); }
+        .btn { background: linear-gradient(135deg, #6b8aff, var(--primary)); }
         .btn.small {
             padding: 4px 10px;
             font-size: 10px;
@@ -546,15 +550,9 @@
             border-radius: 8px;
             width: auto;
         }
-        .btn.save {
-            background: linear-gradient(135deg, var(--success), #27ae60);
-        }
-        .btn.edit {
-            background: linear-gradient(135deg, var(--warning), #f39c12);
-        }
-        .btn.del {
-            background: linear-gradient(135deg, var(--danger), #c0392b);
-        }
+        .btn.save { background: linear-gradient(135deg, var(--success), #27ae60); }
+        .btn.edit { background: linear-gradient(135deg, var(--warning), #f39c12); }
+        .btn.del { background: linear-gradient(135deg, var(--danger), #c0392b); }
         .btn.outline {
             background: var(--panel);
             color: var(--secondary);
@@ -564,44 +562,12 @@
             background: var(--secondary);
             color: #fff;
         }
-        .btn.print {
-            background: linear-gradient(135deg, #6c7ae0, #4a56b0);
-        }
-        .btn.whatsapp {
-            background: linear-gradient(135deg, #25d366, #128C7E);
-        }
-        .btn.email {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-        }
-        .btn.bluetooth {
-            background: linear-gradient(135deg, #4a6cf7, #2a4ac7);
-        }
-        .btn.drive {
-            background: linear-gradient(135deg, #4285F4, #2a56c6);
-        }
-        .fab {
-            position: absolute;
-            bottom: 20px;
-            right: 16px;
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #6b8aff, var(--primary));
-            color: #fff;
-            font-size: 26px;
-            border: none;
-            box-shadow: 0 4px 20px rgba(74, 108, 247, 0.4);
-            z-index: 15;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-        .fab:active {
-            transform: scale(0.88);
-            box-shadow: 0 2px 10px rgba(74, 108, 247, 0.3);
-        }
+        .btn.print { background: linear-gradient(135deg, #6c7ae0, #4a56b0); }
+        .btn.whatsapp { background: linear-gradient(135deg, #25d366, #128C7E); }
+        .btn.email { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .btn.bluetooth { background: linear-gradient(135deg, #4a6cf7, #2a4ac7); }
+        .btn.drive { background: linear-gradient(135deg, #4285F4, #2a56c6); }
+        .btn.gmail { background: linear-gradient(135deg, #EA4335, #c5221f); }
         .toast {
             position: absolute;
             top: 64px;
@@ -633,9 +599,7 @@
             z-index: 20;
             backdrop-filter: blur(4px);
         }
-        .sheet-overlay.show {
-            display: block;
-        }
+        .sheet-overlay.show { display: block; }
         .sheet {
             position: absolute;
             left: 0;
@@ -652,9 +616,7 @@
             box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
             color: var(--text);
         }
-        .sheet.show {
-            transform: translateY(0);
-        }
+        .sheet.show { transform: translateY(0); }
         .sheet-handle {
             width: 40px;
             height: 4px;
@@ -690,9 +652,7 @@
             justify-content: center;
             color: var(--text);
         }
-        .sheet-close:active {
-            transform: scale(0.9);
-        }
+        .sheet-close:active { transform: scale(0.9); }
         .sheet-body {
             padding: 12px 16px;
             overflow-y: auto;
@@ -717,9 +677,7 @@
             font-size: 12px;
             border-radius: 10px;
         }
-        .field {
-            margin-bottom: 6px;
-        }
+        .field { margin-bottom: 6px; }
         .field label {
             display: block;
             font-size: 10px;
@@ -727,9 +685,7 @@
             color: var(--text);
             margin-bottom: 2px;
         }
-        .field input,
-        .field select,
-        .field textarea {
+        .field input, .field select, .field textarea {
             width: 100%;
             padding: 6px 10px;
             border: 2px solid var(--border);
@@ -746,31 +702,15 @@
             min-height: 60px;
             resize: vertical;
         }
-        .field input:focus,
-        .field select:focus,
-        .field textarea:focus {
+        .field input:focus, .field select:focus, .field textarea:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.3);
         }
-        .field input:read-only {
-            background: #eef0f6;
-        }
-        .field-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-        }
-        .field-row-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-        }
-        .field-row-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 4px;
-        }
+        .field input:read-only { background: #eef0f6; }
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .field-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
         .login-overlay {
             position: fixed;
             inset: 0;
@@ -781,9 +721,7 @@
             justify-content: center;
             padding: 16px;
         }
-        .login-overlay.hide {
-            display: none;
-        }
+        .login-overlay.hide { display: none; }
         .login-box {
             background: var(--panel);
             border-radius: 20px;
@@ -822,12 +760,8 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 4px rgba(74, 108, 247, 0.3);
         }
-        .password-wrapper {
-            position: relative;
-        }
-        .password-wrapper input {
-            padding-left: 38px;
-        }
+        .password-wrapper { position: relative; }
+        .password-wrapper input { padding-left: 38px; }
         .password-toggle {
             position: absolute;
             left: 10px;
@@ -853,9 +787,7 @@
             color: #fff;
             transition: var(--transition);
         }
-        .login-btn:active {
-            transform: scale(0.97);
-        }
+        .login-btn:active { transform: scale(0.97); }
         .login-btn.secondary {
             background: var(--panel);
             color: var(--secondary);
@@ -878,8 +810,7 @@
             font-size: 11px;
             margin: 10px 0;
         }
-        .login-divider::before,
-        .login-divider::after {
+        .login-divider::before, .login-divider::after {
             content: '';
             flex: 1;
             height: 1px;
@@ -1017,9 +948,7 @@
             margin-bottom: 12px;
         }
         @media(max-width:450px) {
-            .bi-kpi-grid {
-                grid-template-columns: 1fr 1fr;
-            }
+            .bi-kpi-grid { grid-template-columns: 1fr 1fr; }
         }
         .bi-kpi {
             background: var(--panel);
@@ -1051,12 +980,8 @@
             font-weight: 700;
             margin-top: 2px;
         }
-        .bi-kpi .trend.up {
-            color: var(--success);
-        }
-        .bi-kpi .trend.down {
-            color: var(--danger);
-        }
+        .bi-kpi .trend.up { color: var(--success); }
+        .bi-kpi .trend.down { color: var(--danger); }
         .bi-chart-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1064,9 +989,7 @@
             margin-bottom: 12px;
         }
         @media(max-width:550px) {
-            .bi-chart-container {
-                grid-template-columns: 1fr;
-            }
+            .bi-chart-container { grid-template-columns: 1fr; }
         }
         .bi-chart-box {
             background: var(--panel);
@@ -1096,12 +1019,8 @@
             gap: 6px;
             margin-bottom: 10px;
         }
-        .bi-filters .field {
-            margin-bottom: 0;
-        }
-        .bi-filters .field label {
-            font-size: 8px;
-        }
+        .bi-filters .field { margin-bottom: 0; }
+        .bi-filters .field label { font-size: 8px; }
         .bi-top-table {
             background: var(--panel);
             border: 1px solid var(--border);
@@ -1127,12 +1046,8 @@
             text-align: center;
             border-bottom: 1px solid var(--border);
         }
-        .bi-top-table .rank {
-            font-weight: 700;
-        }
-        .bi-top-table .highlight {
-            background: #f8faff;
-        }
+        .bi-top-table .rank { font-weight: 700; }
+        .bi-top-table .highlight { background: #f8faff; }
         .bi-actions {
             display: flex;
             gap: 6px;
@@ -1174,9 +1089,7 @@
             margin: 12px 0;
         }
         @media(max-width:550px) {
-            .charts-container {
-                grid-template-columns: 1fr;
-            }
+            .charts-container { grid-template-columns: 1fr; }
         }
         .chart-box {
             background: var(--panel);
@@ -1228,12 +1141,8 @@
             background: var(--panel);
             color: var(--text);
         }
-        .report-table tr:nth-child(even) td {
-            background: var(--bg);
-        }
-        .report-table tr:hover td {
-            background: #eef3ff;
-        }
+        .report-table tr:nth-child(even) td { background: var(--bg); }
+        .report-table tr:hover td { background: #eef3ff; }
         .summary-mini-card {
             background: var(--bg);
             border-radius: 12px;
@@ -1248,9 +1157,7 @@
             gap: 4px;
         }
         @media(max-width:450px) {
-            .summary-mini-card .grid-4 {
-                grid-template-columns: 1fr 1fr;
-            }
+            .summary-mini-card .grid-4 { grid-template-columns: 1fr 1fr; }
         }
         .summary-mini-card .grid-4 .item {
             text-align: center;
@@ -1267,18 +1174,10 @@
             font-size: 14px;
             font-weight: 800;
         }
-        .summary-mini-card .grid-4 .item .val.opening {
-            color: var(--primary);
-        }
-        .summary-mini-card .grid-4 .item .val.purchases {
-            color: #2980b9;
-        }
-        .summary-mini-card .grid-4 .item .val.payments {
-            color: var(--success);
-        }
-        .summary-mini-card .grid-4 .item .val.balance {
-            color: var(--danger);
-        }
+        .summary-mini-card .grid-4 .item .val.opening { color: var(--primary); }
+        .summary-mini-card .grid-4 .item .val.purchases { color: #2980b9; }
+        .summary-mini-card .grid-4 .item .val.payments { color: var(--success); }
+        .summary-mini-card .grid-4 .item .val.balance { color: var(--danger); }
         .client-summary-card {
             background: linear-gradient(135deg, var(--secondary), #2a3f7a);
             color: #fff;
@@ -1297,15 +1196,9 @@
             opacity: 0.7;
             font-weight: 400;
         }
-        .client-summary-card .grid .value {
-            font-weight: 700;
-        }
-        .client-summary-card .grid .value.positive {
-            color: #4dbf8c;
-        }
-        .client-summary-card .grid .value.negative {
-            color: #ff6b6b;
-        }
+        .client-summary-card .grid .value { font-weight: 700; }
+        .client-summary-card .grid .value.positive { color: #4dbf8c; }
+        .client-summary-card .grid .value.negative { color: #ff6b6b; }
         .balance-display {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1332,12 +1225,8 @@
             font-weight: 800;
             color: var(--secondary);
         }
-        .balance-display .item .value.opening {
-            color: var(--primary);
-        }
-        .balance-display .item .value.closing {
-            color: var(--danger);
-        }
+        .balance-display .item .value.opening { color: var(--primary); }
+        .balance-display .item .value.closing { color: var(--danger); }
         .history-table-wrapper {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -1381,9 +1270,7 @@
             overflow-y: auto;
             padding: 10px;
         }
-        .print-overlay.show {
-            display: block;
-        }
+        .print-overlay.show { display: block; }
         .invoice-doc {
             background: #fff;
             color: #111;
@@ -1465,9 +1352,7 @@
             justify-content: center;
             padding: 20px;
         }
-        .notification-panel.show {
-            display: flex;
-        }
+        .notification-panel.show { display: flex; }
         .notification-content {
             background: var(--panel);
             border-radius: 16px;
@@ -1490,9 +1375,7 @@
             padding: 16px;
             backdrop-filter: blur(4px);
         }
-        .modal-overlay.show {
-            display: flex;
-        }
+        .modal-overlay.show { display: flex; }
         .modal-box {
             background: var(--panel);
             border-radius: 20px;
@@ -1537,9 +1420,7 @@
             margin-right: 6px;
             display: none;
         }
-        .offline-badge.show {
-            display: inline-block;
-        }
+        .offline-badge.show { display: inline-block; }
         .shortcut-help {
             position: fixed;
             top: 0;
@@ -1553,9 +1434,7 @@
             justify-content: center;
             padding: 20px;
         }
-        .shortcut-help.show {
-            display: flex;
-        }
+        .shortcut-help.show { display: flex; }
         .shortcut-help-content {
             background: var(--panel);
             border-radius: 16px;
@@ -1705,15 +1584,9 @@
             color: var(--secondary);
             margin-top: 1px;
         }
-        .account-summary-modern .summary-item .value.positive {
-            color: var(--success);
-        }
-        .account-summary-modern .summary-item .value.negative {
-            color: var(--danger);
-        }
-        .account-summary-modern .summary-item .value.warning {
-            color: var(--warning);
-        }
+        .account-summary-modern .summary-item .value.positive { color: var(--success); }
+        .account-summary-modern .summary-item .value.negative { color: var(--danger); }
+        .account-summary-modern .summary-item .value.warning { color: var(--warning); }
         .add-product-section {
             background: var(--panel);
             border: 1px solid var(--border);
@@ -1744,9 +1617,7 @@
             gap: 6px;
             align-items: end;
         }
-        .add-product-row .field {
-            margin-bottom: 0;
-        }
+        .add-product-row .field { margin-bottom: 0; }
         .add-product-row .field label {
             font-size: 8px;
             font-weight: 700;
@@ -1790,9 +1661,7 @@
             justify-content: center;
             min-width: 40px;
         }
-        .add-product-row .btn-add:active {
-            transform: scale(0.94);
-        }
+        .add-product-row .btn-add:active { transform: scale(0.94); }
         .stock-hint {
             font-size: 7px;
             color: var(--muted);
@@ -1834,9 +1703,7 @@
             color: var(--text);
             font-size: 10px;
         }
-        .items-table-modern tr:last-child td {
-            border-bottom: none;
-        }
+        .items-table-modern tr:last-child td { border-bottom: none; }
         .items-table-modern .item-name {
             font-weight: 700;
             text-align: left;
@@ -1853,22 +1720,10 @@
             cursor: pointer;
             transition: var(--transition);
         }
-        .items-table-modern .btn-action.edit {
-            background: var(--warning);
-            color: #fff;
-        }
-        .items-table-modern .btn-action.delete {
-            background: var(--danger);
-            color: #fff;
-        }
-        .items-table-modern .btn-action.save-edit {
-            background: var(--success);
-            color: #fff;
-        }
-        .items-table-modern .btn-action.cancel-edit {
-            background: var(--muted);
-            color: #fff;
-        }
+        .items-table-modern .btn-action.edit { background: var(--warning); color: #fff; }
+        .items-table-modern .btn-action.delete { background: var(--danger); color: #fff; }
+        .items-table-modern .btn-action.save-edit { background: var(--success); color: #fff; }
+        .items-table-modern .btn-action.cancel-edit { background: var(--muted); color: #fff; }
         .items-table-modern .edit-input {
             width: 50px;
             padding: 1px 3px;
@@ -1962,9 +1817,7 @@
             gap: 6px;
             align-items: end;
         }
-        .add-payment-row .field {
-            margin-bottom: 0;
-        }
+        .add-payment-row .field { margin-bottom: 0; }
         .add-payment-row .field label {
             font-size: 8px;
             font-weight: 700;
@@ -2004,9 +1857,7 @@
             height: 30px;
             transition: var(--transition);
         }
-        .add-payment-row .btn-add-payment:active {
-            transform: scale(0.94);
-        }
+        .add-payment-row .btn-add-payment:active { transform: scale(0.94); }
         .invoice-actions-modern {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -2028,21 +1879,11 @@
             justify-content: center;
             gap: 3px;
         }
-        .invoice-actions-modern .btn-action:active {
-            transform: scale(0.95);
-        }
-        .invoice-actions-modern .btn-action.whatsapp {
-            background: linear-gradient(135deg, #25d366, #128C7E);
-        }
-        .invoice-actions-modern .btn-action.email {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-        }
-        .invoice-actions-modern .btn-action.print {
-            background: linear-gradient(135deg, #6c7ae0, #4a56b0);
-        }
-        .invoice-actions-modern .btn-action.bluetooth {
-            background: linear-gradient(135deg, #4a6cf7, #2a4ac7);
-        }
+        .invoice-actions-modern .btn-action:active { transform: scale(0.95); }
+        .invoice-actions-modern .btn-action.whatsapp { background: linear-gradient(135deg, #25d366, #128C7E); }
+        .invoice-actions-modern .btn-action.email { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .invoice-actions-modern .btn-action.print { background: linear-gradient(135deg, #6c7ae0, #4a56b0); }
+        .invoice-actions-modern .btn-action.bluetooth { background: linear-gradient(135deg, #4a6cf7, #2a4ac7); }
         .toast-modern {
             position: fixed;
             bottom: 20px;
@@ -2085,12 +1926,8 @@
             display: inline-block;
             flex-shrink: 0;
         }
-        .drive-status .status-dot.connected {
-            background: var(--success);
-        }
-        .drive-status .status-dot.disconnected {
-            background: var(--danger);
-        }
+        .drive-status .status-dot.connected { background: var(--success); }
+        .drive-status .status-dot.disconnected { background: var(--danger); }
         .drive-status .status-dot.syncing {
             background: var(--warning);
             animation: pulse 1s infinite;
@@ -2099,72 +1936,139 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.3; }
         }
-        .drive-status .status-text {
-            flex: 1;
-        }
+        .drive-status .status-text { flex: 1; }
         .drive-status .status-time {
             color: var(--muted);
             font-size: 8px;
         }
         @media(max-width:550px) {
-            .account-summary-modern {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .add-product-row {
-                grid-template-columns: 1fr 1fr;
-            }
-            .add-product-row .field:first-child {
-                grid-column: 1 / -1;
-            }
-            .invoice-actions-modern {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .party-info-grid {
-                grid-template-columns: 1fr;
-            }
-            .add-payment-row {
-                grid-template-columns: 1fr 1fr;
-            }
-            .add-payment-row .field:first-child {
-                grid-column: 1 / -1;
-            }
+            .account-summary-modern { grid-template-columns: repeat(2, 1fr); }
+            .add-product-row { grid-template-columns: 1fr 1fr; }
+            .add-product-row .field:first-child { grid-column: 1 / -1; }
+            .invoice-actions-modern { grid-template-columns: repeat(2, 1fr); }
+            .party-info-grid { grid-template-columns: 1fr; }
+            .add-payment-row { grid-template-columns: 1fr 1fr; }
+            .add-payment-row .field:first-child { grid-column: 1 / -1; }
             .invoice-header-modern {
                 flex-direction: column;
                 align-items: stretch;
                 text-align: center;
             }
-            .invoice-header-modern .invoice-badge {
-                align-self: center;
-            }
-            .items-table-modern {
-                font-size: 8px;
-            }
-            .items-table-modern .edit-input {
-                width: 35px;
-                font-size: 8px;
-            }
-            .invoice-total-modern .amount {
-                font-size: 17px;
-            }
-            .capital-details {
-                grid-template-columns: 1fr 1fr;
-            }
+            .invoice-header-modern .invoice-badge { align-self: center; }
+            .items-table-modern { font-size: 8px; }
+            .items-table-modern .edit-input { width: 35px; font-size: 8px; }
+            .invoice-total-modern .amount { font-size: 17px; }
+            .capital-details { grid-template-columns: 1fr 1fr; }
         }
         @media(max-width:400px) {
-            .account-summary-modern {
-                grid-template-columns: 1fr 1fr;
-                gap: 4px;
-            }
-            .account-summary-modern .summary-item {
-                padding: 4px 2px;
-            }
-            .account-summary-modern .summary-item .value {
-                font-size: 11px;
-            }
-            .invoice-total-modern .amount {
-                font-size: 14px;
-            }
+            .account-summary-modern { grid-template-columns: 1fr 1fr; gap: 4px; }
+            .account-summary-modern .summary-item { padding: 4px 2px; }
+            .account-summary-modern .summary-item .value { font-size: 11px; }
+            .invoice-total-modern .amount { font-size: 14px; }
         }
+        .import-section {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+        }
+        .import-section .import-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .import-section .import-header h4 {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+        .import-section .import-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .import-section .import-actions .btn {
+            flex: 1;
+            min-width: 70px;
+            padding: 4px 10px;
+            font-size: 10px;
+            margin: 0;
+        }
+        .import-section .import-preview {
+            max-height: 200px;
+            overflow-y: auto;
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 8px;
+            margin-top: 8px;
+            font-size: 10px;
+            border: 1px solid var(--border);
+        }
+        .import-section .import-preview table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9px;
+        }
+        .import-section .import-preview th {
+            background: var(--secondary);
+            color: #fff;
+            padding: 4px 6px;
+            text-align: center;
+            font-weight: 700;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+        .import-section .import-preview td {
+            padding: 3px 6px;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+        }
+        .import-section .import-preview .highlight-duplicate { background: #fde8e8; }
+        .import-section .import-progress {
+            margin-top: 8px;
+            font-size: 10px;
+            color: var(--muted);
+        }
+        .import-section .import-progress .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+        .import-section .import-progress .progress-bar .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, var(--success), #27ae60);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .file-drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            color: var(--muted);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 6px;
+        }
+        .file-drop-zone:hover,
+        .file-drop-zone.dragover {
+            border-color: var(--primary);
+            background: rgba(74, 108, 247, 0.05);
+        }
+        .file-drop-zone .icon {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .file-drop-zone input[type="file"] { display: none; }
     </style>
 </head>
 <body>
@@ -2180,7 +2084,7 @@
                 </div>
                 <span class="version-tag">V 0.8.1</span>
             </div>
-            <div class="login-logo">GTR POS <span style="font-size:12px;opacity:.6;font-weight:400;"></span></div>
+            <div class="login-logo">GTR POS</div>
             <div class="login-sub" id="loginModeLabel">Connexion à votre compte</div>
             <input type="email" id="loginEmail" placeholder="E-mail" autocomplete="email">
             <div class="password-wrapper">
@@ -2243,6 +2147,9 @@
             </div>
         </div>
 
+        <!-- ===== FAB TOP ===== -->
+        <button class="fab-top" id="fabBtn">＋</button>
+
         <div class="content">
             <!-- ===== DASHBOARD ===== -->
             <div class="section active" id="sec-dashboard">
@@ -2273,8 +2180,32 @@
 
             <!-- ===== CLIENTS ===== -->
             <div class="section" id="sec-clients">
+                <div class="import-section">
+                    <div class="import-header">
+                        <h4>📥 Importer des clients</h4>
+                        <div class="import-actions">
+                            <button class="btn save small" onclick="document.getElementById('importFileInput').click()" style="flex:1;min-width:60px;padding:4px 8px;font-size:9px;">📂 Choisir fichier</button>
+                            <button class="btn print small" onclick="downloadTemplate()" style="flex:1;min-width:60px;padding:4px 8px;font-size:9px;">📄 Télécharger modèle</button>
+                        </div>
+                    </div>
+                    <div class="file-drop-zone" id="fileDropZone" onclick="document.getElementById('importFileInput').click()">
+                        <span class="icon">📁</span>
+                        <span>Déposez votre fichier Excel ou CSV ici, ou cliquez pour sélectionner</span>
+                        <span style="font-size:8px;color:var(--muted);display:block;margin-top:2px;">Formats supportés: .xlsx, .xls, .csv</span>
+                    </div>
+                    <input type="file" id="importFileInput" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleImportFile(this)">
+                    <div id="importPreview" class="import-preview" style="display:none;"></div>
+                    <div id="importProgress" class="import-progress" style="display:none;">
+                        <span id="importStatus">Chargement...</span>
+                        <div class="progress-bar"><div class="progress-fill" id="importProgressFill"></div></div>
+                    </div>
+                    <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+                        <button class="btn save small" id="importConfirmBtn" onclick="confirmImport()" style="display:none;flex:1;min-width:60px;padding:4px 8px;font-size:9px;">✅ Importer maintenant</button>
+                        <button class="btn del small" id="importCancelBtn" onclick="cancelImport()" style="display:none;flex:1;min-width:60px;padding:4px 8px;font-size:9px;">❌ Annuler</button>
+                    </div>
+                </div>
                 <input class="search-box" id="cSearch" placeholder="🔍 Rechercher par nom ou téléphone..." oninput="Clients.render()">
-                <div id="clientsList"></div>
+                <div id="clientsList" class="list-container"></div>
             </div>
 
             <!-- ===== CLIENT HISTORY ===== -->
@@ -2286,7 +2217,7 @@
             <!-- ===== FOURNISSEURS ===== -->
             <div class="section" id="sec-fournisseurs">
                 <input class="search-box" id="fSearch" placeholder="🔍 Rechercher par nom ou téléphone..." oninput="Fournisseurs.render()">
-                <div id="fournisseursList"></div>
+                <div id="fournisseursList" class="list-container"></div>
             </div>
 
             <!-- ===== FOURNISSEUR HISTORY ===== -->
@@ -2298,7 +2229,7 @@
             <!-- ===== ARTICLES ===== -->
             <div class="section" id="sec-articles">
                 <input class="search-box" id="aSearch" placeholder="🔍 Rechercher par nom d'article..." oninput="Articles.render()">
-                <div id="articlesList"></div>
+                <div id="articlesList" class="list-container"></div>
             </div>
 
             <!-- ===== ARTICLE HISTORY ===== -->
@@ -2310,20 +2241,20 @@
             <!-- ===== VENTES ===== -->
             <div class="section" id="sec-ventes">
                 <input class="search-box" id="vSearch" placeholder="🔍 Rechercher par n° de facture ou client..." oninput="Ventes.render()">
-                <div id="ventesList"></div>
+                <div id="ventesList" class="list-container"></div>
             </div>
 
             <!-- ===== ACHATS ===== -->
             <div class="section" id="sec-achats">
                 <input class="search-box" id="aSearchP" placeholder="🔍 Rechercher par n° de facture ou fournisseur..." oninput="Achats.render()">
-                <div id="achatsList"></div>
+                <div id="achatsList" class="list-container"></div>
             </div>
 
             <!-- ===== EXPENSES ===== -->
             <div class="section" id="sec-expenses">
                 <div class="kpi-row" style="grid-template-columns:1fr;"><div class="kpi-card"><div class="val" id="expensesTotal">0.000 TND</div><div class="lbl">Total des dépenses</div></div></div>
                 <input class="search-box" id="expSearch" placeholder="🔍 Rechercher par catégorie ou libellé..." oninput="Expenses.render()">
-                <div id="expensesList"></div>
+                <div id="expensesList" class="list-container"></div>
             </div>
 
             <!-- ===== CAISSE ===== -->
@@ -2353,30 +2284,16 @@
             <!-- ===== FINANCE ===== -->
             <div class="section" id="sec-finance">
                 <div class="section-title">📊 Indicateurs financiers</div>
-                
                 <div class="capital-card" id="capitalCard">
                     <div class="capital-label">💰 Capital de l'entreprise</div>
                     <div class="capital-value" id="capitalValue">0.000 TND</div>
                     <div class="capital-details">
-                        <div class="item">
-                            <span class="lbl">Solde client départ</span>
-                            <span class="val" id="capClientDepart">0.000</span>
-                        </div>
-                        <div class="item">
-                            <span class="lbl">Valeur stock départ</span>
-                            <span class="val" id="capStockDepart">0.000</span>
-                        </div>
-                        <div class="item">
-                            <span class="lbl">Caisse départ</span>
-                            <span class="val" id="capCashDepart">0.000</span>
-                        </div>
-                        <div class="item">
-                            <span class="lbl">Solde fournisseur départ</span>
-                            <span class="val" id="capSupplierBalance">0.000</span>
-                        </div>
+                        <div class="item"><span class="lbl">Solde client départ</span><span class="val" id="capClientDepart">0.000</span></div>
+                        <div class="item"><span class="lbl">Valeur stock départ</span><span class="val" id="capStockDepart">0.000</span></div>
+                        <div class="item"><span class="lbl">Caisse départ</span><span class="val" id="capCashDepart">0.000</span></div>
+                        <div class="item"><span class="lbl">Solde fournisseur départ</span><span class="val" id="capSupplierBalance">0.000</span></div>
                     </div>
                 </div>
-
                 <div class="finance-kpi-grid" id="financeKpiGrid">
                     <div class="kpi-card"><div class="val" id="finTotalClientBalance">0.000</div><div class="lbl">Solde client</div></div>
                     <div class="kpi-card"><div class="val" id="finTotalStockValue">0.000</div><div class="lbl">Valeur du stock</div></div>
@@ -2396,18 +2313,7 @@
                 </div>
                 <div class="finance-table-wrapper">
                     <table class="finance-table" id="financeTable">
-                        <thead>
-                            <tr>
-                                <th style="min-width:80px;">Date</th>
-                                <th style="min-width:80px;">Solde client</th>
-                                <th style="min-width:80px;">Valeur du stock</th>
-                                <th style="min-width:70px;">Caisse</th>
-                                <th style="min-width:80px;">Solde fournisseur</th>
-                                <th style="min-width:80px;">Total</th>
-                                <th style="min-width:70px;">Bénéfice</th>
-                                <th style="min-width:50px;">Action</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th style="min-width:80px;">Date</th><th style="min-width:80px;">Solde client</th><th style="min-width:80px;">Valeur du stock</th><th style="min-width:70px;">Caisse</th><th style="min-width:80px;">Solde fournisseur</th><th style="min-width:80px;">Total</th><th style="min-width:70px;">Bénéfice</th><th style="min-width:50px;">Action</th></tr></thead>
                         <tbody id="financeTableBody"></tbody>
                     </table>
                 </div>
@@ -2416,83 +2322,33 @@
 
             <!-- ===== BI DASHBOARD ===== -->
             <div class="section" id="sec-bi-dashboard">
-                <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;">
-                    <span>📈 Analyses BI - Business Intelligence</span>
-                    <span style="font-size:9px;color:var(--muted);font-weight:400;">GTR POS V 0.8.1</span>
-                </div>
+                <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;"><span>📈 Analyses BI - Business Intelligence</span><span style="font-size:9px;color:var(--muted);font-weight:400;">GTR POS V 0.8.1</span></div>
                 <div class="bi-filters">
                     <div class="field"><label>📅 Du</label><input type="date" id="biDateFrom" onchange="BIAnalytics.render()"></div>
                     <div class="field"><label>📅 Au</label><input type="date" id="biDateTo" onchange="BIAnalytics.render()"></div>
-                    <div class="field"><label>📊 Période</label>
-                        <select id="biPeriod" onchange="BIAnalytics.render()">
-                            <option value="daily">Quotidien</option>
-                            <option value="weekly">Hebdomadaire</option>
-                            <option value="monthly" selected>Mensuel</option>
-                            <option value="yearly">Annuel</option>
-                        </select>
-                    </div>
+                    <div class="field"><label>📊 Période</label><select id="biPeriod" onchange="BIAnalytics.render()"><option value="daily">Quotidien</option><option value="weekly">Hebdomadaire</option><option value="monthly" selected>Mensuel</option><option value="yearly">Annuel</option></select></div>
                 </div>
                 <div class="bi-kpi-grid" id="biKPIs">
-                    <div class="bi-kpi" style="border-top:3px solid #4a6cf7;">
-                        <div class="num" id="biTotalSales">0.000</div>
-                        <div class="lbl">Total des ventes</div>
-                        <div class="trend up" id="biSalesTrend">▲ 0%</div>
-                    </div>
-                    <div class="bi-kpi" style="border-top:3px solid #2ecc71;">
-                        <div class="num" id="biTotalProfit">0.000</div>
-                        <div class="lbl">Bénéfice net</div>
-                        <div class="trend up" id="biProfitTrend">▲ 0%</div>
-                    </div>
-                    <div class="bi-kpi" style="border-top:3px solid #f39c12;">
-                        <div class="num" id="biAvgTicket">0.000</div>
-                        <div class="lbl">Panier moyen</div>
-                        <div class="trend up" id="biTicketTrend">▲ 0%</div>
-                    </div>
-                    <div class="bi-kpi" style="border-top:3px solid #9b59b6;">
-                        <div class="num" id="biTotalTransactions">0</div>
-                        <div class="lbl">Transactions</div>
-                        <div class="trend up" id="biTransTrend">▲ 0%</div>
-                    </div>
+                    <div class="bi-kpi" style="border-top:3px solid #4a6cf7;"><div class="num" id="biTotalSales">0.000</div><div class="lbl">Total des ventes</div><div class="trend up" id="biSalesTrend">▲ 0%</div></div>
+                    <div class="bi-kpi" style="border-top:3px solid #2ecc71;"><div class="num" id="biTotalProfit">0.000</div><div class="lbl">Bénéfice net</div><div class="trend up" id="biProfitTrend">▲ 0%</div></div>
+                    <div class="bi-kpi" style="border-top:3px solid #f39c12;"><div class="num" id="biAvgTicket">0.000</div><div class="lbl">Panier moyen</div><div class="trend up" id="biTicketTrend">▲ 0%</div></div>
+                    <div class="bi-kpi" style="border-top:3px solid #9b59b6;"><div class="num" id="biTotalTransactions">0</div><div class="lbl">Transactions</div><div class="trend up" id="biTransTrend">▲ 0%</div></div>
                 </div>
                 <div class="bi-chart-container">
-                    <div class="bi-chart-box">
-                        <div class="chart-title">📊 Évolution des ventes</div>
-                        <canvas id="biSalesChart"></canvas>
-                    </div>
-                    <div class="bi-chart-box">
-                        <div class="chart-title">📊 Répartition des coûts</div>
-                        <canvas id="biProfitChart"></canvas>
-                    </div>
+                    <div class="bi-chart-box"><div class="chart-title">📊 Évolution des ventes</div><canvas id="biSalesChart"></canvas></div>
+                    <div class="bi-chart-box"><div class="chart-title">📊 Répartition des coûts</div><canvas id="biProfitChart"></canvas></div>
                 </div>
                 <div class="bi-chart-container">
-                    <div class="bi-chart-box">
-                        <div class="chart-title">🏆 Top produits</div>
-                        <canvas id="biTopProductsChart"></canvas>
-                    </div>
-                    <div class="bi-chart-box">
-                        <div class="chart-title">🏆 Top clients</div>
-                        <canvas id="biTopClientsChart"></canvas>
-                    </div>
+                    <div class="bi-chart-box"><div class="chart-title">🏆 Top produits</div><canvas id="biTopProductsChart"></canvas></div>
+                    <div class="bi-chart-box"><div class="chart-title">🏆 Top clients</div><canvas id="biTopClientsChart"></canvas></div>
                 </div>
                 <div class="bi-top-table">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                        <span style="font-size:11px;font-weight:800;color:var(--secondary);">🏆 Meilleurs produits</span>
-                        <button class="btn print small" style="width:auto;padding:2px 10px;font-size:8px;" onclick="BIAnalytics.printTopProducts()">🖨️ Imprimer</button>
-                    </div>
-                    <table id="biTopProductsTable">
-                        <thead><tr><th>#</th><th>Produit</th><th>Qté</th><th>Ventes</th><th>%</th></tr></thead>
-                        <tbody id="biTopProductsBody"></tbody>
-                    </table>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font-size:11px;font-weight:800;color:var(--secondary);">🏆 Meilleurs produits</span><button class="btn print small" style="width:auto;padding:2px 10px;font-size:8px;" onclick="BIAnalytics.printTopProducts()">🖨️ Imprimer</button></div>
+                    <table id="biTopProductsTable"><thead><tr><th>#</th><th>Produit</th><th>Qté</th><th>Ventes</th><th>%</th></tr></thead><tbody id="biTopProductsBody"></tbody></table>
                 </div>
                 <div class="bi-top-table">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                        <span style="font-size:11px;font-weight:800;color:var(--secondary);">🏆 Meilleurs clients</span>
-                        <button class="btn print small" style="width:auto;padding:2px 10px;font-size:8px;" onclick="BIAnalytics.printTopClients()">🖨️ Imprimer</button>
-                    </div>
-                    <table id="biTopClientsTable">
-                        <thead><tr><th>#</th><th>Client</th><th>Factures</th><th>Total</th><th>%</th></tr></thead>
-                        <tbody id="biTopClientsBody"></tbody>
-                    </table>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font-size:11px;font-weight:800;color:var(--secondary);">🏆 Meilleurs clients</span><button class="btn print small" style="width:auto;padding:2px 10px;font-size:8px;" onclick="BIAnalytics.printTopClients()">🖨️ Imprimer</button></div>
+                    <table id="biTopClientsTable"><thead><tr><th>#</th><th>Client</th><th>Factures</th><th>Total</th><th>%</th></tr></thead><tbody id="biTopClientsBody"></tbody></table>
                 </div>
                 <div class="bi-actions">
                     <button class="btn print small" onclick="BIAnalytics.exportPDF()">📄 PDF</button>
@@ -2509,30 +2365,12 @@
                     <div class="field-row-3">
                         <div class="field"><label>📅 Du</label><input type="date" id="reportDateFrom"></div>
                         <div class="field"><label>📅 Au</label><input type="date" id="reportDateTo"></div>
-                        <div class="field"><label>📊 Type de rapport</label>
-                            <select id="reportType">
-                                <option value="sales">Ventes</option>
-                                <option value="purchases">Achats</option>
-                                <option value="profit">Profits et pertes</option>
-                                <option value="clients">Clients</option>
-                                <option value="products">Produits</option>
-                                <option value="inventory">Inventaire</option>
-                                <option value="cash">Trésorerie</option>
-                                <option value="expenses">Dépenses</option>
-                            </select>
-                        </div>
+                        <div class="field"><label>📊 Type de rapport</label><select id="reportType"><option value="sales">Ventes</option><option value="purchases">Achats</option><option value="profit">Profits et pertes</option><option value="clients">Clients</option><option value="products">Produits</option><option value="inventory">Inventaire</option><option value="cash">Trésorerie</option><option value="expenses">Dépenses</option></select></div>
                     </div>
                     <div class="field-row-3">
                         <div class="field"><label>👤 Client</label><select id="reportClientFilter"><option value="all">Tous</option></select></div>
                         <div class="field"><label>📦 Produit</label><select id="reportProductFilter"><option value="all">Tous</option></select></div>
-                        <div class="field"><label>📋 Statut</label>
-                            <select id="reportStatusFilter">
-                                <option value="all">Tous</option>
-                                <option value="paid">Payé</option>
-                                <option value="pending">Non payé</option>
-                                <option value="partial">Partiellement payé</option>
-                            </select>
-                        </div>
+                        <div class="field"><label>📋 Statut</label><select id="reportStatusFilter"><option value="all">Tous</option><option value="paid">Payé</option><option value="pending">Non payé</option><option value="partial">Partiellement payé</option></select></div>
                     </div>
                     <div class="reports-actions">
                         <button class="btn save" onclick="AdvancedReports.generateReport()">📊 Générer</button>
@@ -2577,14 +2415,7 @@
                 </div>
                 <div class="history-table-wrapper">
                     <table class="history-table" style="min-width:550px;font-size:8px;">
-                        <thead>
-                            <tr>
-                                <th>Client</th>
-                                <th>Date</th>
-                                <th>N° facture</th>
-                                <th>Bénéfice (TND)</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>Client</th><th>Date</th><th>N° facture</th><th>Bénéfice (TND)</th></tr></thead>
                         <tbody id="margeTableBody"></tbody>
                     </table>
                 </div>
@@ -2594,9 +2425,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- ===== FAB ===== -->
-        <button class="fab" id="fabBtn">＋</button>
 
         <!-- ===== OVERLAY ===== -->
         <div class="sheet-overlay" id="overlay"></div>
@@ -2688,118 +2516,48 @@
             </div>
         </div>
 
-        <!-- ===== VENTE SHEET (avec modification pour permettre vente sans stock) ===== -->
+        <!-- VENTE SHEET -->
         <div class="sheet" id="sheet-ventes">
             <div class="sheet-handle"></div>
             <div class="sheet-header"><h3>📄 Facture de vente</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
             <div class="sheet-body">
                 <div class="invoice-header-modern">
-                    <div class="left">
-                        <div class="invoice-title">📄 Facture de vente</div>
-                        <div class="invoice-subtitle">GTR POS • Système intégré</div>
-                    </div>
-                    <div class="invoice-badge">
-                        <span id="vNumDisplay">#VTE-0001</span>
-                        <small id="vDateDisplay">12/08/2026</small>
-                    </div>
+                    <div class="left"><div class="invoice-title">📄 Facture de vente</div><div class="invoice-subtitle">GTR POS • Système intégré</div></div>
+                    <div class="invoice-badge"><span id="vNumDisplay">#VTE-0001</span><small id="vDateDisplay">12/08/2026</small></div>
                 </div>
                 <div class="party-info-grid">
-                    <div class="field-group">
-                        <label>👤 Client</label>
-                        <select id="vClient" onchange="Ventes.fillClient()">
-                            <option value="">-- Choisir un client --</option>
-                        </select>
-                    </div>
-                    <div class="field-group">
-                        <label>📞 Téléphone</label>
-                        <div class="value" id="vPhone">- <small>rempli automatiquement</small></div>
-                    </div>
-                    <div class="field-group">
-                        <label>📧 Email</label>
-                        <div class="value" id="vEmail">-</div>
-                    </div>
-                    <div class="field-group">
-                        <label>🆔 Numéro fiscal</label>
-                        <div class="value" id="vTaxId">-</div>
-                    </div>
+                    <div class="field-group"><label>👤 Client</label><select id="vClient" onchange="Ventes.fillClient()"><option value="">-- Choisir un client --</option></select></div>
+                    <div class="field-group"><label>📞 Téléphone</label><div class="value" id="vPhone">- <small>rempli automatiquement</small></div></div>
+                    <div class="field-group"><label>📧 Email</label><div class="value" id="vEmail">-</div></div>
+                    <div class="field-group"><label>🆔 Numéro fiscal</label><div class="value" id="vTaxId">-</div></div>
                 </div>
                 <div class="account-summary-modern">
-                    <div class="summary-item">
-                        <span class="label">💰 Solde précédent</span>
-                        <span class="value warning" id="vPrevBalance">0.000</span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="label">📄 Montant de la facture</span>
-                        <span class="value" id="vInvoiceTotal">0.000</span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="label">💳 Payé</span>
-                        <span class="value positive" id="vPaidAmount">0.000</span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="label">📊 Solde actuel</span>
-                        <span class="value negative" id="vCurrentBalance">0.000</span>
-                    </div>
+                    <div class="summary-item"><span class="label">💰 Solde précédent</span><span class="value warning" id="vPrevBalance">0.000</span></div>
+                    <div class="summary-item"><span class="label">📄 Montant de la facture</span><span class="value" id="vInvoiceTotal">0.000</span></div>
+                    <div class="summary-item"><span class="label">💳 Payé</span><span class="value positive" id="vPaidAmount">0.000</span></div>
+                    <div class="summary-item"><span class="label">📊 Solde actuel</span><span class="value negative" id="vCurrentBalance">0.000</span></div>
                 </div>
                 <div class="add-product-section">
                     <div class="section-label">➕ Ajouter un produit</div>
                     <div class="add-product-row">
-                        <div class="field">
-                            <label>Produit</label>
-                            <select id="viArticle" onchange="Ventes.fillArticle()">
-                                <option value="">-- Choisir un produit --</option>
-                            </select>
-                            <span class="stock-hint" id="viStockHint">Stock: -</span>
-                        </div>
-                        <div class="field">
-                            <label>Prix</label>
-                            <input type="number" step="0.001" id="viPrice" oninput="Ventes.calcLine()" placeholder="0.000">
-                        </div>
-                        <div class="field">
-                            <label>Quantité</label>
-                            <input type="number" min="1" id="viQty" value="1" oninput="Ventes.calcLine()">
-                        </div>
-                        <div class="field">
-                            <label>Total</label>
-                            <input type="number" step="0.001" id="viTotal" readonly style="background:#eef0f6;font-weight:700;">
-                        </div>
+                        <div class="field"><label>Produit</label><select id="viArticle" onchange="Ventes.fillArticle()"><option value="">-- Choisir un produit --</option></select><span class="stock-hint" id="viStockHint">Stock: -</span></div>
+                        <div class="field"><label>Prix</label><input type="number" step="0.001" id="viPrice" oninput="Ventes.calcLine()" placeholder="0.000"></div>
+                        <div class="field"><label>Quantité</label><input type="number" min="1" id="viQty" value="1" oninput="Ventes.calcLine()"></div>
+                        <div class="field"><label>Total</label><input type="number" step="0.001" id="viTotal" readonly style="background:#eef0f6;font-weight:700;"></div>
                         <button class="btn-add" onclick="Ventes.addLine()">➕</button>
                     </div>
                 </div>
                 <table class="items-table-modern">
-                    <thead>
-                        <tr>
-                            <th style="width:25px;">#</th>
-                            <th style="text-align:left;">Produit</th>
-                            <th style="width:60px;">Prix</th>
-                            <th style="width:45px;">Qté</th>
-                            <th style="width:70px;">Total</th>
-                            <th style="width:55px;">Action</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th style="width:25px;">#</th><th style="text-align:left;">Produit</th><th style="width:60px;">Prix</th><th style="width:45px;">Qté</th><th style="width:70px;">Total</th><th style="width:55px;">Action</th></tr></thead>
                     <tbody id="vLinesBody"></tbody>
                 </table>
-                <div class="invoice-total-modern">
-                    <span class="label">💰 Total de la facture</span>
-                    <span class="amount" id="vGrand">0.000 TND</span>
-                </div>
+                <div class="invoice-total-modern"><span class="label">💰 Total de la facture</span><span class="amount" id="vGrand">0.000 TND</span></div>
                 <div class="payments-section">
                     <div class="section-label">💰 Paiements enregistrés</div>
                     <div class="payments-grid" id="vReglementsList"></div>
                     <div class="add-payment-row">
-                        <div class="field">
-                            <label>Montant</label>
-                            <input type="number" step="0.001" id="vRegAmount" placeholder="0.000">
-                        </div>
-                        <div class="field">
-                            <label>Méthode de paiement</label>
-                            <select id="vRegType">
-                                <option>Espèces</option>
-                                <option>Chèque</option>
-                                <option>Virement</option>
-                                <option>Carte</option>
-                            </select>
-                        </div>
+                        <div class="field"><label>Montant</label><input type="number" step="0.001" id="vRegAmount" placeholder="0.000"></div>
+                        <div class="field"><label>Méthode de paiement</label><select id="vRegType"><option>Espèces</option><option>Chèque</option><option>Virement</option><option>Carte</option></select></div>
                         <button class="btn-add-payment" onclick="Ventes.addReglement()">➕ Ajouter</button>
                     </div>
                 </div>
@@ -2809,8 +2567,7 @@
                     <button class="btn-action print" onclick="Ventes.printInvoice()">🖨️ Imprimer</button>
                     <button class="btn-action bluetooth" onclick="Ventes.printBluetooth()">📡 Bluetooth</button>
                 </div>
-                <input type="hidden" id="vNum">
-                <input type="hidden" id="vDate">
+                <input type="hidden" id="vNum"><input type="hidden" id="vDate">
             </div>
             <div class="sheet-footer">
                 <button class="btn save" onclick="Ventes.save()">💾 Enregistrer</button>
@@ -2819,118 +2576,48 @@
             </div>
         </div>
 
-        <!-- ===== ACHAT SHEET ===== -->
+        <!-- ACHAT SHEET -->
         <div class="sheet" id="sheet-achats">
             <div class="sheet-handle"></div>
             <div class="sheet-header"><h3>📄 Facture d'achat</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
             <div class="sheet-body">
                 <div class="invoice-header-modern">
-                    <div class="left">
-                        <div class="invoice-title">📄 Facture d'achat</div>
-                        <div class="invoice-subtitle">GTR POS • Système intégré</div>
-                    </div>
-                    <div class="invoice-badge">
-                        <span id="pNumDisplay">#ACH-0001</span>
-                        <small id="pDateDisplay">12/08/2026</small>
-                    </div>
+                    <div class="left"><div class="invoice-title">📄 Facture d'achat</div><div class="invoice-subtitle">GTR POS • Système intégré</div></div>
+                    <div class="invoice-badge"><span id="pNumDisplay">#ACH-0001</span><small id="pDateDisplay">12/08/2026</small></div>
                 </div>
                 <div class="party-info-grid">
-                    <div class="field-group">
-                        <label>🤝 Fournisseur</label>
-                        <select id="pSupplier" onchange="Achats.fillSupplier()">
-                            <option value="">-- Choisir un fournisseur --</option>
-                        </select>
-                    </div>
-                    <div class="field-group">
-                        <label>📞 Téléphone</label>
-                        <div class="value" id="pPhone">- <small>rempli automatiquement</small></div>
-                    </div>
-                    <div class="field-group">
-                        <label>🆔 Numéro fiscal</label>
-                        <div class="value" id="pTaxId">-</div>
-                    </div>
-                    <div class="field-group">
-                        <label>📍 Adresse</label>
-                        <div class="value" id="pAddress">-</div>
-                    </div>
+                    <div class="field-group"><label>🤝 Fournisseur</label><select id="pSupplier" onchange="Achats.fillSupplier()"><option value="">-- Choisir un fournisseur --</option></select></div>
+                    <div class="field-group"><label>📞 Téléphone</label><div class="value" id="pPhone">- <small>rempli automatiquement</small></div></div>
+                    <div class="field-group"><label>🆔 Numéro fiscal</label><div class="value" id="pTaxId">-</div></div>
+                    <div class="field-group"><label>📍 Adresse</label><div class="value" id="pAddress">-</div></div>
                 </div>
                 <div class="account-summary-modern">
-                    <div class="summary-item">
-                        <span class="label">💰 Solde précédent</span>
-                        <span class="value warning" id="pPrevBalance">0.000</span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="label">📄 Montant de la facture</span>
-                        <span class="value" id="pInvoiceTotal">0.000</span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="label">💳 Payé</span>
-                        <span class="value positive" id="pPaidAmount">0.000</span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="label">📊 Solde actuel</span>
-                        <span class="value negative" id="pCurrentBalance">0.000</span>
-                    </div>
+                    <div class="summary-item"><span class="label">💰 Solde précédent</span><span class="value warning" id="pPrevBalance">0.000</span></div>
+                    <div class="summary-item"><span class="label">📄 Montant de la facture</span><span class="value" id="pInvoiceTotal">0.000</span></div>
+                    <div class="summary-item"><span class="label">💳 Payé</span><span class="value positive" id="pPaidAmount">0.000</span></div>
+                    <div class="summary-item"><span class="label">📊 Solde actuel</span><span class="value negative" id="pCurrentBalance">0.000</span></div>
                 </div>
                 <div class="add-product-section">
                     <div class="section-label">➕ Ajouter un produit</div>
                     <div class="add-product-row">
-                        <div class="field">
-                            <label>Produit</label>
-                            <select id="piArticle" onchange="Achats.fillArticle()">
-                                <option value="">-- Choisir un produit --</option>
-                            </select>
-                            <span class="stock-hint" id="piStockHint">Stock: -</span>
-                        </div>
-                        <div class="field">
-                            <label>Prix</label>
-                            <input type="number" step="0.001" id="piPrice" oninput="Achats.calcLine()" placeholder="0.000">
-                        </div>
-                        <div class="field">
-                            <label>Quantité</label>
-                            <input type="number" min="1" id="piQty" value="1" oninput="Achats.calcLine()">
-                        </div>
-                        <div class="field">
-                            <label>Total</label>
-                            <input type="number" step="0.001" id="piTotal" readonly style="background:#eef0f6;font-weight:700;">
-                        </div>
+                        <div class="field"><label>Produit</label><select id="piArticle" onchange="Achats.fillArticle()"><option value="">-- Choisir un produit --</option></select><span class="stock-hint" id="piStockHint">Stock: -</span></div>
+                        <div class="field"><label>Prix</label><input type="number" step="0.001" id="piPrice" oninput="Achats.calcLine()" placeholder="0.000"></div>
+                        <div class="field"><label>Quantité</label><input type="number" min="1" id="piQty" value="1" oninput="Achats.calcLine()"></div>
+                        <div class="field"><label>Total</label><input type="number" step="0.001" id="piTotal" readonly style="background:#eef0f6;font-weight:700;"></div>
                         <button class="btn-add" onclick="Achats.addLine()">➕</button>
                     </div>
                 </div>
                 <table class="items-table-modern">
-                    <thead>
-                        <tr>
-                            <th style="width:25px;">#</th>
-                            <th style="text-align:left;">Produit</th>
-                            <th style="width:60px;">Prix</th>
-                            <th style="width:45px;">Qté</th>
-                            <th style="width:70px;">Total</th>
-                            <th style="width:55px;">Action</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th style="width:25px;">#</th><th style="text-align:left;">Produit</th><th style="width:60px;">Prix</th><th style="width:45px;">Qté</th><th style="width:70px;">Total</th><th style="width:55px;">Action</th></tr></thead>
                     <tbody id="pLinesBody"></tbody>
                 </table>
-                <div class="invoice-total-modern">
-                    <span class="label">💰 Total de la facture</span>
-                    <span class="amount" id="pGrand">0.000 TND</span>
-                </div>
+                <div class="invoice-total-modern"><span class="label">💰 Total de la facture</span><span class="amount" id="pGrand">0.000 TND</span></div>
                 <div class="payments-section">
                     <div class="section-label">💰 Paiements enregistrés</div>
                     <div class="payments-grid" id="pReglementsList"></div>
                     <div class="add-payment-row">
-                        <div class="field">
-                            <label>Montant</label>
-                            <input type="number" step="0.001" id="pRegAmount" placeholder="0.000">
-                        </div>
-                        <div class="field">
-                            <label>Méthode de paiement</label>
-                            <select id="pRegType">
-                                <option>Espèces</option>
-                                <option>Chèque</option>
-                                <option>Virement</option>
-                                <option>Carte</option>
-                            </select>
-                        </div>
+                        <div class="field"><label>Montant</label><input type="number" step="0.001" id="pRegAmount" placeholder="0.000"></div>
+                        <div class="field"><label>Méthode de paiement</label><select id="pRegType"><option>Espèces</option><option>Chèque</option><option>Virement</option><option>Carte</option></select></div>
                         <button class="btn-add-payment" onclick="Achats.addReglement()">➕ Ajouter</button>
                     </div>
                 </div>
@@ -2939,8 +2626,7 @@
                     <button class="btn-action print" onclick="Achats.printInvoice()">🖨️ Imprimer</button>
                     <button class="btn-action bluetooth" onclick="Achats.printBluetooth()">📡 Bluetooth</button>
                 </div>
-                <input type="hidden" id="pNum">
-                <input type="hidden" id="pDate">
+                <input type="hidden" id="pNum"><input type="hidden" id="pDate">
             </div>
             <div class="sheet-footer">
                 <button class="btn save" onclick="Achats.save()">💾 Enregistrer</button>
@@ -2967,18 +2653,19 @@
             </div>
         </div>
 
-        <!-- Company Sheet -->
+        <!-- ===== COMPANY SHEET ===== -->
         <div class="sheet" id="sheet-company">
             <div class="sheet-handle"></div>
-            <div class="sheet-header"><h3>Données de l'entreprise</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
+            <div class="sheet-header"><h3>⚙️ Paramètres</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
             <div class="sheet-body">
-                <div class="field"><label>🏢 Nom de l'entreprise</label><input id="cpyName"></div>
+                <div class="section-title">🏢 Entreprise</div>
+                <div class="field"><label>Nom de l'entreprise</label><input id="cpyName"></div>
                 <div class="field"><label>📍 Adresse</label><input id="cpyAddress"></div>
                 <div class="field"><label>📞 Téléphone</label><input id="cpyPhone1"></div>
                 <div class="field"><label>🆔 Matricule fiscal (MF)</label><input id="cpyTaxId"></div>
-                <div class="field" style="border-top:1px dashed var(--border);padding-top:6px;margin-top:6px;"><label>💰 Solde caisse d'ouverture (TND)</label><input id="cpyCashOpening" type="number" step="0.001" value="0"><span style="font-size:7px;color:var(--muted);">⏺ Utilisé pour calculer la caisse</span></div>
+                <div class="field"><label>💰 Solde caisse d'ouverture (TND)</label><input id="cpyCashOpening" type="number" step="0.001" value="0"><span style="font-size:7px;color:var(--muted);">⏺ Utilisé pour calculer la caisse</span></div>
                 <button class="btn save" onclick="CompanyInfo.save()">💾 Enregistrer</button>
-                
+
                 <div class="section-title">📐 Taille des icônes</div>
                 <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
                     <button class="btn outline small" onclick="setDashboardColumns(2)" style="flex:1;font-size:11px;">2 colonnes</button>
@@ -2986,7 +2673,7 @@
                     <button class="btn outline small" onclick="setDashboardColumns(4)" style="flex:1;font-size:11px;">4 colonnes</button>
                 </div>
                 <div id="colsStatus" style="font-size:10px;color:var(--muted);margin-bottom:6px;">Actuel: 2 colonnes</div>
-                
+
                 <div class="section-title">🎨 Thèmes</div>
                 <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;">
                     <button class="btn small" onclick="uiCustomizer.applyTheme('light')" style="flex:1;background:#f0f2f8;color:#1a1f2e;">Clair</button>
@@ -2994,7 +2681,8 @@
                     <button class="btn small" onclick="uiCustomizer.applyTheme('blue')" style="flex:1;background:#1a4fd6;color:#fff;">Bleu</button>
                     <button class="btn small" onclick="uiCustomizer.applyTheme('green')" style="flex:1;background:#27ae60;color:#fff;">Vert</button>
                 </div>
-                
+
+                <!-- ===== SAUVEGARDE GOOGLE DRIVE ===== -->
                 <div class="section-title">☁️ Google Drive - Sauvegarde</div>
                 <div class="drive-status" id="driveStatus">
                     <span class="status-dot disconnected" id="driveStatusDot"></span>
@@ -3011,13 +2699,42 @@
                     <button class="btn del small" onclick="disconnectGoogleDrive()" style="flex:1;font-size:10px;">🚫 Déconnecter</button>
                 </div>
                 <div style="font-size:9px;color:var(--muted);margin-top:4px;" id="driveBackupInfo">Dernière sauvegarde : jamais</div>
-                
+
+                <!-- ===== SAUVEGARDE GMAIL (NOUVEAU) ===== -->
+                <div class="section-title">📧 Sauvegarde automatique Gmail</div>
+                <div class="drive-status">
+                    <span class="status-dot disconnected" id="gmailStatusDot"></span>
+                    <span class="status-text" id="gmailStatusText">❌ Non connecté</span>
+                    <span class="status-time" id="gmailStatusTime"></span>
+                </div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin:4px 0;">
+                    <button class="btn gmail small" onclick="connectGmail()" style="flex:1;font-size:10px;">🔗 Connecter Gmail</button>
+                    <button class="btn del small" onclick="disconnectGmail()" style="flex:1;font-size:10px;">🚫 Déconnecter</button>
+                </div>
+
+                <div class="drive-status" id="emailBackupStatus">
+                    <span class="status-dot disconnected" id="emailBackupStatusDot"></span>
+                    <span class="status-text" id="emailBackupStatusText">❌ Sauvegarde désactivée</span>
+                    <span class="status-time" id="emailBackupStatusTime">Aucune sauvegarde</span>
+                </div>
+                <div style="font-size:9px;color:var(--muted);margin-top:2px;">
+                    📧 Destinataire: <span id="emailBackupRecipientDisplay">Non configuré</span> | 
+                    ⏱️ Intervalle: <span id="emailBackupIntervalDisplay">-</span>
+                </div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin:6px 0;">
+                    <button class="btn save small" onclick="toggleEmailBackup()" id="emailBackupBtn" style="flex:1;font-size:10px;">📧 Activer sauvegarde</button>
+                    <button class="btn edit small" onclick="openEmailBackupSettings()" style="flex:1;font-size:10px;">⚙️ Configurer</button>
+                    <button class="btn print small" onclick="manualEmailBackup()" style="flex:1;font-size:10px;">📤 Sauvegarder maintenant</button>
+                </div>
+
+                <!-- ===== SAUVEGARDE LOCALE ===== -->
                 <div class="section-title">💾 Sauvegarde locale</div>
                 <button class="btn outline small" onclick="exportBackup()">⬇️ Exporter</button>
-                <input type="file" id="importFileInput" accept=".json" style="display:none;" onchange="importBackupFile(this)">
-                <button class="btn outline small" onclick="document.getElementById('importFileInput').click()">⬆️ Importer</button>
+                <input type="file" id="importFileInputBackup" accept=".json" style="display:none;" onchange="importBackupFile(this)">
+                <button class="btn outline small" onclick="document.getElementById('importFileInputBackup').click()">⬆️ Importer</button>
                 <div style="font-size:9px;color:var(--muted);margin-top:4px;">💡 Pour installer l'application : ⋮ dans le navigateur → Ajouter à l'écran d'accueil</div>
-                
+
+                <!-- ===== COMPTE ===== -->
                 <div class="section-title">👤 Compte</div>
                 <div id="accountEmailDisplay" style="font-size:11px;color:var(--muted);margin-bottom:3px;"></div>
                 <button class="btn del" onclick="doLogout()">🚪 Se déconnecter</button>
@@ -3030,6 +2747,7 @@
     </div>
 
     <!-- ===== MODALS ===== -->
+    <!-- Modal changement de mot de passe -->
     <div class="modal-overlay" id="passwordModal">
         <div class="modal-box">
             <h3>🔑 Changer le mot de passe</h3>
@@ -3041,6 +2759,7 @@
         </div>
     </div>
 
+    <!-- Modal email -->
     <div class="modal-overlay" id="emailModal">
         <div class="modal-box">
             <h3>✉️ Envoyer la facture par email</h3>
@@ -3051,6 +2770,39 @@
         </div>
     </div>
 
+    <!-- ===== MODAL CONFIGURATION GMAIL (NOUVEAU) ===== -->
+    <div class="modal-overlay" id="emailBackupModal">
+        <div class="modal-box" style="max-width:420px;">
+            <h3>📧 Configuration Gmail</h3>
+            <div class="field">
+                <label>🔗 Statut Gmail</label>
+                <div id="gmailConnectStatus" style="font-weight:700;font-size:13px;">❌ Non connecté</div>
+                <button class="btn gmail small" onclick="connectGmail()" style="margin-top:4px;">🔗 Connecter Gmail</button>
+            </div>
+            <div class="field">
+                <label>📧 Email destinataire</label>
+                <input type="email" id="emailBackupRecipientInput" placeholder="exemple@email.com" style="direction:ltr;text-align:left;">
+            </div>
+            <div class="field">
+                <label>⏱️ Intervalle (minutes)</label>
+                <input type="number" id="emailBackupIntervalInput" value="60" min="5" max="1440" step="5">
+                <div style="font-size:8px;color:var(--muted);margin-top:2px;">Minimum: 5 minutes | Maximum: 24 heures</div>
+            </div>
+            <div class="field">
+                <label>📊 Statut</label>
+                <div id="emailBackupStatusDisplay" style="font-weight:700;">❌ Désactivée</div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn save" onclick="saveEmailBackupSettings()">💾 Enregistrer</button>
+                <button class="btn del" onclick="closeEmailBackupSettings()">Annuler</button>
+            </div>
+            <div style="font-size:9px;color:var(--muted);margin-top:6px;">
+                ℹ️ La sauvegarde est envoyée directement via Gmail API.
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== NOTIFICATIONS ===== -->
     <div class="notification-panel" id="notificationPanel">
         <div class="notification-content">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
@@ -3067,6 +2819,7 @@
         </div>
     </div>
 
+    <!-- ===== SHORTCUT HELP ===== -->
     <div class="shortcut-help" id="shortcutHelp">
         <div class="shortcut-help-content">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
@@ -3091,7 +2844,7 @@
         <div class="invoice-doc paper-80" id="printDoc"></div>
     </div>
 
-    <!-- ===== JAVASCRIPT COMPLET AVEC MODIFICATION POUR VENTE SANS STOCK ===== -->
+    <!-- ===== JAVASCRIPT ===== -->
     <script>
         // =============================================
         // ===== GTR POS V 0.8.1 - CODE COMPLET =====
@@ -3100,22 +2853,217 @@
         const APP_VERSION = 'V 0.8.1';
         console.log('🚀 GTR POS ' + APP_VERSION + ' loading...');
 
+        // ===== IMPORTATION DES CLIENTS =====
+        let importData = [];
+        let importDuplicates = [];
+
+        function downloadTemplate() {
+            const headers = ['Nom', 'Téléphone 1', 'Téléphone 2', 'Email', 'Adresse', 'Matricule fiscal (MF)', 'Solde d\'ouverture'];
+            const sampleData = [
+                ['Client Exemple 1', '12345678', '87654321', 'client1@email.com', 'Adresse 1', '1234567', '0'],
+                ['Client Exemple 2', '23456789', '', 'client2@email.com', 'Adresse 2', '7654321', '1000']
+            ];
+            const wsData = [headers, ...sampleData];
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, 'Clients');
+            XLSX.writeFile(wb, 'modele_import_clients.xlsx');
+            showToastModern('📄 Modèle téléchargé', 'success');
+        }
+
+        function handleImportFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                    if (jsonData.length === 0) {
+                        showToastModern('⚠️ Le fichier est vide', 'warning');
+                        return;
+                    }
+                    importData = jsonData;
+                    showPreview(jsonData);
+                    showToastModern('✅ Fichier chargé: ' + jsonData.length + ' clients trouvés', 'success');
+                } catch (err) {
+                    showToastModern('❌ Erreur de lecture: ' + err.message, 'error');
+                    console.error(err);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            input.value = '';
+        }
+
+        function showPreview(data) {
+            const previewDiv = document.getElementById('importPreview');
+            const confirmBtn = document.getElementById('importConfirmBtn');
+            const cancelBtn = document.getElementById('importCancelBtn');
+            if (!data || data.length === 0) {
+                previewDiv.style.display = 'none';
+                confirmBtn.style.display = 'none';
+                cancelBtn.style.display = 'none';
+                return;
+            }
+            const existingNames = clients.map(c => c.name.toLowerCase());
+            importDuplicates = [];
+            data.forEach(row => {
+                if (row.Nom && existingNames.includes(row.Nom.toLowerCase())) {
+                    importDuplicates.push(row.Nom);
+                }
+            });
+            let html = `<div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:10px;">
+                <span>📊 ${data.length} clients trouvés</span>
+                <span style="color:${importDuplicates.length > 0 ? 'var(--danger)' : 'var(--success)'}">
+                    ${importDuplicates.length > 0 ? '⚠️ ' + importDuplicates.length + ' doublon(s)' : '✅ Aucun doublon'}
+                </span>
+            </div>`;
+            html += `<table><thead><tr>`;
+            const headers = Object.keys(data[0]);
+            headers.forEach(h => { html += `<th>${h}</th>`; });
+            html += `</tr></thead><tbody>`;
+            data.slice(0, 20).forEach((row, index) => {
+                const isDuplicate = row.Nom && existingNames.includes(row.Nom.toLowerCase());
+                html += `<tr class="${isDuplicate ? 'highlight-duplicate' : ''}">`;
+                headers.forEach(h => { html += `<td>${row[h] || ''}</td>`; });
+                html += `</tr>`;
+            });
+            if (data.length > 20) {
+                html += `<tr><td colspan="${headers.length}" style="text-align:center;color:var(--muted);font-size:9px;">... et ${data.length - 20} autres</td></tr>`;
+            }
+            html += `</tbody></table>`;
+            previewDiv.innerHTML = html;
+            previewDiv.style.display = 'block';
+            confirmBtn.style.display = 'block';
+            cancelBtn.style.display = 'block';
+        }
+
+        function confirmImport() {
+            if (!importData || importData.length === 0) {
+                showToastModern('⚠️ Aucune donnée à importer', 'warning');
+                return;
+            }
+            const confirmBtn = document.getElementById('importConfirmBtn');
+            const cancelBtn = document.getElementById('importCancelBtn');
+            const progressDiv = document.getElementById('importProgress');
+            const progressFill = document.getElementById('importProgressFill');
+            const statusEl = document.getElementById('importStatus');
+            confirmBtn.style.display = 'none';
+            cancelBtn.style.display = 'none';
+            progressDiv.style.display = 'block';
+            let imported = 0;
+            let errors = 0;
+            const total = importData.length;
+            importData.forEach((row, index) => {
+                try {
+                    const name = row.Nom || row.nom || row.name || row['Nom'] || '';
+                    if (!name.trim()) { errors++; return; }
+                    if (clients.some(c => c.name.toLowerCase() === name.toLowerCase())) { errors++; return; }
+                    const phone = row['Téléphone 1'] || row['Téléphone'] || row['Téléphone1'] || row.phone || row.Phone || '';
+                    const phone2 = row['Téléphone 2'] || row['Téléphone2'] || row.phone2 || row.Phone2 || '';
+                    const email = row.Email || row.email || row['Email'] || '';
+                    const address = row.Adresse || row.adresse || row.address || row.Address || '';
+                    const taxId = row['Matricule fiscal'] || row['MF'] || row.taxId || row.TaxId || '';
+                    const openingBalance = parseFloat(row['Solde d\'ouverture'] || row.Solde || row.solde || 0) || 0;
+                    const client = {
+                        id: nextId.clients++,
+                        name: name.trim(),
+                        phone: String(phone).trim(),
+                        phone2: String(phone2).trim(),
+                        email: String(email).trim(),
+                        address: String(address).trim(),
+                        taxId: String(taxId).trim(),
+                        openingBalance: openingBalance,
+                        balance: openingBalance,
+                        specialPrices: []
+                    };
+                    clients.push(client);
+                    imported++;
+                    const progress = ((index + 1) / total) * 100;
+                    progressFill.style.width = progress + '%';
+                    statusEl.textContent = `Importation: ${index + 1}/${total} (${imported} importés, ${errors} erreurs)`;
+                } catch (err) {
+                    errors++;
+                    console.error('Erreur d\'importation:', err);
+                }
+            });
+            setTimeout(() => {
+                saveState();
+                Clients.render();
+                progressFill.style.width = '100%';
+                statusEl.textContent = `✅ Importation terminée! ${imported} clients importés, ${errors} erreurs`;
+                showToastModern(`✅ ${imported} clients importés avec succès`, 'success');
+                setTimeout(() => {
+                    progressDiv.style.display = 'none';
+                    document.getElementById('importPreview').style.display = 'none';
+                    document.getElementById('importConfirmBtn').style.display = 'none';
+                    document.getElementById('importCancelBtn').style.display = 'none';
+                    importData = [];
+                    importDuplicates = [];
+                }, 3000);
+            }, 500);
+        }
+
+        function cancelImport() {
+            importData = [];
+            importDuplicates = [];
+            document.getElementById('importPreview').style.display = 'none';
+            document.getElementById('importConfirmBtn').style.display = 'none';
+            document.getElementById('importCancelBtn').style.display = 'none';
+            document.getElementById('importProgress').style.display = 'none';
+            document.getElementById('importFileInput').value = '';
+            showToastModern('❌ Importation annulée', 'error');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropZone = document.getElementById('fileDropZone');
+            if (dropZone) {
+                dropZone.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.classList.add('dragover');
+                });
+                dropZone.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('dragover');
+                });
+                dropZone.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('dragover');
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        document.getElementById('importFileInput').files = files;
+                        handleImportFile(document.getElementById('importFileInput'));
+                    }
+                });
+            }
+        });
+
+        // ===== GESTION DU FAB =====
+        function updateFabVisibility(sectionId) {
+            const fab = document.getElementById('fabBtn');
+            const fabSections = ['clients', 'fournisseurs', 'articles', 'ventes', 'achats', 'expenses'];
+            if (fabSections.includes(sectionId)) {
+                fab.classList.add('show');
+            } else {
+                fab.classList.remove('show');
+            }
+        }
+
         // ===== TOAST MODERN =====
         function showToastModern(message, type) {
             const toast = document.getElementById('toastModern');
             if (!toast) return;
-            
             const colors = {
                 info: 'var(--secondary)',
                 success: 'var(--success)',
                 error: 'var(--danger)',
                 warning: 'var(--warning)'
             };
-            
             toast.style.background = colors[type] || colors.info;
             toast.textContent = message;
             toast.classList.add('show');
-            
             clearTimeout(toast._timer);
             toast._timer = setTimeout(() => {
                 toast.classList.remove('show');
@@ -3231,25 +3179,20 @@
                 showToastModern('✅ Déjà connecté à Google Drive', 'success');
                 return;
             }
-            
             if (typeof gapi === 'undefined') {
                 showToastModern('⏳ Chargement de l\'API Google...', 'info');
                 loadGoogleApi();
                 return;
             }
-            
             if (!gapiLoaded) {
                 showToastModern('⏳ Initialisation de l\'API...', 'info');
                 initGapiClient();
                 return;
             }
-            
             showToastModern('🔐 Connexion à Google Drive...', 'info');
-            
             const CLIENT_ID = '611699198002-2m2d80gi30mmejrcu59i0v21m0vs7d7d.apps.googleusercontent.com';
             const API_KEY = 'AIzaSyBG_F8TMY4Mmzb1e2etzPHQTw6upu4dkrs';
             const SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.appdata';
-            
             gapi.client.init({
                 apiKey: API_KEY,
                 clientId: CLIENT_ID,
@@ -3301,12 +3244,10 @@
 
         function createBackupFolder() {
             if (!driveToken || !gapi || !gapi.client) return;
-            
             const metadata = {
                 name: 'GTR_POS_Backups',
                 mimeType: 'application/vnd.google-apps.folder'
             };
-            
             gapi.client.drive.files.list({
                 q: "name='GTR_POS_Backups' and mimeType='application/vnd.google-apps.folder' and trashed=false",
                 fields: 'files(id, name)'
@@ -3337,26 +3278,21 @@
                     reject(new Error('Google Drive non connecté'));
                     return;
                 }
-                
                 if (!driveFolderId) {
                     createBackupFolder();
                     setTimeout(() => backupToDrive(data, fileName).then(resolve).catch(reject), 2000);
                     return;
                 }
-                
                 const fileMetadata = {
                     name: fileName || 'gtrpos_backup_' + new Date().toISOString().slice(0, 10) + '.json',
                     parents: [driveFolderId]
                 };
-                
                 const boundary = '-------gtrpos314159';
                 const delimiter = "\r\n--" + boundary + "\r\n";
                 const closeDelim = "\r\n--" + boundary + "--";
-                
                 const body = delimiter + 'Content-Type: application/json\r\n\r\n' + JSON.stringify(fileMetadata) +
                     delimiter + 'Content-Type: application/json\r\n\r\n' + JSON.stringify(data, null, 2) +
                     closeDelim;
-                
                 fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
                     method: 'POST',
                     headers: {
@@ -3383,15 +3319,12 @@
                 connectGoogleDrive();
                 return;
             }
-            
             showToastModern('⏳ Sauvegarde en cours...', 'info');
-            
             const data = {
                 clients, fournisseurs, articles, ventes, achats, expenses,
                 caisseClients, caisseFournisseurs, nextId, companyInfo, financeData,
                 exportedAt: new Date().toISOString()
             };
-            
             backupToDrive(data, 'gtrpos_backup_' + new Date().toISOString().slice(0, 10) + '.json')
                 .then(() => {
                     showToastModern('✅ Sauvegarde Google Drive réussie !', 'success');
@@ -3408,9 +3341,7 @@
                 connectGoogleDrive();
                 return;
             }
-            
             showToastModern('📥 Recherche des sauvegardes...', 'info');
-            
             gapi.client.drive.files.list({
                 q: "'" + driveFolderId + "' in parents and mimeType='application/json' and trashed=false",
                 fields: 'files(id, name, createdTime)',
@@ -3422,23 +3353,18 @@
                     showToastModern('📭 Aucune sauvegarde trouvée', 'warning');
                     return;
                 }
-                
-                const fileList = files.map((f, i) => 
+                const fileList = files.map((f, i) =>
                     `${i+1}. ${f.name} (${new Date(f.createdTime).toLocaleDateString('fr-FR')})`
                 ).join('\n');
-                
                 const choice = prompt('Choisissez une sauvegarde à restaurer (1-' + files.length + '):\n' + fileList);
                 if (!choice) return;
-                
                 const idx = parseInt(choice) - 1;
                 if (idx < 0 || idx >= files.length) {
                     showToastModern('❌ Choix invalide', 'error');
                     return;
                 }
-                
                 const fileId = files[idx].id;
                 showToastModern('⏳ Téléchargement de la sauvegarde...', 'info');
-                
                 gapi.client.drive.files.get({
                     fileId: fileId,
                     alt: 'media'
@@ -3448,7 +3374,6 @@
                         showToastModern('❌ Fichier invalide', 'error');
                         return;
                     }
-                    
                     if (confirm('⚠️ Restaurer cette sauvegarde va remplacer toutes les données actuelles.\nContinuer ?')) {
                         restoreData(data);
                         showToastModern('✅ Données restaurées avec succès', 'success');
@@ -3495,9 +3420,7 @@
                 connectGoogleDrive();
                 return;
             }
-            
             autoBackupEnabled = !autoBackupEnabled;
-            
             if (autoBackupEnabled) {
                 startAutoBackup();
                 showToastModern('⏰ Sauvegarde automatique activée (toutes les 5 min)', 'success');
@@ -3505,7 +3428,6 @@
                 stopAutoBackup();
                 showToastModern('⏸️ Sauvegarde automatique désactivée', 'info');
             }
-            
             updateDriveInfo();
             saveDriveState();
         }
@@ -3515,13 +3437,11 @@
                 clearInterval(autoBackupInterval);
                 autoBackupInterval = null;
             }
-            
             setTimeout(() => {
                 if (autoBackupEnabled && driveConnected) {
                     performAutoBackup();
                 }
             }, 3000);
-            
             autoBackupInterval = setInterval(() => {
                 if (autoBackupEnabled && driveConnected) {
                     performAutoBackup();
@@ -3545,7 +3465,6 @@
                 caisseClients, caisseFournisseurs, nextId, companyInfo, financeData,
                 exportedAt: new Date().toISOString()
             };
-            
             backupToDrive(data, 'gtrpos_auto_backup_' + new Date().toISOString().slice(0, 10) + '.json')
                 .then(() => {
                     console.log('✅ Auto-backup réussi à', new Date().toLocaleTimeString());
@@ -3554,6 +3473,448 @@
                 .catch(err => {
                     console.warn('⚠️ Auto-backup échoué:', err.message);
                 });
+        }
+
+        // =============================================
+        // ===== SAUVEGARDE AUTOMATIQUE GMAIL =====
+        // =============================================
+        let gmailToken = null;
+        let gmailConnected = false;
+        let emailBackupEnabled = false;
+        let emailBackupInterval = null;
+        let emailBackupTime = 60;
+        let emailBackupRecipient = '';
+        let lastEmailBackupTime = null;
+
+        function loadGmailState() {
+            try {
+                const saved = localStorage.getItem('gtrpos_gmail_state');
+                if (saved) {
+                    const state = JSON.parse(saved);
+                    gmailToken = state.token || null;
+                    gmailConnected = state.connected || false;
+                    emailBackupRecipient = state.recipient || '';
+                    emailBackupTime = state.interval || 60;
+                    emailBackupEnabled = state.enabled || false;
+                    lastEmailBackupTime = state.lastBackup ? new Date(state.lastBackup) : null;
+                    if (gmailConnected && gmailToken) {
+                        updateGmailStatus(true);
+                        if (emailBackupEnabled && emailBackupRecipient) {
+                            startEmailBackup();
+                        }
+                    } else {
+                        updateGmailStatus(false);
+                    }
+                    updateEmailBackupUI();
+                }
+            } catch (e) {
+                console.warn('Gmail state load error:', e);
+            }
+        }
+
+        function saveGmailState() {
+            try {
+                const state = {
+                    token: gmailToken,
+                    connected: gmailConnected,
+                    recipient: emailBackupRecipient,
+                    interval: emailBackupTime,
+                    enabled: emailBackupEnabled,
+                    lastBackup: lastEmailBackupTime ? lastEmailBackupTime.toISOString() : null
+                };
+                localStorage.setItem('trpos_gmail_state', JSON.stringify(state));
+            } catch (e) {
+                console.warn('Gmail state save error:', e);
+            }
+        }
+
+        function updateGmailStatus(connected) {
+            gmailConnected = connected;
+            const dot = document.getElementById('gmailStatusDot');
+            const text = document.getElementById('gmailStatusText');
+            if (dot) {
+                dot.className = 'status-dot ' + (connected ? 'connected' : 'disconnected');
+            }
+            if (text) {
+                text.textContent = connected ? '✅ Connecté à Gmail' : '❌ Non connecté';
+            }
+            saveGmailState();
+            updateEmailBackupUI();
+        }
+
+        function connectGmail() {
+            if (gmailConnected && gmailToken) {
+                showToastModern('✅ Déjà connecté à Gmail', 'success');
+                return;
+            }
+            if (typeof gapi === 'undefined') {
+                showToastModern('⏳ Chargement de l\'API Google...', 'info');
+                loadGoogleApiForGmail();
+                return;
+            }
+            if (!gapiLoaded) {
+                showToastModern('⏳ Initialisation de l\'API...', 'info');
+                initGapiClientForGmail();
+                return;
+            }
+            showToastModern('🔐 Connexion à Gmail...', 'info');
+            
+            const CLIENT_ID = '611699198002-2m2d80gi30mmejrcu59i0v21m0vs7d7d.apps.googleusercontent.com';
+            const API_KEY = 'AIzaSyBG_F8TMY4Mmzb1e2etzPHQTw6upu4dkrs';
+            const SCOPES = 'https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/gmail.compose';
+            
+            gapi.client.init({
+                apiKey: API_KEY,
+                clientId: CLIENT_ID,
+                scope: SCOPES,
+                discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest']
+            }).then(function() {
+                const authInstance = gapi.auth2.getAuthInstance();
+                return authInstance.signIn();
+            }).then(function(googleUser) {
+                const token = googleUser.getAuthResponse().access_token;
+                gmailToken = token;
+                gmailConnected = true;
+                updateGmailStatus(true);
+                showToastModern('✅ Connecté à Gmail avec succès', 'success');
+                saveGmailState();
+                if (emailBackupEnabled && emailBackupRecipient) {
+                    startEmailBackup();
+                }
+            }).catch(function(err) {
+                showToastModern('❌ Échec de la connexion: ' + err.message, 'error');
+            });
+        }
+
+        function loadGoogleApiForGmail() {
+            if (typeof gapi !== 'undefined') {
+                gapiLoaded = true;
+                connectGmail();
+                return;
+            }
+            const script = document.createElement('script');
+            script.src = 'https://apis.google.com/js/api.js';
+            script.onload = function() {
+                gapiLoaded = true;
+                connectGmail();
+            };
+            script.onerror = function() {
+                showToastModern('❌ Impossible de charger l\'API Google', 'error');
+            };
+            document.head.appendChild(script);
+        }
+
+        function initGapiClientForGmail() {
+            if (typeof gapi === 'undefined') {
+                loadGoogleApiForGmail();
+                return;
+            }
+            gapi.load('client:auth2', function() {
+                gapiLoaded = true;
+                connectGmail();
+            });
+        }
+
+        function disconnectGmail() {
+            if (emailBackupEnabled) {
+                stopEmailBackup();
+            }
+            gmailToken = null;
+            gmailConnected = false;
+            updateGmailStatus(false);
+            saveGmailState();
+            updateEmailBackupUI();
+            showToastModern('🔌 Déconnecté de Gmail', 'info');
+        }
+
+        async function performEmailBackup() {
+            if (!gmailConnected || !gmailToken) {
+                showToastModern('⚠️ Connectez-vous d\'abord à Gmail', 'warning');
+                connectGmail();
+                return;
+            }
+            if (!emailBackupRecipient || !isValidEmail(emailBackupRecipient)) {
+                showToastModern('⚠️ Adresse email de sauvegarde invalide', 'warning');
+                return;
+            }
+            if (!currentUser) {
+                showToastModern('⚠️ Vous devez être connecté pour la sauvegarde', 'warning');
+                return;
+            }
+            
+            try {
+                showToastModern('📧 Envoi de la sauvegarde en cours...', 'info');
+                
+                const backupData = {
+                    clients, fournisseurs, articles, ventes, achats, expenses,
+                    caisseClients, caisseFournisseurs, nextId, companyInfo, financeData,
+                    exportedAt: new Date().toISOString(),
+                    version: APP_VERSION,
+                    user: currentUser.email
+                };
+                
+                const jsonData = JSON.stringify(backupData, null, 2);
+                const base64Data = btoa(unescape(encodeURIComponent(jsonData)));
+                
+                const dateStr = new Date().toLocaleString('fr-FR');
+                const subject = `Sauvegarde GTR POS - ${new Date().toLocaleDateString('fr-FR')}`;
+                
+                const body = [
+                    'Content-Type: text/plain; charset="UTF-8"',
+                    'MIME-Version: 1.0',
+                    `To: ${emailBackupRecipient}`,
+                    `Subject: ${subject}`,
+                    '',
+                    `Bonjour,\n\nVoici la sauvegarde automatique de votre application GTR POS du ${dateStr}.\n\n`,
+                    `📊 Résumé des données :`,
+                    `- Clients : ${clients.length}`,
+                    `- Fournisseurs : ${fournisseurs.length}`,
+                    `- Articles : ${articles.length}`,
+                    `- Ventes : ${ventes.length}`,
+                    `- Achats : ${achats.length}`,
+                    `- Dépenses : ${expenses.length}`,
+                    `\nVersion: ${APP_VERSION}`,
+                    `Utilisateur: ${currentUser.email}`,
+                    `\nLe fichier JSON est joint à cet email.\n\nCordialement,\nGTR POS`
+                ].join('\n');
+                
+                const boundary = 'gtrpos_boundary_' + Date.now();
+                const fileName = `gtrpos_backup_${new Date().toISOString().slice(0,10)}.json`;
+                
+                const mimeMessage = [
+                    `MIME-Version: 1.0`,
+                    `To: ${emailBackupRecipient}`,
+                    `Subject: ${subject}`,
+                    `Content-Type: multipart/mixed; boundary="${boundary}"`,
+                    '',
+                    `--${boundary}`,
+                    'Content-Type: text/plain; charset="UTF-8"',
+                    'Content-Transfer-Encoding: 7bit',
+                    '',
+                    body,
+                    '',
+                    `--${boundary}`,
+                    `Content-Type: application/json; name="${fileName}"`,
+                    'Content-Transfer-Encoding: base64',
+                    `Content-Disposition: attachment; filename="${fileName}"`,
+                    '',
+                    base64Data,
+                    '',
+                    `--${boundary}--`
+                ].join('\r\n');
+                
+                const encodedMessage = btoa(unescape(encodeURIComponent(mimeMessage)))
+                    .replace(/\+/g, '-')
+                    .replace(/\//g, '_')
+                    .replace(/=+$/, '');
+                
+                const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + gmailToken,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        raw: encodedMessage
+                    })
+                });
+                
+                if (response.ok) {
+                    lastEmailBackupTime = new Date();
+                    saveGmailState();
+                    updateEmailBackupUI();
+                    showToastModern(`✅ Sauvegarde envoyée à ${emailBackupRecipient}`, 'success');
+                } else {
+                    const error = await response.json();
+                    console.error('Gmail API error:', error);
+                    showToastModern('❌ Erreur Gmail: ' + (error.error?.message || 'Échec de l\'envoi'), 'error');
+                }
+            } catch (err) {
+                console.error('Email backup error:', err);
+                showToastModern('❌ Erreur de sauvegarde: ' + err.message, 'error');
+            }
+        }
+
+        function updateEmailBackupUI() {
+            const statusText = document.getElementById('emailBackupStatusText');
+            const statusDot = document.getElementById('emailBackupStatusDot');
+            const statusTime = document.getElementById('emailBackupStatusTime');
+            const statusRecipient = document.getElementById('emailBackupRecipientDisplay');
+            const statusInterval = document.getElementById('emailBackupIntervalDisplay');
+            const statusGmail = document.getElementById('gmailStatusText');
+            const statusGmailDot = document.getElementById('gmailStatusDot');
+            
+            if (statusGmailDot) {
+                statusGmailDot.className = 'status-dot ' + (gmailConnected ? 'connected' : 'disconnected');
+            }
+            if (statusGmail) {
+                statusGmail.textContent = gmailConnected ? '✅ Connecté à Gmail' : '❌ Non connecté';
+            }
+            
+            if (emailBackupEnabled && emailBackupRecipient && gmailConnected) {
+                if (statusDot) { statusDot.className = 'status-dot connected'; }
+                if (statusText) { statusText.textContent = '✅ Sauvegarde activée'; }
+                if (statusRecipient) { statusRecipient.textContent = emailBackupRecipient; }
+                if (statusInterval) { statusInterval.textContent = `${emailBackupTime || 60} minutes`; }
+                if (statusTime) {
+                    statusTime.textContent = lastEmailBackupTime ? `Dernière: ${lastEmailBackupTime.toLocaleString('fr-FR')}` : 'En attente...';
+                }
+            } else if (emailBackupEnabled && emailBackupRecipient && !gmailConnected) {
+                if (statusDot) { statusDot.className = 'status-dot syncing'; }
+                if (statusText) { statusText.textContent = '⏳ En attente connexion Gmail'; }
+                if (statusRecipient) { statusRecipient.textContent = emailBackupRecipient; }
+                if (statusInterval) { statusInterval.textContent = `${emailBackupTime || 60} minutes`; }
+                if (statusTime) { statusTime.textContent = 'Connexion Gmail requise'; }
+            } else {
+                if (statusDot) { statusDot.className = 'status-dot disconnected'; }
+                if (statusText) { statusText.textContent = '❌ Sauvegarde désactivée'; }
+                if (statusRecipient) { statusRecipient.textContent = 'Non configuré'; }
+                if (statusInterval) { statusInterval.textContent = '-'; }
+                if (statusTime) { statusTime.textContent = 'Aucune sauvegarde'; }
+            }
+            
+            const btn = document.getElementById('emailBackupBtn');
+            if (btn) {
+                if (!gmailConnected) {
+                    btn.textContent = '🔗 Connecter Gmail d\'abord';
+                    btn.style.background = 'var(--warning)';
+                } else {
+                    btn.textContent = emailBackupEnabled ? '⏸️ Désactiver' : '📧 Activer';
+                    btn.style.background = '';
+                }
+            }
+            
+            const statusDisplay = document.getElementById('emailBackupStatusDisplay');
+            if (statusDisplay) {
+                statusDisplay.textContent = emailBackupEnabled ? '✅ Activée' : '❌ Désactivée';
+            }
+            
+            const gmailConnectStatus = document.getElementById('gmailConnectStatus');
+            if (gmailConnectStatus) {
+                gmailConnectStatus.textContent = gmailConnected ? '✅ Connecté' : '❌ Non connecté';
+            }
+        }
+
+        function openEmailBackupSettings() {
+            const modal = document.getElementById('emailBackupModal');
+            if (modal) {
+                document.getElementById('emailBackupRecipientInput').value = emailBackupRecipient || '';
+                document.getElementById('emailBackupIntervalInput').value = emailBackupTime || 60;
+                document.getElementById('emailBackupStatusDisplay').textContent = emailBackupEnabled ? '✅ Activée' : '❌ Désactivée';
+                document.getElementById('gmailConnectStatus').textContent = gmailConnected ? '✅ Connecté' : '❌ Non connecté';
+                modal.classList.add('show');
+            }
+        }
+
+        function closeEmailBackupSettings() {
+            document.getElementById('emailBackupModal').classList.remove('show');
+        }
+
+        function saveEmailBackupSettings() {
+            const recipient = document.getElementById('emailBackupRecipientInput').value.trim();
+            const interval = parseInt(document.getElementById('emailBackupIntervalInput').value) || 60;
+            
+            if (!recipient || !isValidEmail(recipient)) {
+                showToastModern('⚠️ Veuillez entrer une adresse email valide', 'warning');
+                return;
+            }
+            if (interval < 5) {
+                showToastModern('⚠️ L\'intervalle minimum est de 5 minutes', 'warning');
+                return;
+            }
+            
+            emailBackupRecipient = recipient;
+            emailBackupTime = interval;
+            
+            if (!gmailConnected) {
+                showToastModern('🔐 Veuillez d\'abord vous connecter à Gmail', 'info');
+                connectGmail();
+                return;
+            }
+            
+            if (!emailBackupEnabled) {
+                emailBackupEnabled = true;
+                startEmailBackup();
+            } else {
+                stopEmailBackup();
+                emailBackupEnabled = true;
+                startEmailBackup();
+            }
+            
+            saveGmailState();
+            updateEmailBackupUI();
+            closeEmailBackupSettings();
+            showToastModern(`✅ Sauvegarde configurée (${interval} min)`, 'success');
+        }
+
+        function toggleEmailBackup() {
+            if (!gmailConnected) {
+                showToastModern('🔐 Connectez-vous d\'abord à Gmail', 'info');
+                connectGmail();
+                return;
+            }
+            
+            if (emailBackupEnabled) {
+                stopEmailBackup();
+            } else {
+                if (!emailBackupRecipient) {
+                    openEmailBackupSettings();
+                    return;
+                }
+                emailBackupEnabled = true;
+                startEmailBackup();
+                saveGmailState();
+                updateEmailBackupUI();
+                showToastModern('📧 Sauvegarde activée', 'success');
+            }
+        }
+
+        function manualEmailBackup() {
+            if (!gmailConnected) {
+                showToastModern('🔐 Connectez-vous d\'abord à Gmail', 'info');
+                connectGmail();
+                return;
+            }
+            if (!emailBackupRecipient) {
+                showToastModern('⚠️ Configurez d\'abord l\'email de sauvegarde', 'warning');
+                openEmailBackupSettings();
+                return;
+            }
+            performEmailBackup();
+        }
+
+        function startEmailBackup() {
+            if (emailBackupInterval) {
+                clearInterval(emailBackupInterval);
+                emailBackupInterval = null;
+            }
+            if (!emailBackupEnabled || !emailBackupRecipient || !gmailConnected) {
+                updateEmailBackupUI();
+                return;
+            }
+            setTimeout(() => {
+                if (emailBackupEnabled && gmailConnected) {
+                    performEmailBackup();
+                }
+            }, 5000);
+            const intervalMs = (emailBackupTime || 60) * 60 * 1000;
+            emailBackupInterval = setInterval(() => {
+                if (emailBackupEnabled && gmailConnected) {
+                    performEmailBackup();
+                }
+            }, intervalMs);
+            updateEmailBackupUI();
+        }
+
+        function stopEmailBackup() {
+            if (emailBackupInterval) {
+                clearInterval(emailBackupInterval);
+                emailBackupInterval = null;
+            }
+            emailBackupEnabled = false;
+            saveGmailState();
+            updateEmailBackupUI();
+            showToastModern('📧 Sauvegarde désactivée', 'info');
         }
 
         // ===== VARIABLES GLOBALES =====
@@ -3622,10 +3983,7 @@
         function doLogin() {
             const e = $('loginEmail').value.trim();
             const p = $('loginPassword').value;
-            if (!e || !p) {
-                $('loginError').textContent = 'Entrez l\'e-mail et le mot de passe';
-                return;
-            }
+            if (!e || !p) { $('loginError').textContent = 'Entrez l\'e-mail et le mot de passe'; return; }
             $('loginError').textContent = '';
             $('loginLoading').style.display = 'block';
             auth.signInWithEmailAndPassword(e, p)
@@ -3636,10 +3994,7 @@
         function doSignup() {
             const e = $('loginEmail').value.trim();
             const p = $('loginPassword').value;
-            if (!e || !p) {
-                $('loginError').textContent = 'Entrez l\'e-mail et le mot de passe';
-                return;
-            }
+            if (!e || !p) { $('loginError').textContent = 'Entrez l\'e-mail et le mot de passe'; return; }
             $('loginError').textContent = '';
             $('loginLoading').style.display = 'block';
             auth.createUserWithEmailAndPassword(e, p)
@@ -3783,14 +4138,12 @@
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             const target = document.getElementById('sec-' + sectionId);
             if (target) target.classList.add('active');
-
             const backBtn = document.getElementById('backBtn');
             if (sectionId === 'dashboard') {
                 backBtn.style.display = 'none';
             } else {
                 backBtn.style.display = 'flex';
             }
-
             const pageNames = {
                 'dashboard': 'Accueil',
                 'clients': 'Clients',
@@ -3811,7 +4164,7 @@
             };
             $('pageTitle').textContent = pageNames[sectionId] || sectionId;
             currentSection = sectionId;
-
+            updateFabVisibility(sectionId);
             const loadMap = {
                 'finance': function() { FinanceTable.load();
                     FinanceTable.render(); },
@@ -3859,6 +4212,7 @@
             if (name === 'company') {
                 CompanyInfo.load();
                 updateDriveInfo();
+                updateEmailBackupUI();
             }
         }
 
@@ -4077,10 +4431,8 @@
                 const list = document.getElementById('notificationList');
                 const count = document.getElementById('notifCount');
                 if (!panel || !list) return;
-
                 const unread = this.getUnread().length;
                 count.textContent = `(${this.notifications.length} total, ${unread} non lus)`;
-
                 if (this.notifications.length === 0) {
                     list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:20px;">Aucune notification</div>';
                 } else {
@@ -4112,7 +4464,7 @@
         }
 
         // =====================================================
-        // ===== FINANCE TABLE AVEC CORRECTION BÉNÉFICE =====
+        // ===== FINANCE TABLE =====
         // =====================================================
         const FinanceTable = {
             data: [],
@@ -4193,13 +4545,11 @@
                 const cashDepart = companyInfo.cashOpening || 0;
                 const supplierDepart = fournisseurs.reduce((sum, f) => sum + (f.openingBalance || 0), 0);
                 const capital = clientDepart + stockDepart + cashDepart - supplierDepart;
-                
                 document.getElementById('capitalValue').textContent = capital.toFixed(3) + ' TND';
                 document.getElementById('capClientDepart').textContent = clientDepart.toFixed(3);
                 document.getElementById('capStockDepart').textContent = stockDepart.toFixed(3);
                 document.getElementById('capCashDepart').textContent = cashDepart.toFixed(3);
                 document.getElementById('capSupplierBalance').textContent = supplierDepart.toFixed(3);
-                
                 this.fixedCapital = capital;
             },
             editRow(index) {
@@ -4274,17 +4624,13 @@
                 const cashOpening = companyInfo.cashOpening || 0;
                 const totalCash = cashOpening + totalCashClient - totalSupplierPay - totalExp;
                 const totalSupplierBal = fournisseurs.reduce((s, f) => s + (f.balance || 0), 0);
-                
                 document.getElementById('finTotalStockValue').textContent = totalStockVal.toFixed(3);
                 document.getElementById('finTotalCash').textContent = totalCash.toFixed(3);
                 document.getElementById('finTotalSupplierBalance').textContent = totalSupplierBal.toFixed(3);
-                
                 const totalActuel = totalClientBalance + totalStockVal + totalCash - totalSupplierBal;
                 document.getElementById('finNetWorth').textContent = totalActuel.toFixed(3);
-                
                 const profit = totalActuel - this.fixedCapital;
                 document.getElementById('finProfit').textContent = profit.toFixed(3);
-                
                 if (this.data.length > 0) {
                     const lastRow = this.data[this.data.length - 1];
                     lastRow.total = totalActuel;
@@ -4301,7 +4647,6 @@
                 }
                 const lastIndex = this.data.length - 1;
                 const last = this.data[lastIndex];
-
                 const totalClientBal = clients.reduce((s, c) => s + (c.balance || 0), 0);
                 const totalStockVal = articles.reduce((s, a) => s + ((a.stock || 0) * (a.costPrice || a.price || 0)), 0);
                 const totalCashClient = caisseClients.reduce((s, c) => s + (c.amount || 0), 0);
@@ -4310,18 +4655,14 @@
                 const cashOpening = companyInfo.cashOpening || 0;
                 const totalCash = cashOpening + totalCashClient - totalSupplierPay - totalExp;
                 const totalSupplierBal = fournisseurs.reduce((s, f) => s + (f.balance || 0), 0);
-
                 last.clientBalance = totalClientBal;
                 last.stockValue = totalStockVal;
                 last.supplierBalance = totalSupplierBal;
                 last.cash = totalCash;
-
                 this.calculateFixedCapital();
-
                 const totalActuel = totalClientBal + totalStockVal + totalCash - totalSupplierBal;
                 last.total = totalActuel;
                 last.profit = totalActuel - this.fixedCapital;
-
                 this.save();
                 this.render();
                 this.updateKPIs();
@@ -4398,14 +4739,12 @@
             data: { sales: [], profit: [], topProducts: [], topClients: [] },
             dateRange: { start: null, end: null },
             chartInstances: {},
-
             init() {
                 const today = new Date();
                 const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
                 document.getElementById('biDateFrom').value = firstDay.toISOString().slice(0, 10);
                 document.getElementById('biDateTo').value = today.toISOString().slice(0, 10);
             },
-
             render() {
                 const from = document.getElementById('biDateFrom').value;
                 const to = document.getElementById('biDateTo').value;
@@ -4419,7 +4758,6 @@
                 this.renderTopProducts();
                 this.renderTopClients();
             },
-
             calculateData(from, to, period) {
                 const filteredVentes = ventes.filter(v => v.date >= from && v.date <= to);
                 const totalSales = filteredVentes.reduce((sum, v) => sum + v.total, 0);
@@ -4428,7 +4766,6 @@
                 const totalPurchases = achats.filter(a => a.date >= from && a.date <= to).reduce((sum, a) => sum + a.total, 0);
                 const totalExp = expenses.filter(e => e.date >= from && e.date <= to).reduce((sum, e) => sum + e.amount, 0);
                 const profit = totalSales - totalPurchases - totalExp;
-                
                 const fromDate = new Date(from);
                 const toDate = new Date(to);
                 const diffDays = Math.floor((toDate - fromDate) / (1000 * 60 * 60 * 24)) + 1;
@@ -4438,32 +4775,26 @@
                 prevTo.setDate(prevTo.getDate() - 1);
                 const prevFromStr = prevFrom.toISOString().slice(0, 10);
                 const prevToStr = prevTo.toISOString().slice(0, 10);
-                
                 const prevVentes = ventes.filter(v => v.date >= prevFromStr && v.date <= prevToStr);
                 const prevTotalSales = prevVentes.reduce((sum, v) => sum + v.total, 0);
                 const prevTotalTransactions = prevVentes.length;
                 const prevAvgTicket = prevTotalTransactions > 0 ? prevTotalSales / prevTotalTransactions : 0;
-                
                 const salesTrend = prevTotalSales > 0 ? ((totalSales - prevTotalSales) / prevTotalSales * 100) : 0;
                 const transTrend = prevTotalTransactions > 0 ? ((totalTransactions - prevTotalTransactions) / prevTotalTransactions * 100) : 0;
                 const ticketTrend = prevAvgTicket > 0 ? ((avgTicket - prevAvgTicket) / prevAvgTicket * 100) : 0;
-                
                 const prevPurchases = achats.filter(a => a.date >= prevFromStr && a.date <= prevToStr).reduce((sum, a) => sum + a.total, 0);
                 const prevExp = expenses.filter(e => e.date >= prevFromStr && e.date <= prevToStr).reduce((sum, e) => sum + e.amount, 0);
                 const prevProfit = prevTotalSales - prevPurchases - prevExp;
                 const profitTrend = prevProfit > 0 ? ((profit - prevProfit) / prevProfit * 100) : 0;
-
                 this.data = {
                     totalSales, totalTransactions, avgTicket, profit,
                     salesTrend, transTrend, ticketTrend, profitTrend,
                     filteredVentes, totalPurchases, totalExp, prevTotalSales,
                     prevTotalTransactions, prevAvgTicket, prevProfit
                 };
-                
                 this.calculateTopProducts(filteredVentes);
                 this.calculateTopClients(filteredVentes);
             },
-
             calculateTopProducts(filteredVentes) {
                 const productSales = {};
                 filteredVentes.forEach(v => {
@@ -4477,13 +4808,11 @@
                     name, qty: productSales[name].qty,
                     total: productSales[name].total
                 })).sort((a, b) => b.total - a.total).slice(0, 10);
-                
                 const totalAll = this.data.topProducts.reduce((sum, p) => sum + p.total, 0);
                 this.data.topProducts.forEach(p => {
                     p.percentage = totalAll > 0 ? (p.total / totalAll * 100) : 0;
                 });
             },
-
             calculateTopClients(filteredVentes) {
                 const clientSales = {};
                 filteredVentes.forEach(v => {
@@ -4495,26 +4824,22 @@
                     name, count: clientSales[name].count,
                     total: clientSales[name].total
                 })).sort((a, b) => b.total - a.total).slice(0, 10);
-                
                 const totalAll = this.data.topClients.reduce((sum, c) => sum + c.total, 0);
                 this.data.topClients.forEach(c => {
                     c.percentage = totalAll > 0 ? (c.total / totalAll * 100) : 0;
                 });
             },
-
             renderKPIs() {
                 const d = this.data;
                 document.getElementById('biTotalSales').textContent = d.totalSales.toFixed(3);
                 document.getElementById('biTotalProfit').textContent = d.profit.toFixed(3);
                 document.getElementById('biAvgTicket').textContent = d.avgTicket.toFixed(3);
                 document.getElementById('biTotalTransactions').textContent = d.totalTransactions;
-                
                 this.renderTrend('biSalesTrend', d.salesTrend);
                 this.renderTrend('biProfitTrend', d.profitTrend);
                 this.renderTrend('biTicketTrend', d.ticketTrend);
                 this.renderTrend('biTransTrend', d.transTrend);
             },
-
             renderTrend(id, value) {
                 const el = document.getElementById(id);
                 if (!el) return;
@@ -4523,14 +4848,12 @@
                 el.className = 'trend ' + cls;
                 el.textContent = sign + ' ' + Math.abs(value).toFixed(1) + '%';
             },
-
             renderCharts() {
                 this.renderSalesChart();
                 this.renderProfitChart();
                 this.renderTopProductsChart();
                 this.renderTopClientsChart();
             },
-
             renderSalesChart() {
                 const canvas = document.getElementById('biSalesChart');
                 if (!canvas) return;
@@ -4544,12 +4867,10 @@
                 canvas.style.height = height + 'px';
                 ctx.scale(2, 2);
                 ctx.clearRect(0, 0, width, height);
-                
                 const period = document.getElementById('biPeriod').value;
                 const data = this.groupByPeriod(this.data.filteredVentes, period);
                 const labels = Object.keys(data);
                 const values = Object.values(data);
-                
                 if (labels.length === 0) {
                     ctx.fillStyle = '#999';
                     ctx.font = '12px Cairo';
@@ -4557,12 +4878,10 @@
                     ctx.fillText('Aucune donnée', width / 2, height / 2);
                     return;
                 }
-                
                 const padding = { top: 15, bottom: 25, left: 30, right: 10 };
                 const chartWidth = width - padding.left - padding.right;
                 const chartHeight = height - padding.top - padding.bottom;
                 const maxValue = Math.max(...values, 1);
-                
                 ctx.strokeStyle = 'rgba(200,200,200,0.3)';
                 ctx.lineWidth = 0.5;
                 for (let i = 0; i < 4; i++) {
@@ -4577,16 +4896,13 @@
                     ctx.textAlign = 'right';
                     ctx.fillText(val.toFixed(0), padding.left - 4, y + 3);
                 }
-                
                 const barWidth = Math.min(chartWidth / labels.length * 0.5, 18);
                 const gap = chartWidth / labels.length;
                 const gradientColors = ['#4a6cf7', '#6b8aff', '#8aadff', '#a8c7ff'];
-                
                 values.forEach((val, index) => {
                     const x = padding.left + index * gap + (gap - barWidth) / 2;
                     const barHeight = Math.max((val / maxValue) * chartHeight, 2);
                     const y = padding.top + chartHeight - barHeight;
-                    
                     const grad = ctx.createLinearGradient(x, y, x, padding.top + chartHeight);
                     const colorIndex = index % gradientColors.length;
                     grad.addColorStop(0, gradientColors[colorIndex]);
@@ -4596,19 +4912,16 @@
                     ctx.shadowBlur = 4;
                     ctx.fillRect(x, y, barWidth, barHeight);
                     ctx.shadowBlur = 0;
-                    
                     ctx.fillStyle = '#333';
                     ctx.font = '6px Cairo';
                     ctx.textAlign = 'center';
                     ctx.fillText(val.toFixed(1), x + barWidth / 2, y - 4);
-                    
                     ctx.fillStyle = '#888';
                     ctx.font = '6px Cairo';
                     const label = labels[index] || '';
                     ctx.fillText(label.length > 8 ? label.substring(0, 6) + '..' : label, x + barWidth / 2, padding.top + chartHeight + 14);
                 });
             },
-
             renderProfitChart() {
                 const canvas = document.getElementById('biProfitChart');
                 if (!canvas) return;
@@ -4622,17 +4935,14 @@
                 canvas.style.height = height + 'px';
                 ctx.scale(2, 2);
                 ctx.clearRect(0, 0, width, height);
-                
                 const d = this.data;
                 const values = [d.totalSales || 0, d.totalPurchases || 0, d.totalExp || 0, d.profit || 0];
                 const labels = ['Ventes', 'Achats', 'Dépenses', 'Bénéfice'];
                 const colors = ['#4a6cf7', '#e74c5e', '#f39c12', '#2ecc71'];
                 const total = values.reduce((s, v) => s + v, 1);
-                
                 const centerX = width / 2;
                 const centerY = height / 2 + 5;
                 const radius = Math.min(width, height) / 2 - 30;
-                
                 if (total <= 0 || values.every(v => v === 0)) {
                     ctx.fillStyle = '#999';
                     ctx.font = '12px Cairo';
@@ -4640,7 +4950,6 @@
                     ctx.fillText('Aucune donnée', centerX, centerY);
                     return;
                 }
-                
                 let startAngle = -Math.PI / 2;
                 values.forEach((value, index) => {
                     if (value <= 0) {
@@ -4649,7 +4958,6 @@
                     }
                     const sliceAngle = (value / total) * 2 * Math.PI;
                     const endAngle = startAngle + sliceAngle;
-                    
                     ctx.beginPath();
                     ctx.moveTo(centerX, centerY);
                     ctx.arc(centerX, centerY, radius, startAngle, endAngle);
@@ -4659,7 +4967,6 @@
                     ctx.shadowBlur = 4;
                     ctx.fill();
                     ctx.shadowBlur = 0;
-                    
                     const midAngle = startAngle + sliceAngle / 2;
                     const labelRadius = radius * 0.6;
                     const labelX = centerX + Math.cos(midAngle) * labelRadius;
@@ -4670,10 +4977,8 @@
                     ctx.textBaseline = 'middle';
                     const percentage = ((value / total) * 100).toFixed(1);
                     ctx.fillText(percentage + '%', labelX, labelY);
-                    
                     startAngle = endAngle;
                 });
-                
                 const legendY = height - 8;
                 let legendX = 10;
                 labels.forEach((label, i) => {
@@ -4687,7 +4992,6 @@
                     legendX += 45;
                 });
             },
-
             renderTopProductsChart() {
                 const canvas = document.getElementById('biTopProductsChart');
                 if (!canvas) return;
@@ -4701,7 +5005,6 @@
                 canvas.style.height = height + 'px';
                 ctx.scale(2, 2);
                 ctx.clearRect(0, 0, width, height);
-                
                 const products = this.data.topProducts.slice(0, 6);
                 if (products.length === 0) {
                     ctx.fillStyle = '#999';
@@ -4710,21 +5013,17 @@
                     ctx.fillText('Aucun produit', width / 2, height / 2);
                     return;
                 }
-                
                 const padding = { top: 10, bottom: 22, left: 25, right: 5 };
                 const chartWidth = width - padding.left - padding.right;
                 const chartHeight = height - padding.top - padding.bottom;
                 const maxValue = Math.max(...products.map(p => p.total), 1);
                 const colors = ['#4a6cf7', '#2ecc71', '#e74c5e', '#f39c12', '#9b59b6', '#1abc9c'];
-                
                 const barWidth = Math.min(chartWidth / products.length * 0.5, 14);
                 const gap = chartWidth / products.length;
-                
                 products.forEach((p, index) => {
                     const x = padding.left + index * gap + (gap - barWidth) / 2;
                     const barHeight = Math.max((p.total / maxValue) * chartHeight, 2);
                     const y = padding.top + chartHeight - barHeight;
-                    
                     const grad = ctx.createLinearGradient(x, y, x, padding.top + chartHeight);
                     grad.addColorStop(0, colors[index % colors.length]);
                     grad.addColorStop(1, colors[index % colors.length] + '88');
@@ -4733,7 +5032,6 @@
                     ctx.shadowBlur = 3;
                     ctx.fillRect(x, y, barWidth, barHeight);
                     ctx.shadowBlur = 0;
-                    
                     ctx.fillStyle = '#333';
                     ctx.font = '6px Cairo';
                     ctx.textAlign = 'center';
@@ -4742,7 +5040,6 @@
                     ctx.fillText(p.total.toFixed(0), x + barWidth / 2, y - 3);
                 });
             },
-
             renderTopClientsChart() {
                 const canvas = document.getElementById('biTopClientsChart');
                 if (!canvas) return;
@@ -4756,7 +5053,6 @@
                 canvas.style.height = height + 'px';
                 ctx.scale(2, 2);
                 ctx.clearRect(0, 0, width, height);
-                
                 const clients = this.data.topClients.slice(0, 6);
                 if (clients.length === 0) {
                     ctx.fillStyle = '#999';
@@ -4765,21 +5061,17 @@
                     ctx.fillText('Aucun client', width / 2, height / 2);
                     return;
                 }
-                
                 const padding = { top: 10, bottom: 22, left: 25, right: 5 };
                 const chartWidth = width - padding.left - padding.right;
                 const chartHeight = height - padding.top - padding.bottom;
                 const maxValue = Math.max(...clients.map(c => c.total), 1);
                 const colors = ['#2ecc71', '#4a6cf7', '#f39c12', '#e74c5e', '#9b59b6', '#1abc9c'];
-                
                 const barWidth = Math.min(chartWidth / clients.length * 0.5, 14);
                 const gap = chartWidth / clients.length;
-                
                 clients.forEach((c, index) => {
                     const x = padding.left + index * gap + (gap - barWidth) / 2;
                     const barHeight = Math.max((c.total / maxValue) * chartHeight, 2);
                     const y = padding.top + chartHeight - barHeight;
-                    
                     const grad = ctx.createLinearGradient(x, y, x, padding.top + chartHeight);
                     grad.addColorStop(0, colors[index % colors.length]);
                     grad.addColorStop(1, colors[index % colors.length] + '88');
@@ -4788,7 +5080,6 @@
                     ctx.shadowBlur = 3;
                     ctx.fillRect(x, y, barWidth, barHeight);
                     ctx.shadowBlur = 0;
-                    
                     ctx.fillStyle = '#333';
                     ctx.font = '6px Cairo';
                     ctx.textAlign = 'center';
@@ -4797,7 +5088,6 @@
                     ctx.fillText(c.total.toFixed(0), x + barWidth / 2, y - 3);
                 });
             },
-
             groupByPeriod(ventes, period) {
                 const grouped = {};
                 ventes.forEach(v => {
@@ -4820,7 +5110,6 @@
                 });
                 return grouped;
             },
-
             renderTopProducts() {
                 const tbody = document.getElementById('biTopProductsBody');
                 if (!tbody) return;
@@ -4843,7 +5132,6 @@
                     tbody.appendChild(tr);
                 });
             },
-
             renderTopClients() {
                 const tbody = document.getElementById('biTopClientsBody');
                 if (!tbody) return;
@@ -4866,12 +5154,8 @@
                     tbody.appendChild(tr);
                 });
             },
-
-            refresh() {
-                this.render();
-                showToastModern('🔄 Données BI actualisées', 'success');
-            },
-
+            refresh() { this.render();
+                showToastModern('🔄 Données BI actualisées', 'success'); },
             exportCSV() {
                 const products = this.data.topProducts;
                 if (products.length === 0) {
@@ -4897,7 +5181,6 @@
                 URL.revokeObjectURL(url);
                 showToastModern('✅ Export CSV réussi', 'success');
             },
-
             exportPDF() {
                 showToastModern('⏳ Création du PDF...', 'info');
                 const container = document.querySelector('#sec-bi-dashboard');
@@ -4922,12 +5205,8 @@
                     })
                     .catch(() => showToastModern('❌ Erreur lors de l\'export PDF', 'error'));
             },
-
-            exportFullReport() {
-                this.exportPDF();
-                setTimeout(() => this.exportCSV(), 1000);
-            },
-
+            exportFullReport() { this.exportPDF();
+                setTimeout(() => this.exportCSV(), 1000); },
             printTopProducts() {
                 const products = this.data.topProducts;
                 if (products.length === 0) {
@@ -4994,7 +5273,6 @@
                 `);
                 w.document.close();
             },
-
             printTopClients() {
                 const clients = this.data.topClients;
                 if (clients.length === 0) {
@@ -5167,7 +5445,6 @@
                     .amount, 0);
                 const openingBalance = client.openingBalance || 0;
                 const currentBalance = openingBalance + totalPurchases - totalPayments;
-
                 document.getElementById('cDisplayOpening').textContent = openingBalance.toFixed(3);
                 document.getElementById('cDisplayTotalPurchases').textContent = totalPurchases.toFixed(3);
                 document.getElementById('cDisplayTotalPayments').textContent = totalPayments.toFixed(3);
@@ -5354,7 +5631,6 @@
                     c) => sum + c.amount, 0);
                 const openingBalance = supplier.openingBalance || 0;
                 const currentBalance = openingBalance + totalPurchases - totalPayments;
-
                 document.getElementById('fDisplayOpening').textContent = openingBalance.toFixed(3);
                 document.getElementById('fDisplayTotalPurchases').textContent = totalPurchases.toFixed(3);
                 document.getElementById('fDisplayTotalPayments').textContent = totalPayments.toFixed(3);
@@ -5731,7 +6007,7 @@
             }
         };
 
-        // ===== VENTES (MODIFICATION: VENTE SANS VÉRIFICATION DE STOCK) =====
+        // ===== VENTES =====
         const Ventes = {
             editingId: null,
             lines: [],
@@ -5845,7 +6121,6 @@
                 const q = parseFloat($('viQty').value) || 0;
                 $('viTotal').value = (p * q).toFixed(3);
             },
-            // ===== MODIFICATION: SUPPRESSION DE LA VÉRIFICATION DE STOCK =====
             addLine() {
                 const sel = $('viArticle');
                 const name = sel.value ? sel.options[sel.selectedIndex].textContent : '';
@@ -5855,10 +6130,6 @@
                     showToastModern('⚠️ Veuillez saisir des données valides pour le produit', 'warning');
                     return;
                 }
-                
-                // ✅ MODIFICATION: Suppression de la vérification du stock
-                // La vente est autorisée même si le stock est épuisé
-                
                 const existing = this.lines.find(l => l.name === name);
                 if (existing) {
                     existing.qty += qty;
@@ -5867,10 +6138,6 @@
                 } else {
                     this.lines.push({ name, price, qty, total: price * qty });
                 }
-                
-                // Le stock n'est pas déduit car on permet la vente sans stock
-                // Le stock reste inchangé
-                
                 $('viArticle').value = '';
                 $('viPrice').value = '';
                 $('viQty').value = 1;
@@ -5883,7 +6150,6 @@
             },
             removeLine(idx) {
                 const line = this.lines[idx];
-                // Le stock n'est pas réajusté car il n'a pas été déduit
                 this.lines.splice(idx, 1);
                 if (this.editingRowIndex === idx) this.editingRowIndex = null;
                 this.renderLines();
@@ -6058,7 +6324,6 @@
                 const rec = ventes.find(v => v.id === this.editingId);
                 if (rec) {
                     if (!confirm(`⚠️ Êtes-vous sûr de vouloir supprimer la facture ${rec.num} ?`)) return;
-                    // Le stock n'est pas réajusté car il n'a pas été déduit
                     caisseClients = caisseClients.filter(c => c.invoiceId !== this.editingId);
                     ventes = ventes.filter(v => v.id !== this.editingId);
                     saveState();
@@ -7163,11 +7428,9 @@
                 const to = document.getElementById('margeDateTo').value;
                 const tbody = document.getElementById('margeTableBody');
                 if (!tbody) return;
-
                 let totalVentes = 0;
                 let totalMarge = 0;
                 let rows = '';
-
                 ventes.forEach(v => {
                     if (v.date < from || v.date > to) return;
                     let margeFacture = 0;
@@ -7187,13 +7450,11 @@
                         <td style="font-weight:700;color:${margeFacture >= 0 ? 'var(--success)' : 'var(--danger)'};">${margeFacture.toFixed(3)}</td>
                     </tr>`;
                 });
-
                 if (rows === '') {
                     tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:15px;color:#999;">Aucune facture dans cette période</td></tr>`;
                 } else {
                     tbody.innerHTML = rows;
                 }
-
                 const taux = totalVentes > 0 ? (totalMarge / totalVentes) * 100 : 0;
                 document.getElementById('margeTotalVentes').textContent = totalVentes.toFixed(3);
                 document.getElementById('margeTotalMarge').textContent = totalMarge.toFixed(3);
@@ -8103,6 +8364,7 @@
                 notificationSystem.loadSaved();
                 notificationSystem.updateBadge();
                 loadDriveState();
+                loadGmailState();
                 document.getElementById('loginOverlay').classList.add('hide');
                 document.getElementById('pendingOverlay').classList.add('hide');
                 showSection('dashboard');
@@ -8225,10 +8487,26 @@
         window.disconnectGoogleDrive = disconnectGoogleDrive;
         window.toggleAutoBackup = toggleAutoBackup;
 
+        // Exposer les fonctions Gmail
+        window.connectGmail = connectGmail;
+        window.disconnectGmail = disconnectGmail;
+        window.toggleEmailBackup = toggleEmailBackup;
+        window.openEmailBackupSettings = openEmailBackupSettings;
+        window.closeEmailBackupSettings = closeEmailBackupSettings;
+        window.saveEmailBackupSettings = saveEmailBackupSettings;
+        window.manualEmailBackup = manualEmailBackup;
+
+        // Exposer les fonctions d'importation
+        window.downloadTemplate = downloadTemplate;
+        window.handleImportFile = handleImportFile;
+        window.confirmImport = confirmImport;
+        window.cancelImport = cancelImport;
+
         document.addEventListener('DOMContentLoaded', function() {
             console.log('📱 GTR POS ' + APP_VERSION + ' loaded');
             console.log('⌨️ Appuyez sur F1 pour afficher les raccourcis clavier');
             loadDriveState();
+            loadGmailState();
         });
     </script>
 </body>
