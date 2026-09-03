@@ -2043,8 +2043,6 @@
             margin-bottom: 4px;
         }
         .file-drop-zone input[type="file"] { display: none; }
-
-        /* Correction CSS pour les boutons de paiement direct dans les sheets */
         #sheet-clients .btn.save.small,
         #sheet-fournisseurs .btn.save.small {
             width: 100%;
@@ -2058,59 +2056,10 @@
             cursor: pointer;
             transition: var(--transition);
         }
-
         #sheet-clients .btn.save.small:active,
         #sheet-fournisseurs .btn.save.small:active {
             transform: scale(0.97);
         }
-
-        /* Style pour les paiements directs dans les sheets */
-        #directPaymentsList .payment-item,
-        #directFournisseurPaymentsList .payment-item {
-            background: var(--bg);
-            border-radius: 8px;
-            padding: 4px 10px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 10px;
-            border: 1px solid var(--border);
-            margin-bottom: 4px;
-        }
-        #directPaymentsList .payment-item .method,
-        #directFournisseurPaymentsList .payment-item .method {
-            font-weight: 700;
-            color: var(--secondary);
-        }
-        #directPaymentsList .payment-item .amount,
-        #directFournisseurPaymentsList .payment-item .amount {
-            font-weight: 800;
-            color: var(--success);
-        }
-        #directPaymentsList .payment-item .delete-payment,
-        #directFournisseurPaymentsList .payment-item .delete-payment {
-            color: var(--danger);
-            cursor: pointer;
-            font-size: 12px;
-            padding: 0 2px;
-            transition: var(--transition);
-        }
-        #directPaymentsList .payment-item .edit-payment,
-        #directFournisseurPaymentsList .payment-item .edit-payment {
-            color: var(--warning);
-            cursor: pointer;
-            font-size: 12px;
-            padding: 0 4px;
-            transition: var(--transition);
-        }
-        #directPaymentsList .payment-item .edit-payment:active,
-        #directFournisseurPaymentsList .payment-item .edit-payment:active,
-        #directPaymentsList .payment-item .delete-payment:active,
-        #directFournisseurPaymentsList .payment-item .delete-payment:active {
-            transform: scale(1.2);
-        }
-
-        /* Style pour les prix spéciaux */
         .special-price-item {
             display: flex;
             justify-content: space-between;
@@ -2288,7 +2237,6 @@
                         <span class="dash-icon">📈</span>
                         <span class="dash-label" style="color:#fff;">Marge bénéficiaire</span>
                     </div>
-                    <!-- ===== RAPPORT FINANCIER DU JOUR ===== -->
                     <div class="dash-item" data-section="finance-jour" style="background:linear-gradient(135deg,#1a2a5c,#2a3f7a);color:#fff;">
                         <span class="dash-icon">📊</span>
                         <span class="dash-label" style="color:#fff;">Rapport du jour</span>
@@ -2422,7 +2370,6 @@
                     ⏰ <span id="financeJourHeure">00:00:00</span>
                 </div>
                 
-                <!-- ===== INDICATEURS FINANCIERS ===== -->
                 <div class="bi-kpi-grid" style="grid-template-columns: 1fr 1fr 1fr;">
                     <div class="bi-kpi" style="border-top:3px solid #4a6cf7;">
                         <div class="num" id="fjSoldeClient">0.000</div>
@@ -2450,7 +2397,6 @@
                     </div>
                 </div>
                 
-                <!-- ===== DÉTAILS DU CAPITAL ===== -->
                 <div class="capital-card" style="margin-top:10px;">
                     <div class="capital-label">💰 Capital de l'entreprise (fixe)</div>
                     <div class="capital-value" id="fjCapitalFixe">0.000 TND</div>
@@ -2462,7 +2408,6 @@
                     </div>
                 </div>
                 
-                <!-- ===== TABLEAU DES MOUVEMENTS DU JOUR ===== -->
                 <div class="section-title" style="margin-top:10px;">📋 Mouvements du jour</div>
                 <div class="history-table-wrapper">
                     <table class="history-table" style="min-width:650px;font-size:8px;">
@@ -2596,7 +2541,6 @@
         <div class="sheet-overlay" id="overlay"></div>
 
         <!-- ===== SHEETS ===== -->
-        <!-- CLIENT SHEET (avec paiements directs et suppression) -->
         <div class="sheet" id="sheet-clients">
             <div class="sheet-handle"></div>
             <div class="sheet-header"><h3>Données client</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
@@ -2620,19 +2564,6 @@
                     </div>
                 </div>
 
-                <!-- ===== PAIEMENT DIRECT (SANS FACTURE) ===== -->
-                <div class="section-title" style="margin-top:8px;">💰 Paiement direct (sans facture)</div>
-                <div class="field-row-2">
-                    <div class="field"><label>Montant (TND)</label><input type="number" step="0.001" id="directClientAmount" placeholder="0.000"></div>
-                    <div class="field"><label>Méthode</label><select id="directClientMethod"><option>Espèces</option><option>Chèque</option><option>Virement</option><option>Carte</option></select></div>
-                </div>
-                <button class="btn save small" onclick="Clients.addDirectPayment()" style="width:100%;">➕ Ajouter paiement direct</button>
-                <div style="font-size:8px;color:var(--muted);margin-top:2px;">💡 Ce paiement sera enregistré dans la caisse et mettra à jour le solde du client.</div>
-
-                <!-- ===== LISTE DES PAIEMENTS DIRECTS ===== -->
-                <div class="section-title" style="margin-top:8px;">📋 Paiements directs enregistrés</div>
-                <div id="directPaymentsList"></div>
-
                 <!-- ===== PRIX SPÉCIAUX ===== -->
                 <div class="section-title" style="margin-top:8px;">💰 Prix spéciaux</div>
                 <div id="specialPricesList"></div>
@@ -2649,7 +2580,6 @@
             </div>
         </div>
 
-        <!-- FOURNISSEUR SHEET (avec paiements directs et suppression) -->
         <div class="sheet" id="sheet-fournisseurs">
             <div class="sheet-handle"></div>
             <div class="sheet-header"><h3>Données fournisseur</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
@@ -2672,19 +2602,6 @@
                     </div>
                 </div>
 
-                <!-- ===== PAIEMENT DIRECT (SANS FACTURE) ===== -->
-                <div class="section-title" style="margin-top:8px;">💰 Paiement direct (sans facture)</div>
-                <div class="field-row-2">
-                    <div class="field"><label>Montant (TND)</label><input type="number" step="0.001" id="directFournisseurAmount" placeholder="0.000"></div>
-                    <div class="field"><label>Méthode</label><select id="directFournisseurMethod"><option>Espèces</option><option>Chèque</option><option>Virement</option><option>Carte</option></select></div>
-                </div>
-                <button class="btn save small" onclick="Fournisseurs.addDirectPayment()" style="width:100%;">➕ Ajouter paiement direct</button>
-                <div style="font-size:8px;color:var(--muted);margin-top:2px;">💡 Ce paiement sera enregistré dans la caisse et mettra à jour le solde du fournisseur.</div>
-
-                <!-- ===== LISTE DES PAIEMENTS DIRECTS ===== -->
-                <div class="section-title" style="margin-top:8px;">📋 Paiements directs enregistrés</div>
-                <div id="directFournisseurPaymentsList"></div>
-
                 <div class="field"><label>Notes</label><input id="fNotes"></div>
             </div>
             <div class="sheet-footer">
@@ -2694,7 +2611,6 @@
             </div>
         </div>
 
-        <!-- Article Sheet -->
         <div class="sheet" id="sheet-articles">
             <div class="sheet-handle"></div>
             <div class="sheet-header"><h3>Données article</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
@@ -2726,7 +2642,6 @@
             </div>
         </div>
 
-        <!-- VENTE SHEET (avec paiement direct avec facture) -->
         <div class="sheet" id="sheet-ventes">
             <div class="sheet-handle"></div>
             <div class="sheet-header"><h3>📄 Facture de vente</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
@@ -2770,9 +2685,6 @@
                         <div class="field"><label>Méthode de paiement</label><select id="vRegType"><option>Espèces</option><option>Chèque</option><option>Virement</option><option>Carte</option></select></div>
                         <button class="btn-add-payment" onclick="Ventes.addReglement()">➕ Ajouter</button>
                     </div>
-                    <div style="margin-top:4px;display:flex;gap:4px;">
-                        <button class="btn save small" onclick="Ventes.addDirectPaymentToInvoice()" style="flex:1;font-size:9px;padding:3px 6px;">💳 Paiement direct (avec facture)</button>
-                    </div>
                 </div>
                 <div class="invoice-actions-modern">
                     <button class="btn-action whatsapp" onclick="Ventes.shareWhatsapp()">📱 WhatsApp</button>
@@ -2789,7 +2701,6 @@
             </div>
         </div>
 
-        <!-- ACHAT SHEET (avec paiement direct avec facture) -->
         <div class="sheet" id="sheet-achats">
             <div class="sheet-handle"></div>
             <div class="sheet-header"><h3>📄 Facture d'achat</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
@@ -2833,9 +2744,6 @@
                         <div class="field"><label>Méthode de paiement</label><select id="pRegType"><option>Espèces</option><option>Chèque</option><option>Virement</option><option>Carte</option></select></div>
                         <button class="btn-add-payment" onclick="Achats.addReglement()">➕ Ajouter</button>
                     </div>
-                    <div style="margin-top:4px;display:flex;gap:4px;">
-                        <button class="btn save small" onclick="Achats.addDirectPaymentToInvoice()" style="flex:1;font-size:9px;padding:3px 6px;">💳 Paiement direct (avec facture)</button>
-                    </div>
                 </div>
                 <div class="invoice-actions-modern">
                     <button class="btn-action whatsapp" onclick="Achats.shareWhatsapp()">📱 WhatsApp</button>
@@ -2851,7 +2759,6 @@
             </div>
         </div>
 
-        <!-- Expense Sheet -->
         <div class="sheet" id="sheet-expenses">
             <div class="sheet-handle"></div>
             <div class="sheet-header"><h3>Dépense</h3><button class="sheet-close" onclick="closeSheet()">✕</button></div>
@@ -2898,27 +2805,26 @@
                     <button class="btn small" onclick="uiCustomizer.applyTheme('green')" style="flex:1;background:#27ae60;color:#fff;">Vert</button>
                 </div>
 
-                <!-- ===== SAUVEGARDE LOCALE ===== -->
                 <div class="section-title">💾 Sauvegarde locale</div>
                 <button class="btn outline small" onclick="exportBackup()">⬇️ Exporter</button>
                 <input type="file" id="importFileInputBackup" accept=".json" style="display:none;" onchange="importBackupFile(this)">
                 <button class="btn outline small" onclick="document.getElementById('importFileInputBackup').click()">⬆️ Importer</button>
                 <div style="font-size:9px;color:var(--muted);margin-top:4px;">💡 Pour installer l'application : ⋮ dans le navigateur → Ajouter à l'écran d'accueil</div>
 
-                <!-- ===== COMPTE ===== -->
+                <div class="section-title">🖨️ تخصيص الطباعة</div>
+                <button class="btn outline small" onclick="openPrintCustomizer()" style="width:100%;margin-bottom:6px;">🖨️ تخصيص الطباعة</button>
+
                 <div class="section-title">👤 Compte</div>
                 <div id="accountEmailDisplay" style="font-size:11px;color:var(--muted);margin-bottom:3px;"></div>
                 <button class="btn del" onclick="doLogout()">🚪 Se déconnecter</button>
             </div>
         </div>
 
-        <!-- ===== TOAST ===== -->
         <div class="toast" id="toast"></div>
         <div class="toast-modern" id="toastModern"></div>
     </div>
 
     <!-- ===== MODALS ===== -->
-    <!-- Modal changement de mot de passe -->
     <div class="modal-overlay" id="passwordModal">
         <div class="modal-box">
             <h3>🔑 Changer le mot de passe</h3>
@@ -2930,7 +2836,6 @@
         </div>
     </div>
 
-    <!-- Modal email -->
     <div class="modal-overlay" id="emailModal">
         <div class="modal-box">
             <h3>✉️ Envoyer la facture par email</h3>
@@ -2941,7 +2846,40 @@
         </div>
     </div>
 
-    <!-- ===== NOTIFICATIONS ===== -->
+    <div class="modal-overlay" id="printCustomizerModal">
+        <div class="modal-box">
+            <h3>🖨️ تخصيص الطباعة</h3>
+            <div class="field">
+                <label>🖼️ الشعار (Logo)</label>
+                <input type="file" id="logoUpload" accept="image/*" onchange="handleLogoUpload(event)">
+                <div id="logoPreview" style="margin-top:4px;text-align:center;font-size:9px;color:var(--muted);">
+                    <span id="logoFileName">لم يتم رفع شعار</span>
+                    <br>
+                    <img id="logoPreviewImg" style="max-width:100px;max-height:60px;display:none;margin-top:4px;border:1px solid var(--border);border-radius:4px;padding:2px;">
+                </div>
+                <button class="btn outline small" onclick="loadDefaultLogo()" style="margin-top:2px;font-size:9px;padding:2px 8px;">⬇️ تحميل الشعار الافتراضي</button>
+            </div>
+            <div class="field">
+                <label>📝 التذييل (Footer)</label>
+                <input type="text" id="customFooter" placeholder="نص التذييل (مثل: شكراً لتسوقكم)">
+            </div>
+            <div class="field">
+                <label>📐 حجم الخط</label>
+                <select id="fontSizeSelect">
+                    <option value="small">صغير</option>
+                    <option value="medium" selected>متوسط</option>
+                    <option value="large">كبير</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn save" onclick="savePrintSettings()">💾 حفظ</button>
+                <button class="btn del" onclick="resetPrintSettings()">🔄 استعادة الافتراضي</button>
+                <button class="btn outline" onclick="closePrintCustomizer()">إلغاء</button>
+            </div>
+            <div class="modal-error" id="printCustomizerError"></div>
+        </div>
+    </div>
+
     <div class="notification-panel" id="notificationPanel">
         <div class="notification-content">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
@@ -2958,7 +2896,6 @@
         </div>
     </div>
 
-    <!-- ===== SHORTCUT HELP ===== -->
     <div class="shortcut-help" id="shortcutHelp">
         <div class="shortcut-help-content">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
@@ -2972,7 +2909,6 @@
         </div>
     </div>
 
-    <!-- ===== PRINT OVERLAY ===== -->
     <div class="print-overlay" id="printOverlay">
         <div class="print-actions">
             <div class="paper-selector"><span>📄 Format papier :</span><select id="paperSizeSelect"><option value="a4">Normal</option><option value="80" selected>80mm</option><option value="56">56mm</option></select></div>
@@ -3236,9 +3172,6 @@
             console.error('❌ Firebase init error:', e);
         }
 
-        // ===== FIN DE LA PARTIE GMAIL & DRIVE & FINANCE TABLE =====
-        // Toutes les fonctions Google Drive, Gmail et FinanceTable ont été supprimées
-
         // ===== VARIABLES GLOBALES =====
         let currentUser = null;
         let isSignupMode = false;
@@ -3277,6 +3210,19 @@
 
         function isValidEmail(email) {
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        // تنسيق الأرقام
+        function formatNum(num) {
+            return num.toFixed(3).replace(/\./g, ',');
+        }
+
+        // تنسيق التاريخ
+        function formatDate(dateStr) {
+            if (!dateStr || dateStr === '---') return '---';
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
         }
 
         // ===== AUTH =====
@@ -3692,6 +3638,163 @@
                 return themes[nextIndex];
             }
         };
+
+        // ===== PRINT CUSTOMIZER =====
+        const PRINT_SETTINGS_KEY = 'gtrpos_print_settings';
+
+        let printSettings = {
+            logo: null,
+            footer: 'شكراً لتسوقكم معنا',
+            fontSize: 'medium'
+        };
+
+        function loadPrintSettings() {
+            try {
+                const saved = localStorage.getItem(PRINT_SETTINGS_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    printSettings = { ...printSettings, ...parsed };
+                }
+            } catch (e) { console.warn('Error loading print settings:', e); }
+        }
+
+        function savePrintSettings() {
+            const footer = document.getElementById('customFooter').value.trim();
+            const fontSize = document.getElementById('fontSizeSelect').value;
+            printSettings.footer = footer || 'شكراً لتسوقكم معنا';
+            printSettings.fontSize = fontSize || 'medium';
+            try {
+                localStorage.setItem(PRINT_SETTINGS_KEY, JSON.stringify(printSettings));
+                showToastModern('✅ تم حفظ إعدادات الطباعة', 'success');
+                closePrintCustomizer();
+            } catch (e) {
+                showToastModern('❌ خطأ في الحفظ', 'error');
+                console.error(e);
+            }
+        }
+
+        function resetPrintSettings() {
+            if (!confirm('⚠️ هل تريد استعادة الإعدادات الافتراضية؟')) return;
+            printSettings = {
+                logo: null,
+                footer: 'شكراً لتسوقكم معنا',
+                fontSize: 'medium'
+            };
+            localStorage.removeItem(PRINT_SETTINGS_KEY);
+            updatePrintCustomizerUI();
+            showToastModern('🔄 تمت الاستعادة', 'success');
+        }
+
+        function openPrintCustomizer() {
+            loadPrintSettings();
+            updatePrintCustomizerUI();
+            document.getElementById('printCustomizerModal').classList.add('show');
+            document.getElementById('printCustomizerError').textContent = '';
+        }
+
+        function closePrintCustomizer() {
+            document.getElementById('printCustomizerModal').classList.remove('show');
+        }
+
+        function updatePrintCustomizerUI() {
+            document.getElementById('customFooter').value = printSettings.footer || '';
+            document.getElementById('fontSizeSelect').value = printSettings.fontSize || 'medium';
+            
+            const previewImg = document.getElementById('logoPreviewImg');
+            const fileNameSpan = document.getElementById('logoFileName');
+            if (printSettings.logo) {
+                previewImg.src = printSettings.logo;
+                previewImg.style.display = 'block';
+                fileNameSpan.textContent = '✅ شعار مرفوع';
+            } else {
+                previewImg.style.display = 'none';
+                fileNameSpan.textContent = 'لم يتم رفع شعار';
+            }
+        }
+
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                printSettings.logo = e.target.result;
+                updatePrintCustomizerUI();
+                showToastModern('✅ تم رفع الشعار', 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function loadDefaultLogo() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 300;
+            canvas.height = 80;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#1a2a5c';
+            ctx.fillRect(0, 0, 300, 80);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 40px Cairo, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('GTR POS', 150, 40);
+            ctx.font = '16px Cairo, sans-serif';
+            ctx.fillStyle = '#c8d8ff';
+            ctx.fillText('Système de gestion', 150, 65);
+            printSettings.logo = canvas.toDataURL('image/png');
+            updatePrintCustomizerUI();
+            showToastModern('✅ تم تحميل الشعار الافتراضي', 'success');
+        }
+
+        function renderInvoice() {
+            if (!_invoiceData) return;
+            const size = document.getElementById('paperSizeSelect').value;
+            const doc = document.getElementById('printDoc');
+            doc.className = 'invoice-doc paper-' + size;
+            
+            const fontSizeMap = { small: '7px', medium: '10px', large: '14px' };
+            const baseFontSize = fontSizeMap[printSettings.fontSize] || '10px';
+            doc.style.fontSize = baseFontSize;
+            
+            const data = _invoiceData;
+            let linesHtml = '';
+            data.lines.forEach((l, i) => {
+                linesHtml += `<tr><td>${i + 1}</td><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td></tr>`;
+            });
+            
+            let logoHtml = '';
+            if (printSettings.logo) {
+                logoHtml = `<div style="text-align:center;margin-bottom:4px;"><img src="${printSettings.logo}" style="max-width:120px;max-height:50px;object-fit:contain;"></div>`;
+            }
+            
+            const footerHtml = printSettings.footer ? `<div style="text-align:center;font-size:${baseFontSize};color:#666;margin-top:8px;border-top:1px dashed #ddd;padding-top:6px;">${printSettings.footer}</div>` : '';
+            
+            const partyHtml = `<div style="display:flex;justify-content:space-between;font-size:${baseFontSize};border:1px solid #999;padding:3px;margin:3px 0;flex-wrap:wrap;gap:2px;"><span><strong>${data.partyLabel}:</strong> ${data.partyName}</span><span><strong>Adresse:</strong> ${data.partyAddr || '-'}</span><span><strong>Tél:</strong> ${data.partyPhone || '-'}</span><span><strong>MF:</strong> ${data.partyTaxId || '-'}</span></div>`;
+            
+            doc.innerHTML = `
+                ${logoHtml}
+                <div style="text-align:center;border-bottom:2px solid #1e2f66;padding-bottom:4px;margin-bottom:4px;">
+                    <div style="font-size:${baseFontSize};font-weight:800;">${data.title}</div>
+                    <div style="font-size:${baseFontSize};color:#666;display:flex;justify-content:space-between;">
+                        <span>${new Date().toLocaleDateString('fr-FR')}  ${new Date().toLocaleTimeString('fr-FR')}</span>
+                        <span style="font-weight:700;">${companyInfo.name || 'GTR POS'}</span>
+                    </div>
+                    <div style="font-size:${baseFontSize};color:#888;margin-top:2px;">${companyInfo.address || ''} | ${companyInfo.phone1 || ''} | MF: ${companyInfo.taxId || '-'}</div>
+                </div>
+                <div style="font-size:${baseFontSize};text-align:center;margin:2px 0;">${data.date}</div>
+                ${partyHtml}
+                <table class="inv-items" style="width:100%;border-collapse:collapse;font-size:${baseFontSize};margin:4px 0;">
+                    <thead><tr><th>#</th><th>Produit</th><th>Prix</th><th>Qté</th><th>Total</th></tr></thead>
+                    <tbody>${linesHtml}</tbody>
+                </table>
+                <table class="inv-print-summary" style="width:100%;border-collapse:collapse;font-size:${baseFontSize};margin:4px 0;">
+                    <tr><td class="label" style="border:1px solid #999;padding:2px 4px;text-align:left;">Solde précédent</td><td class="value" style="border:1px solid #999;padding:2px 4px;text-align:right;">${data.prevBalance.toFixed(3)}</td></tr>
+                    <tr class="total-row"><td class="label" style="border:1px solid #999;padding:2px 4px;text-align:left;font-weight:700;">Total facture</td><td class="value" style="border:1px solid #999;padding:2px 4px;text-align:right;font-weight:700;">${data.total.toFixed(3)}</td></tr>
+                    <tr><td class="label" style="border:1px solid #999;padding:2px 4px;text-align:left;">Payé</td><td class="value" style="border:1px solid #999;padding:2px 4px;text-align:right;">${data.paid.toFixed(3)}</td></tr>
+                    <tr class="highlight-row"><td class="label" style="border:1px solid #999;padding:2px 4px;text-align:left;font-weight:700;">Solde actuel</td><td class="value" style="border:1px solid #999;padding:2px 4px;text-align:right;font-weight:700;color:#c0392b;">${data.currentBalance.toFixed(3)}</td></tr>
+                </table>
+                <div style="text-align:center;font-size:${baseFontSize};font-weight:700;margin:4px 0;">${data.num}</div>
+                ${footerHtml}
+            `;
+        }
 
         // ===== NOTIFICATION SYSTEM =====
         const notificationSystem = {
@@ -4481,29 +4584,21 @@
             refresh() {
                 const today = new Date().toISOString().slice(0, 10);
                 
-                // 1. Solde client actuel
                 this.data.soldeClient = clients.reduce((sum, c) => sum + (c.balance || 0), 0);
-                
-                // 2. Valeur stock actuel
                 this.data.valeurStock = articles.reduce((sum, a) => {
                     const stock = a.stock || 0;
                     const price = a.costPrice || a.price || 0;
                     return sum + (stock * price);
                 }, 0);
                 
-                // 3. Caisse actuelle
                 const totalEntrees = caisseClients.reduce((sum, c) => sum + (c.amount || 0), 0);
                 const totalSorties = caisseFournisseurs.reduce((sum, c) => sum + (c.amount || 0), 0);
                 const totalDepenses = expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
                 this.data.caisse = (companyInfo.cashOpening || 0) + totalEntrees - totalSorties - totalDepenses;
                 
-                // 4. Solde fournisseur actuel
                 this.data.soldeFournisseur = fournisseurs.reduce((sum, f) => sum + (f.balance || 0), 0);
-                
-                // 5. Total actuel
                 this.data.total = this.data.soldeClient + this.data.valeurStock + this.data.caisse - this.data.soldeFournisseur;
                 
-                // 6. Capital fixe
                 const clientDepart = clients.reduce((sum, c) => sum + (c.openingBalance || 0), 0);
                 const stockDepart = articles.reduce((sum, a) => {
                     const stock = a.stockDepart !== undefined ? a.stockDepart : (a.stock || 0);
@@ -4514,13 +4609,10 @@
                 const supplierDepart = fournisseurs.reduce((sum, f) => sum + (f.openingBalance || 0), 0);
                 this.data.capitalFixe = clientDepart + stockDepart + cashDepart - supplierDepart;
                 
-                // 7. Bénéfice
                 this.data.benefice = this.data.total - this.data.capitalFixe;
                 
-                // 8. Mouvements du jour (Inventaire de jour)
                 this.data.mouvements = [];
                 
-                // Ventes du jour
                 ventes.forEach(v => {
                     if (v.date === today) {
                         const totalQty = v.lines.reduce((sum, l) => sum + (l.qty || 0), 0);
@@ -4535,7 +4627,6 @@
                     }
                 });
                 
-                // Achats du jour
                 achats.forEach(a => {
                     if (a.date === today) {
                         const totalQty = a.lines.reduce((sum, l) => sum + (l.qty || 0), 0);
@@ -4550,7 +4641,6 @@
                     }
                 });
                 
-                // Paiements clients du jour
                 caisseClients.forEach(c => {
                     if (c.date === today) {
                         this.data.mouvements.push({
@@ -4564,7 +4654,6 @@
                     }
                 });
                 
-                // Paiements fournisseurs du jour
                 caisseFournisseurs.forEach(c => {
                     if (c.date === today) {
                         this.data.mouvements.push({
@@ -4578,7 +4667,6 @@
                     }
                 });
                 
-                // Dépenses du jour
                 expenses.forEach(e => {
                     if (e.date === today) {
                         this.data.mouvements.push({
@@ -4592,7 +4680,6 @@
                     }
                 });
                 
-                // Tri des mouvements
                 this.data.mouvements.sort((a, b) => {
                     const order = { '📤 Vente': 0, '💳 Paiement client': 1, '📥 Achat': 2, '💳 Paiement fournisseur': 3, '💸 Dépense': 4 };
                     return (order[a.type] || 5) - (order[b.type] || 5);
@@ -4602,7 +4689,6 @@
             },
             
             render() {
-                // Mise à jour des KPI
                 document.getElementById('fjSoldeClient').textContent = this.data.soldeClient.toFixed(3);
                 document.getElementById('fjValeurStock').textContent = this.data.valeurStock.toFixed(3);
                 document.getElementById('fjCaisse').textContent = this.data.caisse.toFixed(3);
@@ -4615,7 +4701,6 @@
                 
                 document.getElementById('fjCapitalFixe').textContent = this.data.capitalFixe.toFixed(3) + ' TND';
                 
-                // Mise à jour des détails du capital
                 const clientDepart = clients.reduce((sum, c) => sum + (c.openingBalance || 0), 0);
                 const stockDepart = articles.reduce((sum, a) => {
                     const stock = a.stockDepart !== undefined ? a.stockDepart : (a.stock || 0);
@@ -4630,7 +4715,6 @@
                 document.getElementById('fjCapCashDepart').textContent = cashDepart.toFixed(3);
                 document.getElementById('fjCapSupplierBalance').textContent = supplierDepart.toFixed(3);
                 
-                // Mise à jour du tableau des mouvements
                 const tbody = document.getElementById('fjMouvementsBody');
                 tbody.innerHTML = '';
                 
@@ -4723,16 +4807,14 @@
             }
         };
 
-        // ===== CLIENTS (avec gestion des paiements directs) =====
+        // ===== CLIENTS =====
         const Clients = {
             editingId: null,
             specialPrices: [],
-            directPayments: [],
 
             reset() {
                 this.editingId = null;
                 this.specialPrices = [];
-                this.directPayments = [];
                 $('cCode').value = 'CL-' + String(nextId.clients).padStart(4, '0');
                 $('cName').value = '';
                 $('cPhone').value = '';
@@ -4746,8 +4828,6 @@
                 this.renderSpecialPrices();
                 this.refreshSpArticleOptions();
                 this.updateSummary();
-                this.renderDirectPayments();
-                $('directClientAmount').value = '';
             },
 
             validateEmail() {
@@ -4807,7 +4887,6 @@
                 if (!c) return;
                 this.editingId = id;
                 this.specialPrices = c.specialPrices ? [...c.specialPrices] : [];
-                this.directPayments = caisseClients.filter(cr => cr.clientId === id && (!cr.invoiceNum || cr.invoiceNum === ''));
                 $('cCode').value = 'CL-' + String(id).padStart(4, '0');
                 $('cName').value = c.name;
                 $('cPhone').value = c.phone || '';
@@ -4821,8 +4900,6 @@
                 this.renderSpecialPrices();
                 this.refreshSpArticleOptions();
                 this.updateSummary();
-                this.renderDirectPayments();
-                $('directClientAmount').value = '';
                 openSheet('clients');
             },
 
@@ -4845,124 +4922,6 @@
                 document.getElementById('cDisplayTotalPurchases').textContent = totalPurchases.toFixed(3);
                 document.getElementById('cDisplayTotalPayments').textContent = totalPayments.toFixed(3);
                 document.getElementById('cDisplayBalance').textContent = currentBalance.toFixed(3);
-            },
-
-            renderDirectPayments() {
-                const container = document.getElementById('directPaymentsList');
-                if (!container) return;
-                if (this.directPayments.length === 0) {
-                    container.innerHTML = '<div class="empty-msg" style="font-size:9px;padding:4px 0;">💳 Aucun paiement direct</div>';
-                    return;
-                }
-                container.innerHTML = '';
-                this.directPayments.forEach((p, idx) => {
-                    const div = document.createElement('div');
-                    div.className = 'payment-item';
-                    div.innerHTML = `
-                        <span class="method">${p.regType || 'Espèces'}</span>
-                        <span class="amount">${p.amount.toFixed(3)} TND</span>
-                        <span style="font-size:8px;color:var(--muted);">${p.date}</span>
-                        <span class="edit-payment" onclick="Clients.editDirectPayment(${idx})">✏️</span>
-                        <span class="delete-payment" onclick="Clients.deleteDirectPayment(${idx})">✕</span>
-                    `;
-                    container.appendChild(div);
-                });
-            },
-
-            addDirectPayment() {
-                const amount = parseFloat($('directClientAmount').value) || 0;
-                if (amount <= 0) {
-                    showToastModern('⚠️ Veuillez saisir un montant valide', 'warning');
-                    return;
-                }
-                const method = $('directClientMethod').value;
-                const date = new Date().toISOString().slice(0, 10);
-                const client = clients.find(c => c.id === this.editingId);
-                if (!client) {
-                    showToastModern('⚠️ Client non chargé', 'warning');
-                    return;
-                }
-                const reglementId = nextId.reglements++;
-                const cRec = {
-                    id: nextId.caisseClients++,
-                    date: date,
-                    clientId: client.id,
-                    clientName: client.name,
-                    type: 'in',
-                    amount: amount,
-                    regType: method,
-                    description: 'Paiement direct (sans facture)',
-                    invoiceId: null,
-                    invoiceNum: '',
-                    reglementId: reglementId
-                };
-                caisseClients.push(cRec);
-                recalculateClientBalance(client.name);
-                saveState();
-                this.directPayments.push(cRec);
-                this.renderDirectPayments();
-                this.updateSummary();
-                $('directClientAmount').value = '';
-                showToastModern(`✅ Paiement direct de ${amount.toFixed(3)} TND`, 'success');
-                if (window.ClientHistory && ClientHistory.currentClientId === client.id) {
-                    ClientHistory.show();
-                }
-            },
-
-            editDirectPayment(index) {
-                const payment = this.directPayments[index];
-                if (!payment) {
-                    showToastModern('⚠️ Défense non trouvée', 'warning');
-                    return;
-                }
-                
-                const newAmount = prompt('Modifier le montant (TND):', payment.amount);
-                if (newAmount === null) return;
-                const amount = parseFloat(newAmount);
-                if (isNaN(amount) || amount <= 0) {
-                    showToastModern('⚠️ Montant invalide', 'warning');
-                    return;
-                }
-                
-                const newMethod = prompt('Méthode de paiement (Espèces/Chèque/Virement/Carte):', payment.regType || 'Espèces');
-                if (newMethod === null) return;
-                
-                const caisseRec = caisseClients.find(cr => cr.reglementId === payment.reglementId);
-                if (caisseRec) {
-                    const oldAmount = caisseRec.amount;
-                    caisseRec.amount = amount;
-                    caisseRec.regType = newMethod;
-                    
-                    const client = clients.find(c => c.id === this.editingId);
-                    if (client) {
-                        recalculateClientBalance(client.name);
-                    }
-                    saveState();
-                    this.directPayments = caisseClients.filter(cr => cr.clientId === this.editingId && (!cr.invoiceNum || cr.invoiceNum === ''));
-                    this.renderDirectPayments();
-                    this.updateSummary();
-                    showToastModern('✅ Défense directe modifiée', 'success');
-                    if (window.ClientHistory && ClientHistory.currentClientId === this.editingId) {
-                        ClientHistory.show();
-                    }
-                }
-            },
-
-            deleteDirectPayment(index) {
-                const payment = this.directPayments[index];
-                if (!payment) return;
-                if (!confirm(`Supprimer ce paiement direct de ${payment.amount.toFixed(3)} TND ?`)) return;
-                caisseClients = caisseClients.filter(cr => cr.reglementId !== payment.reglementId);
-                this.directPayments.splice(index, 1);
-                const client = clients.find(c => c.id === this.editingId);
-                if (client) recalculateClientBalance(client.name);
-                saveState();
-                this.renderDirectPayments();
-                this.updateSummary();
-                showToastModern('🗑️ Paiement direct supprimé', 'success');
-                if (window.ClientHistory && ClientHistory.currentClientId === client?.id) {
-                    ClientHistory.show();
-                }
             },
 
             render() {
@@ -5044,14 +5003,12 @@
             }
         };
 
-        // ===== FOURNISSEURS (avec gestion des paiements directs) =====
+        // ===== FOURNISSEURS =====
         const Fournisseurs = {
             editingId: null,
-            directPayments: [],
 
             reset() {
                 this.editingId = null;
-                this.directPayments = [];
                 $('fCode').value = 'FR-' + String(nextId.fournisseurs).padStart(4, '0');
                 $('fName').value = '';
                 $('fPhone').value = '';
@@ -5062,8 +5019,6 @@
                 $('fBalance').value = '0';
                 $('fNotes').value = '';
                 this.updateSummary();
-                this.renderDirectPayments();
-                $('directFournisseurAmount').value = '';
             },
 
             save() {
@@ -5114,7 +5069,6 @@
                 const f = fournisseurs.find(x => x.id === id);
                 if (!f) return;
                 this.editingId = id;
-                this.directPayments = caisseFournisseurs.filter(cr => cr.fournisseurId === id && (!cr.invoiceNum || cr.invoiceNum === ''));
                 $('fCode').value = 'FR-' + String(id).padStart(4, '0');
                 $('fName').value = f.name;
                 $('fPhone').value = f.phone || '';
@@ -5125,8 +5079,6 @@
                 $('fBalance').value = f.balance || 0;
                 $('fNotes').value = f.notes || '';
                 this.updateSummary();
-                this.renderDirectPayments();
-                $('directFournisseurAmount').value = '';
                 openSheet('fournisseurs');
             },
 
@@ -5149,123 +5101,6 @@
                 document.getElementById('fDisplayTotalPurchases').textContent = totalPurchases.toFixed(3);
                 document.getElementById('fDisplayTotalPayments').textContent = totalPayments.toFixed(3);
                 document.getElementById('fDisplayBalance').textContent = currentBalance.toFixed(3);
-            },
-
-            renderDirectPayments() {
-                const container = document.getElementById('directFournisseurPaymentsList');
-                if (!container) return;
-                if (this.directPayments.length === 0) {
-                    container.innerHTML = '<div class="empty-msg" style="font-size:9px;padding:4px 0;">💳 Aucun paiement direct</div>';
-                    return;
-                }
-                container.innerHTML = '';
-                this.directPayments.forEach((p, idx) => {
-                    const div = document.createElement('div');
-                    div.className = 'payment-item';
-                    div.innerHTML = `
-                        <span class="method">${p.regType || 'Espèces'}</span>
-                        <span class="amount">${p.amount.toFixed(3)} TND</span>
-                        <span style="font-size:8px;color:var(--muted);">${p.date}</span>
-                        <span class="edit-payment" onclick="Fournisseurs.editDirectPayment(${idx})">✏️</span>
-                        <span class="delete-payment" onclick="Fournisseurs.deleteDirectPayment(${idx})">✕</span>
-                    `;
-                    container.appendChild(div);
-                });
-            },
-
-            addDirectPayment() {
-                const amount = parseFloat($('directFournisseurAmount').value) || 0;
-                if (amount <= 0) {
-                    showToastModern('⚠️ Veuillez saisir un montant valide', 'warning');
-                    return;
-                }
-                const method = $('directFournisseurMethod').value;
-                const date = new Date().toISOString().slice(0, 10);
-                const supplier = fournisseurs.find(f => f.id === this.editingId);
-                if (!supplier) {
-                    showToastModern('⚠️ Fournisseur non chargé', 'warning');
-                    return;
-                }
-                const reglementId = nextId.reglements++;
-                const cRec = {
-                    id: nextId.caisseFournisseurs++,
-                    date: date,
-                    fournisseurId: supplier.id,
-                    fournisseurName: supplier.name,
-                    type: 'out',
-                    amount: amount,
-                    regType: method,
-                    description: 'Paiement direct (sans facture)',
-                    invoiceId: null,
-                    invoiceNum: '',
-                    reglementId: reglementId
-                };
-                caisseFournisseurs.push(cRec);
-                recalculateFournisseurBalance(supplier.name);
-                saveState();
-                this.directPayments.push(cRec);
-                this.renderDirectPayments();
-                this.updateSummary();
-                $('directFournisseurAmount').value = '';
-                showToastModern(`✅ Paiement direct de ${amount.toFixed(3)} TND`, 'success');
-                if (window.FournisseurHistory && FournisseurHistory.currentFournisseurId === supplier.id) {
-                    FournisseurHistory.show();
-                }
-            },
-
-            editDirectPayment(index) {
-                const payment = this.directPayments[index];
-                if (!payment) {
-                    showToastModern('⚠️ Défense non trouvée', 'warning');
-                    return;
-                }
-                
-                const newAmount = prompt('Modifier le montant (TND):', payment.amount);
-                if (newAmount === null) return;
-                const amount = parseFloat(newAmount);
-                if (isNaN(amount) || amount <= 0) {
-                    showToastModern('⚠️ Montant invalide', 'warning');
-                    return;
-                }
-                
-                const newMethod = prompt('Méthode de paiement (Espèces/Chèque/Virement/Carte):', payment.regType || 'Espèces');
-                if (newMethod === null) return;
-                
-                const caisseRec = caisseFournisseurs.find(cr => cr.reglementId === payment.reglementId);
-                if (caisseRec) {
-                    caisseRec.amount = amount;
-                    caisseRec.regType = newMethod;
-                    
-                    const supplier = fournisseurs.find(f => f.id === this.editingId);
-                    if (supplier) {
-                        recalculateFournisseurBalance(supplier.name);
-                    }
-                    saveState();
-                    this.directPayments = caisseFournisseurs.filter(cr => cr.fournisseurId === this.editingId && (!cr.invoiceNum || cr.invoiceNum === ''));
-                    this.renderDirectPayments();
-                    this.updateSummary();
-                    showToastModern('✅ Défense directe modifiée', 'success');
-                    if (window.FournisseurHistory && FournisseurHistory.currentFournisseurId === this.editingId) {
-                        FournisseurHistory.show();
-                    }
-                }
-            },
-
-            deleteDirectPayment(index) {
-                const payment = this.directPayments[index];
-                if (!payment) return;
-                if (!confirm(`Supprimer ce paiement direct de ${payment.amount.toFixed(3)} TND ?`)) return;
-                caisseFournisseurs = caisseFournisseurs.filter(cr => cr.reglementId !== payment.reglementId);
-                this.directPayments.splice(index, 1);
-                const supplier = fournisseurs.find(f => f.id === this.editingId);
-                if (supplier) recalculateFournisseurBalance(supplier.name);
-                saveState();
-                this.renderDirectPayments();
-                this.updateSummary();
-                showToastModern('🗑️ Paiement direct supprimé', 'success');
-                if (window.FournisseurHistory && FournisseurHistory.currentFournisseurId === supplier?.id) {
-                    FournisseurHistory.show();
-                }
             },
 
             render() {
@@ -5416,22 +5251,44 @@
             }
         };
 
-        // ===== CLIENT HISTORY =====
+        // ===== CLIENT HISTORY (avec liste des factures) =====
         const ClientHistory = {
             currentClientId: null,
             render() {
                 const container = $('clientHistoryContent');
                 if (!container) return;
-                let html =
-                    `<div class="field"><label>Choisir le client</label><select id="historyClientSelect" onchange="ClientHistory.show()">`;
-                html += `<option value="">-- Choisir --</option>`;
-                clients.forEach(c => { html += `<option value="${c.id}">${c.name}</option>`; });
-                html += `</select></div><div id="clientHistoryResult"></div>`;
+                const today = new Date();
+                const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+                let html = `
+                    <div class="field-row-2">
+                        <div class="field">
+                            <label>📅 Date de début</label>
+                            <input type="date" id="clientHistoryFrom" value="${firstDay.toISOString().slice(0,10)}" onchange="ClientHistory.show()">
+                        </div>
+                        <div class="field">
+                            <label>📅 Date de fin</label>
+                            <input type="date" id="clientHistoryTo" value="${today.toISOString().slice(0,10)}" onchange="ClientHistory.show()">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Choisir le client</label>
+                        <select id="historyClientSelect" onchange="ClientHistory.show()">
+                            <option value="">-- Choisir --</option>
+                            ${clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div id="clientHistoryResult"></div>
+                `;
                 container.innerHTML = html;
+                setTimeout(() => this.show(), 100);
             },
             show() {
                 const select = $('historyClientSelect');
                 const result = $('clientHistoryResult');
+                const dateFrom = new Date($('clientHistoryFrom').value);
+                const dateTo = new Date($('clientHistoryTo').value);
+                dateTo.setHours(23, 59, 59);
+                
                 if (!select || !result) return;
                 const clientId = parseInt(select.value);
                 if (!clientId) {
@@ -5445,8 +5302,14 @@
                     return;
                 }
                 recalculateClientBalance(client.name);
-                const clientVentes = ventes.filter(v => v.client === client.name);
+                
+                const clientVentes = ventes.filter(v => {
+                    if (v.client !== client.name) return false;
+                    const vDate = new Date(v.date);
+                    return vDate >= dateFrom && vDate <= dateTo;
+                });
                 const clientReglements = caisseClients.filter(r => r.clientName === client.name);
+                
                 const sortedVentes = [...clientVentes].sort((a, b) => {
                     return a.date < b.date ? -1 : a.date > b.date ? 1 : 0;
                 });
@@ -5455,51 +5318,117 @@
                 const totalPaid = clientReglements.reduce((sum, r) => sum + r.amount, 0);
                 const openingBalance = client.openingBalance || 0;
                 const currentBalance = client.balance || 0;
-                let html = `<div class="client-summary-card">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;">
-                        <div><span class="label">👤 العميل :</span> <span class="value">${client.name}</span></div>
-                        <div><span class="label">📞 الهاتف :</span> <span class="value">${client.phone || '-'}</span></div>
-                        <div><span class="label">📧 البريد الإلكتروني :</span> <span class="value">${client.email || '-'}</span></div>
-                        <div><span class="label">📄 عدد الفواتير :</span> <span class="value">${totalInvoices}</span></div>
-                        <div><span class="label">💰 إجمالي المشتريات :</span> <span class="value positive">${totalPurchases.toFixed(3)} د.ت</span></div>
-                        <div><span class="label">💳 إجمالي المدفوعات :</span> <span class="value" style="color:#5c7cf0;">${totalPaid.toFixed(3)} د.ت</span></div>
-                        <div><span class="label">📊 الرصيد الحالي :</span> <span class="value ${currentBalance >= 0 ? 'positive' : 'negative'}">${currentBalance.toFixed(3)} د.ت</span></div>
+                
+                let html = `
+                    <!-- ===== CARTE RÉSUMÉ ===== -->
+                    <div style="background:linear-gradient(135deg, var(--secondary), #2a3f7a);color:#fff;padding:14px;border-radius:14px;margin-bottom:10px;box-shadow:0 4px 20px rgba(26,42,92,0.3);">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;">
+                            <div><span style="opacity:0.7;">👤 العميل :</span> <span style="font-weight:700;">${client.name}</span></div>
+                            <div><span style="opacity:0.7;">📞 الهاتف :</span> <span style="font-weight:700;">${client.phone || '-'}</span></div>
+                            <div><span style="opacity:0.7;">📧 البريد الإلكتروني :</span> <span style="font-weight:700;">${client.email || '-'}</span></div>
+                            <div><span style="opacity:0.7;">📄 عدد الفواتير :</span> <span style="font-weight:700;">${totalInvoices}</span></div>
+                            <div><span style="opacity:0.7;">💰 إجمالي المشتريات :</span> <span style="font-weight:700;color:#4dbf8c;">${formatNum(totalPurchases)} د.ت</span></div>
+                            <div><span style="opacity:0.7;">💳 إجمالي المدفوعات :</span> <span style="font-weight:700;color:#5c7cf0;">${formatNum(totalPaid)} د.ت</span></div>
+                            <div><span style="opacity:0.7;">📊 الرصيد الحالي :</span> <span style="font-weight:700;color:${currentBalance >= 0 ? '#4dbf8c' : '#ff6b6b'};">${formatNum(currentBalance)} د.ت</span></div>
+                            <div><span style="opacity:0.7;">📅 الفترة :</span> <span style="font-weight:700;">${formatDate(dateFrom.toISOString().slice(0,10))} → ${formatDate(dateTo.toISOString().slice(0,10))}</span></div>
+                        </div>
                     </div>
-                </div>`;
-                html += `<div class="balance-display">
-                    <div class="item"><span class="label">رصيد البداية</span><span class="value opening">${openingBalance.toFixed(3)} د.ت</span></div>
-                    <div class="item"><span class="label">الرصيد النهائي</span><span class="value closing">${currentBalance.toFixed(3)} د.ت</span></div>
-                </div>`;
-                html += `<div class="history-actions">
-                    <button class="btn print small" onclick="printStatement('client', ${clientId})">🖨️ طباعة السجل</button>
-                    <button class="btn save small" onclick="recalculateClientBalance('${client.name}'); ClientHistory.show();">🔄 تحديث الرصيد</button>
-                </div>`;
-                html += `<div class="history-table-wrapper">
-                    <table class="history-table" style="min-width:650px;font-size:8px;">
-                        <thead>
-                            <tr>
-                                <th>التاريخ</th>
-                                <th>رقم الفاتورة</th>
-                                <th>البيان</th>
-                                <th>المبلغ</th>
-                                <th>المدفوع</th>
-                                <th>المتبقي</th>
-                                <th>الرصيد</th>
-                            </tr>
-                        </thead>
-                        <tbody>`;
-                if (totalInvoices === 0 && Math.abs(openingBalance) <= 0.0001 && totalPaid === 0) {
+                    
+                    <!-- ===== رصيد البداية والنهائي ===== -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:4px 0 8px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:8px 12px;box-shadow:var(--shadow);">
+                        <div style="text-align:center;font-size:10px;font-weight:600;">
+                            <span style="color:var(--muted);font-size:8px;display:block;">رصيد البداية</span>
+                            <span style="font-size:13px;font-weight:800;color:var(--primary);">${formatNum(openingBalance)} د.ت</span>
+                        </div>
+                        <div style="text-align:center;font-size:10px;font-weight:600;">
+                            <span style="color:var(--muted);font-size:8px;display:block;">الرصيد النهائي</span>
+                            <span style="font-size:13px;font-weight:800;color:var(--danger);">${formatNum(currentBalance)} د.ت</span>
+                        </div>
+                    </div>
+                    
+                    <!-- ===== أزرار الإجراءات ===== -->
+                    <div style="display:flex;gap:6px;margin:6px 0;flex-wrap:wrap;">
+                        <button class="btn print small" onclick="printStatement('client', ${clientId})" style="flex:1;padding:6px;font-size:10px;min-width:80px;">🖨️ طباعة السجل</button>
+                        <button class="btn save small" onclick="recalculateClientBalance('${client.name}'); ClientHistory.show();" style="flex:1;padding:6px;font-size:10px;min-width:80px;">🔄 تحديث الرصيد</button>
+                    </div>
+                    
+                    <!-- ===== قائمة الفواتير ===== -->
+                    <div class="section-title" style="margin-top:10px;">📋 قائمة الفواتير</div>
+                    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:6px;border-radius:12px;border:1px solid var(--border);background:var(--panel);">
+                        <table style="width:100%;min-width:700px;border-collapse:collapse;font-size:8px;direction:ltr;background:var(--panel);">
+                            <thead>
+                                <tr style="background:var(--secondary);color:#fff;">
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">رقم الفاتورة</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">التاريخ</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المبلغ</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المدفوع</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المتبقي</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">الحالة</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                
+                if (sortedVentes.length === 0) {
+                    html += `<tr><td colspan="7" style="text-align:center;padding:12px;color:var(--muted);font-size:10px;">📭 لا توجد فواتير</td></tr>`;
+                } else {
+                    sortedVentes.forEach(v => {
+                        const invoicePayments = clientReglements.filter(r => r.invoiceNum === v.num);
+                        const paidAmount = invoicePayments.reduce((sum, r) => sum + r.amount, 0);
+                        const remaining = v.total - paidAmount;
+                        let statusText = '✅ مدفوعة';
+                        let statusColor = 'var(--success)';
+                        if (remaining > v.total * 0.9) { statusText = '⏳ غير مدفوعة';
+                            statusColor = 'var(--danger)'; } else if (remaining > 0.001) { statusText = '🔄 جزئياً';
+                            statusColor = 'var(--warning)'; }
+                        
+                        html += `<tr>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:700;">${v.num}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatDate(v.date)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatNum(v.total)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:var(--success);">${formatNum(paidAmount)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:${remaining > 0.001 ? 'var(--danger)' : 'var(--success)'};">${formatNum(remaining)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:${statusColor};font-weight:700;">${statusText}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">
+                                <button class="btn edit small" onclick="ClientHistory.editInvoice('${v.id}')" style="padding:1px 6px;font-size:7px;margin:0 1px;">✏️</button>
+                                <button class="btn save small" onclick="ClientHistory.payInvoice('${v.id}')" style="padding:1px 6px;font-size:7px;margin:0 1px;background:linear-gradient(135deg,var(--success),#27ae60);">💰</button>
+                            </td>
+                        </tr>`;
+                    });
+                }
+                
+                html += `</tbody></table></div>`;
+                
+                // ===== جدول تفصيلي للحركات =====
+                html += `
+                    <div class="section-title" style="margin-top:10px;">📊 تفاصيل الحركات</div>
+                    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:6px;border-radius:12px;border:1px solid var(--border);background:var(--panel);">
+                        <table style="width:100%;min-width:650px;border-collapse:collapse;font-size:8px;direction:ltr;background:var(--panel);">
+                            <thead>
+                                <tr style="background:var(--secondary);color:#fff;">
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">التاريخ</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">رقم الفاتورة</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">البيان</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المبلغ</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المدفوع</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المتبقي</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">الرصيد</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                
+                if (sortedVentes.length === 0 && Math.abs(openingBalance) <= 0.0001 && totalPaid === 0) {
                     html += `<tr><td colspan="7" style="text-align:center;padding:12px;color:var(--muted);font-size:10px;">📭 لا توجد حركات</td></tr>`;
                 } else {
                     let cumulative = openingBalance;
                     html += `<tr style="background:#f0f4ff;">
-                        <td>---</td>
-                        <td>---</td>
-                        <td style="font-weight:700;">رصيد البداية</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td style="font-weight:800;">${openingBalance.toFixed(3)}</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">---</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">---</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:700;">رصيد البداية</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">-</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">-</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">-</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:800;">${formatNum(openingBalance)}</td>
                     </tr>`;
                     sortedVentes.forEach(v => {
                         const invoicePayments = clientReglements.filter(r => r.invoiceNum === v.num);
@@ -5507,35 +5436,72 @@
                         const remaining = v.total - paidAmount;
                         cumulative += remaining;
                         html += `<tr>
-                            <td>${v.date}</td>
-                            <td style="font-weight:700;color:var(--navy);cursor:pointer;" onclick="ClientHistory.showInvoiceDetail('${v.num}')">📄 ${v.num}</td>
-                            <td>فاتورة بيع</td>
-                            <td>${v.total.toFixed(3)}</td>
-                            <td style="color:var(--success);">${paidAmount.toFixed(3)}</td>
-                            <td style="color:${remaining > 0 ? 'var(--danger)' : 'var(--success)'};">${remaining.toFixed(3)}</td>
-                            <td>${cumulative.toFixed(3)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatDate(v.date)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:700;cursor:pointer;" onclick="ClientHistory.showInvoiceDetail('${v.num}')">📄 ${v.num}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">فاتورة بيع</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatNum(v.total)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:var(--success);">${formatNum(paidAmount)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:${remaining > 0 ? 'var(--danger)' : 'var(--success)'};">${formatNum(remaining)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:800;">${formatNum(cumulative)}</td>
                         </tr>`;
                     });
                     const directPayments = clientReglements.filter(r => !r.invoiceNum || r.invoiceNum === '');
                     directPayments.forEach(p => {
                         cumulative -= p.amount;
                         html += `<tr style="background:#f0fff0;">
-                            <td>${p.date}</td>
-                            <td>---</td>
-                            <td>💳 Paiement direct</td>
-                            <td></td>
-                            <td style="color:var(--success);">${p.amount.toFixed(3)}</td>
-                            <td></td>
-                            <td>${cumulative.toFixed(3)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatDate(p.date)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">---</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">💳 Paiement direct</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;"></td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:var(--success);">${formatNum(p.amount)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;"></td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:800;">${formatNum(cumulative)}</td>
                         </tr>`;
                     });
                 }
                 html += `</tbody></table></div>`;
+                
                 result.innerHTML = html;
             },
+            
+            // تعديل الفاتورة
+            editInvoice(invoiceId) {
+                const invoice = ventes.find(v => v.id === invoiceId);
+                if (!invoice) {
+                    showToastModern('❌ الفاتورة غير موجودة', 'error');
+                    return;
+                }
+                Ventes.load(invoice.id);
+                openSheet('ventes');
+            },
+            
+            // تسديد دفعة للفاتورة
+            payInvoice(invoiceId) {
+                const invoice = ventes.find(v => v.id === invoiceId);
+                if (!invoice) {
+                    showToastModern('❌ الفاتورة غير موجودة', 'error');
+                    return;
+                }
+                Ventes.load(invoice.id);
+                openSheet('ventes');
+                setTimeout(() => {
+                    const regAmount = document.getElementById('vRegAmount');
+                    if (regAmount) {
+                        regAmount.focus();
+                        regAmount.select();
+                        const paid = (invoice.reglements || []).reduce((s, r) => s + r.amount, 0);
+                        showToastModern(`💰 تسديد فاتورة ${invoice.num} - المتبقي: ${(invoice.total - paid).toFixed(3)} د.ت`, 'info');
+                    }
+                }, 500);
+            },
+            
+            // عرض تفاصيل الفاتورة
             showInvoiceDetail(invoiceNum) {
                 const invoice = ventes.find(v => v.num === invoiceNum);
-                if (!invoice) { showToast('Facture introuvable'); return; }
+                if (!invoice) {
+                    showToastModern('❌ الفاتورة غير موجودة', 'error');
+                    return;
+                }
                 Ventes.load(invoice.id);
                 openSheet('ventes');
             }
@@ -5547,16 +5513,38 @@
             render() {
                 const container = $('fournisseurHistoryContent');
                 if (!container) return;
-                let html =
-                    `<div class="field"><label>Choisir le fournisseur</label><select id="historyFournisseurSelect" onchange="FournisseurHistory.show()">`;
-                html += `<option value="">-- Choisir --</option>`;
-                fournisseurs.forEach(f => { html += `<option value="${f.id}">${f.name}</option>`; });
-                html += `</select></div><div id="fournisseurHistoryResult"></div>`;
+                const today = new Date();
+                const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+                let html = `
+                    <div class="field-row-2">
+                        <div class="field">
+                            <label>📅 Date de début</label>
+                            <input type="date" id="fournisseurHistoryFrom" value="${firstDay.toISOString().slice(0,10)}" onchange="FournisseurHistory.show()">
+                        </div>
+                        <div class="field">
+                            <label>📅 Date de fin</label>
+                            <input type="date" id="fournisseurHistoryTo" value="${today.toISOString().slice(0,10)}" onchange="FournisseurHistory.show()">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Choisir le fournisseur</label>
+                        <select id="historyFournisseurSelect" onchange="FournisseurHistory.show()">
+                            <option value="">-- Choisir --</option>
+                            ${fournisseurs.map(f => `<option value="${f.id}">${f.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div id="fournisseurHistoryResult"></div>
+                `;
                 container.innerHTML = html;
+                setTimeout(() => this.show(), 100);
             },
             show() {
                 const select = $('historyFournisseurSelect');
                 const result = $('fournisseurHistoryResult');
+                const dateFrom = new Date($('fournisseurHistoryFrom').value);
+                const dateTo = new Date($('fournisseurHistoryTo').value);
+                dateTo.setHours(23, 59, 59);
+                
                 if (!select || !result) return;
                 const fournisseurId = parseInt(select.value);
                 if (!fournisseurId) {
@@ -5570,8 +5558,14 @@
                     return;
                 }
                 recalculateFournisseurBalance(fournisseur.name);
-                const fournisseurAchats = achats.filter(a => a.supplier === fournisseur.name);
+                
+                const fournisseurAchats = achats.filter(a => {
+                    if (a.supplier !== fournisseur.name) return false;
+                    const aDate = new Date(a.date);
+                    return aDate >= dateFrom && aDate <= dateTo;
+                });
                 const fournisseurPayments = caisseFournisseurs.filter(p => p.fournisseurName === fournisseur.name);
+                
                 const sortedAchats = [...fournisseurAchats].sort((a, b) => {
                     return a.date < b.date ? -1 : a.date > b.date ? 1 : 0;
                 });
@@ -5580,50 +5574,113 @@
                 const totalPaid = fournisseurPayments.reduce((sum, p) => sum + p.amount, 0);
                 const openingBalance = fournisseur.openingBalance || 0;
                 const currentBalance = fournisseur.balance || 0;
-                let html = `<div class="client-summary-card">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;">
-                        <div><span class="label">🤝 المورد :</span> <span class="value">${fournisseur.name}</span></div>
-                        <div><span class="label">📞 الهاتف :</span> <span class="value">${fournisseur.phone || '-'}</span></div>
-                        <div><span class="label">📄 عدد الفواتير :</span> <span class="value">${totalInvoices}</span></div>
-                        <div><span class="label">💰 إجمالي المشتريات :</span> <span class="value positive">${totalPurchases.toFixed(3)} د.ت</span></div>
-                        <div><span class="label">💳 إجمالي المدفوعات :</span> <span class="value" style="color:#5c7cf0;">${totalPaid.toFixed(3)} د.ت</span></div>
-                        <div><span class="label">📊 الرصيد الحالي :</span> <span class="value ${currentBalance >= 0 ? 'positive' : 'negative'}">${currentBalance.toFixed(3)} د.ت</span></div>
+                
+                let html = `
+                    <div style="background:linear-gradient(135deg, var(--secondary), #2a3f7a);color:#fff;padding:14px;border-radius:14px;margin-bottom:10px;box-shadow:0 4px 20px rgba(26,42,92,0.3);">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;">
+                            <div><span style="opacity:0.7;">🤝 المورد :</span> <span style="font-weight:700;">${fournisseur.name}</span></div>
+                            <div><span style="opacity:0.7;">📞 الهاتف :</span> <span style="font-weight:700;">${fournisseur.phone || '-'}</span></div>
+                            <div><span style="opacity:0.7;">📄 عدد الفواتير :</span> <span style="font-weight:700;">${totalInvoices}</span></div>
+                            <div><span style="opacity:0.7;">📍 العنوان :</span> <span style="font-weight:700;">${fournisseur.address || '-'}</span></div>
+                            <div><span style="opacity:0.7;">💰 إجمالي المشتريات :</span> <span style="font-weight:700;color:#4dbf8c;">${formatNum(totalPurchases)} د.ت</span></div>
+                            <div><span style="opacity:0.7;">💳 إجمالي المدفوعات :</span> <span style="font-weight:700;color:#5c7cf0;">${formatNum(totalPaid)} د.ت</span></div>
+                            <div><span style="opacity:0.7;">📊 الرصيد الحالي :</span> <span style="font-weight:700;color:${currentBalance >= 0 ? '#4dbf8c' : '#ff6b6b'};">${formatNum(currentBalance)} د.ت</span></div>
+                            <div><span style="opacity:0.7;">📅 الفترة :</span> <span style="font-weight:700;">${formatDate(dateFrom.toISOString().slice(0,10))} → ${formatDate(dateTo.toISOString().slice(0,10))}</span></div>
+                        </div>
                     </div>
-                </div>`;
-                html += `<div class="balance-display">
-                    <div class="item"><span class="label">رصيد البداية</span><span class="value opening">${openingBalance.toFixed(3)} د.ت</span></div>
-                    <div class="item"><span class="label">الرصيد النهائي</span><span class="value closing">${currentBalance.toFixed(3)} د.ت</span></div>
-                </div>`;
-                html += `<div class="history-actions">
-                    <button class="btn print small" onclick="printStatement('fournisseur', ${fournisseurId})">🖨️ طباعة السجل</button>
-                    <button class="btn save small" onclick="recalculateFournisseurBalance('${fournisseur.name}'); FournisseurHistory.show();">🔄 تحديث الرصيد</button>
-                </div>`;
-                html += `<div class="history-table-wrapper">
-                    <table class="history-table" style="min-width:650px;font-size:8px;">
-                        <thead>
-                            <tr>
-                                <th>التاريخ</th>
-                                <th>رقم الفاتورة</th>
-                                <th>البيان</th>
-                                <th>المبلغ</th>
-                                <th>المدفوع</th>
-                                <th>المتبقي</th>
-                                <th>الرصيد</th>
-                            </tr>
-                        </thead>
-                        <tbody>`;
-                if (totalInvoices === 0 && Math.abs(openingBalance) <= 0.0001 && totalPaid === 0) {
+                    
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:4px 0 8px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:8px 12px;box-shadow:var(--shadow);">
+                        <div style="text-align:center;font-size:10px;font-weight:600;">
+                            <span style="color:var(--muted);font-size:8px;display:block;">رصيد البداية</span>
+                            <span style="font-size:13px;font-weight:800;color:var(--primary);">${formatNum(openingBalance)} د.ت</span>
+                        </div>
+                        <div style="text-align:center;font-size:10px;font-weight:600;">
+                            <span style="color:var(--muted);font-size:8px;display:block;">الرصيد النهائي</span>
+                            <span style="font-size:13px;font-weight:800;color:var(--danger);">${formatNum(currentBalance)} د.ت</span>
+                        </div>
+                    </div>
+                    
+                    <div style="display:flex;gap:6px;margin:6px 0;flex-wrap:wrap;">
+                        <button class="btn print small" onclick="printStatement('fournisseur', ${fournisseurId})" style="flex:1;padding:6px;font-size:10px;min-width:80px;">🖨️ طباعة السجل</button>
+                        <button class="btn save small" onclick="recalculateFournisseurBalance('${fournisseur.name}'); FournisseurHistory.show();" style="flex:1;padding:6px;font-size:10px;min-width:80px;">🔄 تحديث الرصيد</button>
+                    </div>
+                    
+                    <div class="section-title" style="margin-top:10px;">📋 قائمة الفواتير</div>
+                    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:6px;border-radius:12px;border:1px solid var(--border);background:var(--panel);">
+                        <table style="width:100%;min-width:700px;border-collapse:collapse;font-size:8px;direction:ltr;background:var(--panel);">
+                            <thead>
+                                <tr style="background:var(--secondary);color:#fff;">
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">رقم الفاتورة</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">التاريخ</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المبلغ</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المدفوع</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المتبقي</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">الحالة</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                
+                if (sortedAchats.length === 0) {
+                    html += `<tr><td colspan="7" style="text-align:center;padding:12px;color:var(--muted);font-size:10px;">📭 لا توجد فواتير</td></tr>`;
+                } else {
+                    sortedAchats.forEach(a => {
+                        const invoicePayments = fournisseurPayments.filter(p => p.invoiceNum === a.num);
+                        const paidAmount = invoicePayments.reduce((sum, r) => sum + r.amount, 0);
+                        const remaining = a.total - paidAmount;
+                        let statusText = '✅ مدفوعة';
+                        let statusColor = 'var(--success)';
+                        if (remaining > a.total * 0.9) { statusText = '⏳ غير مدفوعة';
+                            statusColor = 'var(--danger)'; } else if (remaining > 0.001) { statusText = '🔄 جزئياً';
+                            statusColor = 'var(--warning)'; }
+                        
+                        html += `<tr>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:700;">${a.num}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatDate(a.date)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatNum(a.total)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:var(--success);">${formatNum(paidAmount)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:${remaining > 0.001 ? 'var(--danger)' : 'var(--success)'};">${formatNum(remaining)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:${statusColor};font-weight:700;">${statusText}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">
+                                <button class="btn edit small" onclick="FournisseurHistory.editInvoice('${a.id}')" style="padding:1px 6px;font-size:7px;margin:0 1px;">✏️</button>
+                                <button class="btn save small" onclick="FournisseurHistory.payInvoice('${a.id}')" style="padding:1px 6px;font-size:7px;margin:0 1px;background:linear-gradient(135deg,var(--success),#27ae60);">💰</button>
+                            </td>
+                        </tr>`;
+                    });
+                }
+                
+                html += `</tbody></table></div>`;
+                
+                // ===== جدول تفصيلي للحركات =====
+                html += `
+                    <div class="section-title" style="margin-top:10px;">📊 تفاصيل الحركات</div>
+                    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:6px;border-radius:12px;border:1px solid var(--border);background:var(--panel);">
+                        <table style="width:100%;min-width:650px;border-collapse:collapse;font-size:8px;direction:ltr;background:var(--panel);">
+                            <thead>
+                                <tr style="background:var(--secondary);color:#fff;">
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">التاريخ</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">رقم الفاتورة</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">البيان</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المبلغ</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المدفوع</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المتبقي</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">الرصيد</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                
+                if (sortedAchats.length === 0 && Math.abs(openingBalance) <= 0.0001 && totalPaid === 0) {
                     html += `<tr><td colspan="7" style="text-align:center;padding:12px;color:var(--muted);font-size:10px;">📭 لا توجد حركات</td></tr>`;
                 } else {
                     let cumulative = openingBalance;
                     html += `<tr style="background:#f0f4ff;">
-                        <td>---</td>
-                        <td>---</td>
-                        <td style="font-weight:700;">رصيد البداية</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td style="font-weight:800;">${openingBalance.toFixed(3)}</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">---</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">---</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:700;">رصيد البداية</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">-</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">-</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">-</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:800;">${formatNum(openingBalance)}</td>
                     </tr>`;
                     sortedAchats.forEach(a => {
                         const invoicePayments = fournisseurPayments.filter(p => p.invoiceNum === a.num);
@@ -5631,35 +5688,69 @@
                         const remaining = a.total - paidAmount;
                         cumulative += remaining;
                         html += `<tr>
-                            <td>${a.date}</td>
-                            <td style="font-weight:700;color:var(--navy);cursor:pointer;" onclick="FournisseurHistory.showInvoiceDetail('${a.num}')">📄 ${a.num}</td>
-                            <td>فاتورة شراء</td>
-                            <td>${a.total.toFixed(3)}</td>
-                            <td style="color:var(--success);">${paidAmount.toFixed(3)}</td>
-                            <td style="color:${remaining > 0 ? 'var(--danger)' : 'var(--success)'};">${remaining.toFixed(3)}</td>
-                            <td>${cumulative.toFixed(3)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatDate(a.date)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:700;cursor:pointer;" onclick="FournisseurHistory.showInvoiceDetail('${a.num}')">📄 ${a.num}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">فاتورة شراء</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatNum(a.total)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:var(--success);">${formatNum(paidAmount)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:${remaining > 0 ? 'var(--danger)' : 'var(--success)'};">${formatNum(remaining)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:800;">${formatNum(cumulative)}</td>
                         </tr>`;
                     });
                     const directPayments = fournisseurPayments.filter(p => !p.invoiceNum || p.invoiceNum === '');
                     directPayments.forEach(p => {
                         cumulative -= p.amount;
                         html += `<tr style="background:#fff0f0;">
-                            <td>${p.date}</td>
-                            <td>---</td>
-                            <td>💳 Paiement direct</td>
-                            <td></td>
-                            <td style="color:var(--success);">${p.amount.toFixed(3)}</td>
-                            <td></td>
-                            <td>${cumulative.toFixed(3)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatDate(p.date)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">---</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">💳 Paiement direct</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;"></td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:var(--success);">${formatNum(p.amount)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;"></td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:800;">${formatNum(cumulative)}</td>
                         </tr>`;
                     });
                 }
                 html += `</tbody></table></div>`;
+                
                 result.innerHTML = html;
             },
+            
+            editInvoice(invoiceId) {
+                const invoice = achats.find(a => a.id === invoiceId);
+                if (!invoice) {
+                    showToastModern('❌ الفاتورة غير موجودة', 'error');
+                    return;
+                }
+                Achats.load(invoice.id);
+                openSheet('achats');
+            },
+            
+            payInvoice(invoiceId) {
+                const invoice = achats.find(a => a.id === invoiceId);
+                if (!invoice) {
+                    showToastModern('❌ الفاتورة غير موجودة', 'error');
+                    return;
+                }
+                Achats.load(invoice.id);
+                openSheet('achats');
+                setTimeout(() => {
+                    const regAmount = document.getElementById('pRegAmount');
+                    if (regAmount) {
+                        regAmount.focus();
+                        regAmount.select();
+                        const paid = (invoice.reglements || []).reduce((s, r) => s + r.amount, 0);
+                        showToastModern(`💰 تسديد فاتورة ${invoice.num} - المتبقي: ${(invoice.total - paid).toFixed(3)} د.ت`, 'info');
+                    }
+                }, 500);
+            },
+            
             showInvoiceDetail(invoiceNum) {
                 const invoice = achats.find(a => a.num === invoiceNum);
-                if (!invoice) { showToast('Facture introuvable'); return; }
+                if (!invoice) {
+                    showToastModern('❌ الفاتورة غير موجودة', 'error');
+                    return;
+                }
                 Achats.load(invoice.id);
                 openSheet('achats');
             }
@@ -5671,19 +5762,25 @@
             render() {
                 const container = $('articleHistoryContent');
                 if (!container) return;
-                let html =
-                    `<div class="article-history-filter"><div class="field"><label>Choisir l'article</label><select id="articleHistorySelect" onchange="ArticleHistory.show()"><option value="">-- Choisir --</option>${articles.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select></div><div class="field"><label>Date de début</label><input type="date" id="articleDateFrom" onchange="ArticleHistory.show()"></div><div class="field"><label>Date de fin</label><input type="date" id="articleDateTo" onchange="ArticleHistory.show()"></div></div><div id="articleHistoryResult"></div>`;
-                container.innerHTML = html;
                 const today = new Date();
-                const from = new Date();
-                from.setMonth(from.getMonth() - 1);
-                document.getElementById('articleDateFrom').value = from.toISOString().slice(0, 10);
-                document.getElementById('articleDateTo').value = today.toISOString().slice(0, 10);
+                const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+                let html =
+                    `<div class="field-row-2">
+                        <div class="field"><label>📅 Date de début</label><input type="date" id="articleHistoryFrom" value="${firstDay.toISOString().slice(0,10)}" onchange="ArticleHistory.show()"></div>
+                        <div class="field"><label>📅 Date de fin</label><input type="date" id="articleHistoryTo" value="${today.toISOString().slice(0,10)}" onchange="ArticleHistory.show()"></div>
+                    </div>
+                    <div class="field"><label>Choisir l'article</label><select id="articleHistorySelect" onchange="ArticleHistory.show()"><option value="">-- Choisir --</option>${articles.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}</select></div>
+                    <div id="articleHistoryResult"></div>`;
+                container.innerHTML = html;
                 setTimeout(() => this.show(), 100);
             },
             show() {
                 const select = $('articleHistorySelect');
                 const result = $('articleHistoryResult');
+                const dateFrom = new Date($('articleHistoryFrom').value);
+                const dateTo = new Date($('articleHistoryTo').value);
+                dateTo.setHours(23, 59, 59);
+                
                 if (!select || !result) return;
                 const articleId = parseInt(select.value);
                 if (!articleId) { result.innerHTML =
@@ -5691,9 +5788,7 @@
                 this.currentArticleId = articleId;
                 const article = articles.find(a => a.id === articleId);
                 if (!article) { result.innerHTML = '<div class="empty-msg">Article introuvable</div>'; return; }
-                const dateFrom = new Date($('articleDateFrom').value);
-                const dateTo = new Date($('articleDateTo').value);
-                dateTo.setHours(23, 59, 59);
+                
                 let movements = [];
                 ventes.forEach(v => {
                     const vDate = new Date(v.date);
@@ -5722,31 +5817,64 @@
                 const totalIn = movements.filter(m => m.qty > 0).reduce((s, m) => s + m.qty, 0);
                 const totalOut = movements.filter(m => m.qty < 0).reduce((s, m) => s + Math.abs(m.qty), 0);
                 const stockDepart = article.stockDepart !== undefined ? article.stockDepart : (article.stock || 0);
+                
                 let html =
-                    `<div class="client-summary-card"><div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:6px;font-size:11px;">
-          <div><span class="label">📦 Article :</span> <span class="value">${article.name}</span></div>
-          <div><span class="label">📅 Période :</span> <span class="value">${dateFrom.toLocaleDateString('fr')} → ${dateTo.toLocaleDateString('fr')}</span></div>
-          <div><span class="label">📥 Entrées :</span> <span class="value positive">${totalIn}</span></div>
-          <div><span class="label">📤 Sorties :</span> <span class="value negative">${totalOut}</span></div>
-          <div><span class="label">📊 Stock départ :</span> <span class="value opening">${stockDepart}</span></div>
-          <div><span class="label">📊 Stock actuel :</span> <span class="value closing">${article.stock}</span></div>
-        </div></div>`;
-                html +=
-                    `<div class="history-actions"><button class="btn print small" onclick="printStatement('article', ${articleId})">🖨️ Imprimer le rapport</button></div>`;
-                html +=
-                    `<div class="history-table-wrapper"><table class="history-table" style="min-width:650px;font-size:8px;"><thead><tr><th>Date</th><th>Document</th><th>Type</th><th>Partie</th><th>Qté</th><th>Prix</th><th>Total</th><th>Solde</th></tr></thead><tbody>`;
+                    `<div style="background:linear-gradient(135deg, var(--secondary), #2a3f7a);color:#fff;padding:14px;border-radius:14px;margin-bottom:10px;box-shadow:0 4px 20px rgba(26,42,92,0.3);">
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:6px;font-size:11px;">
+                            <div><span style="opacity:0.7;">📦 Article :</span> <span style="font-weight:700;">${article.name}</span></div>
+                            <div><span style="opacity:0.7;">📅 الفترة :</span> <span style="font-weight:700;">${formatDate(dateFrom.toISOString().slice(0,10))} → ${formatDate(dateTo.toISOString().slice(0,10))}</span></div>
+                            <div><span style="opacity:0.7;">📥 المدخلات :</span> <span style="font-weight:700;color:#4dbf8c;">${totalIn}</span></div>
+                            <div><span style="opacity:0.7;">📤 المخرجات :</span> <span style="font-weight:700;color:#ff6b6b;">${totalOut}</span></div>
+                            <div><span style="opacity:0.7;">📊 المخزون الحالي :</span> <span style="font-weight:700;color:#5c7cf0;">${article.stock}</span></div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:6px;margin:6px 0;">
+                        <button class="btn print small" onclick="printStatement('article', ${articleId})" style="flex:1;padding:6px;font-size:10px;">🖨️ طباعة التقرير</button>
+                    </div>
+                    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:6px;border-radius:12px;border:1px solid var(--border);background:var(--panel);">
+                        <table style="width:100%;min-width:650px;border-collapse:collapse;font-size:8px;direction:ltr;background:var(--panel);">
+                            <thead>
+                                <tr style="background:var(--secondary);color:#fff;">
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">التاريخ</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">الوثيقة</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">النوع</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">الطرف</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">الكمية</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">السعر</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المجموع</th>
+                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">الرصيد</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
                 if (movements.length === 0) {
-                    html +=
-                        `<tr><td colspan="8" style="text-align:center;padding:12px;color:var(--muted);font-size:10px;">📭 Aucun mouvement</td></tr>`;
+                    html += `<tr><td colspan="8" style="text-align:center;padding:12px;color:var(--muted);font-size:10px;">📭 لا توجد حركات</td></tr>`;
                 } else {
                     let cumul = stockDepart;
+                    html += `<tr style="background:#f0f4ff;">
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">---</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">---</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:700;">المخزون الابتدائي</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">-</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:700;">${cumul}</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">-</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">-</td>
+                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:800;">${cumul}</td>
+                    </tr>`;
                     movements.forEach(m => {
                         cumul += m.qty;
-                        const typeLabel = m.type === 'vente' ? 'Vente' : 'Achat';
+                        const typeLabel = m.type === 'vente' ? '📤 Vente' : '📥 Achat';
                         const qtyDisplay = m.qty > 0 ? '+' + m.qty : m.qty;
                         const color = m.qty > 0 ? 'var(--success)' : 'var(--danger)';
-                        html +=
-                            `<tr><td>${m.date}</td><td style="font-weight:700;color:var(--navy);">${m.docNum}</td><td>${typeLabel}</td><td>${m.party}</td><td style="color:${color};font-weight:700;">${qtyDisplay}</td><td>${m.price.toFixed(3)}</td><td>${m.total.toFixed(3)}</td><td style="font-weight:800;">${cumul}</td></tr>`;
+                        html += `<tr>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatDate(m.date)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:700;">${m.docNum}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${typeLabel}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${m.party}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:${color};font-weight:700;">${qtyDisplay}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatNum(m.price)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatNum(m.total)}</td>
+                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:800;">${cumul}</td>
+                        </tr>`;
                     });
                 }
                 html += `</tbody></table></div>`;
@@ -6031,56 +6159,6 @@
                 this.updateAccountSummary();
                 $('vRegAmount').value = '';
                 showToastModern('✅ Paiement ajouté', 'success');
-            },
-            addDirectPaymentToInvoice() {
-                const amount = parseFloat($('vRegAmount').value) || 0;
-                if (amount <= 0) {
-                    showToastModern('⚠️ Veuillez saisir un montant valide', 'warning');
-                    return;
-                }
-                const method = $('vRegType').value;
-                const date = new Date().toISOString().slice(0, 10);
-                const clientName = $('vClient').options[$('vClient').selectedIndex]?.textContent || '';
-                if (!clientName) {
-                    showToastModern('⚠️ Veuillez sélectionner un client', 'warning');
-                    return;
-                }
-                const client = clients.find(c => c.name === clientName);
-                if (!client) {
-                    showToastModern('⚠️ Client introuvable', 'error');
-                    return;
-                }
-                const reglementId = nextId.reglements++;
-                const invoiceNum = $('vNum').value;
-                const cRec = {
-                    id: nextId.caisseClients++,
-                    date: date,
-                    clientId: client.id,
-                    clientName: client.name,
-                    type: 'in',
-                    amount: amount,
-                    regType: method,
-                    description: `Paiement direct - Facture ${invoiceNum}`,
-                    invoiceId: this.editingId || null,
-                    invoiceNum: invoiceNum,
-                    reglementId: reglementId,
-                    directPayment: true
-                };
-                caisseClients.push(cRec);
-                this.reglements.push({
-                    id: reglementId,
-                    date,
-                    amount,
-                    method,
-                    directPayment: true,
-                    invoiceNum: invoiceNum
-                });
-                saveState();
-                recalculateClientBalance(client.name);
-                this.renderReglements();
-                this.updateAccountSummary();
-                $('vRegAmount').value = '';
-                showToastModern(`✅ Paiement direct de ${amount.toFixed(3)} TND ajouté à la facture ${invoiceNum}`, 'success');
             },
             deleteReglement(idx) {
                 const removed = this.reglements.splice(idx, 1)[0];
@@ -6707,56 +6785,6 @@
                 $('pRegAmount').value = '';
                 showToastModern('✅ Paiement ajouté', 'success');
             },
-            addDirectPaymentToInvoice() {
-                const amount = parseFloat($('pRegAmount').value) || 0;
-                if (amount <= 0) {
-                    showToastModern('⚠️ Veuillez saisir un montant valide', 'warning');
-                    return;
-                }
-                const method = $('pRegType').value;
-                const date = new Date().toISOString().slice(0, 10);
-                const supplierName = $('pSupplier').options[$('pSupplier').selectedIndex]?.textContent || '';
-                if (!supplierName) {
-                    showToastModern('⚠️ Veuillez sélectionner un fournisseur', 'warning');
-                    return;
-                }
-                const supplier = fournisseurs.find(f => f.name === supplierName);
-                if (!supplier) {
-                    showToastModern('⚠️ Fournisseur introuvable', 'error');
-                    return;
-                }
-                const reglementId = nextId.reglements++;
-                const invoiceNum = $('pNum').value;
-                const cRec = {
-                    id: nextId.caisseFournisseurs++,
-                    date: date,
-                    fournisseurId: supplier.id,
-                    fournisseurName: supplier.name,
-                    type: 'out',
-                    amount: amount,
-                    regType: method,
-                    description: `Paiement direct - Facture ${invoiceNum}`,
-                    invoiceId: this.editingId || null,
-                    invoiceNum: invoiceNum,
-                    reglementId: reglementId,
-                    directPayment: true
-                };
-                caisseFournisseurs.push(cRec);
-                this.reglements.push({
-                    id: reglementId,
-                    date,
-                    amount,
-                    method,
-                    directPayment: true,
-                    invoiceNum: invoiceNum
-                });
-                saveState();
-                recalculateFournisseurBalance(supplier.name);
-                this.renderReglements();
-                this.updateAccountSummary();
-                $('pRegAmount').value = '';
-                showToastModern(`✅ Paiement direct de ${amount.toFixed(3)} TND ajouté à la facture ${invoiceNum}`, 'success');
-            },
             deleteReglement(idx) {
                 const removed = this.reglements.splice(idx, 1)[0];
                 if (!removed) {
@@ -7172,7 +7200,159 @@
                 html += `</tbody></table></div>`;
                 result.innerHTML = html;
             },
-            printReport() { showToast('Impression du rapport de caisse...'); }
+            printReport() {
+                const dateFrom = document.getElementById('caisseDateFrom').value;
+                const dateTo = document.getElementById('caisseDateTo').value;
+                const type = document.getElementById('caisseType').value;
+                const partyFilter = document.getElementById('caisseParty').value;
+                
+                let movements = [];
+                caisseClients.forEach(p => {
+                    if (p.date < dateFrom || p.date > dateTo) return;
+                    if (type === 'fournisseur') return;
+                    if (partyFilter !== 'all' && partyFilter !== 'client_' + p.clientName) return;
+                    movements.push({
+                        date: p.date,
+                        type: 'client',
+                        party: p.clientName,
+                        invoiceNum: p.invoiceNum || '-',
+                        description: p.description || 'Règlement client',
+                        method: p.regType || p.method || 'Espèces',
+                        amount: p.amount,
+                        direction: 'in'
+                    });
+                });
+                caisseFournisseurs.forEach(p => {
+                    if (p.date < dateFrom || p.date > dateTo) return;
+                    if (type === 'client') return;
+                    if (partyFilter !== 'all' && partyFilter !== 'fournisseur_' + p.fournisseurName) return;
+                    movements.push({
+                        date: p.date,
+                        type: 'fournisseur',
+                        party: p.fournisseurName,
+                        invoiceNum: p.invoiceNum || '-',
+                        description: p.description || 'Règlement fournisseur',
+                        method: p.regType || p.method || 'Espèces',
+                        amount: p.amount,
+                        direction: 'out'
+                    });
+                });
+                movements.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+                const totalIn = movements.filter(m => m.direction === 'in').reduce((s, m) => s + m.amount, 0);
+                const totalOut = movements.filter(m => m.direction === 'out').reduce((s, m) => s + m.amount, 0);
+                const balance = totalIn - totalOut;
+                
+                let html = `
+                    <div style="font-family:'Cairo',sans-serif;direction:ltr;padding:20px;max-width:800px;margin:0 auto;">
+                        <div style="text-align:center;border-bottom:3px double #1e2f66;padding-bottom:10px;margin-bottom:15px;">
+                            <h1 style="color:#1e2f66;margin:0;">💰 Rapport de caisse</h1>
+                            <p style="color:#666;margin:5px 0;">${companyInfo.name || 'GTR POS'}</p>
+                            <p style="color:#888;font-size:12px;">Période: ${dateFrom} → ${dateTo}</p>
+                        </div>
+                        
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:15px 0;">
+                            <div style="background:#e8f5e9;padding:10px;border-radius:8px;text-align:center;border-top:3px solid #2ecc71;">
+                                <div style="font-size:14px;font-weight:700;color:#27ae60;">${totalIn.toFixed(3)} TND</div>
+                                <div style="font-size:10px;color:#666;">💰 Total entrées</div>
+                            </div>
+                            <div style="background:#fbe9e7;padding:10px;border-radius:8px;text-align:center;border-top:3px solid #e74c5e;">
+                                <div style="font-size:14px;font-weight:700;color:#c0392b;">${totalOut.toFixed(3)} TND</div>
+                                <div style="font-size:10px;color:#666;">💸 Total sorties</div>
+                            </div>
+                            <div style="background:${balance >= 0 ? '#e8f5e9' : '#fbe9e7'};padding:10px;border-radius:8px;text-align:center;border-top:3px solid ${balance >= 0 ? '#2ecc71' : '#e74c5e'};">
+                                <div style="font-size:14px;font-weight:700;color:${balance >= 0 ? '#27ae60' : '#c0392b'};">${balance.toFixed(3)} TND</div>
+                                <div style="font-size:10px;color:#666;">📊 Solde</div>
+                            </div>
+                        </div>
+                        
+                        <table style="width:100%;border-collapse:collapse;font-size:11px;margin:10px 0;">
+                            <thead>
+                                <tr style="background:#1a2a5c;color:#fff;">
+                                    <th style="padding:8px;border:1px solid #999;text-align:center;">Date</th>
+                                    <th style="padding:8px;border:1px solid #999;text-align:center;">Type</th>
+                                    <th style="padding:8px;border:1px solid #999;text-align:center;">Partie</th>
+                                    <th style="padding:8px;border:1px solid #999;text-align:center;">Facture</th>
+                                    <th style="padding:8px;border:1px solid #999;text-align:center;">Méthode</th>
+                                    <th style="padding:8px;border:1px solid #999;text-align:center;">Libellé</th>
+                                    <th style="padding:8px;border:1px solid #999;text-align:center;">Montant</th>
+                                    <th style="padding:8px;border:1px solid #999;text-align:center;">Direction</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+                
+                if (movements.length === 0) {
+                    html += `<tr><td colspan="8" style="text-align:center;padding:15px;color:#999;">📭 Aucun mouvement</td></tr>`;
+                } else {
+                    movements.forEach(m => {
+                        const dirLabel = m.direction === 'in' ? '⬆️ Entrée' : '⬇️ Sortie';
+                        const dirColor = m.direction === 'in' ? '#27ae60' : '#c0392b';
+                        const typeLabel = m.type === 'client' ? 'Client' : 'Fournisseur';
+                        html += `
+                            <tr style="border-bottom:1px solid #ddd;">
+                                <td style="padding:6px;text-align:center;">${m.date}</td>
+                                <td style="padding:6px;text-align:center;">${typeLabel}</td>
+                                <td style="padding:6px;text-align:center;">${m.party}</td>
+                                <td style="padding:6px;text-align:center;font-weight:700;">${m.invoiceNum}</td>
+                                <td style="padding:6px;text-align:center;">${m.method}</td>
+                                <td style="padding:6px;text-align:center;">${m.description}</td>
+                                <td style="padding:6px;text-align:center;font-weight:700;color:${dirColor};">${m.amount.toFixed(3)}</td>
+                                <td style="padding:6px;text-align:center;color:${dirColor};">${dirLabel}</td>
+                            </tr>
+                        `;
+                    });
+                }
+                
+                html += `
+                            </tbody>
+                            <tfoot>
+                                <tr style="font-weight:700;background:#f0f4ff;">
+                                    <td colspan="6" style="padding:8px;text-align:right;border-top:2px solid #1e2f66;">Totaux :</td>
+                                    <td style="padding:8px;text-align:center;border-top:2px solid #1e2f66;color:#27ae60;">${totalIn.toFixed(3)}</td>
+                                    <td style="padding:8px;text-align:center;border-top:2px solid #1e2f66;color:#c0392b;">${totalOut.toFixed(3)}</td>
+                                </tr>
+                                <tr style="font-weight:700;background:#e8ecf4;">
+                                    <td colspan="7" style="padding:8px;text-align:right;">Solde :</td>
+                                    <td style="padding:8px;text-align:center;color:${balance >= 0 ? '#27ae60' : '#c0392b'};">${balance.toFixed(3)}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        
+                        <div style="text-align:center;margin-top:15px;color:#666;font-size:10px;border-top:1px solid #ddd;padding-top:8px;">
+                            ${companyInfo.name} - ${companyInfo.address || ''} - ${companyInfo.phone1 || ''}
+                            <br>Généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}
+                        </div>
+                    </div>
+                `;
+                
+                const w = window.open('', '_blank', 'width=1000,height=700');
+                w.document.write(`
+                    <html dir="ltr">
+                    <head>
+                        <title>Rapport de caisse</title>
+                        <style>
+                            body { font-family: 'Cairo', sans-serif; padding: 20px; direction: ltr; background: #fff; }
+                            table { width: 100%; border-collapse: collapse; }
+                            th, td { border: 1px solid #999; padding: 6px; text-align: center; }
+                            th { background: #1a2a5c; color: #fff; }
+                            @media print {
+                                body { padding: 10px; }
+                                .no-print { display: none; }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        ${html}
+                        <script>
+                            window.onload = function() {
+                                window.print();
+                                setTimeout(function() { window.close(); }, 500);
+                            };
+                        <\/script>
+                    </body>
+                    </html>
+                `);
+                w.document.close();
+            }
         };
 
         // ===== ACCOUNTS =====
@@ -7483,24 +7663,6 @@
             else if (_statementData) renderStatement();
         });
 
-        function renderInvoice() {
-            if (!_invoiceData) return;
-            const size = document.getElementById('paperSizeSelect').value;
-            const doc = document.getElementById('printDoc');
-            doc.className = 'invoice-doc paper-' + size;
-            const data = _invoiceData;
-            let linesHtml = '';
-            data.lines.forEach((l, i) => {
-                linesHtml +=
-                    `<tr><td>${i + 1}</td><td>${l.name}</td><td>${l.price.toFixed(3)}</td><td>${l.qty}</td><td>${l.total.toFixed(3)}</td></tr>`;
-            });
-            const words = amountInWords(data.total);
-            const partyHtml =
-                `<div style="display:flex;justify-content:space-between;font-size:9px;border:1px solid #999;padding:3px;margin:3px 0;flex-wrap:wrap;gap:2px;"><span><strong>${data.partyLabel}:</strong> ${data.partyName}</span><span><strong>Adresse:</strong> ${data.partyAddr || '-'}</span><span><strong>Tél:</strong> ${data.partyPhone || '-'}</span><span><strong>MF:</strong> ${data.partyTaxId || '-'}</span></div>`;
-            doc.innerHTML =
-                `<div style="text-align:center;border-bottom:2px solid #1e2f66;padding-bottom:4px;margin-bottom:4px;"><div style="font-size:14px;font-weight:800;">${data.title}</div><div style="font-size:8px;color:#666;display:flex;justify-content:space-between;"><span>${new Date().toLocaleDateString('fr-FR')}  ${new Date().toLocaleTimeString('fr-FR')}</span><span style="font-weight:700;">${companyInfo.name || 'GTR POS'}</span></div><div style="font-size:7px;color:#888;margin-top:2px;">${companyInfo.address || ''} | ${companyInfo.phone1 || ''} | MF: ${companyInfo.taxId || '-'}</div></div><div style="font-size:10px;text-align:center;margin:2px 0;">${data.date}</div>${partyHtml}<table class="inv-items" style="width:100%;border-collapse:collapse;font-size:9px;margin:4px 0;"><thead><tr><th>#</th><th>Produit</th><th>Prix</th><th>Qté</th><th>Total</th></tr></thead><tbody>${linesHtml}</tbody></table><div style="font-size:8px;text-align:center;margin:2px 0;background:#f0f4ff;padding:2px;">Montant en lettres : ${words}</div><table class="inv-print-summary" style="width:100%;border-collapse:collapse;font-size:9px;margin:4px 0;"><tr><td class="label" style="border:1px solid #999;padding:2px 4px;text-align:left;">Solde précédent</td><td class="value" style="border:1px solid #999;padding:2px 4px;text-align:right;">${data.prevBalance.toFixed(3)}</td></tr><tr class="total-row"><td class="label" style="border:1px solid #999;padding:2px 4px;text-align:left;font-weight:700;">Total facture</td><td class="value" style="border:1px solid #999;padding:2px 4px;text-align:right;font-weight:700;">${data.total.toFixed(3)}</td></tr><tr><td class="label" style="border:1px solid #999;padding:2px 4px;text-align:left;">Payé</td><td class="value" style="border:1px solid #999;padding:2px 4px;text-align:right;">${data.paid.toFixed(3)}</td></tr><tr class="highlight-row"><td class="label" style="border:1px solid #999;padding:2px 4px;text-align:left;font-weight:700;">Solde actuel</td><td class="value" style="border:1px solid #999;padding:2px 4px;text-align:right;font-weight:700;color:#c0392b;">${data.currentBalance.toFixed(3)}</td></tr></table><div style="text-align:center;font-size:10px;font-weight:700;margin:4px 0;">${data.num}</div>`;
-        }
-
         function amountInWords(amount) {
             const d = Math.floor(amount);
             const m = Math.round((amount - d) * 1000);
@@ -7544,7 +7706,16 @@
                 const client = clients.find(c => c.id === id);
                 if (!client) { showToast('Client introuvable'); return; }
                 recalculateClientBalance(client.name);
-                const invoices = ventes.filter(v => v.client === client.name);
+                
+                const dateFrom = new Date(document.getElementById('clientHistoryFrom').value);
+                const dateTo = new Date(document.getElementById('clientHistoryTo').value);
+                dateTo.setHours(23, 59, 59);
+                
+                const invoices = ventes.filter(v => {
+                    if (v.client !== client.name) return false;
+                    const vDate = new Date(v.date);
+                    return vDate >= dateFrom && vDate <= dateTo;
+                });
                 const payments = caisseClients.filter(p => p.clientName === client.name);
                 const openingBalance = client.openingBalance || 0;
                 
@@ -7590,7 +7761,16 @@
                 const supplier = fournisseurs.find(f => f.id === id);
                 if (!supplier) { showToast('Fournisseur introuvable'); return; }
                 recalculateFournisseurBalance(supplier.name);
-                const invoices = achats.filter(a => a.supplier === supplier.name);
+                
+                const dateFrom = new Date(document.getElementById('fournisseurHistoryFrom').value);
+                const dateTo = new Date(document.getElementById('fournisseurHistoryTo').value);
+                dateTo.setHours(23, 59, 59);
+                
+                const invoices = achats.filter(a => {
+                    if (a.supplier !== supplier.name) return false;
+                    const aDate = new Date(a.date);
+                    return aDate >= dateFrom && aDate <= dateTo;
+                });
                 const payments = caisseFournisseurs.filter(p => p.fournisseurName === supplier.name);
                 const openingBalance = supplier.openingBalance || 0;
                 
@@ -7634,8 +7814,15 @@
             } else if (type === 'article') {
                 const article = articles.find(a => a.id === id);
                 if (!article) { showToast('Article introuvable'); return; }
+                
+                const dateFrom = new Date(document.getElementById('articleHistoryFrom').value);
+                const dateTo = new Date(document.getElementById('articleHistoryTo').value);
+                dateTo.setHours(23, 59, 59);
+                
                 let movements = [];
                 ventes.forEach(v => {
+                    const vDate = new Date(v.date);
+                    if (vDate < dateFrom || vDate > dateTo) return;
                     v.lines.forEach(line => {
                         if (line.name === article.name) {
                             movements.push({ date: v.date, doc: v.num, type: 'vente', party: v
@@ -7645,6 +7832,8 @@
                     });
                 });
                 achats.forEach(a => {
+                    const aDate = new Date(a.date);
+                    if (aDate < dateFrom || aDate > dateTo) return;
                     a.lines.forEach(line => {
                         if (line.name === article.name) {
                             movements.push({ date: a.date, doc: a.num, type: 'achat', party: a
@@ -7692,6 +7881,10 @@
             const size = document.getElementById('paperSizeSelect').value;
             const doc = document.getElementById('printDoc');
             doc.className = 'invoice-doc paper-' + size;
+            const fontSizeMap = { small: '7px', medium: '9px', large: '12px' };
+            const baseFontSize = fontSizeMap[printSettings.fontSize] || '9px';
+            doc.style.fontSize = baseFontSize;
+            
             const d = _statementData.data;
             let rows = '';
             d.movements.forEach((m, i) => {
@@ -7700,61 +7893,68 @@
                 const debitDisplay = (m.debit || 0).toFixed(3);
                 const creditDisplay = (m.credit || 0).toFixed(3);
                 rows += `<tr class="${isSub ? 'sub-row' : ''}">
-          <td style="border:1px solid #999;padding:2px 4px;font-size:8px;">${m.date}</td>
-          <td style="border:1px solid #999;padding:2px 4px;font-size:8px;">${m.doc}</td>
-          <td style="border:1px solid #999;padding:2px 4px;font-size:8px;text-align:left;">${m.description}</td>
-          <td style="border:1px solid #999;padding:2px 4px;font-size:8px;text-align:right;color:#c0392b;">${debitDisplay}</td>
-          <td style="border:1px solid #999;padding:2px 4px;font-size:8px;text-align:right;color:#27ae60;">${creditDisplay}</td>
-          <td style="border:1px solid #999;padding:2px 4px;font-size:8px;text-align:right;font-weight:700;">${balanceDisplay}</td>
-        </tr>`;
+                    <td style="border:1px solid #999;padding:2px 4px;font-size:${baseFontSize};">${m.date}</td>
+                    <td style="border:1px solid #999;padding:2px 4px;font-size:${baseFontSize};">${m.doc}</td>
+                    <td style="border:1px solid #999;padding:2px 4px;font-size:${baseFontSize};text-align:left;">${m.description}</td>
+                    <td style="border:1px solid #999;padding:2px 4px;font-size:${baseFontSize};text-align:right;color:#c0392b;">${debitDisplay}</td>
+                    <td style="border:1px solid #999;padding:2px 4px;font-size:${baseFontSize};text-align:right;color:#27ae60;">${creditDisplay}</td>
+                    <td style="border:1px solid #999;padding:2px 4px;font-size:${baseFontSize};text-align:right;font-weight:700;">${balanceDisplay}</td>
+                </tr>`;
             });
             const totalDebit = d.movements.reduce((s, m) => s + (m.debit || 0), 0);
             const totalCredit = d.movements.reduce((s, m) => s + (m.credit || 0), 0);
             const finalBalance = d.currentBalance !== undefined ? d.currentBalance : d.openingBalance;
             const emailDisplay = d.email ? `<span><strong>📧:</strong> ${d.email}</span>` : '';
+            
+            let logoHtml = '';
+            if (printSettings.logo) {
+                logoHtml = `<div style="text-align:center;margin-bottom:4px;"><img src="${printSettings.logo}" style="max-width:120px;max-height:50px;object-fit:contain;"></div>`;
+            }
+            
+            const footerHtml = printSettings.footer ? `<div style="text-align:center;font-size:${baseFontSize};color:#666;margin-top:8px;border-top:1px dashed #ddd;padding-top:6px;">${printSettings.footer}</div>` : '';
+            
             doc.innerHTML = `
-            <div style="text-align:center;border-bottom:2px solid #1e2f66;padding-bottom:4px;margin-bottom:4px;">
-              <div style="font-size:14px;font-weight:800;">${_statementData.title}</div>
-              <div style="font-size:8px;color:#666;display:flex;justify-content:space-between;">
-                <span>${new Date().toLocaleDateString('fr-FR')}  ${new Date().toLocaleTimeString('fr-FR')}</span>
-                <span style="font-weight:700;">${companyInfo.name || 'GTR POS'}</span>
-              </div>
-              <div style="font-size:7px;color:#888;margin-top:2px;">${companyInfo.address || ''} | ${companyInfo.phone1 || ''} | MF: ${companyInfo.taxId || '-'}</div>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:9px;border:1px solid #999;padding:3px;margin:3px 0;flex-wrap:wrap;gap:2px;">
-              <span><strong>${_statementData.partyLabel}:</strong> ${d.partyName}</span>
-              <span><strong>Tél:</strong> ${d.phone || '-'}</span>
-              ${emailDisplay}
-              <span><strong>MF:</strong> ${d.taxId || '-'}</span>
-              <span><strong>Solde actuel:</strong> ${finalBalance.toFixed(3)}</span>
-            </div>
-            <table style="width:100%;border-collapse:collapse;font-size:8px;margin:4px 0;">
-              <thead>
-                <tr style="background:#1e2f66;color:#fff;">
-                  <th style="border:1px solid #999;padding:2px 4px;">Date</th>
-                  <th style="border:1px solid #999;padding:2px 4px;">N°</th>
-                  <th style="border:1px solid #999;padding:2px 4px;text-align:left;">Libellé</th>
-                  <th style="border:1px solid #999;padding:2px 4px;text-align:right;">Débit</th>
-                  <th style="border:1px solid #999;padding:2px 4px;text-align:right;">Crédit</th>
-                  <th style="border:1px solid #999;padding:2px 4px;text-align:right;">Solde</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${rows}
-              </tbody>
-              <tfoot>
-                <tr style="font-weight:700;background:#e8ecf4;">
-                  <td colspan="3" style="border:1px solid #999;padding:2px 4px;text-align:left;">Totaux</td>
-                  <td style="border:1px solid #999;padding:2px 4px;text-align:right;">${totalDebit.toFixed(3)}</td>
-                  <td style="border:1px solid #999;padding:2px 4px;text-align:right;">${totalCredit.toFixed(3)}</td>
-                  <td style="border:1px solid #999;padding:2px 4px;text-align:right;color:#c0392b;">${finalBalance.toFixed(3)}</td>
-                </tr>
-              </tfoot>
-            </table>
-            <div style="text-align:center;font-size:8px;color:#888;margin-top:4px;border-top:1px dashed #ddd;padding-top:4px;">
-              ${companyInfo.name} - ${companyInfo.phone1 || ''}
-            </div>
-          `;
+                ${logoHtml}
+                <div style="text-align:center;border-bottom:2px solid #1e2f66;padding-bottom:4px;margin-bottom:4px;">
+                    <div style="font-size:${baseFontSize};font-weight:800;">${_statementData.title}</div>
+                    <div style="font-size:${baseFontSize};color:#666;display:flex;justify-content:space-between;">
+                        <span>${new Date().toLocaleDateString('fr-FR')}  ${new Date().toLocaleTimeString('fr-FR')}</span>
+                        <span style="font-weight:700;">${companyInfo.name || 'GTR POS'}</span>
+                    </div>
+                    <div style="font-size:${baseFontSize};color:#888;margin-top:2px;">${companyInfo.address || ''} | ${companyInfo.phone1 || ''} | MF: ${companyInfo.taxId || '-'}</div>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:${baseFontSize};border:1px solid #999;padding:3px;margin:3px 0;flex-wrap:wrap;gap:2px;">
+                    <span><strong>${_statementData.partyLabel}:</strong> ${d.partyName}</span>
+                    <span><strong>Tél:</strong> ${d.phone || '-'}</span>
+                    ${emailDisplay}
+                    <span><strong>MF:</strong> ${d.taxId || '-'}</span>
+                    <span><strong>Solde actuel:</strong> ${finalBalance.toFixed(3)}</span>
+                </div>
+                <table style="width:100%;border-collapse:collapse;font-size:${baseFontSize};margin:4px 0;">
+                    <thead>
+                        <tr style="background:#1e2f66;color:#fff;">
+                            <th style="border:1px solid #999;padding:2px 4px;">Date</th>
+                            <th style="border:1px solid #999;padding:2px 4px;">N°</th>
+                            <th style="border:1px solid #999;padding:2px 4px;text-align:left;">Libellé</th>
+                            <th style="border:1px solid #999;padding:2px 4px;text-align:right;">Débit</th>
+                            <th style="border:1px solid #999;padding:2px 4px;text-align:right;">Crédit</th>
+                            <th style="border:1px solid #999;padding:2px 4px;text-align:right;">Solde</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows}
+                    </tbody>
+                    <tfoot>
+                        <tr style="font-weight:700;background:#e8ecf4;">
+                            <td colspan="3" style="border:1px solid #999;padding:2px 4px;text-align:left;">Totaux</td>
+                            <td style="border:1px solid #999;padding:2px 4px;text-align:right;">${totalDebit.toFixed(3)}</td>
+                            <td style="border:1px solid #999;padding:2px 4px;text-align:right;">${totalCredit.toFixed(3)}</td>
+                            <td style="border:1px solid #999;padding:2px 4px;text-align:right;color:#c0392b;">${finalBalance.toFixed(3)}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+                ${footerHtml}
+            `;
         }
 
         // ===== ADVANCED REPORTS =====
@@ -8135,60 +8335,60 @@
                 const kpis = document.getElementById('reportsKPIs')?.innerHTML || '';
                 const printWindow = window.open('', '_blank', 'width=900,height=600');
                 printWindow.document.write(`
-              <html dir="ltr">
-              <head>
-                <title>${title}</title>
-                <style>
-                  body { font-family: 'Cairo', sans-serif; padding: 20px; direction: ltr; }
-                  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-                  th { background: #1e2f66; color: #fff; padding: 8px; border: 1px solid #999; }
-                  td { padding: 6px; border: 1px solid #ddd; text-align: center; }
-                  .header { text-align: center; border-bottom: 3px double #1e2f66; padding-bottom: 10px; margin-bottom: 15px; }
-                  .kpi-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin: 10px 0; }
-                  .kpi-card { background: #f0f4ff; padding: 10px; border-radius: 8px; text-align: center; }
-                  .kpi-card .val { font-size: 16px; font-weight: 800; color: #1e2f66; }
-                  .kpi-card .lbl { font-size: 10px; color: #666; }
-                  .charts-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
-                  .chart-box { background: #f8f9fc; padding: 10px; border-radius: 8px; text-align: center; }
-                  .chart-box canvas { max-width: 100%; height: auto; }
-                  @media print { body { padding: 10px; } .no-print { display: none; } }
-                </style>
-              </head>
-              <body>
-                <div class="header">
-                  <h1>${title}</h1>
-                  <p>${companyInfo.name || 'GTR POS'} | ${new Date().toLocaleDateString('fr-FR')}</p>
-                </div>
-                <div class="kpi-row">${kpis}</div>
-                <div class="charts-container">
-                  <div class="chart-box"><canvas id="salesChartPrint"></canvas></div>
-                  <div class="chart-box"><canvas id="profitChartPrint"></canvas></div>
-                </div>
-                ${content}
-                <div style="text-align:center;margin-top:20px;color:#666;font-size:10px;border-top:1px solid #ddd;padding-top:10px;">
-                  ${companyInfo.name} - ${companyInfo.address || ''} - ${companyInfo.phone1 || ''}
-                </div>
-                <script>
-                  window.onload = function() {
-                    const salesCanvas = document.getElementById('salesChart');
-                    const profitCanvas = document.getElementById('profitChart');
-                    if (salesCanvas) {
-                      const clone = document.getElementById('salesChartPrint');
-                      if (clone) clone.getContext('2d').drawImage(salesCanvas, 0, 0);
-                    }
-                    if (profitCanvas) {
-                      const clone = document.getElementById('profitChartPrint');
-                      if (clone) clone.getContext('2d').drawImage(profitCanvas, 0, 0);
-                    }
-                    setTimeout(function() {
-                      window.print();
-                      setTimeout(function() { window.close(); }, 500);
-                    }, 300);
-                  };
-                <\/script>
-              </body>
-              </html>
-            `);
+                    <html dir="ltr">
+                    <head>
+                        <title>${title}</title>
+                        <style>
+                            body { font-family: 'Cairo', sans-serif; padding: 20px; direction: ltr; }
+                            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                            th { background: #1e2f66; color: #fff; padding: 8px; border: 1px solid #999; }
+                            td { padding: 6px; border: 1px solid #ddd; text-align: center; }
+                            .header { text-align: center; border-bottom: 3px double #1e2f66; padding-bottom: 10px; margin-bottom: 15px; }
+                            .kpi-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin: 10px 0; }
+                            .kpi-card { background: #f0f4ff; padding: 10px; border-radius: 8px; text-align: center; }
+                            .kpi-card .val { font-size: 16px; font-weight: 800; color: #1e2f66; }
+                            .kpi-card .lbl { font-size: 10px; color: #666; }
+                            .charts-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+                            .chart-box { background: #f8f9fc; padding: 10px; border-radius: 8px; text-align: center; }
+                            .chart-box canvas { max-width: 100%; height: auto; }
+                            @media print { body { padding: 10px; } .no-print { display: none; } }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <h1>${title}</h1>
+                            <p>${companyInfo.name || 'GTR POS'} | ${new Date().toLocaleDateString('fr-FR')}</p>
+                        </div>
+                        <div class="kpi-row">${kpis}</div>
+                        <div class="charts-container">
+                            <div class="chart-box"><canvas id="salesChartPrint"></canvas></div>
+                            <div class="chart-box"><canvas id="profitChartPrint"></canvas></div>
+                        </div>
+                        ${content}
+                        <div style="text-align:center;margin-top:20px;color:#666;font-size:10px;border-top:1px solid #ddd;padding-top:10px;">
+                            ${companyInfo.name} - ${companyInfo.address || ''} - ${companyInfo.phone1 || ''}
+                        </div>
+                        <script>
+                            window.onload = function() {
+                                const salesCanvas = document.getElementById('salesChart');
+                                const profitCanvas = document.getElementById('profitChart');
+                                if (salesCanvas) {
+                                    const clone = document.getElementById('salesChartPrint');
+                                    if (clone) clone.getContext('2d').drawImage(salesCanvas, 0, 0);
+                                }
+                                if (profitCanvas) {
+                                    const clone = document.getElementById('profitChartPrint');
+                                    if (clone) clone.getContext('2d').drawImage(profitCanvas, 0, 0);
+                                }
+                                setTimeout(function() {
+                                    window.print();
+                                    setTimeout(function() { window.close(); }, 500);
+                                }, 300);
+                            };
+                        <\/script>
+                    </body>
+                    </html>
+                `);
                 printWindow.document.close();
             },
             exportCSV() {
@@ -8316,6 +8516,7 @@
                 uiCustomizer.loadUserPreferences();
                 notificationSystem.loadSaved();
                 notificationSystem.updateBadge();
+                loadPrintSettings();
                 document.getElementById('loginOverlay').classList.add('hide');
                 document.getElementById('pendingOverlay').classList.add('hide');
                 showSection('dashboard');
@@ -8429,19 +8630,26 @@
         document.getElementById('storageLocalBtn').addEventListener('click', function() { setStorageMode('local'); });
         document.getElementById('storageCloudBtn').addEventListener('click', function() { setStorageMode('cloud'); });
 
-        // Exposer les fonctions d'importation
+        // Exposer les fonctions globales
         window.downloadTemplate = downloadTemplate;
         window.handleImportFile = handleImportFile;
         window.confirmImport = confirmImport;
         window.cancelImport = cancelImport;
-
-        // Exposer les fonctions de recalcul
         window.recalculateClientBalance = recalculateClientBalance;
         window.recalculateFournisseurBalance = recalculateFournisseurBalance;
+        window.openPrintCustomizer = openPrintCustomizer;
+        window.closePrintCustomizer = closePrintCustomizer;
+        window.savePrintSettings = savePrintSettings;
+        window.resetPrintSettings = resetPrintSettings;
+        window.handleLogoUpload = handleLogoUpload;
+        window.loadDefaultLogo = loadDefaultLogo;
+        window.formatNum = formatNum;
+        window.formatDate = formatDate;
 
         document.addEventListener('DOMContentLoaded', function() {
             console.log('📱 GTR POS ' + APP_VERSION + ' loaded');
             console.log('⌨️ Appuyez sur F1 pour afficher les raccourcis clavier');
+            loadPrintSettings();
         });
     </script>
 </body>
