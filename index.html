@@ -2811,8 +2811,8 @@
                 <button class="btn outline small" onclick="document.getElementById('importFileInputBackup').click()">⬆️ Importer</button>
                 <div style="font-size:9px;color:var(--muted);margin-top:4px;">💡 Pour installer l'application : ⋮ dans le navigateur → Ajouter à l'écran d'accueil</div>
 
-                <div class="section-title">🖨️ تخصيص الطباعة</div>
-                <button class="btn outline small" onclick="openPrintCustomizer()" style="width:100%;margin-bottom:6px;">🖨️ تخصيص الطباعة</button>
+                <div class="section-title">🖨️ Personnalisation de l'impression</div>
+                <button class="btn outline small" onclick="openPrintCustomizer()" style="width:100%;margin-bottom:6px;">🖨️ Personnaliser l'impression</button>
 
                 <div class="section-title">👤 Compte</div>
                 <div id="accountEmailDisplay" style="font-size:11px;color:var(--muted);margin-bottom:3px;"></div>
@@ -2848,33 +2848,33 @@
 
     <div class="modal-overlay" id="printCustomizerModal">
         <div class="modal-box">
-            <h3>🖨️ تخصيص الطباعة</h3>
+            <h3>🖨️ Personnalisation de l'impression</h3>
             <div class="field">
-                <label>🖼️ الشعار (Logo)</label>
+                <label>🖼️ Logo</label>
                 <input type="file" id="logoUpload" accept="image/*" onchange="handleLogoUpload(event)">
                 <div id="logoPreview" style="margin-top:4px;text-align:center;font-size:9px;color:var(--muted);">
-                    <span id="logoFileName">لم يتم رفع شعار</span>
+                    <span id="logoFileName">Aucun logo téléchargé</span>
                     <br>
                     <img id="logoPreviewImg" style="max-width:100px;max-height:60px;display:none;margin-top:4px;border:1px solid var(--border);border-radius:4px;padding:2px;">
                 </div>
-                <button class="btn outline small" onclick="loadDefaultLogo()" style="margin-top:2px;font-size:9px;padding:2px 8px;">⬇️ تحميل الشعار الافتراضي</button>
+                <button class="btn outline small" onclick="loadDefaultLogo()" style="margin-top:2px;font-size:9px;padding:2px 8px;">⬇️ Charger le logo par défaut</button>
             </div>
             <div class="field">
-                <label>📝 التذييل (Footer)</label>
-                <input type="text" id="customFooter" placeholder="نص التذييل (مثل: شكراً لتسوقكم)">
+                <label>📝 Pied de page</label>
+                <input type="text" id="customFooter" placeholder="Texte du pied de page (ex: Merci de votre visite)">
             </div>
             <div class="field">
-                <label>📐 حجم الخط</label>
+                <label>📐 Taille de police</label>
                 <select id="fontSizeSelect">
-                    <option value="small">صغير</option>
-                    <option value="medium" selected>متوسط</option>
-                    <option value="large">كبير</option>
+                    <option value="small">Petite</option>
+                    <option value="medium" selected>Moyenne</option>
+                    <option value="large">Grande</option>
                 </select>
             </div>
             <div class="modal-actions">
-                <button class="btn save" onclick="savePrintSettings()">💾 حفظ</button>
-                <button class="btn del" onclick="resetPrintSettings()">🔄 استعادة الافتراضي</button>
-                <button class="btn outline" onclick="closePrintCustomizer()">إلغاء</button>
+                <button class="btn save" onclick="savePrintSettings()">💾 Enregistrer</button>
+                <button class="btn del" onclick="resetPrintSettings()">🔄 Réinitialiser</button>
+                <button class="btn outline" onclick="closePrintCustomizer()">Annuler</button>
             </div>
             <div class="modal-error" id="printCustomizerError"></div>
         </div>
@@ -2923,6 +2923,7 @@
     <script>
         // =============================================
         // ===== GTR POS V 0.8.1 - CODE COMPLET =====
+        // Version unifiée en français
         // =============================================
 
         const APP_VERSION = 'V 0.8.1';
@@ -3212,12 +3213,12 @@
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         }
 
-        // تنسيق الأرقام
+        // Formatage des nombres
         function formatNum(num) {
             return num.toFixed(3).replace(/\./g, ',');
         }
 
-        // تنسيق التاريخ
+        // Formatage des dates
         function formatDate(dateStr) {
             if (!dateStr || dateStr === '---') return '---';
             const parts = dateStr.split('-');
@@ -3644,7 +3645,7 @@
 
         let printSettings = {
             logo: null,
-            footer: 'شكراً لتسوقكم معنا',
+            footer: 'Merci de votre visite',
             fontSize: 'medium'
         };
 
@@ -3661,28 +3662,28 @@
         function savePrintSettings() {
             const footer = document.getElementById('customFooter').value.trim();
             const fontSize = document.getElementById('fontSizeSelect').value;
-            printSettings.footer = footer || 'شكراً لتسوقكم معنا';
+            printSettings.footer = footer || 'Merci de votre visite';
             printSettings.fontSize = fontSize || 'medium';
             try {
                 localStorage.setItem(PRINT_SETTINGS_KEY, JSON.stringify(printSettings));
-                showToastModern('✅ تم حفظ إعدادات الطباعة', 'success');
+                showToastModern('✅ Paramètres d\'impression enregistrés', 'success');
                 closePrintCustomizer();
             } catch (e) {
-                showToastModern('❌ خطأ في الحفظ', 'error');
+                showToastModern('❌ Erreur lors de l\'enregistrement', 'error');
                 console.error(e);
             }
         }
 
         function resetPrintSettings() {
-            if (!confirm('⚠️ هل تريد استعادة الإعدادات الافتراضية؟')) return;
+            if (!confirm('⚠️ Voulez-vous vraiment restaurer les paramètres par défaut ?')) return;
             printSettings = {
                 logo: null,
-                footer: 'شكراً لتسوقكم معنا',
+                footer: 'Merci de votre visite',
                 fontSize: 'medium'
             };
             localStorage.removeItem(PRINT_SETTINGS_KEY);
             updatePrintCustomizerUI();
-            showToastModern('🔄 تمت الاستعادة', 'success');
+            showToastModern('🔄 Paramètres restaurés', 'success');
         }
 
         function openPrintCustomizer() {
@@ -3705,10 +3706,10 @@
             if (printSettings.logo) {
                 previewImg.src = printSettings.logo;
                 previewImg.style.display = 'block';
-                fileNameSpan.textContent = '✅ شعار مرفوع';
+                fileNameSpan.textContent = '✅ Logo téléchargé';
             } else {
                 previewImg.style.display = 'none';
-                fileNameSpan.textContent = 'لم يتم رفع شعار';
+                fileNameSpan.textContent = 'Aucun logo téléchargé';
             }
         }
 
@@ -3719,7 +3720,7 @@
             reader.onload = function(e) {
                 printSettings.logo = e.target.result;
                 updatePrintCustomizerUI();
-                showToastModern('✅ تم رفع الشعار', 'success');
+                showToastModern('✅ Logo téléchargé', 'success');
             };
             reader.readAsDataURL(file);
         }
@@ -3741,7 +3742,7 @@
             ctx.fillText('Système de gestion', 150, 65);
             printSettings.logo = canvas.toDataURL('image/png');
             updatePrintCustomizerUI();
-            showToastModern('✅ تم تحميل الشعار الافتراضي', 'success');
+            showToastModern('✅ Logo par défaut chargé', 'success');
         }
 
         function renderInvoice() {
@@ -4870,7 +4871,7 @@
                         details.push(`📄 ${count} facture(s) de vente`); }
                     if (hasPayments) { const count = caisseClients.filter(c => c.clientName === client.name).length;
                         details.push(`💰 ${count} règlement(s)`); }
-                    showToast(`🚫 Impossible de supprimer le client "${client.name}" car il a des mouvements : ${details.join('، ')}`);
+                    showToast(`🚫 Impossible de supprimer le client "${client.name}" car il a des mouvements : ${details.join(', ')}`);
                     return;
                 }
                 if (confirm(`Voulez-vous vraiment supprimer le client "${client.name}" ?`)) {
@@ -5053,7 +5054,7 @@
                     if (hasPayments) { const count = caisseFournisseurs.filter(c => c.fournisseurName === fournisseur
                             .name).length;
                         details.push(`💰 ${count} règlement(s)`); }
-                    showToast(`🚫 Impossible de supprimer le fournisseur "${fournisseur.name}" car il a des mouvements : ${details.join('، ')}`);
+                    showToast(`🚫 Impossible de supprimer le fournisseur "${fournisseur.name}" car il a des mouvements : ${details.join(', ')}`);
                     return;
                 }
                 if (confirm(`Voulez-vous vraiment supprimer le fournisseur "${fournisseur.name}" ?`)) {
@@ -5170,7 +5171,7 @@
                     if (inAchats) { const count = achats.filter(a => a.lines.some(l => l.name === article.name))
                             .length;
                         details.push(`📄 ${count} facture(s) d'achat`); }
-                    showToast(`🚫 Impossible de supprimer l'article "${article.name}" car il est utilisé dans : ${details.join('، ')}`);
+                    showToast(`🚫 Impossible de supprimer l'article "${article.name}" car il est utilisé dans : ${details.join(', ')}`);
                     return;
                 }
                 if (confirm(`Voulez-vous vraiment supprimer l'article "${article.name}" ?`)) {
@@ -5292,13 +5293,13 @@
                 if (!select || !result) return;
                 const clientId = parseInt(select.value);
                 if (!clientId) {
-                    result.innerHTML = '<div class="empty-msg">اختر عميلاً لعرض سجله</div>';
+                    result.innerHTML = '<div class="empty-msg">Choisissez un client pour afficher son relevé</div>';
                     return;
                 }
                 this.currentClientId = clientId;
                 const client = clients.find(c => c.id === clientId);
                 if (!client) {
-                    result.innerHTML = '<div class="empty-msg">العميل غير موجود</div>';
+                    result.innerHTML = '<div class="empty-msg">Client introuvable</div>';
                     return;
                 }
                 recalculateClientBalance(client.name);
@@ -5321,75 +5322,75 @@
                 
                 let html = `
                     <!-- ===== CARTE RÉSUMÉ ===== -->
-                    <div style="background:linear-gradient(135deg, var(--secondary), #2a3f7a);color:#fff;padding:14px;border-radius:14px;margin-bottom:10px;box-shadow:0 4px 20px rgba(26,42,92,0.3);">
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;">
-                            <div><span style="opacity:0.7;">👤 العميل :</span> <span style="font-weight:700;">${client.name}</span></div>
-                            <div><span style="opacity:0.7;">📞 الهاتف :</span> <span style="font-weight:700;">${client.phone || '-'}</span></div>
-                            <div><span style="opacity:0.7;">📧 البريد الإلكتروني :</span> <span style="font-weight:700;">${client.email || '-'}</span></div>
-                            <div><span style="opacity:0.7;">📄 عدد الفواتير :</span> <span style="font-weight:700;">${totalInvoices}</span></div>
-                            <div><span style="opacity:0.7;">💰 إجمالي المشتريات :</span> <span style="font-weight:700;color:#4dbf8c;">${formatNum(totalPurchases)} د.ت</span></div>
-                            <div><span style="opacity:0.7;">💳 إجمالي المدفوعات :</span> <span style="font-weight:700;color:#5c7cf0;">${formatNum(totalPaid)} د.ت</span></div>
-                            <div><span style="opacity:0.7;">📊 الرصيد الحالي :</span> <span style="font-weight:700;color:${currentBalance >= 0 ? '#4dbf8c' : '#ff6b6b'};">${formatNum(currentBalance)} د.ت</span></div>
-                            <div><span style="opacity:0.7;">📅 الفترة :</span> <span style="font-weight:700;">${formatDate(dateFrom.toISOString().slice(0,10))} → ${formatDate(dateTo.toISOString().slice(0,10))}</span></div>
+                    <div class="client-summary-card">
+                        <div class="grid">
+                            <div><span class="label">👤 Client :</span> <span class="value">${client.name}</span></div>
+                            <div><span class="label">📞 Téléphone :</span> <span class="value">${client.phone || '-'}</span></div>
+                            <div><span class="label">📧 Email :</span> <span class="value">${client.email || '-'}</span></div>
+                            <div><span class="label">📄 Nb factures :</span> <span class="value">${totalInvoices}</span></div>
+                            <div><span class="label">💰 Total achats :</span> <span class="value positive">${formatNum(totalPurchases)} TND</span></div>
+                            <div><span class="label">💳 Total règlements :</span> <span class="value">${formatNum(totalPaid)} TND</span></div>
+                            <div><span class="label">📊 Solde actuel :</span> <span class="value ${currentBalance >= 0 ? 'positive' : 'negative'}">${formatNum(currentBalance)} TND</span></div>
+                            <div><span class="label">📅 Période :</span> <span class="value">${formatDate(dateFrom.toISOString().slice(0,10))} → ${formatDate(dateTo.toISOString().slice(0,10))}</span></div>
                         </div>
                     </div>
                     
-                    <!-- ===== رصيد البداية والنهائي ===== -->
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:4px 0 8px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:8px 12px;box-shadow:var(--shadow);">
-                        <div style="text-align:center;font-size:10px;font-weight:600;">
-                            <span style="color:var(--muted);font-size:8px;display:block;">رصيد البداية</span>
-                            <span style="font-size:13px;font-weight:800;color:var(--primary);">${formatNum(openingBalance)} د.ت</span>
+                    <!-- ===== SOLDE DÉBUT ET FIN ===== -->
+                    <div class="balance-display">
+                        <div class="item">
+                            <span class="label">Solde d'ouverture</span>
+                            <span class="value opening">${formatNum(openingBalance)} TND</span>
                         </div>
-                        <div style="text-align:center;font-size:10px;font-weight:600;">
-                            <span style="color:var(--muted);font-size:8px;display:block;">الرصيد النهائي</span>
-                            <span style="font-size:13px;font-weight:800;color:var(--danger);">${formatNum(currentBalance)} د.ت</span>
+                        <div class="item">
+                            <span class="label">Solde final</span>
+                            <span class="value closing">${formatNum(currentBalance)} TND</span>
                         </div>
                     </div>
                     
-                    <!-- ===== أزرار الإجراءات ===== -->
+                    <!-- ===== BOUTONS D'ACTIONS ===== -->
                     <div style="display:flex;gap:6px;margin:6px 0;flex-wrap:wrap;">
-                        <button class="btn print small" onclick="printStatement('client', ${clientId})" style="flex:1;padding:6px;font-size:10px;min-width:80px;">🖨️ طباعة السجل</button>
-                        <button class="btn save small" onclick="recalculateClientBalance('${client.name}'); ClientHistory.show();" style="flex:1;padding:6px;font-size:10px;min-width:80px;">🔄 تحديث الرصيد</button>
+                        <button class="btn print small" onclick="printStatement('client', ${clientId})" style="flex:1;padding:6px;font-size:10px;min-width:80px;">🖨️ Imprimer le relevé</button>
+                        <button class="btn save small" onclick="recalculateClientBalance('${client.name}'); ClientHistory.show();" style="flex:1;padding:6px;font-size:10px;min-width:80px;">🔄 Actualiser le solde</button>
                     </div>
                     
-                    <!-- ===== قائمة الفواتير ===== -->
-                    <div class="section-title" style="margin-top:10px;">📋 قائمة الفواتير</div>
-                    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:6px;border-radius:12px;border:1px solid var(--border);background:var(--panel);">
-                        <table style="width:100%;min-width:700px;border-collapse:collapse;font-size:8px;direction:ltr;background:var(--panel);">
+                    <!-- ===== LISTE DES FACTURES ===== -->
+                    <div class="section-title" style="margin-top:10px;">📋 Liste des factures</div>
+                    <div class="history-table-wrapper">
+                        <table class="history-table" style="min-width:700px;">
                             <thead>
-                                <tr style="background:var(--secondary);color:#fff;">
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">رقم الفاتورة</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">التاريخ</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المبلغ</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المدفوع</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المتبقي</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">الحالة</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">الإجراءات</th>
+                                <tr>
+                                    <th>N° Facture</th>
+                                    <th>Date</th>
+                                    <th>Montant</th>
+                                    <th>Payé</th>
+                                    <th>Reste</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>`;
                 
                 if (sortedVentes.length === 0) {
-                    html += `<tr><td colspan="7" style="text-align:center;padding:12px;color:var(--muted);font-size:10px;">📭 لا توجد فواتير</td></tr>`;
+                    html += `<tr><td colspan="7" style="text-align:center;padding:12px;color:var(--muted);font-size:10px;">📭 Aucune facture</td></tr>`;
                 } else {
                     sortedVentes.forEach(v => {
                         const invoicePayments = clientReglements.filter(r => r.invoiceNum === v.num);
                         const paidAmount = invoicePayments.reduce((sum, r) => sum + r.amount, 0);
                         const remaining = v.total - paidAmount;
-                        let statusText = '✅ مدفوعة';
+                        let statusText = '✅ Payée';
                         let statusColor = 'var(--success)';
-                        if (remaining > v.total * 0.9) { statusText = '⏳ غير مدفوعة';
-                            statusColor = 'var(--danger)'; } else if (remaining > 0.001) { statusText = '🔄 جزئياً';
+                        if (remaining > v.total * 0.9) { statusText = '⏳ Non payée';
+                            statusColor = 'var(--danger)'; } else if (remaining > 0.001) { statusText = '🔄 Partiellement payée';
                             statusColor = 'var(--warning)'; }
                         
                         html += `<tr>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:700;">${v.num}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatDate(v.date)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatNum(v.total)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:var(--success);">${formatNum(paidAmount)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:${remaining > 0.001 ? 'var(--danger)' : 'var(--success)'};">${formatNum(remaining)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:${statusColor};font-weight:700;">${statusText}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">
+                            <td style="font-weight:700;">${v.num}</td>
+                            <td>${formatDate(v.date)}</td>
+                            <td>${formatNum(v.total)}</td>
+                            <td style="color:var(--success);">${formatNum(paidAmount)}</td>
+                            <td style="color:${remaining > 0.001 ? 'var(--danger)' : 'var(--success)'};">${formatNum(remaining)}</td>
+                            <td style="color:${statusColor};font-weight:700;">${statusText}</td>
+                            <td>
                                 <button class="btn edit small" onclick="ClientHistory.editInvoice('${v.id}')" style="padding:1px 6px;font-size:7px;margin:0 1px;">✏️</button>
                                 <button class="btn save small" onclick="ClientHistory.payInvoice('${v.id}')" style="padding:1px 6px;font-size:7px;margin:0 1px;background:linear-gradient(135deg,var(--success),#27ae60);">💰</button>
                             </td>
@@ -5399,36 +5400,36 @@
                 
                 html += `</tbody></table></div>`;
                 
-                // ===== جدول تفصيلي للحركات =====
+                // ===== TABLEAU DÉTAILLÉ DES MOUVEMENTS =====
                 html += `
-                    <div class="section-title" style="margin-top:10px;">📊 تفاصيل الحركات</div>
-                    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:6px;border-radius:12px;border:1px solid var(--border);background:var(--panel);">
-                        <table style="width:100%;min-width:650px;border-collapse:collapse;font-size:8px;direction:ltr;background:var(--panel);">
+                    <div class="section-title" style="margin-top:10px;">📊 Détail des mouvements</div>
+                    <div class="history-table-wrapper">
+                        <table class="history-table" style="min-width:650px;">
                             <thead>
-                                <tr style="background:var(--secondary);color:#fff;">
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">التاريخ</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">رقم الفاتورة</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">البيان</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المبلغ</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المدفوع</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المتبقي</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">الرصيد</th>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>N° Facture</th>
+                                    <th>Libellé</th>
+                                    <th>Montant</th>
+                                    <th>Payé</th>
+                                    <th>Reste</th>
+                                    <th>Solde</th>
                                 </tr>
                             </thead>
                             <tbody>`;
                 
                 if (sortedVentes.length === 0 && Math.abs(openingBalance) <= 0.0001 && totalPaid === 0) {
-                    html += `<tr><td colspan="7" style="text-align:center;padding:12px;color:var(--muted);font-size:10px;">📭 لا توجد حركات</td></tr>`;
+                    html += `<tr><td colspan="7" style="text-align:center;padding:12px;color:var(--muted);font-size:10px;">📭 Aucun mouvement</td></tr>`;
                 } else {
                     let cumulative = openingBalance;
                     html += `<tr style="background:#f0f4ff;">
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">---</td>
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">---</td>
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:700;">رصيد البداية</td>
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">-</td>
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">-</td>
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">-</td>
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:800;">${formatNum(openingBalance)}</td>
+                        <td>---</td>
+                        <td>---</td>
+                        <td style="font-weight:700;">Solde d'ouverture</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td style="font-weight:800;">${formatNum(openingBalance)}</td>
                     </tr>`;
                     sortedVentes.forEach(v => {
                         const invoicePayments = clientReglements.filter(r => r.invoiceNum === v.num);
@@ -5436,26 +5437,26 @@
                         const remaining = v.total - paidAmount;
                         cumulative += remaining;
                         html += `<tr>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatDate(v.date)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:700;cursor:pointer;" onclick="ClientHistory.showInvoiceDetail('${v.num}')">📄 ${v.num}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">فاتورة بيع</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatNum(v.total)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:var(--success);">${formatNum(paidAmount)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:${remaining > 0 ? 'var(--danger)' : 'var(--success)'};">${formatNum(remaining)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:800;">${formatNum(cumulative)}</td>
+                            <td>${formatDate(v.date)}</td>
+                            <td style="font-weight:700;cursor:pointer;" onclick="ClientHistory.showInvoiceDetail('${v.num}')">📄 ${v.num}</td>
+                            <td>Facture de vente</td>
+                            <td>${formatNum(v.total)}</td>
+                            <td style="color:var(--success);">${formatNum(paidAmount)}</td>
+                            <td style="color:${remaining > 0 ? 'var(--danger)' : 'var(--success)'};">${formatNum(remaining)}</td>
+                            <td style="font-weight:800;">${formatNum(cumulative)}</td>
                         </tr>`;
                     });
                     const directPayments = clientReglements.filter(r => !r.invoiceNum || r.invoiceNum === '');
                     directPayments.forEach(p => {
                         cumulative -= p.amount;
                         html += `<tr style="background:#f0fff0;">
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatDate(p.date)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">---</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">💳 Paiement direct</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;"></td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:var(--success);">${formatNum(p.amount)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;"></td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:800;">${formatNum(cumulative)}</td>
+                            <td>${formatDate(p.date)}</td>
+                            <td>---</td>
+                            <td>💳 Paiement direct</td>
+                            <td></td>
+                            <td style="color:var(--success);">${formatNum(p.amount)}</td>
+                            <td></td>
+                            <td style="font-weight:800;">${formatNum(cumulative)}</td>
                         </tr>`;
                     });
                 }
@@ -5464,22 +5465,20 @@
                 result.innerHTML = html;
             },
             
-            // تعديل الفاتورة
             editInvoice(invoiceId) {
                 const invoice = ventes.find(v => v.id === invoiceId);
                 if (!invoice) {
-                    showToastModern('❌ الفاتورة غير موجودة', 'error');
+                    showToastModern('❌ Facture introuvable', 'error');
                     return;
                 }
                 Ventes.load(invoice.id);
                 openSheet('ventes');
             },
             
-            // تسديد دفعة للفاتورة
             payInvoice(invoiceId) {
                 const invoice = ventes.find(v => v.id === invoiceId);
                 if (!invoice) {
-                    showToastModern('❌ الفاتورة غير موجودة', 'error');
+                    showToastModern('❌ Facture introuvable', 'error');
                     return;
                 }
                 Ventes.load(invoice.id);
@@ -5490,16 +5489,15 @@
                         regAmount.focus();
                         regAmount.select();
                         const paid = (invoice.reglements || []).reduce((s, r) => s + r.amount, 0);
-                        showToastModern(`💰 تسديد فاتورة ${invoice.num} - المتبقي: ${(invoice.total - paid).toFixed(3)} د.ت`, 'info');
+                        showToastModern(`💰 Règlement de la facture ${invoice.num} - Reste: ${(invoice.total - paid).toFixed(3)} TND`, 'info');
                     }
                 }, 500);
             },
             
-            // عرض تفاصيل الفاتورة
             showInvoiceDetail(invoiceNum) {
                 const invoice = ventes.find(v => v.num === invoiceNum);
                 if (!invoice) {
-                    showToastModern('❌ الفاتورة غير موجودة', 'error');
+                    showToastModern('❌ Facture introuvable', 'error');
                     return;
                 }
                 Ventes.load(invoice.id);
@@ -5548,13 +5546,13 @@
                 if (!select || !result) return;
                 const fournisseurId = parseInt(select.value);
                 if (!fournisseurId) {
-                    result.innerHTML = '<div class="empty-msg">اختر مورداً لعرض سجله</div>';
+                    result.innerHTML = '<div class="empty-msg">Choisissez un fournisseur pour afficher son relevé</div>';
                     return;
                 }
                 this.currentFournisseurId = fournisseurId;
                 const fournisseur = fournisseurs.find(f => f.id === fournisseurId);
                 if (!fournisseur) {
-                    result.innerHTML = '<div class="empty-msg">المورد غير موجود</div>';
+                    result.innerHTML = '<div class="empty-msg">Fournisseur introuvable</div>';
                     return;
                 }
                 recalculateFournisseurBalance(fournisseur.name);
@@ -5576,72 +5574,72 @@
                 const currentBalance = fournisseur.balance || 0;
                 
                 let html = `
-                    <div style="background:linear-gradient(135deg, var(--secondary), #2a3f7a);color:#fff;padding:14px;border-radius:14px;margin-bottom:10px;box-shadow:0 4px 20px rgba(26,42,92,0.3);">
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;">
-                            <div><span style="opacity:0.7;">🤝 المورد :</span> <span style="font-weight:700;">${fournisseur.name}</span></div>
-                            <div><span style="opacity:0.7;">📞 الهاتف :</span> <span style="font-weight:700;">${fournisseur.phone || '-'}</span></div>
-                            <div><span style="opacity:0.7;">📄 عدد الفواتير :</span> <span style="font-weight:700;">${totalInvoices}</span></div>
-                            <div><span style="opacity:0.7;">📍 العنوان :</span> <span style="font-weight:700;">${fournisseur.address || '-'}</span></div>
-                            <div><span style="opacity:0.7;">💰 إجمالي المشتريات :</span> <span style="font-weight:700;color:#4dbf8c;">${formatNum(totalPurchases)} د.ت</span></div>
-                            <div><span style="opacity:0.7;">💳 إجمالي المدفوعات :</span> <span style="font-weight:700;color:#5c7cf0;">${formatNum(totalPaid)} د.ت</span></div>
-                            <div><span style="opacity:0.7;">📊 الرصيد الحالي :</span> <span style="font-weight:700;color:${currentBalance >= 0 ? '#4dbf8c' : '#ff6b6b'};">${formatNum(currentBalance)} د.ت</span></div>
-                            <div><span style="opacity:0.7;">📅 الفترة :</span> <span style="font-weight:700;">${formatDate(dateFrom.toISOString().slice(0,10))} → ${formatDate(dateTo.toISOString().slice(0,10))}</span></div>
+                    <div class="client-summary-card">
+                        <div class="grid">
+                            <div><span class="label">🤝 Fournisseur :</span> <span class="value">${fournisseur.name}</span></div>
+                            <div><span class="label">📞 Téléphone :</span> <span class="value">${fournisseur.phone || '-'}</span></div>
+                            <div><span class="label">📄 Nb factures :</span> <span class="value">${totalInvoices}</span></div>
+                            <div><span class="label">📍 Adresse :</span> <span class="value">${fournisseur.address || '-'}</span></div>
+                            <div><span class="label">💰 Total achats :</span> <span class="value positive">${formatNum(totalPurchases)} TND</span></div>
+                            <div><span class="label">💳 Total règlements :</span> <span class="value">${formatNum(totalPaid)} TND</span></div>
+                            <div><span class="label">📊 Solde actuel :</span> <span class="value ${currentBalance >= 0 ? 'positive' : 'negative'}">${formatNum(currentBalance)} TND</span></div>
+                            <div><span class="label">📅 Période :</span> <span class="value">${formatDate(dateFrom.toISOString().slice(0,10))} → ${formatDate(dateTo.toISOString().slice(0,10))}</span></div>
                         </div>
                     </div>
                     
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:4px 0 8px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:8px 12px;box-shadow:var(--shadow);">
-                        <div style="text-align:center;font-size:10px;font-weight:600;">
-                            <span style="color:var(--muted);font-size:8px;display:block;">رصيد البداية</span>
-                            <span style="font-size:13px;font-weight:800;color:var(--primary);">${formatNum(openingBalance)} د.ت</span>
+                    <div class="balance-display">
+                        <div class="item">
+                            <span class="label">Solde d'ouverture</span>
+                            <span class="value opening">${formatNum(openingBalance)} TND</span>
                         </div>
-                        <div style="text-align:center;font-size:10px;font-weight:600;">
-                            <span style="color:var(--muted);font-size:8px;display:block;">الرصيد النهائي</span>
-                            <span style="font-size:13px;font-weight:800;color:var(--danger);">${formatNum(currentBalance)} د.ت</span>
+                        <div class="item">
+                            <span class="label">Solde final</span>
+                            <span class="value closing">${formatNum(currentBalance)} TND</span>
                         </div>
                     </div>
                     
                     <div style="display:flex;gap:6px;margin:6px 0;flex-wrap:wrap;">
-                        <button class="btn print small" onclick="printStatement('fournisseur', ${fournisseurId})" style="flex:1;padding:6px;font-size:10px;min-width:80px;">🖨️ طباعة السجل</button>
-                        <button class="btn save small" onclick="recalculateFournisseurBalance('${fournisseur.name}'); FournisseurHistory.show();" style="flex:1;padding:6px;font-size:10px;min-width:80px;">🔄 تحديث الرصيد</button>
+                        <button class="btn print small" onclick="printStatement('fournisseur', ${fournisseurId})" style="flex:1;padding:6px;font-size:10px;min-width:80px;">🖨️ Imprimer le relevé</button>
+                        <button class="btn save small" onclick="recalculateFournisseurBalance('${fournisseur.name}'); FournisseurHistory.show();" style="flex:1;padding:6px;font-size:10px;min-width:80px;">🔄 Actualiser le solde</button>
                     </div>
                     
-                    <div class="section-title" style="margin-top:10px;">📋 قائمة الفواتير</div>
-                    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:6px;border-radius:12px;border:1px solid var(--border);background:var(--panel);">
-                        <table style="width:100%;min-width:700px;border-collapse:collapse;font-size:8px;direction:ltr;background:var(--panel);">
+                    <div class="section-title" style="margin-top:10px;">📋 Liste des factures</div>
+                    <div class="history-table-wrapper">
+                        <table class="history-table" style="min-width:700px;">
                             <thead>
-                                <tr style="background:var(--secondary);color:#fff;">
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">رقم الفاتورة</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">التاريخ</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المبلغ</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المدفوع</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المتبقي</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">الحالة</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">الإجراءات</th>
+                                <tr>
+                                    <th>N° Facture</th>
+                                    <th>Date</th>
+                                    <th>Montant</th>
+                                    <th>Payé</th>
+                                    <th>Reste</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>`;
                 
                 if (sortedAchats.length === 0) {
-                    html += `<tr><td colspan="7" style="text-align:center;padding:12px;color:var(--muted);font-size:10px;">📭 لا توجد فواتير</td></tr>`;
+                    html += `<tr><td colspan="7" style="text-align:center;padding:12px;color:var(--muted);font-size:10px;">📭 Aucune facture</td></tr>`;
                 } else {
                     sortedAchats.forEach(a => {
                         const invoicePayments = fournisseurPayments.filter(p => p.invoiceNum === a.num);
                         const paidAmount = invoicePayments.reduce((sum, r) => sum + r.amount, 0);
                         const remaining = a.total - paidAmount;
-                        let statusText = '✅ مدفوعة';
+                        let statusText = '✅ Payée';
                         let statusColor = 'var(--success)';
-                        if (remaining > a.total * 0.9) { statusText = '⏳ غير مدفوعة';
-                            statusColor = 'var(--danger)'; } else if (remaining > 0.001) { statusText = '🔄 جزئياً';
+                        if (remaining > a.total * 0.9) { statusText = '⏳ Non payée';
+                            statusColor = 'var(--danger)'; } else if (remaining > 0.001) { statusText = '🔄 Partiellement payée';
                             statusColor = 'var(--warning)'; }
                         
                         html += `<tr>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:700;">${a.num}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatDate(a.date)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatNum(a.total)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:var(--success);">${formatNum(paidAmount)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:${remaining > 0.001 ? 'var(--danger)' : 'var(--success)'};">${formatNum(remaining)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:${statusColor};font-weight:700;">${statusText}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">
+                            <td style="font-weight:700;">${a.num}</td>
+                            <td>${formatDate(a.date)}</td>
+                            <td>${formatNum(a.total)}</td>
+                            <td style="color:var(--success);">${formatNum(paidAmount)}</td>
+                            <td style="color:${remaining > 0.001 ? 'var(--danger)' : 'var(--success)'};">${formatNum(remaining)}</td>
+                            <td style="color:${statusColor};font-weight:700;">${statusText}</td>
+                            <td>
                                 <button class="btn edit small" onclick="FournisseurHistory.editInvoice('${a.id}')" style="padding:1px 6px;font-size:7px;margin:0 1px;">✏️</button>
                                 <button class="btn save small" onclick="FournisseurHistory.payInvoice('${a.id}')" style="padding:1px 6px;font-size:7px;margin:0 1px;background:linear-gradient(135deg,var(--success),#27ae60);">💰</button>
                             </td>
@@ -5651,36 +5649,35 @@
                 
                 html += `</tbody></table></div>`;
                 
-                // ===== جدول تفصيلي للحركات =====
                 html += `
-                    <div class="section-title" style="margin-top:10px;">📊 تفاصيل الحركات</div>
-                    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:6px;border-radius:12px;border:1px solid var(--border);background:var(--panel);">
-                        <table style="width:100%;min-width:650px;border-collapse:collapse;font-size:8px;direction:ltr;background:var(--panel);">
+                    <div class="section-title" style="margin-top:10px;">📊 Détail des mouvements</div>
+                    <div class="history-table-wrapper">
+                        <table class="history-table" style="min-width:650px;">
                             <thead>
-                                <tr style="background:var(--secondary);color:#fff;">
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">التاريخ</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">رقم الفاتورة</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">البيان</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المبلغ</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المدفوع</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المتبقي</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">الرصيد</th>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>N° Facture</th>
+                                    <th>Libellé</th>
+                                    <th>Montant</th>
+                                    <th>Payé</th>
+                                    <th>Reste</th>
+                                    <th>Solde</th>
                                 </tr>
                             </thead>
                             <tbody>`;
                 
                 if (sortedAchats.length === 0 && Math.abs(openingBalance) <= 0.0001 && totalPaid === 0) {
-                    html += `<tr><td colspan="7" style="text-align:center;padding:12px;color:var(--muted);font-size:10px;">📭 لا توجد حركات</td></tr>`;
+                    html += `<tr><td colspan="7" style="text-align:center;padding:12px;color:var(--muted);font-size:10px;">📭 Aucun mouvement</td></tr>`;
                 } else {
                     let cumulative = openingBalance;
                     html += `<tr style="background:#f0f4ff;">
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">---</td>
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">---</td>
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:700;">رصيد البداية</td>
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">-</td>
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">-</td>
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">-</td>
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:800;">${formatNum(openingBalance)}</td>
+                        <td>---</td>
+                        <td>---</td>
+                        <td style="font-weight:700;">Solde d'ouverture</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td style="font-weight:800;">${formatNum(openingBalance)}</td>
                     </tr>`;
                     sortedAchats.forEach(a => {
                         const invoicePayments = fournisseurPayments.filter(p => p.invoiceNum === a.num);
@@ -5688,26 +5685,26 @@
                         const remaining = a.total - paidAmount;
                         cumulative += remaining;
                         html += `<tr>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatDate(a.date)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:700;cursor:pointer;" onclick="FournisseurHistory.showInvoiceDetail('${a.num}')">📄 ${a.num}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">فاتورة شراء</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatNum(a.total)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:var(--success);">${formatNum(paidAmount)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:${remaining > 0 ? 'var(--danger)' : 'var(--success)'};">${formatNum(remaining)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:800;">${formatNum(cumulative)}</td>
+                            <td>${formatDate(a.date)}</td>
+                            <td style="font-weight:700;cursor:pointer;" onclick="FournisseurHistory.showInvoiceDetail('${a.num}')">📄 ${a.num}</td>
+                            <td>Facture d'achat</td>
+                            <td>${formatNum(a.total)}</td>
+                            <td style="color:var(--success);">${formatNum(paidAmount)}</td>
+                            <td style="color:${remaining > 0 ? 'var(--danger)' : 'var(--success)'};">${formatNum(remaining)}</td>
+                            <td style="font-weight:800;">${formatNum(cumulative)}</td>
                         </tr>`;
                     });
                     const directPayments = fournisseurPayments.filter(p => !p.invoiceNum || p.invoiceNum === '');
                     directPayments.forEach(p => {
                         cumulative -= p.amount;
                         html += `<tr style="background:#fff0f0;">
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatDate(p.date)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">---</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">💳 Paiement direct</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;"></td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:var(--success);">${formatNum(p.amount)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;"></td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:800;">${formatNum(cumulative)}</td>
+                            <td>${formatDate(p.date)}</td>
+                            <td>---</td>
+                            <td>💳 Paiement direct</td>
+                            <td></td>
+                            <td style="color:var(--success);">${formatNum(p.amount)}</td>
+                            <td></td>
+                            <td style="font-weight:800;">${formatNum(cumulative)}</td>
                         </tr>`;
                     });
                 }
@@ -5719,7 +5716,7 @@
             editInvoice(invoiceId) {
                 const invoice = achats.find(a => a.id === invoiceId);
                 if (!invoice) {
-                    showToastModern('❌ الفاتورة غير موجودة', 'error');
+                    showToastModern('❌ Facture introuvable', 'error');
                     return;
                 }
                 Achats.load(invoice.id);
@@ -5729,7 +5726,7 @@
             payInvoice(invoiceId) {
                 const invoice = achats.find(a => a.id === invoiceId);
                 if (!invoice) {
-                    showToastModern('❌ الفاتورة غير موجودة', 'error');
+                    showToastModern('❌ Facture introuvable', 'error');
                     return;
                 }
                 Achats.load(invoice.id);
@@ -5740,7 +5737,7 @@
                         regAmount.focus();
                         regAmount.select();
                         const paid = (invoice.reglements || []).reduce((s, r) => s + r.amount, 0);
-                        showToastModern(`💰 تسديد فاتورة ${invoice.num} - المتبقي: ${(invoice.total - paid).toFixed(3)} د.ت`, 'info');
+                        showToastModern(`💰 Règlement de la facture ${invoice.num} - Reste: ${(invoice.total - paid).toFixed(3)} TND`, 'info');
                     }
                 }, 500);
             },
@@ -5748,7 +5745,7 @@
             showInvoiceDetail(invoiceNum) {
                 const invoice = achats.find(a => a.num === invoiceNum);
                 if (!invoice) {
-                    showToastModern('❌ الفاتورة غير موجودة', 'error');
+                    showToastModern('❌ Facture introuvable', 'error');
                     return;
                 }
                 Achats.load(invoice.id);
@@ -5784,7 +5781,7 @@
                 if (!select || !result) return;
                 const articleId = parseInt(select.value);
                 if (!articleId) { result.innerHTML =
-                        '<div class="empty-msg">Choisissez un article pour voir son historique</div>'; return; }
+                        '<div class="empty-msg">Choisissez un article pour afficher son historique</div>'; return; }
                 this.currentArticleId = articleId;
                 const article = articles.find(a => a.id === articleId);
                 if (!article) { result.innerHTML = '<div class="empty-msg">Article introuvable</div>'; return; }
@@ -5819,46 +5816,46 @@
                 const stockDepart = article.stockDepart !== undefined ? article.stockDepart : (article.stock || 0);
                 
                 let html =
-                    `<div style="background:linear-gradient(135deg, var(--secondary), #2a3f7a);color:#fff;padding:14px;border-radius:14px;margin-bottom:10px;box-shadow:0 4px 20px rgba(26,42,92,0.3);">
-                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:6px;font-size:11px;">
-                            <div><span style="opacity:0.7;">📦 Article :</span> <span style="font-weight:700;">${article.name}</span></div>
-                            <div><span style="opacity:0.7;">📅 الفترة :</span> <span style="font-weight:700;">${formatDate(dateFrom.toISOString().slice(0,10))} → ${formatDate(dateTo.toISOString().slice(0,10))}</span></div>
-                            <div><span style="opacity:0.7;">📥 المدخلات :</span> <span style="font-weight:700;color:#4dbf8c;">${totalIn}</span></div>
-                            <div><span style="opacity:0.7;">📤 المخرجات :</span> <span style="font-weight:700;color:#ff6b6b;">${totalOut}</span></div>
-                            <div><span style="opacity:0.7;">📊 المخزون الحالي :</span> <span style="font-weight:700;color:#5c7cf0;">${article.stock}</span></div>
+                    `<div class="client-summary-card">
+                        <div class="grid">
+                            <div><span class="label">📦 Article :</span> <span class="value">${article.name}</span></div>
+                            <div><span class="label">📅 Période :</span> <span class="value">${formatDate(dateFrom.toISOString().slice(0,10))} → ${formatDate(dateTo.toISOString().slice(0,10))}</span></div>
+                            <div><span class="label">📥 Entrées :</span> <span class="value positive">${totalIn}</span></div>
+                            <div><span class="label">📤 Sorties :</span> <span class="value negative">${totalOut}</span></div>
+                            <div><span class="label">📊 Stock actuel :</span> <span class="value">${article.stock}</span></div>
                         </div>
                     </div>
                     <div style="display:flex;gap:6px;margin:6px 0;">
-                        <button class="btn print small" onclick="printStatement('article', ${articleId})" style="flex:1;padding:6px;font-size:10px;">🖨️ طباعة التقرير</button>
+                        <button class="btn print small" onclick="printStatement('article', ${articleId})" style="flex:1;padding:6px;font-size:10px;">🖨️ Imprimer le rapport</button>
                     </div>
-                    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:6px;border-radius:12px;border:1px solid var(--border);background:var(--panel);">
-                        <table style="width:100%;min-width:650px;border-collapse:collapse;font-size:8px;direction:ltr;background:var(--panel);">
+                    <div class="history-table-wrapper">
+                        <table class="history-table" style="min-width:650px;">
                             <thead>
-                                <tr style="background:var(--secondary);color:#fff;">
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">التاريخ</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">الوثيقة</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">النوع</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">الطرف</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">الكمية</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">السعر</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">المجموع</th>
-                                    <th style="padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px;">الرصيد</th>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Document</th>
+                                    <th>Type</th>
+                                    <th>Tiers</th>
+                                    <th>Quantité</th>
+                                    <th>Prix</th>
+                                    <th>Total</th>
+                                    <th>Solde</th>
                                 </tr>
                             </thead>
                             <tbody>`;
                 if (movements.length === 0) {
-                    html += `<tr><td colspan="8" style="text-align:center;padding:12px;color:var(--muted);font-size:10px;">📭 لا توجد حركات</td></tr>`;
+                    html += `<tr><td colspan="8" style="text-align:center;padding:12px;color:var(--muted);font-size:10px;">📭 Aucun mouvement</td></tr>`;
                 } else {
                     let cumul = stockDepart;
                     html += `<tr style="background:#f0f4ff;">
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">---</td>
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">---</td>
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:700;">المخزون الابتدائي</td>
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">-</td>
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:700;">${cumul}</td>
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">-</td>
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">-</td>
-                        <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:800;">${cumul}</td>
+                        <td>---</td>
+                        <td>---</td>
+                        <td style="font-weight:700;">Stock initial</td>
+                        <td>-</td>
+                        <td style="font-weight:700;">${cumul}</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td style="font-weight:800;">${cumul}</td>
                     </tr>`;
                     movements.forEach(m => {
                         cumul += m.qty;
@@ -5866,14 +5863,14 @@
                         const qtyDisplay = m.qty > 0 ? '+' + m.qty : m.qty;
                         const color = m.qty > 0 ? 'var(--success)' : 'var(--danger)';
                         html += `<tr>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatDate(m.date)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:700;">${m.docNum}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${typeLabel}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${m.party}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;color:${color};font-weight:700;">${qtyDisplay}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatNum(m.price)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;">${formatNum(m.total)}</td>
-                            <td style="padding:4px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:7px;font-weight:800;">${cumul}</td>
+                            <td>${formatDate(m.date)}</td>
+                            <td style="font-weight:700;">${m.docNum}</td>
+                            <td>${typeLabel}</td>
+                            <td>${m.party}</td>
+                            <td style="color:${color};font-weight:700;">${qtyDisplay}</td>
+                            <td>${formatNum(m.price)}</td>
+                            <td>${formatNum(m.total)}</td>
+                            <td style="font-weight:800;">${cumul}</td>
                         </tr>`;
                     });
                 }
@@ -5894,6 +5891,8 @@
             clientAddress: '',
             clientEmail: '',
             clientSpecialPrices: [],
+            stockSnapshot: [],
+            isSaved: false,
             reset() {
                 this.editingId = null;
                 this.lines = [];
@@ -5905,6 +5904,8 @@
                 this.clientAddress = '';
                 this.clientEmail = '';
                 this.clientSpecialPrices = [];
+                this.stockSnapshot = [];
+                this.isSaved = false;
                 const num = 'VTE-' + String(nextId.ventes).padStart(4, '0');
                 const date = new Date().toISOString().slice(0, 10);
                 const dateDisplay = date.split('-').reverse().join('/');
@@ -6008,10 +6009,18 @@
                 const article = articles.find(a => a.name === name);
                 if (article) {
                     const currentStock = article.stock || 0;
+                    
+                    // Sauvegarde du stock initial avant modification
+                    this.stockSnapshot.push({
+                        articleName: article.name,
+                        originalStock: currentStock
+                    });
+                    
                     if (currentStock < qty) {
-                        showToastModern(`⚠️ Stock insuffisant! Disponible: ${currentStock}`, 'error');
-                        return;
+                        const remainingAfterSale = currentStock - qty;
+                        showToastModern(`⚠️ Attention: stock insuffisant! Disponible: ${currentStock}, deviendra: ${remainingAfterSale}`, 'warning');
                     }
+                    
                     article.stock = currentStock - qty;
                     saveState();
                     Articles.render();
@@ -6163,7 +6172,7 @@
             deleteReglement(idx) {
                 const removed = this.reglements.splice(idx, 1)[0];
                 if (!removed) {
-                    showToastModern('⚠️ La défense n\'existe pas', 'warning');
+                    showToastModern('⚠️ Le règlement n\'existe pas', 'warning');
                     return;
                 }
                 if (removed.id) {
@@ -6218,19 +6227,27 @@
                     clientTaxId: client.taxId || '', clientAddress: client.address || '',
                     clientEmail: client.email || '' };
                 isSaving = true;
+                const isNewInvoice = !this.editingId;
                 try {
-                    if (this.editingId) {
+                    if (isNewInvoice) {
+                        ventes.push(rec);
+                    } else {
                         const idx = ventes.findIndex(v => v.id === this.editingId);
-                        if (idx !== -1) ventes[idx] = rec;
-                        else ventes.push(rec);
-                    } else { ventes.push(rec); }
+                        if (idx === -1) {
+                            showToastModern('❌ Facture introuvable — impossible de modifier', 'error');
+                            return;
+                        }
+                        ventes[idx] = rec;
+                    }
                     saveState();
                     recalculateClientBalance(clientName);
                     this.render();
                     this.editingId = rec.id;
                     this.originalClientBalance = client.balance;
                     this.updateAccountSummary();
-                    showToastModern(this.editingId ? '✅ Facture modifiée' : '✅ Facture enregistrée', 'success');
+                    this.isSaved = true;
+                    this.stockSnapshot = [];
+                    showToastModern(isNewInvoice ? '✅ Facture enregistrée' : '✅ Facture modifiée', 'success');
                 } catch (e) {
                     showToastModern('❌ Erreur lors de l\'enregistrement', 'error');
                     console.error(e);
@@ -6295,11 +6312,25 @@
                 this.lines = [...r.lines];
                 this.reglements = r.reglements ? [...r.reglements] : [];
                 this.editingRowIndex = null;
+                this.stockSnapshot = [];
+                this.isSaved = true;
                 this.renderLines();
                 this.refreshArticleOptions();
                 this.renderReglements();
                 this.updateAccountSummary();
                 openSheet('ventes');
+            },
+            restoreStockOnCancel() {
+                if (this.isSaved || this.stockSnapshot.length === 0) return;
+                this.stockSnapshot.forEach(snap => {
+                    const article = articles.find(a => a.name === snap.articleName);
+                    if (article) {
+                        article.stock = snap.originalStock;
+                    }
+                });
+                this.stockSnapshot = [];
+                saveState();
+                Articles.render();
             },
             render() {
                 const q = $('vSearch').value.trim().toLowerCase();
@@ -6316,7 +6347,7 @@
                     const paid = (v.reglements || []).reduce((a, r) => a + r.amount, 0);
                     const remaining = v.total - paid;
                     const statusClass = remaining <= 0 ? 'paid' : 'pending';
-                    const statusText = remaining <= 0 ? 'Payé' : 'Non payé';
+                    const statusText = remaining <= 0 ? 'Payée' : 'Non payée';
                     d.innerHTML =
                         `<div class="main-info"><div class="name">${v.num}</div><div class="meta">${v.client} - ${v.date} | <span class="badge ${statusClass}">${statusText}</span></div></div><div class="amount">${v.total.toFixed(3)} TND</div>`;
                     list.appendChild(d);
@@ -6548,6 +6579,8 @@
             editingRowIndex: null,
             supplierTaxId: '',
             supplierAddress: '',
+            stockSnapshot: [],
+            isSaved: false,
             reset() {
                 this.editingId = null;
                 this.lines = [];
@@ -6557,6 +6590,8 @@
                 this.editingRowIndex = null;
                 this.supplierTaxId = '';
                 this.supplierAddress = '';
+                this.stockSnapshot = [];
+                this.isSaved = false;
                 const num = 'ACH-' + String(nextId.achats).padStart(4, '0');
                 const date = new Date().toISOString().slice(0, 10);
                 const dateDisplay = date.split('-').reverse().join('/');
@@ -6648,6 +6683,10 @@
                 }
                 const article = articles.find(a => a.name === name);
                 if (article) {
+                    this.stockSnapshot.push({
+                        articleName: article.name,
+                        originalStock: article.stock || 0
+                    });
                     article.stock = (article.stock || 0) + qty;
                     saveState();
                     Articles.render();
@@ -6788,7 +6827,7 @@
             deleteReglement(idx) {
                 const removed = this.reglements.splice(idx, 1)[0];
                 if (!removed) {
-                    showToastModern('⚠️ La défense n\'existe pas', 'warning');
+                    showToastModern('⚠️ Le règlement n\'existe pas', 'warning');
                     return;
                 }
                 if (removed.id) {
@@ -6842,19 +6881,27 @@
                     lines: [...this.lines], total, reglements: [...this.reglements], prevBalance,
                     supplierTaxId: supplier.taxId || '', supplierAddress: supplier.address || '' };
                 isSaving = true;
+                const isNewInvoice = !this.editingId;
                 try {
-                    if (this.editingId) {
+                    if (isNewInvoice) {
+                        achats.push(rec);
+                    } else {
                         const idx = achats.findIndex(a => a.id === this.editingId);
-                        if (idx !== -1) achats[idx] = rec;
-                        else achats.push(rec);
-                    } else { achats.push(rec); }
+                        if (idx === -1) {
+                            showToastModern('❌ Facture introuvable — impossible de modifier', 'error');
+                            return;
+                        }
+                        achats[idx] = rec;
+                    }
                     saveState();
                     recalculateFournisseurBalance(supplierName);
                     this.render();
                     this.editingId = rec.id;
                     this.originalSupplierBalance = supplier.balance;
                     this.updateAccountSummary();
-                    showToastModern(this.editingId ? '✅ Facture d\'achat modifiée' : '✅ Facture d\'achat enregistrée', 'success');
+                    this.isSaved = true;
+                    this.stockSnapshot = [];
+                    showToastModern(isNewInvoice ? '✅ Facture d\'achat enregistrée' : '✅ Facture d\'achat modifiée', 'success');
                 } catch (e) {
                     showToastModern('❌ Erreur lors de l\'enregistrement', 'error');
                     console.error(e);
@@ -6918,11 +6965,25 @@
                 this.lines = [...r.lines];
                 this.reglements = r.reglements ? [...r.reglements] : [];
                 this.editingRowIndex = null;
+                this.stockSnapshot = [];
+                this.isSaved = true;
                 this.renderLines();
                 this.refreshArticleOptions();
                 this.renderReglements();
                 this.updateAccountSummary();
                 openSheet('achats');
+            },
+            restoreStockOnCancel() {
+                if (this.isSaved || this.stockSnapshot.length === 0) return;
+                this.stockSnapshot.forEach(snap => {
+                    const article = articles.find(a => a.name === snap.articleName);
+                    if (article) {
+                        article.stock = snap.originalStock;
+                    }
+                });
+                this.stockSnapshot = [];
+                saveState();
+                Articles.render();
             },
             render() {
                 const q = $('aSearchP').value.trim().toLowerCase();
@@ -7696,7 +7757,7 @@
             return 'seulement ' + (text || 'zéro') + ' seulement';
         }
 
-        // ===== PRINT STATEMENT =====
+        // ===== PRINT STATEMENT - VERSION CORRIGÉE AVEC TRI PAR DATE =====
         function printStatement(type, id) {
             let data = null;
             let title = '';
@@ -7724,20 +7785,53 @@
                 movements.push({ date: '---', doc: 'Solde d\'ouverture', description: 'Solde initial',
                     debit: 0, credit: 0, balance: cumulative });
                 
-                const sortedInvoices = [...invoices].sort((a, b) => a.date < b.date ? -1 : 1);
-                sortedInvoices.forEach(inv => {
+                let allMovements = [];
+                
+                invoices.forEach(inv => {
                     const invPayments = payments.filter(p => p.invoiceNum === inv.num);
                     const paid = invPayments.reduce((s, p) => s + p.amount, 0);
-                    cumulative += inv.total - paid;
-                    movements.push({ date: inv.date, doc: inv.num, description: 'Facture de vente',
-                        debit: inv.total, credit: paid, balance: cumulative });
+                    allMovements.push({
+                        date: inv.date,
+                        doc: inv.num,
+                        description: 'Facture de vente',
+                        debit: inv.total,
+                        credit: paid,
+                        type: 'invoice'
+                    });
                 });
                 
                 const directPayments = payments.filter(p => !p.invoiceNum || p.invoiceNum === '');
                 directPayments.forEach(p => {
-                    cumulative -= p.amount;
-                    movements.push({ date: p.date, doc: '', description: '💳 Paiement direct',
-                        debit: 0, credit: p.amount, balance: cumulative });
+                    allMovements.push({
+                        date: p.date,
+                        doc: '',
+                        description: '💳 Paiement direct',
+                        debit: 0,
+                        credit: p.amount,
+                        type: 'payment'
+                    });
+                });
+                
+                allMovements.sort((a, b) => {
+                    if (a.date < b.date) return -1;
+                    if (a.date > b.date) return 1;
+                    return 0;
+                });
+                
+                allMovements.forEach(m => {
+                    if (m.type === 'invoice') {
+                        cumulative += m.debit - m.credit;
+                    } else {
+                        cumulative -= m.credit;
+                    }
+                    movements.push({
+                        date: m.date,
+                        doc: m.doc,
+                        description: m.description,
+                        debit: m.debit,
+                        credit: m.credit,
+                        balance: cumulative
+                    });
                 });
                 
                 const currentBalance = cumulative;
@@ -7779,20 +7873,53 @@
                 movements.push({ date: '---', doc: 'Solde d\'ouverture', description: 'Solde initial',
                     debit: 0, credit: 0, balance: cumulative });
                 
-                const sortedInvoices = [...invoices].sort((a, b) => a.date < b.date ? -1 : 1);
-                sortedInvoices.forEach(inv => {
+                let allMovements = [];
+                
+                invoices.forEach(inv => {
                     const invPayments = payments.filter(p => p.invoiceNum === inv.num);
                     const paid = invPayments.reduce((s, p) => s + p.amount, 0);
-                    cumulative += inv.total - paid;
-                    movements.push({ date: inv.date, doc: inv.num, description: 'Facture d\'achat',
-                        debit: inv.total, credit: paid, balance: cumulative });
+                    allMovements.push({
+                        date: inv.date,
+                        doc: inv.num,
+                        description: 'Facture d\'achat',
+                        debit: inv.total,
+                        credit: paid,
+                        type: 'invoice'
+                    });
                 });
                 
                 const directPayments = payments.filter(p => !p.invoiceNum || p.invoiceNum === '');
                 directPayments.forEach(p => {
-                    cumulative -= p.amount;
-                    movements.push({ date: p.date, doc: '', description: '💳 Paiement direct',
-                        debit: 0, credit: p.amount, balance: cumulative });
+                    allMovements.push({
+                        date: p.date,
+                        doc: '',
+                        description: '💳 Paiement direct',
+                        debit: 0,
+                        credit: p.amount,
+                        type: 'payment'
+                    });
+                });
+                
+                allMovements.sort((a, b) => {
+                    if (a.date < b.date) return -1;
+                    if (a.date > b.date) return 1;
+                    return 0;
+                });
+                
+                allMovements.forEach(m => {
+                    if (m.type === 'invoice') {
+                        cumulative += m.debit - m.credit;
+                    } else {
+                        cumulative -= m.credit;
+                    }
+                    movements.push({
+                        date: m.date,
+                        doc: m.doc,
+                        description: m.description,
+                        debit: m.debit,
+                        credit: m.credit,
+                        balance: cumulative
+                    });
                 });
                 
                 const currentBalance = cumulative;
@@ -8075,8 +8202,8 @@
                 return filtered.map(v => {
                     const paid = (v.reglements || []).reduce((sum, r) => sum + r.amount, 0);
                     const remaining = v.total - paid;
-                    const statusText = remaining <= 0 ? '✅ Payé' : (remaining >= v.total ? '⏳ Non payé' :
-                        '🔄 Partiellement payé');
+                    const statusText = remaining <= 0 ? '✅ Payée' : (remaining >= v.total ? '⏳ Non payée' :
+                        '🔄 Partiellement payée');
                     return { date: v.date, client: v.client, num: v.num, total: v.total, paid: paid,
                         remaining: remaining, status: statusText };
                 });
