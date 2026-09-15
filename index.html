@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-title" content="GTR POS">
     <meta name="theme-color" content="#1e2f66">
     <title>GTR POS V 0.8.1 - Système intégré</title>
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkdUUiBQT1MiLAogICJzaG9ydF9uYW1lIjogIkdUUiBQT1MiLAogICJkZXNjcmlwdGlvbiI6ICJQb2ludCBkZSB2ZW50ZSBwcm9mZXNzaW9uZWwiLAogICJzdGFydF91cmwiOiAiL2luZGV4Lmh0bWwiLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJvcmllbnRhdGlvbiI6ICJwb3J0cmFpdCIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzFhMmE1YyIsCiAgInRoZW1lX2NvbG9yIjogIiMxYTJhNWMiCn0=">
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkdUUiBQT1MiLAogICJzaG9ydF9uYW1lIjogIkdUUiBQT1MiLAogICJkZXNjcmlwdGlvbiI6ICJQb2ludCBkZSB2ZW50ZSBwcm9mZXNzaW9ubmVsIiwKICAic3RhcnRfdXJsIjogIi9pbmRleC5odG1sIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAib3JpZW50YXRpb24iOiAicG9ydHJhaXQiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMxYTJhNWMiLAogICJ0aGVtZV9jb2xvciI6ICIjMWEyYTVjIgp9">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -691,6 +691,34 @@
             .preview-modal-body .preview-doc th,
             .preview-modal-body .preview-doc td { padding: 3px 4px; }
         }
+
+        /* ===== MODE PLEIN ÉCRAN ===== */
+        :fullscreen .phone,
+        :-webkit-full-screen .phone,
+        :-moz-full-screen .phone,
+        :-ms-fullscreen .phone {
+            max-width: 100% !important;
+            width: 100% !important;
+            height: 100dvh !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+        }
+        :fullscreen body,
+        :-webkit-full-screen body {
+            background: var(--bg);
+            overflow: hidden;
+        }
+        :fullscreen .appbar {
+            padding-top: max(12px, env(safe-area-inset-top));
+        }
+        :fullscreen .content {
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+        }
+        #fullscreenBtn.active {
+            background: rgba(255,255,255,0.3) !important;
+            box-shadow: 0 0 12px rgba(74, 108, 247, 0.6);
+        }
     </style>
 </head>
 <body>
@@ -780,6 +808,7 @@
                 <button class="menu-btn" onclick="Theme.toggle()" title="Changer le thème">🌓</button>
                 <button class="menu-btn" id="backBtn" onclick="App.goHome()" style="display:none;">🏠</button>
                 <button class="menu-btn" onclick="App.openSheet('company')">⚙️</button>
+                <button class="menu-btn" id="fullscreenBtn" onclick="Fullscreen.toggle()" title="Plein écran">⛶</button>
                 <button class="menu-btn" id="langBtn" style="font-size:11px;">🌐</button>
             </div>
         </div>
@@ -1263,8 +1292,7 @@
                     <div class="summary-item"><span class="label">💳 Payé</span><span class="value positive" id="vPaidAmount">0.000</span></div>
                     <div class="summary-item"><span class="label">📊 Solde</span><span class="value negative" id="vCurrentBalance">0.000</span></div>
                 </div>
-                
-                <!-- ✨ Notice pour règlement sans produit -->
+
                 <div class="payment-only-notice" id="vPaymentOnlyNotice" style="display:none;">
                     <div class="title">💰 Mode Règlement</div>
                     <div class="subtitle">Aucun produit — enregistrez uniquement le paiement</div>
@@ -1343,8 +1371,7 @@
                     <div class="summary-item"><span class="label">💳 Payé</span><span class="value positive" id="pPaidAmount">0.000</span></div>
                     <div class="summary-item"><span class="label">📊 Solde</span><span class="value negative" id="pCurrentBalance">0.000</span></div>
                 </div>
-                
-                <!-- ✨ Notice pour règlement sans produit -->
+
                 <div class="payment-only-notice" id="pPaymentOnlyNotice" style="display:none;">
                     <div class="title">💸 Mode Règlement</div>
                     <div class="subtitle">Aucun produit — enregistrez uniquement le paiement</div>
@@ -1462,6 +1489,9 @@
 
                 <div class="section-title">🖨️ Impression</div>
                 <button class="btn outline small" onclick="PrintSystem.openCustomizer()" style="width:100%;margin-bottom:6px;">🖨️ Personnaliser</button>
+
+                <div class="section-title">🖥️ Affichage</div>
+                <button class="btn outline small" onclick="Fullscreen.toggle()" style="width:100%;margin-bottom:6px;">⛶ Basculer en plein écran</button>
 
                 <div class="section-title">👤 Compte</div>
                 <div id="accountEmailDisplay" style="font-size:11px;color:var(--muted);margin-bottom:3px;"></div>
@@ -1616,16 +1646,10 @@
         <div class="invoice-doc paper-80" id="printDoc"></div>
     </div>
 
-    <!-- ============================================================
-         JAVASCRIPT COMPLET
-         ============================================================ -->
     <script>
     (function() {
         'use strict';
 
-        // ============================================================
-        // 1. CONFIGURATION
-        // ============================================================
         const APP_CONFIG = {
             version: 'V 0.8.1',
             storageKey: 'gtrpos_data_v30',
@@ -1658,13 +1682,11 @@
             'Ctrl+F': 'Rechercher',
             'Ctrl+P': 'Imprimer',
             'Ctrl+E': 'Exporter',
+            'F11': 'Plein écran',
             'Esc': 'Fermer',
             'F1': 'Aide'
         };
 
-        // ============================================================
-        // 2. STATE
-        // ============================================================
         const State = {
             clients: [], fournisseurs: [], articles: [],
             ventes: [], achats: [], expenses: [],
@@ -1680,9 +1702,6 @@
             notifications: []
         };
 
-        // ============================================================
-        // 3. UTILITIES
-        // ============================================================
         const Utils = {
             $(id) { return document.getElementById(id); },
             formatNum(n) { return Number(n || 0).toFixed(3).replace(/\./g, ','); },
@@ -1705,9 +1724,6 @@
 
         const $ = Utils.$;
 
-        // ============================================================
-        // 4. TOAST & NOTIFICATIONS
-        // ============================================================
         const Toast = {
             _timer: null,
             show(msg, type = 'info') {
@@ -1803,9 +1819,6 @@
             }
         };
 
-        // ============================================================
-        // 5. THEME
-        // ============================================================
         const Theme = {
             current: 'light',
             themes: THEMES,
@@ -1833,9 +1846,6 @@
             }
         };
 
-        // ============================================================
-        // 6. STOCK
-        // ============================================================
         const Stock = {
             adjust(name, delta, opts = {}) {
                 const a = State.articles.find(x => x.name === name);
@@ -1870,9 +1880,6 @@
             }
         };
 
-        // ============================================================
-        // 7. BALANCE CALCULATOR
-        // ============================================================
         const BalanceCalculator = {
             _cfg: {
                 client: { list:() => State.clients, docs:() => State.ventes, caisse:() => State.caisseClients, docKey:'client', caisseKey:'clientName' },
@@ -1897,9 +1904,6 @@
             }
         };
 
-        // ============================================================
-        // 8. PERSISTENCE
-        // ============================================================
         const Persistence = {
             serialize() {
                 return {
@@ -1992,9 +1996,6 @@
             }
         };
 
-        // ============================================================
-        // 9. PRINT SYSTEM
-        // ============================================================
         const PrintSystem = {
             settings: { logo: null, footer: 'Merci de votre visite', fontSize: 'medium' },
             _currentData: null,
@@ -2071,7 +2072,7 @@
                     ? `<div style="text-align:center;margin-bottom:4px;"><img src="${this.settings.logo}" style="max-width:120px;max-height:50px;object-fit:contain;"></div>` : '';
                 const footer = this.settings.footer
                     ? `<div style="text-align:center;font-size:${fs};color:#666;margin-top:8px;border-top:1px dashed #ddd;padding-top:6px;">${this.settings.footer}</div>` : '';
-                
+
                 let lines = (data.lines || []).map((l, i) => `
                     <tr>
                         <td style="border:1px solid #999;padding:2px 4px;text-align:center;">${i+1}</td>
@@ -2080,7 +2081,7 @@
                         <td style="border:1px solid #999;padding:2px 4px;text-align:center;">${l.qty}</td>
                         <td style="border:1px solid #999;padding:2px 4px;text-align:right;font-weight:700;">${l.total.toFixed(3)}</td>
                     </tr>`).join('');
-                
+
                 if (!lines) {
                     lines = `<tr>
                         <td colspan="5" style="border:1px solid #999;padding:10px;text-align:center;
@@ -2089,7 +2090,7 @@
                         </td>
                     </tr>`;
                 }
-                
+
                 return `
                     ${logo}
                     <div style="text-align:center;border-bottom:2px solid #1e2f66;padding-bottom:4px;margin-bottom:4px;">
@@ -2174,9 +2175,6 @@
             }
         };
 
-        // ============================================================
-        // PREVIEW MODAL - Aperçu avant impression
-        // ============================================================
         const PreviewModal = {
             _currentType: null,
             _currentData: null,
@@ -2292,9 +2290,6 @@
             }
         };
 
-        // ============================================================
-        // 10. BLUETOOTH
-        // ============================================================
         const Bluetooth = {
             SERVICE_UUID: '000018f0-0000-1000-8000-00805f9b34fb',
             CHAR_UUID: '00002af1-0000-1000-8000-00805f9b34fb',
@@ -2317,9 +2312,6 @@
             }
         };
 
-        // ============================================================
-        // 11. CHART RENDERER
-        // ============================================================
         const ChartRenderer = {
             drawBars(canvas, { labels, values, colors, maxValue, showValues = true }) {
                 if (!canvas) return;
@@ -2409,9 +2401,6 @@
             }
         };
 
-        // ============================================================
-        // 12. ENTITY MODULE FACTORY
-        // ============================================================
         function createEntityModule(cfg) {
             const M = {
                 editingId: null,
@@ -2488,9 +2477,6 @@
             return M;
         }
 
-        // ============================================================
-        // 13. TRANSACTION MODULE FACTORY
-        // ============================================================
         function createTransactionModule(cfg) {
             return {
                 editingId: null, lines: [], reglements: [],
@@ -2665,7 +2651,7 @@
                     const b = $(cfg.linesBody);
                     if (!b) return;
                     let sum = 0;
-                    
+
                     if (!this.lines.length) {
                         b.innerHTML = `<tr>
                             <td colspan="6" style="text-align:center;padding:16px;color:#2980b9;font-size:11px;background:#e3f2fd;">
@@ -2679,11 +2665,11 @@
                         }
                         return;
                     }
-                    
+
                     if (cfg.paymentOnlyNotice && $(cfg.paymentOnlyNotice)) {
                         $(cfg.paymentOnlyNotice).style.display = 'none';
                     }
-                    
+
                     b.innerHTML = this.lines.map((l, i) => {
                         sum += l.total;
                         if (this.editingRowIndex === i) {
@@ -2790,14 +2776,14 @@
                     if (State.isSaving) { Toast.show('⏳ Enregistrement...'); return; }
                     if (this.editingRowIndex !== null) { Toast.show('⚠️ Terminez la modification', 'warning'); return; }
                     if (!$(cfg.partySelect).value) { Toast.show('⚠️ Choisissez une partie', 'warning'); return; }
-                    
+
                     const isPaymentOnly = !this.lines.length && this.reglements.length > 0;
-                    
+
                     if (!this.lines.length && !this.reglements.length) {
                         Toast.show('⚠️ Ajoutez un produit OU un règlement', 'warning');
                         return;
                     }
-                    
+
                     if (isPaymentOnly) {
                         const totalPaid = this.reglements.reduce((a, r) => a + r.amount, 0);
                         const ok = confirm(
@@ -2809,7 +2795,7 @@
                         );
                         if (!ok) return;
                     }
-                    
+
                     const pn = $(cfg.partySelect).options[$(cfg.partySelect).selectedIndex].textContent;
                     const party = cfg.partyList().find(p => p.name === pn);
                     if (!party) { Toast.show('⚠️ Introuvable', 'error'); return; }
@@ -2846,7 +2832,7 @@
                         this.updateAccountSummary();
                         this.isSaved = true;
                         this.stockSnapshot = [];
-                        
+
                         if (isPaymentOnly) {
                             NotificationSystem.add(
                                 cfg.isPurchase ? '💸 Règlement fournisseur' : '💰 Règlement client',
@@ -3083,9 +3069,6 @@
             };
         }
 
-        // ============================================================
-        // 14. RENDERERS
-        // ============================================================
         const ClientsRenderer = {
             render() {
                 const q = ($('cSearch')?.value || '').trim().toLowerCase();
@@ -3182,7 +3165,7 @@
                     const paid = (v.reglements || []).reduce((a, r) => a + r.amount, 0);
                     const isPaymentOnly = (!v.lines || v.lines.length === 0);
                     let badge, namePrefix, amountDisplay;
-                    
+
                     if (isPaymentOnly) {
                         badge = '<span class="badge payment-only">💰 Règlement</span>';
                         namePrefix = '💰 ';
@@ -3195,7 +3178,7 @@
                         namePrefix = '';
                         amountDisplay = v.total.toFixed(3);
                     }
-                    
+
                     const d = document.createElement('div');
                     d.className = 'row-card';
                     d.onclick = () => { VentesModule.load(v.id); };
@@ -3221,7 +3204,7 @@
                     const paid = (a.reglements || []).reduce((s, r) => s + r.amount, 0);
                     const isPaymentOnly = (!a.lines || a.lines.length === 0);
                     let badge, namePrefix, amountDisplay;
-                    
+
                     if (isPaymentOnly) {
                         badge = '<span class="badge payment-only">💰 Règlement</span>';
                         namePrefix = '💰 ';
@@ -3231,7 +3214,7 @@
                         namePrefix = '';
                         amountDisplay = a.total.toFixed(3);
                     }
-                    
+
                     const d = document.createElement('div');
                     d.className = 'row-card';
                     d.onclick = () => { AchatsModule.load(a.id); };
@@ -3243,9 +3226,6 @@
             }
         };
 
-        // ============================================================
-        // 15. MODULE INSTANCES
-        // ============================================================
         const ClientsModule = createEntityModule({
             table: 'clients', prefix: 'CL', sheet: 'clients',
             list: () => State.clients,
@@ -3514,9 +3494,6 @@
             renderer: AchatsRenderer
         });
 
-        // ============================================================
-        // 16. EXPENSES MODULE
-        // ============================================================
         const Expenses = {
             editingId: null,
             reset() {
@@ -3599,9 +3576,6 @@
             }
         };
 
-        // ============================================================
-        // 17. HISTORY MODULES
-        // ============================================================
         function createHistoryModule(cfg) {
             return {
                 currentId: null,
@@ -3778,9 +3752,6 @@
             list:() => State.fournisseurs, docs:() => State.achats, caisse:() => State.caisseFournisseurs
         });
 
-        // ============================================================
-        // 18. ARTICLE HISTORY
-        // ============================================================
         const ArticleHistory = {
             currentArticleId: null,
             render() {
@@ -3877,9 +3848,6 @@
             }
         };
 
-        // ============================================================
-        // 19. CAISSE HISTORY
-        // ============================================================
         const CaisseHistory = {
             render() {
                 const container = $('caisseHistoryContent');
@@ -3991,9 +3959,6 @@
             }
         };
 
-        // ============================================================
-        // 20. FINANCE JOUR
-        // ============================================================
         const FinanceJour = {
             data: {},
             init() {
@@ -4105,9 +4070,6 @@
             }
         };
 
-        // ============================================================
-        // 21. MARGES
-        // ============================================================
         const Marges = {
             init() {
                 if ($('margeDateFrom')) $('margeDateFrom').value = Utils.monthStart();
@@ -4170,9 +4132,6 @@
             }
         };
 
-        // ============================================================
-        // 22. BI ANALYTICS
-        // ============================================================
         const BIAnalytics = {
             data: { sales:[], profit:[], topProducts:[], topClients:[] },
             init() {
@@ -4390,9 +4349,6 @@
             exportFullReport() { this.exportPDF(); setTimeout(() => this.exportCSV(), 1000); }
         };
 
-        // ============================================================
-        // 23. ADVANCED REPORTS
-        // ============================================================
         const AdvancedReports = {
             setupDatePicker() {
                 if ($('reportDateFrom')) $('reportDateFrom').value = Utils.monthStart();
@@ -4660,9 +4616,6 @@
             }
         };
 
-        // ============================================================
-        // 24. COMPANY & ACCOUNTS
-        // ============================================================
         const CompanyInfo = {
             load() {
                 try {
@@ -4751,9 +4704,6 @@
             }
         };
 
-        // ============================================================
-        // 25. DASHBOARD
-        // ============================================================
         const Dashboard = {
             setColumns(cols) {
                 State.dashboardColumns = cols;
@@ -4786,9 +4736,84 @@
             }
         };
 
-        // ============================================================
-        // 26. APP CONTROLLER
-        // ============================================================
+        const Fullscreen = {
+            isActive() {
+                return !!(document.fullscreenElement ||
+                          document.webkitFullscreenElement ||
+                          document.mozFullScreenElement ||
+                          document.msFullscreenElement);
+            },
+            async enter() {
+                const el = document.documentElement;
+                try {
+                    if (el.requestFullscreen) {
+                        await el.requestFullscreen();
+                    } else if (el.webkitRequestFullscreen) {
+                        await el.webkitRequestFullscreen();
+                    } else if (el.mozRequestFullScreen) {
+                        await el.mozRequestFullScreen();
+                    } else if (el.msRequestFullscreen) {
+                        await el.msRequestFullscreen();
+                    }
+                    this.updateButton();
+                    Toast.show('⛶ Mode plein écran activé', 'success');
+                } catch(err) {
+                    console.warn('Fullscreen error:', err);
+                    Toast.show('⚠️ Plein écran non supporté', 'warning');
+                }
+            },
+            async exit() {
+                try {
+                    if (document.exitFullscreen) {
+                        await document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        await document.webkitExitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        await document.mozCancelFullScreen();
+                    } else if (document.msExitFullscreen) {
+                        await document.msExitFullscreen();
+                    }
+                    this.updateButton();
+                    Toast.show('🗗 Mode normal', 'info');
+                } catch(err) {
+                    console.warn('Exit fullscreen error:', err);
+                }
+            },
+            toggle() {
+                if (this.isActive()) {
+                    this.exit();
+                } else {
+                    this.enter();
+                }
+            },
+            updateButton() {
+                const btn = $('fullscreenBtn');
+                if (!btn) return;
+                if (this.isActive()) {
+                    btn.textContent = '🗗';
+                    btn.title = 'Quitter le plein écran';
+                    btn.classList.add('active');
+                } else {
+                    btn.textContent = '⛶';
+                    btn.title = 'Plein écran';
+                    btn.classList.remove('active');
+                }
+            },
+            init() {
+                ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange']
+                    .forEach(evt => document.addEventListener(evt, () => this.updateButton()));
+
+                document.addEventListener('keydown', e => {
+                    if (e.key === 'F11') {
+                        e.preventDefault();
+                        this.toggle();
+                    }
+                });
+
+                this.updateButton();
+            }
+        };
+
         const App = {
             goHome() { this.showSection('dashboard'); },
             showSection(id) {
@@ -4888,9 +4913,6 @@
             }
         };
 
-        // ============================================================
-        // 27. AUTH
-        // ============================================================
         const Auth = {
             isSignup: false,
             init() {
@@ -5067,9 +5089,6 @@
             }
         };
 
-        // ============================================================
-        // 28. IMPORT CLIENTS
-        // ============================================================
         let importData = [];
 
         function downloadTemplate() {
@@ -5192,9 +5211,6 @@
             Toast.show('❌ Importation annulée', 'error');
         }
 
-        // ============================================================
-        // 29. UI HELPERS
-        // ============================================================
         function showNotificationPanel() { NotificationSystem.renderPanel(); }
         function closeNotificationPanel() { $('notificationPanel').classList.remove('show'); }
         function openChangePasswordModal() {
@@ -5341,9 +5357,6 @@
             });
         }
 
-        // ============================================================
-        // 30. EVENT BINDINGS
-        // ============================================================
         function bindEvents() {
             $('overlay')?.addEventListener('click', () => App.closeSheet());
             $('fabBtn')?.addEventListener('click', () => App.onFabClick());
@@ -5385,9 +5398,6 @@
             }
         }
 
-        // ============================================================
-        // 31. GLOBAL EXPORTS
-        // ============================================================
         window.ClientsModule = ClientsModule;
         window.FournisseursModule = FournisseursModule;
         window.ArticlesModule = ArticlesModule;
@@ -5411,6 +5421,7 @@
         window.PreviewModal = PreviewModal;
         window.NotificationSystem = NotificationSystem;
         window.Dashboard = Dashboard;
+        window.Fullscreen = Fullscreen;
         window.Persistence = Persistence;
         window.BalanceCalculator = BalanceCalculator;
         window.ClientsRenderer = ClientsRenderer;
@@ -5433,15 +5444,13 @@
         window.Toast = Toast;
         window.Utils = Utils;
 
-        // ============================================================
-        // 32. BOOTSTRAP
-        // ============================================================
         function bootstrap() {
             console.log(`🚀 GTR POS ${APP_CONFIG.version} loading...`);
             Theme.load();
             PrintSystem.load();
             NotificationSystem.load();
             Dashboard.load();
+            Fullscreen.init();
             bindEvents();
             Auth.init();
             Persistence.load();
