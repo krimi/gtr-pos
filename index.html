@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="GTR POS">
     <meta name="theme-color" content="#1e2f66">
-    <title>GTR POS V 0.8.1 - Système intégré</title>
+    <title>GTR POS V 0.8.2 - Système intégré</title>
     <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkdUUiBQT1MiLAogICJzaG9ydF9uYW1lIjogIkdUUiBQT1MiLAogICJkZXNjcmlwdGlvbiI6ICJQb2ludCBkZSB2ZW50ZSBwcm9mZXNzaW9ubmVsIiwKICAic3RhcnRfdXJsIjogIi9pbmRleC5odG1sIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAib3JpZW50YXRpb24iOiAicG9ydHJhaXQiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMxYTJhNWMiLAogICJ0aGVtZV9jb2xvciI6ICIjMWEyYTVjIgp9">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -48,16 +48,12 @@
             box-shadow: 0 4px 16px rgba(74, 108, 247, 0.45); position: relative;
             transition: var(--transition); letter-spacing: -0.5px;
             font-family: 'Cairo', sans-serif; }
-        .appbar .logo-icon::after { content: ''; position: absolute; inset: -2px;
-            border-radius: 14px; background: linear-gradient(145deg, rgba(255,255,255,0.15), transparent);
-            z-index: 0; pointer-events: none; }
         .appbar .logo-icon .logo-text { position: relative; z-index: 1; display: flex;
             align-items: center; gap: 0; }
         .appbar .logo-icon .logo-text .gtr { font-size: 18px; font-weight: 900; }
         .appbar .logo-icon .logo-text .pos { font-size: 10px; font-weight: 700;
             background: rgba(255,255,255,0.2); padding: 1px 4px; border-radius: 4px;
             margin-left: 1px; letter-spacing: 0.5px; }
-        .appbar .logo-icon:active { transform: scale(0.92); }
         .appbar .logo-icon .badge-dot { position: absolute; bottom: -2px; right: -2px;
             width: 14px; height: 14px; border-radius: 50%;
             background: linear-gradient(135deg, var(--success), #27ae60);
@@ -80,8 +76,7 @@
         .login-logo-icon { width: 80px; height: 80px; border-radius: 22px;
             background: linear-gradient(145deg, #6b8aff, #2a4ac7); display: flex;
             align-items: center; justify-content: center; margin: 0 auto 14px auto;
-            box-shadow: 0 8px 40px rgba(74, 108, 247, 0.4); position: relative;
-            transition: var(--transition); }
+            box-shadow: 0 8px 40px rgba(74, 108, 247, 0.4); position: relative; }
         .login-logo-icon .logo-content { display: flex; flex-direction: column;
             align-items: center; justify-content: center; color: #fff;
             position: relative; z-index: 1; }
@@ -89,23 +84,13 @@
             letter-spacing: -1px; text-shadow: 0 2px 12px rgba(0,0,0,0.15); line-height: 1; }
         .login-logo-icon .logo-content .pos-badge { font-size: 12px; font-weight: 700;
             background: rgba(255,255,255,0.2); padding: 2px 10px; border-radius: 20px;
-            margin-top: 2px; letter-spacing: 1px; backdrop-filter: blur(4px);
-            border: 1px solid rgba(255,255,255,0.1); }
-        .login-logo-icon::after { content: ''; position: absolute; inset: -3px;
-            border-radius: 25px; background: linear-gradient(145deg, rgba(255,255,255,0.1), transparent 60%);
-            z-index: 0; pointer-events: none; }
-        .login-logo-icon .pulse-ring { position: absolute; inset: -8px; border-radius: 28px;
-            border: 2px solid rgba(74, 108, 247, 0.2); animation: pulseRing 2s ease-in-out infinite; z-index: 0; }
-        @keyframes pulseRing { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.15); opacity: 0; } }
+            margin-top: 2px; letter-spacing: 1px; }
         .login-logo-icon .version-tag { position: absolute; bottom: -6px; right: -6px;
             background: linear-gradient(135deg, var(--warning), #f39c12); color: #fff;
             font-size: 8px; padding: 2px 10px; border-radius: 20px; font-weight: 700;
-            box-shadow: 0 2px 12px rgba(241, 196, 15, 0.3); z-index: 2; letter-spacing: 0.3px; }
+            z-index: 2; }
         .content { flex: 1; overflow-y: auto; padding: 12px 12px 20px;
             -webkit-overflow-scrolling: touch; position: relative; background: var(--bg); padding-top: 60px; }
-        .content::-webkit-scrollbar { width: 4px; }
-        .content::-webkit-scrollbar-track { background: transparent; }
-        .content::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
         .section { display: none !important; animation: fadeIn .3s ease; }
         .section.active { display: block !important; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
@@ -119,47 +104,36 @@
             justify-content: center; box-shadow: var(--shadow); border: none;
             transition: var(--transition); cursor: pointer; min-height: 80px;
             position: relative; overflow: hidden; color: var(--text); }
-        .dash-item::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0;
-            height: 3px; background: var(--primary); opacity: 0; transition: var(--transition); }
-        .dash-item:active { transform: scale(0.95); box-shadow: 0 2px 10px rgba(26, 42, 92, 0.1); }
-        .dash-item:active::after { opacity: 1; }
-        .dash-icon { font-size: 36px; margin-bottom: 6px; transition: var(--transition); }
-        .dash-label { font-size: 12px; font-weight: 700; color: var(--text); text-align: center; transition: var(--transition); }
+        .dash-item:active { transform: scale(0.95); }
+        .dash-icon { font-size: 36px; margin-bottom: 6px; }
+        .dash-label { font-size: 12px; font-weight: 700; color: var(--text); text-align: center; }
         .fab-top { position: absolute; top: 12px; right: 16px; width: 44px; height: 44px;
             border-radius: 50%; background: linear-gradient(135deg, #6b8aff, var(--primary));
             color: #fff; font-size: 24px; border: none;
             box-shadow: 0 4px 16px rgba(74, 108, 247, 0.4); z-index: 15; cursor: pointer;
-            display: none; align-items: center; justify-content: center; transition: var(--transition); }
+            display: none; align-items: center; justify-content: center; }
         .fab-top.show { display: flex; }
-        .fab-top:active { transform: scale(0.88); box-shadow: 0 2px 10px rgba(74, 108, 247, 0.3); }
         .search-box { width: 100%; padding: 8px 14px; border: 2px solid var(--border);
             border-radius: 12px; font-family: 'Cairo', sans-serif; font-size: 12px;
-            margin-bottom: 8px; background: var(--panel); color: var(--text); height: 36px;
-            transition: var(--transition); position: relative; z-index: 10; }
-        .search-box:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.3); }
-        .list-container { position: relative; z-index: 20; }
+            margin-bottom: 8px; background: var(--panel); color: var(--text); height: 36px; }
         .row-card { background: var(--panel); border: 1px solid var(--border);
             border-radius: 12px; padding: 8px 12px; margin-bottom: 6px; display: flex;
             justify-content: space-between; align-items: center; cursor: pointer;
-            min-height: 44px; transition: var(--transition); color: var(--text);
-            position: relative; z-index: 15; }
-        .row-card:active { transform: scale(0.98); background: #f8faff; }
+            min-height: 44px; color: var(--text); }
         .row-card .name { font-size: 12px; font-weight: 700; white-space: nowrap;
-            overflow: hidden; text-overflow: ellipsis; max-width: 120px; color: var(--text); }
-        .row-card .meta { font-size: 9px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .row-card .amount { font-size: 12px; font-weight: 800; flex-shrink: 0; white-space: nowrap; color: var(--secondary); }
+            overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+        .row-card .meta { font-size: 9px; color: var(--muted); }
+        .row-card .amount { font-size: 12px; font-weight: 800; color: var(--secondary); }
         .empty-msg { text-align: center; color: var(--muted); font-size: 12px; padding: 16px 0; }
         .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; margin-bottom: 12px; }
         .kpi-card { background: var(--panel); border: 1px solid var(--border);
-            border-radius: 12px; padding: 10px 6px; text-align: center;
-            box-shadow: var(--shadow); min-height: 60px; display: flex;
-            flex-direction: column; justify-content: center; }
+            border-radius: 12px; padding: 10px 6px; text-align: center; }
         .kpi-card .val { font-size: 15px; font-weight: 800; color: var(--secondary); }
         .kpi-card .lbl { font-size: 8px; color: var(--muted); margin-top: 2px; font-weight: 600; text-transform: uppercase; }
         .section-title { font-size: 13px; font-weight: 800; color: var(--secondary);
             margin: 10px 0 6px; display: flex; align-items: center; gap: 6px; }
         .section-title::before { content: ''; width: 3px; height: 16px; background: var(--primary); border-radius: 2px; }
-        .badge { padding: 3px 8px; border-radius: 20px; font-size: 8px; font-weight: 700; color: #fff; white-space: nowrap; }
+        .badge { padding: 3px 8px; border-radius: 20px; font-size: 8px; font-weight: 700; color: #fff; }
         .badge.paid { background: linear-gradient(135deg, var(--success), #27ae60); }
         .badge.pending { background: linear-gradient(135deg, var(--warning), #f39c12); }
         .badge.low { background: linear-gradient(135deg, var(--danger), #c0392b); }
@@ -168,15 +142,12 @@
         .badge.payment-only { background: linear-gradient(135deg, #3498db, #2980b9); }
         .btn { width: 100%; padding: 8px; border: none; border-radius: 10px;
             font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700;
-            color: #fff; cursor: pointer; margin-bottom: 4px; transition: var(--transition); }
-        .btn:active { transform: scale(0.97); }
-        .btn { background: linear-gradient(135deg, #6b8aff, var(--primary)); }
+            color: #fff; cursor: pointer; margin-bottom: 4px; background: linear-gradient(135deg, #6b8aff, var(--primary)); }
         .btn.small { padding: 4px 10px; font-size: 10px; margin-bottom: 2px; border-radius: 8px; width: auto; }
         .btn.save { background: linear-gradient(135deg, var(--success), #27ae60); }
         .btn.edit { background: linear-gradient(135deg, var(--warning), #f39c12); }
         .btn.del { background: linear-gradient(135deg, var(--danger), #c0392b); }
         .btn.outline { background: var(--panel); color: var(--secondary); border: 2px solid var(--secondary); }
-        .btn.outline:active { background: var(--secondary); color: #fff; }
         .btn.print { background: linear-gradient(135deg, #6c7ae0, #4a56b0); }
         .btn.whatsapp { background: linear-gradient(135deg, #25d366, #128C7E); }
         .btn.email { background: linear-gradient(135deg, #3498db, #2980b9); }
@@ -184,42 +155,32 @@
         .toast { position: absolute; top: 64px; left: 50%; transform: translateX(-50%) translateY(-10px);
             background: var(--secondary); color: #fff; padding: 6px 18px; border-radius: 14px;
             font-size: 12px; font-weight: 700; opacity: 0; pointer-events: none;
-            transition: all 0.3s ease; z-index: 250; white-space: nowrap; max-width: 90%;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+            transition: all 0.3s ease; z-index: 250; white-space: nowrap; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .sheet-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5);
-            display: none; z-index: 20; backdrop-filter: blur(4px); }
+            display: none; z-index: 20; }
         .sheet-overlay.show { display: block; }
         .sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 92%;
             background: var(--panel); border-radius: 20px 20px 0 0; z-index: 21;
             transform: translateY(100%); transition: transform 0.35s ease; display: flex;
-            flex-direction: column; box-shadow: 0 -10px 40px rgba(0,0,0,0.15); color: var(--text); }
+            flex-direction: column; color: var(--text); }
         .sheet.show { transform: translateY(0); }
         .sheet-handle { width: 40px; height: 4px; background: #dde1ec; border-radius: 4px; margin: 8px auto 4px; }
         .sheet-header { display: flex; justify-content: space-between; align-items: center;
-            padding: 6px 16px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-        .sheet-header h3 { font-size: 16px; font-weight: 800; color: var(--secondary); margin: 0; }
+            padding: 6px 16px 10px; border-bottom: 1px solid var(--border); }
+        .sheet-header h3 { font-size: 16px; font-weight: 800; color: var(--secondary); }
         .sheet-close { width: 30px; height: 30px; border-radius: 50%; background: var(--bg);
             border: 1px solid var(--border); font-size: 14px; cursor: pointer;
-            transition: var(--transition); display: flex; align-items: center;
-            justify-content: center; color: var(--text); }
-        .sheet-close:active { transform: scale(0.9); }
+            display: flex; align-items: center; justify-content: center; color: var(--text); }
         .sheet-body { padding: 12px 16px; overflow-y: auto; flex: 1; }
         .sheet-footer { padding: 10px 16px 14px; background: var(--panel);
-            border-top: 1px solid var(--border); display: flex; gap: 8px;
-            flex-shrink: 0; position: sticky; bottom: 0; z-index: 5;
-            box-shadow: 0 -2px 12px rgba(0,0,0,0.04); }
+            border-top: 1px solid var(--border); display: flex; gap: 8px; }
         .sheet-footer .btn { flex: 1; margin: 0; padding: 10px 6px; font-size: 12px; border-radius: 10px; }
         .field { margin-bottom: 6px; }
         .field label { display: block; font-size: 10px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
         .field input, .field select, .field textarea { width: 100%; padding: 6px 10px;
             border: 2px solid var(--border); border-radius: 8px; font-family: 'Cairo', sans-serif;
-            font-size: 12px; background: var(--bg); color: var(--text); height: 32px;
-            transition: var(--transition); }
-        .field textarea { height: auto; min-height: 60px; resize: vertical; }
-        .field input:focus, .field select:focus, .field textarea:focus { outline: none;
-            border-color: var(--primary); box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.3); }
-        .field input:read-only { background: #eef0f6; }
+            font-size: 12px; background: var(--bg); color: var(--text); height: 32px; }
         .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
         .field-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
         .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
@@ -233,17 +194,14 @@
         .login-sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
         .login-box input { width: 100%; padding: 10px 14px; border: 2px solid var(--border);
             border-radius: 10px; font-size: 13px; margin-bottom: 8px; background: var(--bg);
-            transition: var(--transition); font-family: 'Cairo', sans-serif; color: var(--text); }
-        .login-box input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(74, 108, 247, 0.3); }
+            font-family: 'Cairo', sans-serif; color: var(--text); }
         .password-wrapper { position: relative; }
         .password-wrapper input { padding-left: 38px; }
         .password-toggle { position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
-            background: none; border: none; font-size: 16px; cursor: pointer; color: var(--muted); padding: 0 4px; }
+            background: none; border: none; font-size: 16px; cursor: pointer; color: var(--muted); }
         .login-btn { width: 100%; padding: 10px; border: none; border-radius: 10px;
             font-size: 13px; font-weight: 700; cursor: pointer; margin-bottom: 4px;
-            background: linear-gradient(135deg, #6b8aff, var(--primary)); color: #fff;
-            transition: var(--transition); }
-        .login-btn:active { transform: scale(0.97); }
+            background: linear-gradient(135deg, #6b8aff, var(--primary)); color: #fff; }
         .login-btn.secondary { background: var(--panel); color: var(--secondary); border: 2px solid var(--secondary); }
         .login-btn.google { background: var(--panel); color: #333; border: 2px solid var(--border);
             display: flex; align-items: center; justify-content: center; gap: 6px; }
@@ -257,11 +215,9 @@
         .storage-selector .btn { flex: 1; padding: 6px; font-size: 11px; margin: 0;
             background: #eee; color: #333; border: 2px solid var(--border); }
         .storage-selector .btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-        .finance-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch;
-            border-radius: 12px; border: 1px solid var(--border); background: var(--panel); }
         .capital-card { background: linear-gradient(135deg, var(--secondary), #2a3f7a);
             color: #fff; border-radius: var(--card-radius); padding: 16px 20px;
-            margin-bottom: 12px; text-align: center; box-shadow: 0 4px 20px rgba(26, 42, 92, 0.3); }
+            margin-bottom: 12px; text-align: center; }
         .capital-card .capital-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; }
         .capital-card .capital-value { font-size: 28px; font-weight: 800; margin-top: 4px; }
         .capital-details { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px;
@@ -272,27 +228,23 @@
         .bi-kpi-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
         @media(max-width:450px) { .bi-kpi-grid { grid-template-columns: 1fr 1fr; } }
         .bi-kpi { background: var(--panel); border: 1px solid var(--border);
-            border-radius: 12px; padding: 10px 6px; text-align: center;
-            box-shadow: var(--shadow); transition: all 0.3s ease; }
-        .bi-kpi:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(26, 42, 92, 0.12); }
+            border-radius: 12px; padding: 10px 6px; text-align: center; }
         .bi-kpi .num { font-size: 20px; font-weight: 800; color: var(--secondary); }
-        .bi-kpi .lbl { font-size: 8px; color: var(--muted); text-transform: uppercase;
-            letter-spacing: 0.5px; margin-top: 2px; }
+        .bi-kpi .lbl { font-size: 8px; color: var(--muted); text-transform: uppercase; margin-top: 2px; }
         .bi-kpi .trend { font-size: 9px; font-weight: 700; margin-top: 2px; }
         .bi-kpi .trend.up { color: var(--success); }
         .bi-kpi .trend.down { color: var(--danger); }
         .bi-chart-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
         @media(max-width:550px) { .bi-chart-container { grid-template-columns: 1fr; } }
         .bi-chart-box { background: var(--panel); border: 1px solid var(--border);
-            border-radius: 12px; padding: 12px 10px; box-shadow: var(--shadow); min-height: 220px; }
+            border-radius: 12px; padding: 12px 10px; min-height: 220px; }
         .bi-chart-box .chart-title { font-size: 9px; font-weight: 700; color: var(--muted);
-            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; text-align: center; }
+            text-transform: uppercase; margin-bottom: 6px; text-align: center; }
         .bi-chart-box canvas { width: 100% !important; height: auto !important; max-height: 200px; }
         .bi-filters { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 10px; }
         .bi-filters .field { margin-bottom: 0; }
-        .bi-filters .field label { font-size: 8px; }
         .bi-top-table { background: var(--panel); border: 1px solid var(--border);
-            border-radius: 12px; padding: 10px; margin-bottom: 8px; box-shadow: var(--shadow); }
+            border-radius: 12px; padding: 10px; margin-bottom: 8px; }
         .bi-top-table table { width: 100%; border-collapse: collapse; font-size: 8px; }
         .bi-top-table th { background: var(--secondary); color: #fff; padding: 4px 6px;
             text-align: center; font-weight: 700; }
@@ -302,28 +254,24 @@
         .bi-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
         .bi-actions .btn { flex: 1; min-width: 70px; padding: 6px 8px; font-size: 9px; margin: 0; }
         .reports-toolbar { background: var(--panel); border: 1px solid var(--border);
-            border-radius: 12px; padding: 12px; margin-bottom: 12px; box-shadow: var(--shadow); }
+            border-radius: 12px; padding: 12px; margin-bottom: 12px; }
         .reports-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
         .reports-actions .btn { flex: 1; min-width: 80px; padding: 6px 10px; font-size: 10px; margin: 0; }
         .charts-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
         @media(max-width:550px) { .charts-container { grid-template-columns: 1fr; } }
         .chart-box { background: var(--panel); border: 1px solid var(--border);
-            border-radius: 12px; padding: 10px; box-shadow: var(--shadow); min-height: 250px; }
+            border-radius: 12px; padding: 10px; min-height: 250px; }
         .chart-box canvas { width: 100% !important; height: auto !important; max-height: 280px; }
-        .report-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch;
-            border-radius: 12px; background: var(--panel); border: 1px solid var(--border);
-            box-shadow: var(--shadow); margin-top: 8px; }
+        .report-table-wrapper { overflow-x: auto; border-radius: 12px; background: var(--panel);
+            border: 1px solid var(--border); margin-top: 8px; }
         .report-table { width: 100%; min-width: 600px; border-collapse: collapse;
             font-size: 9px; direction: ltr; background: var(--panel); }
         .report-table th { background: var(--secondary); color: #fff; padding: 6px 8px;
-            font-weight: 700; white-space: nowrap; text-align: center; font-size: 8px;
-            position: sticky; top: 0; z-index: 2; }
+            font-weight: 700; white-space: nowrap; text-align: center; font-size: 8px; }
         .report-table td { padding: 5px 8px; border-bottom: 1px solid var(--border);
-            text-align: center; font-size: 8px; background: var(--panel); color: var(--text); }
-        .report-table tr:nth-child(even) td { background: var(--bg); }
-        .report-table tr:hover td { background: #eef3ff; }
+            text-align: center; font-size: 8px; }
         .summary-mini-card { background: var(--bg); border-radius: 12px; padding: 10px;
-            margin-top: 6px; margin-bottom: 6px; border: 1px solid var(--border); }
+            margin: 6px 0; border: 1px solid var(--border); }
         .summary-mini-card .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 4px; }
         @media(max-width:450px) { .summary-mini-card .grid-4 { grid-template-columns: 1fr 1fr; } }
         .summary-mini-card .grid-4 .item { text-align: center; font-size: 10px; }
@@ -335,36 +283,34 @@
         .summary-mini-card .grid-4 .item .val.payments { color: var(--success); }
         .summary-mini-card .grid-4 .item .val.balance { color: var(--danger); }
         .client-summary-card { background: linear-gradient(135deg, var(--secondary), #2a3f7a);
-            color: #fff; padding: 14px; border-radius: 14px; margin-bottom: 10px;
-            box-shadow: 0 4px 20px rgba(26, 42, 92, 0.3); }
+            color: #fff; padding: 14px; border-radius: 14px; margin-bottom: 10px; }
         .client-summary-card .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 11px; }
-        .client-summary-card .grid .label { opacity: 0.7; font-weight: 400; }
+        .client-summary-card .grid .label { opacity: 0.7; }
         .client-summary-card .grid .value { font-weight: 700; }
         .client-summary-card .grid .value.positive { color: #4dbf8c; }
         .client-summary-card .grid .value.negative { color: #ff6b6b; }
         .balance-display { display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
             margin: 4px 0 8px; background: var(--panel); border: 1px solid var(--border);
-            border-radius: 12px; padding: 8px 12px; box-shadow: var(--shadow); }
+            border-radius: 12px; padding: 8px 12px; }
         .balance-display .item { text-align: center; font-size: 10px; font-weight: 600; }
         .balance-display .item .label { color: var(--muted); font-size: 8px; display: block; }
         .balance-display .item .value { font-size: 13px; font-weight: 800; color: var(--secondary); }
         .balance-display .item .value.opening { color: var(--primary); }
         .balance-display .item .value.closing { color: var(--danger); }
-        .history-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch;
-            margin-bottom: 6px; border-radius: 12px; border: 1px solid var(--border);
-            background: var(--panel); }
+        .history-table-wrapper { overflow-x: auto; margin-bottom: 6px; border-radius: 12px;
+            border: 1px solid var(--border); background: var(--panel); }
         .history-table { width: 100%; min-width: 480px; border-collapse: collapse;
             font-size: 7px; direction: ltr; background: var(--panel); }
         .history-table th { background: var(--secondary); color: #fff; padding: 4px 6px;
             font-weight: 700; white-space: nowrap; text-align: center; font-size: 7px; }
         .history-table td { padding: 4px 6px; border-bottom: 1px solid var(--border);
-            text-align: center; white-space: nowrap; font-size: 7px; background: var(--panel); color: var(--text); }
+            text-align: center; white-space: nowrap; font-size: 7px; }
         .print-overlay { position: fixed; inset: 0; background: #525659; z-index: 200;
             display: none; overflow-y: auto; padding: 10px; }
         .print-overlay.show { display: block; }
         .invoice-doc { background: #fff; color: #111; border-radius: 8px; padding: 10px;
             font-family: 'Cairo', sans-serif; direction: ltr; margin: 0 auto;
-            font-size: 10px; max-width: 650px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+            font-size: 10px; max-width: 650px; }
         .invoice-doc.paper-80 { max-width: 80mm; font-size: 8px; padding: 6px; }
         .invoice-doc.paper-56 { max-width: 56mm; font-size: 6px; padding: 4px; }
         .print-actions { position: sticky; top: 0; display: flex; flex-wrap: wrap;
@@ -376,21 +322,17 @@
         .print-actions .btn-print { background: #25d366; color: #fff; }
         .paper-selector { display: flex; align-items: center; gap: 3px; color: #fff;
             font-size: 11px; background: rgba(255,255,255,0.12); padding: 3px 8px; border-radius: 5px; }
-        .paper-selector select { padding: 2px 5px; border-radius: 3px; border: none;
-            font-family: 'Cairo', sans-serif; font-size: 11px; }
-        .notification-panel { position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5); z-index: 9999; display: none; align-items: center;
-            justify-content: center; padding: 20px; }
+        .paper-selector select { padding: 2px 5px; border-radius: 3px; border: none; font-size: 11px; }
+        .notification-panel { position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+            z-index: 9999; display: none; align-items: center; justify-content: center; padding: 20px; }
         .notification-panel.show { display: flex; }
         .notification-content { background: var(--panel); border-radius: 16px; padding: 24px;
-            max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto;
-            direction: ltr; color: var(--text); }
+            max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; color: var(--text); }
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-            z-index: 350; display: none; align-items: center; justify-content: center;
-            padding: 16px; backdrop-filter: blur(4px); }
+            z-index: 350; display: none; align-items: center; justify-content: center; padding: 16px; }
         .modal-overlay.show { display: flex; }
         .modal-box { background: var(--panel); border-radius: 20px; padding: 24px;
-            width: 100%; max-width: 340px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); color: var(--text); }
+            width: 100%; max-width: 340px; color: var(--text); }
         .modal-box h3 { font-size: 18px; font-weight: 800; color: var(--secondary);
             text-align: center; margin-bottom: 14px; }
         .modal-actions { display: flex; gap: 8px; margin-top: 14px; }
@@ -399,13 +341,11 @@
         .offline-badge { background: var(--warning); color: #fff; font-size: 8px;
             padding: 2px 8px; border-radius: 12px; margin-right: 6px; display: none; }
         .offline-badge.show { display: inline-block; }
-        .shortcut-help { position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7); z-index: 9999; display: none; align-items: center;
-            justify-content: center; padding: 20px; }
+        .shortcut-help { position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            z-index: 9999; display: none; align-items: center; justify-content: center; padding: 20px; }
         .shortcut-help.show { display: flex; }
         .shortcut-help-content { background: var(--panel); border-radius: 16px; padding: 24px;
-            max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto;
-            direction: ltr; color: var(--text); }
+            max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; color: var(--text); }
         .shortcut-help-content kbd { background: var(--bg); border: 1px solid var(--border);
             border-radius: 4px; padding: 2px 6px; font-size: 11px; font-family: monospace; }
         .shortcut-help-content table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -414,41 +354,34 @@
         .invoice-header-modern { background: linear-gradient(135deg, var(--secondary), var(--primary));
             color: #fff; padding: 14px 18px; border-radius: var(--card-radius);
             margin-bottom: 12px; display: flex; justify-content: space-between;
-            align-items: center; flex-wrap: wrap; gap: 8px;
-            box-shadow: 0 4px 20px rgba(74, 108, 247, 0.25); }
+            align-items: center; flex-wrap: wrap; gap: 8px; }
         .invoice-header-modern .invoice-title { font-size: 17px; font-weight: 800; }
         .invoice-header-modern .invoice-subtitle { font-size: 10px; opacity: 0.8; }
         .invoice-header-modern .invoice-badge { background: rgba(255,255,255,0.15);
-            padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;
-            border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(4px); text-align: center; }
-        .invoice-header-modern .invoice-badge small { display: block; font-size: 9px; font-weight: 400; opacity: 0.7; }
+            padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; text-align: center; }
+        .invoice-header-modern .invoice-badge small { display: block; font-size: 9px; opacity: 0.7; }
         .party-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px;
             background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
-            padding: 10px 14px; margin-bottom: 10px; box-shadow: var(--shadow); }
+            padding: 10px 14px; margin-bottom: 10px; }
         .party-info-grid .field-group label { font-size: 8px; font-weight: 700; color: var(--muted);
-            text-transform: uppercase; letter-spacing: 0.3px; display: block; }
-        .party-info-grid .field-group .value { font-size: 12px; font-weight: 700;
-            color: var(--text); padding: 2px 0; }
-        .party-info-grid .field-group .value small { font-weight: 400; color: var(--muted); font-size: 10px; }
+            text-transform: uppercase; display: block; }
+        .party-info-grid .field-group .value { font-size: 12px; font-weight: 700; color: var(--text); padding: 2px 0; }
         .party-info-grid .field-group select, .party-info-grid .field-group input {
             width: 100%; padding: 4px 8px; border: 2px solid var(--border); border-radius: 8px;
             font-family: 'Cairo', sans-serif; font-size: 11px; background: var(--bg);
-            color: var(--text); height: 32px; transition: var(--transition); }
-        .party-info-grid .field-group select:focus, .party-info-grid .field-group input:focus {
-            outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.2); }
+            color: var(--text); height: 32px; }
         .account-summary-modern { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
         .account-summary-modern .summary-item { background: var(--panel); border: 1px solid var(--border);
-            border-radius: 10px; padding: 8px 4px; text-align: center;
-            box-shadow: var(--shadow); transition: var(--transition); }
+            border-radius: 10px; padding: 8px 4px; text-align: center; }
         .account-summary-modern .summary-item .label { font-size: 7px; color: var(--muted);
-            text-transform: uppercase; font-weight: 700; display: block; letter-spacing: 0.3px; }
+            text-transform: uppercase; font-weight: 700; display: block; }
         .account-summary-modern .summary-item .value { font-size: 14px; font-weight: 800;
             color: var(--secondary); margin-top: 1px; }
         .account-summary-modern .summary-item .value.positive { color: var(--success); }
         .account-summary-modern .summary-item .value.negative { color: var(--danger); }
         .account-summary-modern .summary-item .value.warning { color: var(--warning); }
         .add-product-section { background: var(--panel); border: 1px solid var(--border);
-            border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; box-shadow: var(--shadow); }
+            border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; }
         .add-product-section .section-label { font-size: 10px; font-weight: 700;
             color: var(--secondary); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
         .add-product-section .section-label::before { content: ''; width: 3px; height: 14px;
@@ -460,31 +393,24 @@
         .add-product-row .field select, .add-product-row .field input { width: 100%;
             padding: 4px 6px; border: 2px solid var(--border); border-radius: 8px;
             font-family: 'Cairo', sans-serif; font-size: 10px; background: var(--bg);
-            color: var(--text); height: 30px; transition: var(--transition); }
-        .add-product-row .field select:focus, .add-product-row .field input:focus {
-            outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.15); }
+            color: var(--text); height: 30px; }
         .add-product-row .btn-add { padding: 4px 14px; border: none; border-radius: 8px;
             background: linear-gradient(135deg, var(--primary), #3a56d4); color: #fff;
             font-size: 14px; font-weight: 700; cursor: pointer; height: 30px;
-            transition: var(--transition); display: flex; align-items: center;
-            justify-content: center; min-width: 40px; }
-        .add-product-row .btn-add:active { transform: scale(0.94); }
+            display: flex; align-items: center; justify-content: center; min-width: 40px; }
         .stock-hint { font-size: 7px; color: var(--muted); margin-top: 2px;
             padding: 1px 6px; background: var(--bg); border-radius: 4px; display: inline-block; }
-        .stock-hint.low { color: var(--danger); background: #fde8e8; }
         .items-table-modern { width: 100%; border-collapse: collapse; font-size: 10px;
             border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
         .items-table-modern thead { background: var(--secondary); color: #fff; }
-        .items-table-modern th { padding: 6px 4px; text-align: center; font-size: 8px;
-            font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+        .items-table-modern th { padding: 6px 4px; text-align: center; font-size: 8px; font-weight: 700; }
         .items-table-modern td { padding: 4px 3px; text-align: center;
             border-bottom: 1px solid var(--border); background: var(--panel);
             color: var(--text); font-size: 10px; }
-        .items-table-modern tr:last-child td { border-bottom: none; }
         .items-table-modern .item-name { font-weight: 700; text-align: left; }
         .items-table-modern .item-total { font-weight: 800; color: var(--primary); }
         .items-table-modern .btn-action { padding: 1px 6px; border: none; border-radius: 4px;
-            font-size: 9px; cursor: pointer; transition: var(--transition); }
+            font-size: 9px; cursor: pointer; }
         .items-table-modern .btn-action.edit { background: var(--warning); color: #fff; }
         .items-table-modern .btn-action.delete { background: var(--danger); color: #fff; }
         .items-table-modern .btn-action.save-edit { background: var(--success); color: #fff; }
@@ -494,12 +420,11 @@
             font-family: 'Cairo', sans-serif; text-align: center; background: #fff; color: var(--text); }
         .invoice-total-modern { display: flex; justify-content: space-between; align-items: center;
             padding: 8px 14px; background: linear-gradient(135deg, var(--secondary), var(--primary));
-            color: #fff; border-radius: 12px; margin: 8px 0 10px;
-            box-shadow: 0 4px 20px rgba(74, 108, 247, 0.2); }
+            color: #fff; border-radius: 12px; margin: 8px 0 10px; }
         .invoice-total-modern .label { font-size: 12px; font-weight: 600; opacity: 0.9; }
-        .invoice-total-modern .amount { font-size: 20px; font-weight: 800; letter-spacing: 0.5px; }
+        .invoice-total-modern .amount { font-size: 20px; font-weight: 800; }
         .payments-section { background: var(--panel); border: 1px solid var(--border);
-            border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; box-shadow: var(--shadow); }
+            border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; }
         .payments-section .section-label { font-size: 10px; font-weight: 700;
             color: var(--secondary); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
         .payments-section .section-label::before { content: ''; width: 3px; height: 14px;
@@ -509,9 +434,7 @@
             display: flex; align-items: center; gap: 6px; font-size: 10px; border: 1px solid var(--border); }
         .payment-item .method { font-weight: 700; color: var(--secondary); }
         .payment-item .amount { font-weight: 800; color: var(--success); }
-        .payment-item .delete-payment { color: var(--danger); cursor: pointer;
-            font-size: 12px; padding: 0 2px; transition: var(--transition); }
-        .payment-item .delete-payment:active { transform: scale(1.2); }
+        .payment-item .delete-payment { color: var(--danger); cursor: pointer; font-size: 12px; padding: 0 2px; }
         .add-payment-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; align-items: end; }
         .add-payment-row .field { margin-bottom: 0; }
         .add-payment-row .field label { font-size: 8px; font-weight: 700; color: var(--muted);
@@ -519,19 +442,14 @@
         .add-payment-row .field input, .add-payment-row .field select { width: 100%;
             padding: 4px 6px; border: 2px solid var(--border); border-radius: 8px;
             font-family: 'Cairo', sans-serif; font-size: 10px; background: var(--bg);
-            color: var(--text); height: 30px; transition: var(--transition); }
-        .add-payment-row .field input:focus, .add-payment-row .field select:focus {
-            outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.15); }
+            color: var(--text); height: 30px; }
         .add-payment-row .btn-add-payment { padding: 4px 14px; border: none; border-radius: 8px;
             background: linear-gradient(135deg, var(--success), #27ae60); color: #fff;
-            font-size: 13px; font-weight: 700; cursor: pointer; height: 30px; transition: var(--transition); }
-        .add-payment-row .btn-add-payment:active { transform: scale(0.94); }
+            font-size: 13px; font-weight: 700; cursor: pointer; height: 30px; }
         .invoice-actions-modern { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 8px 0 4px; }
         .invoice-actions-modern .btn-action { padding: 6px 4px; border: none; border-radius: 10px;
             font-family: 'Cairo', sans-serif; font-size: 9px; font-weight: 700; color: #fff;
-            cursor: pointer; transition: var(--transition); display: flex;
-            align-items: center; justify-content: center; gap: 3px; }
-        .invoice-actions-modern .btn-action:active { transform: scale(0.95); }
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 3px; }
         .invoice-actions-modern .btn-action.whatsapp { background: linear-gradient(135deg, #25d366, #128C7E); }
         .invoice-actions-modern .btn-action.email { background: linear-gradient(135deg, #3498db, #2980b9); }
         .invoice-actions-modern .btn-action.print { background: linear-gradient(135deg, #6c7ae0, #4a56b0); }
@@ -540,7 +458,7 @@
             transform: translateX(-50%) translateY(80px); background: var(--secondary);
             color: #fff; padding: 8px 20px; border-radius: 14px; font-size: 12px;
             font-weight: 700; opacity: 0; pointer-events: none; transition: all 0.4s ease;
-            z-index: 999; box-shadow: 0 8px 30px rgba(0,0,0,0.25); max-width: 90%; text-align: center; }
+            z-index: 999; max-width: 90%; text-align: center; }
         .toast-modern.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         @media(max-width:550px) {
             .account-summary-modern { grid-template-columns: repeat(2, 1fr); }
@@ -553,18 +471,11 @@
             .invoice-header-modern { flex-direction: column; align-items: stretch; text-align: center; }
             .invoice-header-modern .invoice-badge { align-self: center; }
             .items-table-modern { font-size: 8px; }
-            .items-table-modern .edit-input { width: 35px; font-size: 8px; }
             .invoice-total-modern .amount { font-size: 17px; }
             .capital-details { grid-template-columns: 1fr 1fr; }
         }
-        @media(max-width:400px) {
-            .account-summary-modern { grid-template-columns: 1fr 1fr; gap: 4px; }
-            .account-summary-modern .summary-item { padding: 4px 2px; }
-            .account-summary-modern .summary-item .value { font-size: 11px; }
-            .invoice-total-modern .amount { font-size: 14px; }
-        }
         .import-section { background: var(--panel); border: 1px solid var(--border);
-            border-radius: 12px; padding: 12px; margin-bottom: 12px; box-shadow: var(--shadow); }
+            border-radius: 12px; padding: 12px; margin-bottom: 12px; }
         .import-section .import-header { display: flex; justify-content: space-between;
             align-items: center; margin-bottom: 8px; }
         .import-section .import-header h4 { font-size: 13px; font-weight: 700; color: var(--secondary); }
@@ -575,7 +486,7 @@
             font-size: 10px; border: 1px solid var(--border); }
         .import-section .import-preview table { width: 100%; border-collapse: collapse; font-size: 9px; }
         .import-section .import-preview th { background: var(--secondary); color: #fff;
-            padding: 4px 6px; text-align: center; font-weight: 700; position: sticky; top: 0; z-index: 2; }
+            padding: 4px 6px; text-align: center; font-weight: 700; }
         .import-section .import-preview td { padding: 3px 6px; border-bottom: 1px solid var(--border); text-align: center; }
         .import-section .import-preview .highlight-duplicate { background: #fde8e8; }
         .import-section .import-progress { margin-top: 8px; font-size: 10px; color: var(--muted); }
@@ -585,33 +496,24 @@
             background: linear-gradient(135deg, var(--success), #27ae60); border-radius: 2px;
             width: 0%; transition: width 0.3s ease; }
         .file-drop-zone { border: 2px dashed var(--border); border-radius: 8px; padding: 16px;
-            text-align: center; color: var(--muted); cursor: pointer;
-            transition: var(--transition); margin-bottom: 6px; }
-        .file-drop-zone:hover, .file-drop-zone.dragover { border-color: var(--primary); background: rgba(74, 108, 247, 0.05); }
+            text-align: center; color: var(--muted); cursor: pointer; margin-bottom: 6px; }
         .file-drop-zone .icon { font-size: 28px; display: block; margin-bottom: 4px; }
-        .file-drop-zone input[type="file"] { display: none; }
         .special-price-item { display: flex; justify-content: space-between; align-items: center;
             padding: 4px 8px; background: var(--bg); border-radius: 6px; margin-bottom: 3px;
             border: 1px solid var(--border); font-size: 10px; }
         .special-price-item .sp-article { font-weight: 600; color: var(--text); }
         .special-price-item .sp-price { font-weight: 700; color: var(--primary); }
         .special-price-item .sp-del { color: var(--danger); cursor: pointer; font-size: 12px; padding: 0 4px; }
-        .special-price-item .sp-del:active { transform: scale(1.2); }
         .add-sp-row { display: flex; gap: 4px; margin-top: 4px; align-items: center; }
         .add-sp-row select, .add-sp-row input { flex: 1; padding: 4px 6px;
             border: 2px solid var(--border); border-radius: 8px;
             font-family: 'Cairo', sans-serif; font-size: 10px; background: var(--bg);
-            color: var(--text); height: 30px; transition: var(--transition); }
-        .add-sp-row select:focus, .add-sp-row input:focus { outline: none;
-            border-color: var(--primary); box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.15); }
+            color: var(--text); height: 30px; }
         .add-sp-row .btn.save.small { flex: 0 0 32px; padding: 4px 8px; font-size: 14px;
-            height: 30px; display: flex; align-items: center; justify-content: center;
-            background: linear-gradient(135deg, var(--primary), #3a56d4); border: none;
-            border-radius: 8px; color: #fff; cursor: pointer; transition: var(--transition); }
-        .add-sp-row .btn.save.small:active { transform: scale(0.94); }
+            height: 30px; display: flex; align-items: center; justify-content: center; }
         .account-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
         .account-stats .stat { background: var(--panel); padding: 10px; border-radius: 12px;
-            text-align: center; border: 1px solid var(--border); box-shadow: var(--shadow); }
+            text-align: center; border: 1px solid var(--border); }
         .account-stats .stat .num { font-size: 20px; font-weight: 800; color: var(--secondary); }
         .account-stats .stat .lbl { font-size: 9px; color: var(--muted); text-transform: uppercase; }
         .account-item { background: var(--panel); border: 1px solid var(--border);
@@ -628,97 +530,103 @@
             margin: 8px 0; text-align: center; color: #1565c0; }
         .payment-only-notice .title { font-weight: 800; font-size: 12px; margin-bottom: 2px; }
         .payment-only-notice .subtitle { font-size: 9px; opacity: 0.8; }
-
-        /* ===== APERÇU AVANT IMPRESSION ===== */
-        .preview-modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.75);
-            z-index: 9998; display: none; align-items: center; justify-content: center;
-            padding: 12px; backdrop-filter: blur(4px);
-        }
+        .preview-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+            z-index: 9998; display: none; align-items: center; justify-content: center; padding: 12px; }
         .preview-modal.show { display: flex; }
-        .preview-modal-content {
-            background: #fff; border-radius: 16px; width: 100%; max-width: 720px;
-            max-height: 92vh; display: flex; flex-direction: column;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5); overflow: hidden;
-        }
-        .preview-modal-header {
-            display: flex; justify-content: space-between; align-items: center;
+        .preview-modal-content { background: #fff; border-radius: 16px; width: 100%; max-width: 720px;
+            max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; }
+        .preview-modal-header { display: flex; justify-content: space-between; align-items: center;
             padding: 12px 16px; background: linear-gradient(135deg, var(--secondary), #2a3f7a);
-            color: #fff; flex-shrink: 0;
-        }
+            color: #fff; flex-shrink: 0; }
         .preview-modal-header h3 { font-size: 14px; font-weight: 800; margin: 0; }
-        .preview-close-btn {
-            width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.15);
-            border: none; color: #fff; font-size: 14px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: var(--transition);
+        .preview-close-btn { width: 30px; height: 30px; border-radius: 50%;
+            background: rgba(255,255,255,0.15); border: none; color: #fff;
+            font-size: 14px; cursor: pointer; display: flex;
+            align-items: center; justify-content: center; }
+        .preview-modal-body { flex: 1; overflow-y: auto; padding: 14px; background: #f5f5f5; }
+        .preview-modal-body .preview-doc { background: #fff; color: #111;
+            border-radius: 8px; padding: 16px; font-family: 'Cairo', sans-serif;
+            direction: ltr; font-size: 11px; overflow-x: auto; }
+        .preview-modal-body .preview-doc table { width: 100%; border-collapse: collapse; font-size: 10px; }
+        .preview-modal-body .preview-doc th { background: #1e2f66; color: #fff;
+            padding: 6px 8px; text-align: center; font-weight: 700; font-size: 9px; }
+        .preview-modal-body .preview-doc td { padding: 5px 8px;
+            border-bottom: 1px solid #ddd; text-align: center; }
+        .preview-modal-body .preview-doc tfoot td { font-weight: 700;
+            background: #e8ecf4; border-top: 2px solid #999; }
+        .preview-modal-footer { display: flex; gap: 8px; padding: 12px 16px;
+            background: #fff; border-top: 1px solid #e2e6f0; flex-shrink: 0; }
+        .preview-modal-footer .btn { flex: 1; padding: 10px; font-size: 12px; margin: 0; border-radius: 10px; }
+        :fullscreen .phone, :-webkit-full-screen .phone,
+        :-moz-full-screen .phone, :-ms-fullscreen .phone {
+            max-width: 100% !important; width: 100% !important;
+            height: 100dvh !important; border-radius: 0 !important;
+            margin: 0 !important; box-shadow: none !important;
         }
-        .preview-close-btn:active { transform: scale(0.9); }
-        .preview-modal-body {
-            flex: 1; overflow-y: auto; padding: 14px; background: #f5f5f5;
-            -webkit-overflow-scrolling: touch;
-        }
-        .preview-modal-body .preview-doc {
-            background: #fff; color: #111; border-radius: 8px; padding: 16px;
-            font-family: 'Cairo', sans-serif; direction: ltr; font-size: 11px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
-            max-width: 100%; overflow-x: auto;
-        }
-        .preview-modal-body .preview-doc table {
-            width: 100%; border-collapse: collapse; font-size: 10px;
-        }
-        .preview-modal-body .preview-doc th {
-            background: #1e2f66; color: #fff; padding: 6px 8px;
-            text-align: center; font-weight: 700; font-size: 9px;
-        }
-        .preview-modal-body .preview-doc td {
-            padding: 5px 8px; border-bottom: 1px solid #ddd; text-align: center;
-        }
-        .preview-modal-body .preview-doc tfoot td {
-            font-weight: 700; background: #e8ecf4; border-top: 2px solid #999;
-        }
-        .preview-modal-footer {
-            display: flex; gap: 8px; padding: 12px 16px;
-            background: #fff; border-top: 1px solid #e2e6f0; flex-shrink: 0;
-        }
-        .preview-modal-footer .btn {
-            flex: 1; padding: 10px; font-size: 12px; margin: 0; border-radius: 10px;
-        }
-        @media(max-width:550px) {
-            .preview-modal-body { padding: 8px; }
-            .preview-modal-body .preview-doc { padding: 10px; font-size: 9px; }
-            .preview-modal-body .preview-doc table { font-size: 8px; }
-            .preview-modal-body .preview-doc th,
-            .preview-modal-body .preview-doc td { padding: 3px 4px; }
-        }
+        #fullscreenBtn.active { background: rgba(255,255,255,0.3) !important; }
 
-        /* ===== MODE PLEIN ÉCRAN ===== */
-        :fullscreen .phone,
-        :-webkit-full-screen .phone,
-        :-moz-full-screen .phone,
-        :-ms-fullscreen .phone {
-            max-width: 100% !important;
-            width: 100% !important;
-            height: 100dvh !important;
-            border-radius: 0 !important;
-            margin: 0 !important;
-            box-shadow: none !important;
-        }
-        :fullscreen body,
-        :-webkit-full-screen body {
-            background: var(--bg);
-            overflow: hidden;
-        }
-        :fullscreen .appbar {
-            padding-top: max(12px, env(safe-area-inset-top));
-        }
-        :fullscreen .content {
-            padding-bottom: max(20px, env(safe-area-inset-bottom));
-        }
-        #fullscreenBtn.active {
-            background: rgba(255,255,255,0.3) !important;
-            box-shadow: 0 0 12px rgba(74, 108, 247, 0.6);
-        }
+        /* ===== CLIENT PORTAL ===== */
+        .client-portal { position: fixed; inset: 0; z-index: 250; display: none;
+            flex-direction: column; background: var(--bg); color: var(--text); overflow: hidden; }
+        .client-portal.show { display: flex; }
+        .cp-header { background: linear-gradient(135deg, var(--secondary), #2a3f7a);
+            color: #fff; padding: 12px 16px; display: flex;
+            justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 20px rgba(26, 42, 92, 0.3); flex-shrink: 0; }
+        .cp-logo { font-size: 20px; font-weight: 900; letter-spacing: -0.5px;
+            display: flex; align-items: center; gap: 3px; }
+        .cp-logo span { font-size: 11px; background: rgba(255,255,255,0.2);
+            padding: 2px 6px; border-radius: 5px; }
+        .cp-user { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+        .cp-user button { background: rgba(255,255,255,0.15); border: none; color: #fff;
+            width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 14px; }
+        .cp-content { flex: 1; overflow-y: auto; padding: 14px; padding-bottom: 30px; }
+        .cp-balance-card { background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: #fff; border-radius: 16px; padding: 22px;
+            text-align: center; margin-bottom: 14px;
+            box-shadow: 0 4px 20px rgba(74, 108, 247, 0.3); }
+        .cp-balance-card .cp-label { font-size: 11px; text-transform: uppercase;
+            letter-spacing: 1px; opacity: 0.8; }
+        .cp-balance-card .cp-balance { font-size: 32px; font-weight: 800; margin-top: 6px; }
+        .cp-balance-card .cp-balance-note { font-size: 10px; margin-top: 6px;
+            display: inline-block; padding: 3px 12px; border-radius: 12px;
+            background: rgba(255,255,255,0.15); }
+        .cp-balance-card .cp-balance-note.positive { background: rgba(46, 204, 113, 0.3); }
+        .cp-balance-card .cp-balance-note.negative { background: rgba(231, 76, 94, 0.3); }
+        .cp-kpis { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+        .cp-kpi { background: var(--panel); border: 1px solid var(--border);
+            border-radius: 12px; padding: 12px 6px; text-align: center; }
+        .cp-kpi .num { font-size: 15px; font-weight: 800; color: var(--secondary); white-space: nowrap; }
+        .cp-kpi .num.positive { color: var(--success); }
+        .cp-kpi .num.negative { color: var(--danger); }
+        .cp-kpi .lbl { font-size: 8px; color: var(--muted);
+            text-transform: uppercase; margin-top: 3px; font-weight: 600; }
+        .cp-section-title { font-size: 13px; font-weight: 800; color: var(--secondary);
+            margin: 14px 0 8px; display: flex; align-items: center; gap: 6px; }
+        .cp-section-title::before { content: ''; width: 3px; height: 16px;
+            background: var(--primary); border-radius: 2px; }
+        .cp-row { background: var(--panel); border: 1px solid var(--border);
+            border-radius: 12px; padding: 10px 14px; margin-bottom: 6px;
+            display: flex; justify-content: space-between; align-items: center; }
+        .cp-row .cp-row-info .name { font-size: 12px; font-weight: 700; color: var(--text); }
+        .cp-row .cp-row-info .meta { font-size: 9px; color: var(--muted); margin-top: 2px; }
+        .cp-row .cp-row-amount { font-size: 13px; font-weight: 800; text-align: right; }
+        .cp-row .cp-row-amount .paid { color: var(--success); }
+        .cp-row .cp-row-amount small { display: block; font-size: 8px;
+            font-weight: 400; color: var(--muted); margin-top: 2px; }
+        .cp-badge { padding: 2px 8px; border-radius: 10px; font-size: 8px;
+            font-weight: 700; color: #fff; margin-left: 6px; }
+        .cp-badge.paid { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .cp-badge.pending { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .cp-badge.partial { background: linear-gradient(135deg, #f1c40f, #f39c12); }
+        .cp-badge.payment { background: linear-gradient(135deg, #3498db, #2980b9); }
+        .cp-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+        .cp-btn { padding: 12px; border: none; border-radius: 12px;
+            font-family: 'Cairo', sans-serif; font-size: 12px;
+            font-weight: 700; color: #fff; cursor: pointer; }
+        .cp-btn.print { background: linear-gradient(135deg, #6c7ae0, #4a56b0); }
+        .cp-btn.whatsapp { background: linear-gradient(135deg, #25d366, #128C7E); }
+        .cp-empty { text-align: center; color: var(--muted); font-size: 11px; padding: 20px 0; }
     </style>
 </head>
 <body>
@@ -727,12 +635,11 @@
     <div class="login-overlay" id="loginOverlay">
         <div class="login-box">
             <div class="login-logo-icon">
-                <div class="pulse-ring"></div>
                 <div class="logo-content">
                     <span class="gtr-big">GTR</span>
                     <span class="pos-badge">POS</span>
                 </div>
-                <span class="version-tag">V 0.8.1</span>
+                <span class="version-tag">V 0.8.2</span>
             </div>
             <div class="login-logo">GTR POS</div>
             <div class="login-sub" id="loginModeLabel">Connexion à votre compte</div>
@@ -796,7 +703,7 @@
                 <div>
                     <div class="title" id="pageTitle">Accueil</div>
                     <div class="sub" onclick="App.openSheet('company')">
-                        GTR POS <span style="opacity:.6;font-weight:400;">V 0.8.1</span>
+                        GTR POS <span style="opacity:.6;font-weight:400;">V 0.8.2</span>
                     </div>
                 </div>
             </div>
@@ -857,7 +764,6 @@
                     <div class="file-drop-zone" id="fileDropZone" onclick="document.getElementById('importFileInput').click()">
                         <span class="icon">📁</span>
                         <span>Déposez votre fichier Excel ou CSV ici, ou cliquez pour sélectionner</span>
-                        <span style="font-size:8px;color:var(--muted);display:block;margin-top:2px;">Formats: .xlsx, .xls, .csv</span>
                     </div>
                     <input type="file" id="importFileInput" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleImportFile(this)">
                     <div id="importPreview" class="import-preview" style="display:none;"></div>
@@ -941,7 +847,7 @@
 
             <div class="section" id="sec-finance">
                 <div class="section-title">📊 Indicateurs financiers</div>
-                <div class="capital-card" id="capitalCard">
+                <div class="capital-card">
                     <div class="capital-label">💰 Capital de l'entreprise</div>
                     <div class="capital-value" id="capitalValue">0.000 TND</div>
                     <div class="capital-details">
@@ -972,12 +878,6 @@
                 <div class="capital-card" style="margin-top:10px;">
                     <div class="capital-label">💰 Capital fixe</div>
                     <div class="capital-value" id="fjCapitalFixe">0.000 TND</div>
-                    <div class="capital-details">
-                        <div class="item"><span class="lbl">Solde client départ</span><span class="val" id="fjCapClientDepart">0.000</span></div>
-                        <div class="item"><span class="lbl">Valeur stock départ</span><span class="val" id="fjCapStockDepart">0.000</span></div>
-                        <div class="item"><span class="lbl">Caisse départ</span><span class="val" id="fjCapCashDepart">0.000</span></div>
-                        <div class="item"><span class="lbl">Solde fournisseur départ</span><span class="val" id="fjCapSupplierBalance">0.000</span></div>
-                    </div>
                 </div>
                 <div class="section-title" style="margin-top:10px;">📋 Mouvements du jour</div>
                 <div class="history-table-wrapper">
@@ -998,10 +898,7 @@
             </div>
 
             <div class="section" id="sec-bi-dashboard">
-                <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;">
-                    <span>📈 Analyses BI - Business Intelligence</span>
-                    <span style="font-size:9px;color:var(--muted);font-weight:400;">GTR POS V 0.8.1</span>
-                </div>
+                <div class="section-title">📈 Analyses BI</div>
                 <div class="bi-filters">
                     <div class="field"><label>📅 Du</label><input type="date" id="biDateFrom" onchange="BIAnalytics.render()"></div>
                     <div class="field"><label>📅 Au</label><input type="date" id="biDateTo" onchange="BIAnalytics.render()"></div>
@@ -1040,14 +937,9 @@
                     <div class="bi-chart-box"><div class="chart-title">📊 Évolution des ventes</div><canvas id="biSalesChart"></canvas></div>
                     <div class="bi-chart-box"><div class="chart-title">📊 Répartition des coûts</div><canvas id="biProfitChart"></canvas></div>
                 </div>
-                <div class="bi-chart-container">
-                    <div class="bi-chart-box"><div class="chart-title">🏆 Top produits</div><canvas id="biTopProductsChart"></canvas></div>
-                    <div class="bi-chart-box"><div class="chart-title">🏆 Top clients</div><canvas id="biTopClientsChart"></canvas></div>
-                </div>
                 <div class="bi-top-table">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                         <span style="font-size:11px;font-weight:800;color:var(--secondary);">🏆 Meilleurs produits</span>
-                        <button class="btn print small" style="width:auto;padding:2px 10px;font-size:8px;" onclick="BIAnalytics.printTopProducts()">🖨️</button>
                     </div>
                     <table><thead><tr><th>#</th><th>Produit</th><th>Qté</th><th>Ventes</th><th>%</th></tr></thead>
                         <tbody id="biTopProductsBody"></tbody>
@@ -1056,7 +948,6 @@
                 <div class="bi-top-table">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                         <span style="font-size:11px;font-weight:800;color:var(--secondary);">🏆 Meilleurs clients</span>
-                        <button class="btn print small" style="width:auto;padding:2px 10px;font-size:8px;" onclick="BIAnalytics.printTopClients()">🖨️</button>
                     </div>
                     <table><thead><tr><th>#</th><th>Client</th><th>Factures</th><th>Total</th><th>%</th></tr></thead>
                         <tbody id="biTopClientsBody"></tbody>
@@ -1066,7 +957,6 @@
                     <button class="btn print small" onclick="BIAnalytics.exportPDF()">📄 PDF</button>
                     <button class="btn outline small" onclick="BIAnalytics.exportCSV()">📥 CSV</button>
                     <button class="btn edit small" onclick="BIAnalytics.refresh()">🔄 Actualiser</button>
-                    <button class="btn save small" onclick="BIAnalytics.exportFullReport()">📊 Complet</button>
                 </div>
             </div>
 
@@ -1089,22 +979,6 @@
                             </select>
                         </div>
                     </div>
-                    <div class="field-row-3">
-                        <div class="field"><label>👤 Client</label>
-                            <select id="reportClientFilter"><option value="all">Tous</option></select>
-                        </div>
-                        <div class="field"><label>📦 Produit</label>
-                            <select id="reportProductFilter"><option value="all">Tous</option></select>
-                        </div>
-                        <div class="field"><label>📋 Statut</label>
-                            <select id="reportStatusFilter">
-                                <option value="all">Tous</option>
-                                <option value="paid">Payé</option>
-                                <option value="pending">Non payé</option>
-                                <option value="partial">Partiel</option>
-                            </select>
-                        </div>
-                    </div>
                     <div class="reports-actions">
                         <button class="btn save" onclick="AdvancedReports.generateReport()">📊 Générer</button>
                         <button class="btn print" onclick="AdvancedReports.printReport()">🖨️ Imprimer</button>
@@ -1112,15 +986,13 @@
                         <button class="btn outline" onclick="AdvancedReports.exportPDF()">📄 PDF</button>
                     </div>
                 </div>
-                <div class="reports-summary" id="reportsSummary">
-                    <div class="kpi-row" id="reportsKPIs">
-                        <div class="kpi-card"><div class="val" id="reportTotalSales">0.000</div><div class="lbl">Total ventes</div></div>
-                        <div class="kpi-card"><div class="val" id="reportTotalPurchases">0.000</div><div class="lbl">Total achats</div></div>
-                        <div class="kpi-card"><div class="val" id="reportGrossProfit">0.000</div><div class="lbl">Bénéfice brut</div></div>
-                        <div class="kpi-card"><div class="val" id="reportNetProfit">0.000</div><div class="lbl">Bénéfice net</div></div>
-                        <div class="kpi-card"><div class="val" id="reportTotalClients">0</div><div class="lbl">Clients</div></div>
-                        <div class="kpi-card"><div class="val" id="reportTotalProducts">0</div><div class="lbl">Produits</div></div>
-                    </div>
+                <div class="kpi-row" id="reportsKPIs">
+                    <div class="kpi-card"><div class="val" id="reportTotalSales">0.000</div><div class="lbl">Total ventes</div></div>
+                    <div class="kpi-card"><div class="val" id="reportTotalPurchases">0.000</div><div class="lbl">Total achats</div></div>
+                    <div class="kpi-card"><div class="val" id="reportGrossProfit">0.000</div><div class="lbl">Bénéfice brut</div></div>
+                    <div class="kpi-card"><div class="val" id="reportNetProfit">0.000</div><div class="lbl">Bénéfice net</div></div>
+                    <div class="kpi-card"><div class="val" id="reportTotalClients">0</div><div class="lbl">Clients</div></div>
+                    <div class="kpi-card"><div class="val" id="reportTotalProducts">0</div><div class="lbl">Produits</div></div>
                 </div>
                 <div class="charts-container">
                     <div class="chart-box"><canvas id="salesChart"></canvas></div>
@@ -1171,7 +1043,7 @@
                     <div class="field"><label>Téléphone 1</label><input id="cPhone"></div>
                     <div class="field"><label>Téléphone 2</label><input id="cPhone2"></div>
                 </div>
-                <div class="field"><label>📧 Email</label><input id="cEmail" type="email" placeholder="exemple@email.com" style="direction:ltr;text-align:left;">
+                <div class="field"><label>📧 Email (pour accès client)</label><input id="cEmail" type="email" placeholder="exemple@email.com" style="direction:ltr;text-align:left;">
                     <div id="cEmailError" style="font-size:8px;color:var(--danger);min-height:12px;"></div>
                 </div>
                 <div class="field"><label>Adresse</label><input id="cAddress"></div>
@@ -1255,14 +1127,10 @@
                     <div class="field">
                         <label>✏️ Corriger le stock</label>
                         <input id="aStockCorrection" type="number" step="1" placeholder="+/-">
-                        <span style="font-size:7px;color:var(--muted);">+ pour ajouter, - pour retirer</span>
                     </div>
                 </div>
                 <button class="btn edit small" onclick="ArticlesModule.correctStock()" style="width:100%;margin-top:4px;">✏️ Corriger le stock</button>
                 <div class="field"><label>⚠️ Stock minimum</label><input id="aMinStock" type="number" value="5"></div>
-                <div style="font-size:8px;color:var(--muted);margin-top:2px;">
-                    💡 La quantité départ est le stock initial.
-                </div>
             </div>
             <div class="sheet-footer">
                 <button class="btn save" onclick="ArticlesModule.save()">💾 Enregistrer</button>
@@ -1292,12 +1160,10 @@
                     <div class="summary-item"><span class="label">💳 Payé</span><span class="value positive" id="vPaidAmount">0.000</span></div>
                     <div class="summary-item"><span class="label">📊 Solde</span><span class="value negative" id="vCurrentBalance">0.000</span></div>
                 </div>
-
                 <div class="payment-only-notice" id="vPaymentOnlyNotice" style="display:none;">
                     <div class="title">💰 Mode Règlement</div>
                     <div class="subtitle">Aucun produit — enregistrez uniquement le paiement</div>
                 </div>
-
                 <div class="add-product-section">
                     <div class="section-label">➕ Ajouter un produit</div>
                     <div class="add-product-row">
@@ -1371,12 +1237,10 @@
                     <div class="summary-item"><span class="label">💳 Payé</span><span class="value positive" id="pPaidAmount">0.000</span></div>
                     <div class="summary-item"><span class="label">📊 Solde</span><span class="value negative" id="pCurrentBalance">0.000</span></div>
                 </div>
-
                 <div class="payment-only-notice" id="pPaymentOnlyNotice" style="display:none;">
                     <div class="title">💸 Mode Règlement</div>
                     <div class="subtitle">Aucun produit — enregistrez uniquement le paiement</div>
                 </div>
-
                 <div class="add-product-section">
                     <div class="section-label">➕ Ajouter un produit</div>
                     <div class="add-product-row">
@@ -1464,15 +1328,12 @@
                 <div class="field"><label>🆔 Matricule fiscal (MF)</label><input id="cpyTaxId"></div>
                 <div class="field"><label>💰 Solde caisse d'ouverture (TND)</label><input id="cpyCashOpening" type="number" step="0.001" value="0"></div>
                 <button class="btn save" onclick="CompanyInfo.save()">💾 Enregistrer</button>
-
                 <div class="section-title">📐 Taille des icônes</div>
                 <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
                     <button class="btn outline small" onclick="Dashboard.setColumns(2)" style="flex:1;font-size:11px;">2 col.</button>
                     <button class="btn outline small" onclick="Dashboard.setColumns(3)" style="flex:1;font-size:11px;">3 col.</button>
                     <button class="btn outline small" onclick="Dashboard.setColumns(4)" style="flex:1;font-size:11px;">4 col.</button>
                 </div>
-                <div id="colsStatus" style="font-size:10px;color:var(--muted);margin-bottom:6px;">Actuel: 4 colonnes</div>
-
                 <div class="section-title">🎨 Thèmes</div>
                 <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;">
                     <button class="btn small" onclick="Theme.apply('light')" style="flex:1;background:#f0f2f8;color:#1a1f2e;">Clair</button>
@@ -1480,19 +1341,15 @@
                     <button class="btn small" onclick="Theme.apply('blue')" style="flex:1;background:#1a4fd6;color:#fff;">Bleu</button>
                     <button class="btn small" onclick="Theme.apply('green')" style="flex:1;background:#27ae60;color:#fff;">Vert</button>
                 </div>
-
                 <div class="section-title">💾 Sauvegarde</div>
                 <button class="btn outline small" onclick="Persistence.export()">⬇️ Exporter</button>
                 <input type="file" id="importFileInputBackup" accept=".json" style="display:none;"
                        onchange="Persistence.import(this.files[0]); this.value='';">
                 <button class="btn outline small" onclick="document.getElementById('importFileInputBackup').click()">⬆️ Importer</button>
-
                 <div class="section-title">🖨️ Impression</div>
                 <button class="btn outline small" onclick="PrintSystem.openCustomizer()" style="width:100%;margin-bottom:6px;">🖨️ Personnaliser</button>
-
                 <div class="section-title">🖥️ Affichage</div>
                 <button class="btn outline small" onclick="Fullscreen.toggle()" style="width:100%;margin-bottom:6px;">⛶ Basculer en plein écran</button>
-
                 <div class="section-title">👤 Compte</div>
                 <div id="accountEmailDisplay" style="font-size:11px;color:var(--muted);margin-bottom:3px;"></div>
                 <button class="btn del" onclick="Auth.logout()">🚪 Se déconnecter</button>
@@ -1629,6 +1486,62 @@
         </div>
     </div>
 
+    <!-- ===== CUSTOM CONFIRM MODAL ===== -->
+    <div class="modal-overlay" id="customConfirmModal">
+        <div class="modal-box">
+            <h3 id="customConfirmTitle">Confirmation</h3>
+            <div id="customConfirmMessage" style="font-size:13px; line-height:1.6; white-space:pre-wrap; margin-bottom:15px; color:var(--text);"></div>
+            <div class="modal-actions">
+                <button class="btn del" id="customConfirmCancel">Annuler</button>
+                <button class="btn save" id="customConfirmOk">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CLIENT PORTAL ===== -->
+    <div class="client-portal" id="clientPortal">
+        <div class="cp-header">
+            <div class="cp-logo">GTR<span>POS</span></div>
+            <div class="cp-user">
+                <span id="cpClientName">Client</span>
+                <button onclick="Auth.logout()" title="Déconnexion">🚪</button>
+            </div>
+        </div>
+        <div class="cp-content">
+            <div class="cp-balance-card">
+                <div class="cp-label">💰 Votre solde actuel</div>
+                <div class="cp-balance" id="cpBalance">0.000 TND</div>
+                <div class="cp-balance-note" id="cpBalanceNote">À jour</div>
+            </div>
+            <div class="cp-kpis">
+                <div class="cp-kpi">
+                    <div class="num" id="cpInvoiceCount">0</div>
+                    <div class="lbl">📄 Factures</div>
+                </div>
+                <div class="cp-kpi">
+                    <div class="num" id="cpTotalPurchases">0.000</div>
+                    <div class="lbl">💰 Achats</div>
+                </div>
+                <div class="cp-kpi">
+                    <div class="num positive" id="cpTotalPaid">0.000</div>
+                    <div class="lbl">💳 Payé</div>
+                </div>
+            </div>
+            <div class="cp-section-title">📄 Mes factures</div>
+            <div id="cpInvoicesList"></div>
+            <div class="cp-section-title">💳 Mes paiements</div>
+            <div id="cpPaymentsList"></div>
+            <div class="cp-actions">
+                <button class="cp-btn print" onclick="ClientPortal.printStatement()">
+                    🖨️ Mon relevé
+                </button>
+                <button class="cp-btn whatsapp" onclick="ClientPortal.shareWhatsapp()">
+                    📱 WhatsApp
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="print-overlay" id="printOverlay">
         <div class="print-actions">
             <div class="paper-selector">
@@ -1651,8 +1564,8 @@
         'use strict';
 
         const APP_CONFIG = {
-            version: 'V 0.8.1',
-            storageKey: 'gtrpos_data_v30',
+            version: 'V 0.8.2',
+            storageKey: 'gtrpos_data_v31',
             themeKey: 'gtrpos_theme',
             printKey: 'gtrpos_print_settings',
             dashboardKey: 'gtrpos_dashboard_cols',
@@ -1695,6 +1608,7 @@
             nextId: { clients:1, fournisseurs:1, articles:1, ventes:1, achats:1,
                       expenses:1, caisseClients:1, caisseFournisseurs:1, reglements:1 },
             currentUser: null,
+            currentClient: null,
             storageMode: 'local',
             currentSection: 'dashboard',
             dashboardColumns: 4,
@@ -1989,7 +1903,7 @@
                         this.deserialize(data);
                         this.save();
                         App.reloadAll();
-                        Toast.show(`✅ Importé (${State.clients.length} clients, ${State.articles.length} produits)`);
+                        Toast.show(`✅ Importé`);
                     } catch(err) { Toast.show('❌ Erreur: ' + err.message); }
                 };
                 reader.readAsText(file);
@@ -2014,8 +1928,9 @@
                     this.closeCustomizer();
                 } catch(e) { Toast.show('❌ Erreur', 'error'); }
             },
-            reset() {
-                if (!confirm('⚠️ Restaurer les paramètres par défaut ?')) return;
+            async reset() {
+                const ok = await CustomConfirm.show('⚠️ Restaurer les paramètres par défaut ?');
+                if (!ok) return;
                 this.settings = { logo:null, footer:'Merci de votre visite', fontSize:'medium' };
                 localStorage.removeItem(APP_CONFIG.printKey);
                 this.updateCustomizerUI();
@@ -2072,7 +1987,6 @@
                     ? `<div style="text-align:center;margin-bottom:4px;"><img src="${this.settings.logo}" style="max-width:120px;max-height:50px;object-fit:contain;"></div>` : '';
                 const footer = this.settings.footer
                     ? `<div style="text-align:center;font-size:${fs};color:#666;margin-top:8px;border-top:1px dashed #ddd;padding-top:6px;">${this.settings.footer}</div>` : '';
-
                 let lines = (data.lines || []).map((l, i) => `
                     <tr>
                         <td style="border:1px solid #999;padding:2px 4px;text-align:center;">${i+1}</td>
@@ -2081,7 +1995,6 @@
                         <td style="border:1px solid #999;padding:2px 4px;text-align:center;">${l.qty}</td>
                         <td style="border:1px solid #999;padding:2px 4px;text-align:right;font-weight:700;">${l.total.toFixed(3)}</td>
                     </tr>`).join('');
-
                 if (!lines) {
                     lines = `<tr>
                         <td colspan="5" style="border:1px solid #999;padding:10px;text-align:center;
@@ -2090,7 +2003,6 @@
                         </td>
                     </tr>`;
                 }
-
                 return `
                     ${logo}
                     <div style="text-align:center;border-bottom:2px solid #1e2f66;padding-bottom:4px;margin-bottom:4px;">
@@ -2180,23 +2092,16 @@
             _currentData: null,
             _currentContent: null,
             _currentTitle: null,
-
             showStatement(type, data) {
                 this._currentType = type;
                 this._currentData = data;
                 this._currentTitle = data.title;
-                let content = '';
-                if (type === 'article') {
-                    content = this.buildArticleHTML(data);
-                } else {
-                    content = this.buildStatementHTML(data);
-                }
+                let content = type === 'article' ? this.buildArticleHTML(data) : this.buildStatementHTML(data);
                 this._currentContent = content;
                 $('previewModalTitle').textContent = '👁️ Aperçu : ' + data.title;
                 $('previewModalBody').innerHTML = `<div class="preview-doc">${content}</div>`;
                 $('previewModal').classList.add('show');
             },
-
             buildStatementHTML(data) {
                 const { entity, movements, totals, partyLabel, finalBalance } = data;
                 const rows = movements.map(m => `
@@ -2237,7 +2142,6 @@
                         </tfoot>
                     </table>`;
             },
-
             buildArticleHTML(data) {
                 const { article, rows } = data;
                 return `
@@ -2261,7 +2165,6 @@
                         <tbody>${rows || '<tr><td colspan="8" style="text-align:center;padding:10px;color:#999;">Aucun mouvement</td></tr>'}</tbody>
                     </table>`;
             },
-
             showInvoice(data) {
                 this._currentType = 'invoice';
                 this._currentData = data;
@@ -2272,14 +2175,12 @@
                 $('previewModalBody').innerHTML = `<div class="preview-doc" style="max-width:400px;margin:0 auto;">${html}</div>`;
                 $('previewModal').classList.add('show');
             },
-
             close() {
                 $('previewModal').classList.remove('show');
                 this._currentType = null;
                 this._currentData = null;
                 this._currentContent = null;
             },
-
             confirmPrint() {
                 if (!this._currentContent) { Toast.show('⚠️ Aucun contenu', 'warning'); return; }
                 const title = this._currentTitle || 'Aperçu';
@@ -2287,6 +2188,34 @@
                 setTimeout(() => {
                     PrintSystem.openPrintWindow(title, this._currentContent);
                 }, 150);
+            }
+        };
+
+        const CustomConfirm = {
+            resolvePromise: null,
+            init() {
+                const modal = $('customConfirmModal');
+                if (!modal) return;
+                $('customConfirmOk').onclick = () => this.handle(true);
+                $('customConfirmCancel').onclick = () => this.handle(false);
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) this.handle(false);
+                });
+            },
+            show(message, title = 'Confirmation') {
+                return new Promise((resolve) => {
+                    this.resolvePromise = resolve;
+                    $('customConfirmTitle').textContent = title;
+                    $('customConfirmMessage').textContent = message;
+                    $('customConfirmModal').classList.add('show');
+                });
+            },
+            handle(value) {
+                $('customConfirmModal').classList.remove('show');
+                if (this.resolvePromise) {
+                    this.resolvePromise(value);
+                    this.resolvePromise = null;
+                }
             }
         };
 
@@ -2345,8 +2274,7 @@
                     const col = (colors || defColors)[i % (colors || defColors).length];
                     const grad = ctx.createLinearGradient(x, y, x, pad.top + cH);
                     grad.addColorStop(0, col); grad.addColorStop(1, col + '88');
-                    ctx.fillStyle = grad; ctx.shadowColor = 'rgba(0,0,0,0.1)';
-                    ctx.shadowBlur = 4; ctx.fillRect(x, y, barW, bH); ctx.shadowBlur = 0;
+                    ctx.fillStyle = grad; ctx.fillRect(x, y, barW, bH);
                     if (showValues) {
                         ctx.fillStyle = '#333'; ctx.font = '6px Cairo'; ctx.textAlign = 'center';
                         ctx.fillText(val.toFixed(1), x + barW / 2, y - 4);
@@ -2379,8 +2307,7 @@
                     const end = start + angle;
                     ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, start, end); ctx.closePath();
                     ctx.fillStyle = (colors || defColors)[i % (colors || defColors).length];
-                    ctx.shadowColor = 'rgba(0,0,0,0.1)'; ctx.shadowBlur = 4;
-                    ctx.fill(); ctx.shadowBlur = 0;
+                    ctx.fill();
                     const mid = start + angle / 2;
                     const lx = cx + Math.cos(mid) * r * 0.6;
                     const ly = cy + Math.sin(mid) * r * 0.6;
@@ -2389,15 +2316,175 @@
                     ctx.fillText(((v / total) * 100).toFixed(1) + '%', lx, ly);
                     start = end;
                 });
-                const ly = H - 8; let lx = 10;
-                labels.forEach((l, i) => {
-                    ctx.fillStyle = (colors || defColors)[i % (colors || defColors).length];
-                    ctx.fillRect(lx, ly - 5, 8, 8);
-                    ctx.fillStyle = '#555'; ctx.font = '7px Cairo';
-                    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-                    ctx.fillText(l, lx + 11, ly + 1);
-                    lx += 45;
-                });
+            }
+        };
+
+        // ============================================================
+        // ROLE MANAGER
+        // ============================================================
+        const RoleManager = {
+            getRole() {
+                const user = State.currentUser;
+                if (!user || !user.email) return 'anonymous';
+                const email = user.email.toLowerCase().trim();
+                if (email === APP_CONFIG.adminEmail.toLowerCase()) return 'admin';
+                const client = State.clients.find(c => 
+                    (c.email || '').toLowerCase().trim() === email
+                );
+                if (client) {
+                    State.currentClient = client;
+                    return 'client';
+                }
+                return 'staff';
+            },
+            isClient() { return this.getRole() === 'client'; }
+        };
+
+        // ============================================================
+        // CLIENT PORTAL
+        // ============================================================
+        const ClientPortal = {
+            show() {
+                const client = State.currentClient;
+                if (!client) { Toast.show('❌ Client introuvable', 'error'); return; }
+                $('clientPortal').classList.add('show');
+                $('loginOverlay').classList.add('hide');
+                $('pendingOverlay').classList.add('hide');
+                document.querySelector('.phone').style.display = 'none';
+                $('cpClientName').textContent = client.name || 'Client';
+                BalanceCalculator.recalculateClient(client.name);
+                this.render();
+            },
+            hide() {
+                $('clientPortal').classList.remove('show');
+                document.querySelector('.phone').style.display = 'flex';
+                State.currentClient = null;
+            },
+            render() {
+                const client = State.currentClient;
+                if (!client) return;
+                const name = client.name;
+                const invoices = State.ventes.filter(v => v.client === name);
+                const payments = State.caisseClients.filter(c => c.clientName === name);
+                const totalPurchases = invoices.reduce((s, v) => s + (v.total || 0), 0);
+                const totalPaid = payments.reduce((s, p) => s + (p.amount || 0), 0);
+                const balance = client.balance || 0;
+                
+                const balEl = $('cpBalance');
+                balEl.textContent = balance.toFixed(3) + ' TND';
+                
+                const noteEl = $('cpBalanceNote');
+                if (Math.abs(balance) < 0.001) {
+                    noteEl.textContent = '✅ À jour';
+                    noteEl.className = 'cp-balance-note positive';
+                } else if (balance > 0) {
+                    noteEl.textContent = '⚠️ Reste à payer: ' + balance.toFixed(3) + ' TND';
+                    noteEl.className = 'cp-balance-note negative';
+                } else {
+                    noteEl.textContent = '💰 Crédit: ' + Math.abs(balance).toFixed(3) + ' TND';
+                    noteEl.className = 'cp-balance-note positive';
+                }
+                
+                $('cpInvoiceCount').textContent = invoices.length;
+                $('cpTotalPurchases').textContent = totalPurchases.toFixed(3);
+                $('cpTotalPaid').textContent = totalPaid.toFixed(3);
+                
+                this.renderInvoices(invoices, payments);
+                this.renderPayments(payments);
+            },
+            renderInvoices(invoices, payments) {
+                const container = $('cpInvoicesList');
+                if (!invoices.length) {
+                    container.innerHTML = '<div class="cp-empty">📭 Aucune facture</div>';
+                    return;
+                }
+                const sorted = [...invoices].sort((a, b) => a.date < b.date ? 1 : -1);
+                container.innerHTML = sorted.slice(0, 30).map(v => {
+                    const paid = (v.reglements || []).reduce((s, r) => s + r.amount, 0);
+                    const rem = (v.total || 0) - paid;
+                    const isPaymentOnly = !v.lines || !v.lines.length;
+                    let badge, badgeClass;
+                    if (isPaymentOnly) {
+                        badge = '💰 Règlement'; badgeClass = 'payment';
+                    } else if (rem <= 0.001) {
+                        badge = '✅ Payée'; badgeClass = 'paid';
+                    } else if (rem >= v.total - 0.001) {
+                        badge = '⏳ Non payée'; badgeClass = 'pending';
+                    } else {
+                        badge = '🔄 Partielle'; badgeClass = 'partial';
+                    }
+                    const amountDisplay = isPaymentOnly ? paid : (v.total || 0);
+                    return `<div class="cp-row">
+                        <div class="cp-row-info">
+                            <div class="name">${v.num}
+                                <span class="cp-badge ${badgeClass}">${badge}</span>
+                            </div>
+                            <div class="meta">${Utils.formatDate(v.date)}</div>
+                        </div>
+                        <div class="cp-row-amount">
+                            ${amountDisplay.toFixed(3)} TND
+                            ${!isPaymentOnly && rem > 0.001 ? 
+                                `<small style="color:var(--danger);">Reste: ${rem.toFixed(3)}</small>` : ''}
+                        </div>
+                    </div>`;
+                }).join('');
+            },
+            renderPayments(payments) {
+                const container = $('cpPaymentsList');
+                if (!payments.length) {
+                    container.innerHTML = '<div class="cp-empty">📭 Aucun paiement</div>';
+                    return;
+                }
+                const sorted = [...payments].sort((a, b) => a.date < b.date ? 1 : -1);
+                container.innerHTML = sorted.slice(0, 30).map(p => `
+                    <div class="cp-row">
+                        <div class="cp-row-info">
+                            <div class="name">💳 ${p.regType || 'Espèces'}</div>
+                            <div class="meta">${Utils.formatDate(p.date)} • Facture: ${p.invoiceNum || '-'}</div>
+                        </div>
+                        <div class="cp-row-amount">
+                            <span class="paid">${(p.amount || 0).toFixed(3)} TND</span>
+                        </div>
+                    </div>
+                `).join('');
+            },
+            printStatement() {
+                const client = State.currentClient;
+                if (!client) return;
+                Toast.show('⏳ Préparation...', 'info');
+                BalanceCalculator.recalculateClient(client.name);
+                const from = new Date('2020-01-01');
+                const to = new Date();
+                const docs = State.ventes
+                    .filter(v => v.client === client.name)
+                    .sort((a, b) => a.date < b.date ? -1 : 1);
+                const pays = State.caisseClients.filter(p => p.clientName === client.name);
+                showPreviewReleve('client', client, docs, pays);
+            },
+            async shareWhatsapp() {
+                const client = State.currentClient;
+                if (!client) return;
+                Toast.show('⏳ Création...', 'info');
+                const invoices = State.ventes.filter(v => v.client === client.name);
+                const totalPurchases = invoices.reduce((s, v) => s + (v.total || 0), 0);
+                const payments = State.caisseClients.filter(c => c.clientName === client.name);
+                const totalPaid = payments.reduce((s, p) => s + (p.amount || 0), 0);
+                const balance = client.balance || 0;
+                const text = 
+                    `🏢 *${State.companyInfo.name}*\n` +
+                    `📋 Relevé de compte\n\n` +
+                    `👤 Client: ${client.name}\n` +
+                    `📊 Solde actuel: *${balance.toFixed(3)} TND*\n\n` +
+                    `📄 Nombre de factures: ${invoices.length}\n` +
+                    `💰 Total achats: ${totalPurchases.toFixed(3)} TND\n` +
+                    `💳 Total payé: ${totalPaid.toFixed(3)} TND\n\n` +
+                    `📞 ${State.companyInfo.phone1 || ''}`;
+                const phone = (client.phone || '').replace(/\D/g, '');
+                const url = phone ? 
+                    `https://wa.me/216${phone}?text=${encodeURIComponent(text)}` :
+                    `https://wa.me/?text=${encodeURIComponent(text)}`;
+                window.open(url, '_blank');
+                Toast.show('✅ WhatsApp ouvert', 'success');
             }
         };
 
@@ -2407,7 +2494,6 @@
                 list: cfg.list,
                 prefix: cfg.prefix,
                 _specialPrices: [],
-
                 reset() {
                     this.editingId = null;
                     this._specialPrices = [];
@@ -2425,7 +2511,6 @@
                     });
                     if (cfg.onReset) cfg.onReset.call(this);
                 },
-
                 save() {
                     if (cfg.validate && !cfg.validate.call(this)) return;
                     const data = cfg.collect.call(this);
@@ -2441,18 +2526,17 @@
                     App.closeSheet();
                     Toast.show(this.editingId ? '✅ Modifié' : '✅ Enregistré');
                 },
-
                 edit() {
                     if (this.editingId == null) { Toast.show('⚠️ Choisissez un élément'); return; }
                     this.save();
                 },
-
-                remove() {
+                async remove() {
                     if (this.editingId == null) { Toast.show('⚠️ Choisissez un élément'); return; }
                     const item = this.list().find(x => x.id === this.editingId);
                     if (!item) return;
                     if (cfg.canDelete && !cfg.canDelete(item)) return;
-                    if (!confirm(`Voulez-vous vraiment supprimer "${item.name}" ?`)) return;
+                    const ok = await CustomConfirm.show(`Voulez-vous vraiment supprimer "${item.name}" ?`);
+                    if (!ok) return;
                     const idx = this.list().findIndex(x => x.id === this.editingId);
                     this.list().splice(idx, 1);
                     Persistence.save();
@@ -2460,7 +2544,6 @@
                     App.closeSheet();
                     Toast.show('🗑️ Supprimé');
                 },
-
                 load(id) {
                     const item = this.list().find(x => x.id === id);
                     if (!item) return;
@@ -2484,7 +2567,6 @@
                 editingRowIndex: null, stockSnapshot: [],
                 isSaved: false, partyTaxId: '', partyAddress: '',
                 partyEmail: '', partySpecialPrices: [],
-
                 reset() {
                     this.editingId = null; this.lines = []; this.reglements = [];
                     this.originalBalance = 0; this.originalPartyId = null;
@@ -2510,13 +2592,11 @@
                     this.refreshArticleOptions(); this.refreshPartyOptions();
                     this.updateAccountSummary();
                 },
-
                 refreshPartyOptions() {
                     const s = $(cfg.partySelect);
                     if (s) s.innerHTML = '<option value="">-- Choisir --</option>' +
                         cfg.partyList().map(p => `<option value="${p.id}">${p.name}</option>`).join('');
                 },
-
                 refreshArticleOptions() {
                     const used = this.lines.map(l => l.name);
                     const avail = State.articles.filter(a => !used.includes(a.name));
@@ -2524,7 +2604,6 @@
                     if (s) s.innerHTML = '<option value="">-- Choisir un produit --</option>' +
                         avail.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
                 },
-
                 fillParty() {
                     const p = cfg.partyList().find(x => x.id == $(cfg.partySelect).value);
                     if (p) {
@@ -2548,7 +2627,6 @@
                     }
                     this.updateAccountSummary(); this.refreshArticleOptions();
                 },
-
                 fillArticle() {
                     const a = State.articles.find(x => x.id == $(cfg.articleSelect).value);
                     if (!a) {
@@ -2573,13 +2651,11 @@
                     $(cfg.priceInput).value = price.toFixed(3);
                     this.calcLine();
                 },
-
                 calcLine() {
                     const p = parseFloat($(cfg.priceInput).value) || 0;
                     const q = parseFloat($(cfg.qtyInput).value) || 0;
                     $(cfg.totalInput).value = (p * q).toFixed(3);
                 },
-
                 addLine() {
                     const sel = $(cfg.articleSelect);
                     const name = sel.value ? sel.options[sel.selectedIndex].textContent : '';
@@ -2617,7 +2693,6 @@
                         $(cfg.paymentOnlyNotice).style.display = 'none';
                     }
                 },
-
                 removeLine(idx) {
                     const line = this.lines[idx];
                     Stock.adjust(line.name, cfg.isPurchase ? -line.qty : line.qty, { silent: true, allowNegative: true });
@@ -2627,9 +2702,7 @@
                     this.updateAccountSummary();
                     Toast.show('🗑️ Produit supprimé');
                 },
-
                 editLine(idx) { this.editingRowIndex = idx; this.renderLines(); },
-
                 saveEditLine(idx) {
                     const row = document.querySelector(`#${cfg.linesBody} tr:nth-child(${idx+1})`);
                     if (!row) return;
@@ -2644,14 +2717,11 @@
                     this.renderLines(); this.updateAccountSummary();
                     Toast.show('✅ Modifié');
                 },
-
                 cancelEdit() { this.editingRowIndex = null; this.renderLines(); },
-
                 renderLines() {
                     const b = $(cfg.linesBody);
                     if (!b) return;
                     let sum = 0;
-
                     if (!this.lines.length) {
                         b.innerHTML = `<tr>
                             <td colspan="6" style="text-align:center;padding:16px;color:#2980b9;font-size:11px;background:#e3f2fd;">
@@ -2665,11 +2735,9 @@
                         }
                         return;
                     }
-
                     if (cfg.paymentOnlyNotice && $(cfg.paymentOnlyNotice)) {
                         $(cfg.paymentOnlyNotice).style.display = 'none';
                     }
-
                     b.innerHTML = this.lines.map((l, i) => {
                         sum += l.total;
                         if (this.editingRowIndex === i) {
@@ -2694,7 +2762,6 @@
                     }).join('');
                     $(cfg.grandTotal).textContent = sum.toFixed(3) + ' TND';
                 },
-
                 renderReglements() {
                     const c = $(cfg.reglementsList);
                     if (!c) return;
@@ -2710,7 +2777,6 @@
                         </div>`).join('');
                     this.updateAccountSummary();
                 },
-
                 addReglement() {
                     const amount = parseFloat($(cfg.regAmount).value) || 0;
                     if (amount <= 0) { Toast.show('⚠️ Montant invalide', 'warning'); return; }
@@ -2738,21 +2804,12 @@
                     $(cfg.regAmount).value = '';
                     Toast.show('✅ Paiement ajouté');
                 },
-
                 deleteReglement(idx) {
                     const removed = this.reglements.splice(idx, 1)[0];
                     if (!removed) return;
                     const caisse = cfg.caisseList();
                     if (removed.id) {
                         const i = caisse.findIndex(c => c.reglementId === removed.id);
-                        if (i !== -1) caisse.splice(i, 1);
-                    } else {
-                        const pn = $(cfg.partySelect).options[$(cfg.partySelect).selectedIndex]?.textContent || '';
-                        const i = caisse.findIndex(c =>
-                            c[cfg.caissePartyKey] === pn &&
-                            c.amount === removed.amount &&
-                            c.date === removed.date &&
-                            c.invoiceNum === $(cfg.numField).value);
                         if (i !== -1) caisse.splice(i, 1);
                     }
                     Persistence.save();
@@ -2761,7 +2818,6 @@
                     this.renderReglements(); this.updateAccountSummary();
                     Toast.show('🗑️ Paiement supprimé');
                 },
-
                 updateAccountSummary() {
                     const total = this.lines.reduce((a, l) => a + l.total, 0);
                     const paid = this.reglements.reduce((a, r) => a + r.amount, 0);
@@ -2771,31 +2827,27 @@
                     $(cfg.paidAmount).textContent = paid.toFixed(3);
                     $(cfg.currentBalance).textContent = cur.toFixed(3);
                 },
-
-                save() {
+                async save() {
                     if (State.isSaving) { Toast.show('⏳ Enregistrement...'); return; }
                     if (this.editingRowIndex !== null) { Toast.show('⚠️ Terminez la modification', 'warning'); return; }
                     if (!$(cfg.partySelect).value) { Toast.show('⚠️ Choisissez une partie', 'warning'); return; }
-
                     const isPaymentOnly = !this.lines.length && this.reglements.length > 0;
-
                     if (!this.lines.length && !this.reglements.length) {
                         Toast.show('⚠️ Ajoutez un produit OU un règlement', 'warning');
                         return;
                     }
-
                     if (isPaymentOnly) {
                         const totalPaid = this.reglements.reduce((a, r) => a + r.amount, 0);
-                        const ok = confirm(
+                        const ok = await CustomConfirm.show(
                             '💡 Aucun produit dans cette facture.\n\n' +
                             'Voulez-vous l\'enregistrer comme RÈGLEMENT uniquement ?\n\n' +
                             '• Montant du règlement: ' + totalPaid.toFixed(3) + ' TND\n' +
                             '• Le solde sera mis à jour\n' +
-                            '• La facture apparaîtra avec le badge 💰 Règlement'
+                            '• La facture apparaîtra avec le badge 💰 Règlement',
+                            'Confirmation'
                         );
                         if (!ok) return;
                     }
-
                     const pn = $(cfg.partySelect).options[$(cfg.partySelect).selectedIndex].textContent;
                     const party = cfg.partyList().find(p => p.name === pn);
                     if (!party) { Toast.show('⚠️ Introuvable', 'error'); return; }
@@ -2803,11 +2855,8 @@
                     const isNew = !this.editingId;
                     const id = this.editingId || State.nextId[cfg.table]++;
                     const rec = {
-                        id,
-                        num: $(cfg.numField).value,
-                        date: $(cfg.dateField).value,
-                        [cfg.partyKey]: pn,
-                        lines: [...this.lines], total,
+                        id, num: $(cfg.numField).value, date: $(cfg.dateField).value,
+                        [cfg.partyKey]: pn, lines: [...this.lines], total,
                         reglements: [...this.reglements],
                         prevBalance: this.originalBalance,
                         [cfg.taxIdField]: party.taxId || '',
@@ -2832,11 +2881,10 @@
                         this.updateAccountSummary();
                         this.isSaved = true;
                         this.stockSnapshot = [];
-
                         if (isPaymentOnly) {
                             NotificationSystem.add(
                                 cfg.isPurchase ? '💸 Règlement fournisseur' : '💰 Règlement client',
-                                `${pn} - ${this.reglements.reduce((a, r) => a + r.amount, 0).toFixed(3)} TND (sans produits)`,
+                                `${pn} - ${this.reglements.reduce((a, r) => a + r.amount, 0).toFixed(3)} TND`,
                                 'SUCCESS'
                             );
                             Toast.show('✅ Règlement enregistré', 'success');
@@ -2848,17 +2896,16 @@
                         Toast.show('❌ Erreur', 'error');
                     } finally { State.isSaving = false; }
                 },
-
                 edit() {
                     if (this.editingId == null) { Toast.show('⚠️ Choisissez une facture'); return; }
                     this.save();
                 },
-
-                remove() {
+                async remove() {
                     if (this.editingId == null) { Toast.show('⚠️ Choisissez une facture'); return; }
                     const rec = cfg.list().find(x => x.id === this.editingId);
                     if (!rec) return;
-                    if (!confirm(`⚠️ Supprimer la facture ${rec.num} ?`)) return;
+                    const ok = await CustomConfirm.show(`⚠️ Supprimer la facture ${rec.num} ?`);
+                    if (!ok) return;
                     rec.lines.forEach(l => {
                         Stock.adjust(l.name, cfg.isPurchase ? -l.qty : l.qty, { silent: true, allowNegative: true });
                     });
@@ -2875,7 +2922,6 @@
                     App.closeSheet();
                     Toast.show('🗑️ Supprimé');
                 },
-
                 load(id) {
                     const r = cfg.list().find(x => x.id === id);
                     if (!r) return;
@@ -2889,9 +2935,7 @@
                     if (opt) $(cfg.partySelect).value = opt.value;
                     const p = cfg.partyList().find(x => x.name === pn);
                     const paid = (r.reglements || []).reduce((a, x) => a + x.amount, 0);
-                    this.originalBalance = r.prevBalance !== undefined
-                        ? r.prevBalance
-                        : (p ? p.balance - (r.total - paid) : 0);
+                    this.originalBalance = r.prevBalance !== undefined ? r.prevBalance : (p ? p.balance - (r.total - paid) : 0);
                     this.originalPartyId = p ? p.id : null;
                     this.partyTaxId = r[cfg.taxIdField] || (p ? p.taxId || '' : '');
                     this.partyAddress = r[cfg.addressField] || (p ? p.address || '' : '');
@@ -2909,7 +2953,6 @@
                     this.renderReglements(); this.updateAccountSummary();
                     App.openSheet(cfg.sheet);
                 },
-
                 printInvoice() {
                     if (this.editingId == null) { Toast.show('⚠️ Enregistrez d\'abord'); return; }
                     const rec = cfg.list().find(x => x.id === this.editingId);
@@ -2930,7 +2973,6 @@
                         prevBalance, currentBalance
                     });
                 },
-
                 printBluetooth() {
                     if (this.editingId == null) { Toast.show('⚠️ Enregistrez d\'abord'); return; }
                     if (!navigator.bluetooth) { Toast.show('❌ Bluetooth non supporté', 'error'); return; }
@@ -2953,7 +2995,6 @@
                     text += `----------------\nSolde précédent : ${prevBalance.toFixed(3)} TND\nTotal facture   : ${rec.total.toFixed(3)} TND\nPayé            : ${paid.toFixed(3)} TND\nSolde actuel    : ${currentBalance.toFixed(3)} TND\n----------------\nMerci !\n`;
                     Bluetooth.print(text);
                 },
-
                 async shareWhatsapp() {
                     if (this.editingId == null) { Toast.show('⚠️ Enregistrez d\'abord'); return; }
                     const rec = cfg.list().find(x => x.id === this.editingId);
@@ -2994,7 +3035,6 @@
                         Toast.show('❌ Erreur: ' + err.message, 'error');
                     }
                 },
-
                 sendEmail() {
                     if (this.editingId == null) { Toast.show('⚠️ Enregistrez d\'abord'); return; }
                     const rec = cfg.list().find(x => x.id === this.editingId);
@@ -3010,7 +3050,6 @@
                     $('emailError').textContent = '';
                     $('emailModal').classList.add('show');
                 },
-
                 sendEmailNow() {
                     const recipient = $('emailRecipient').value.trim();
                     const message = $('emailMessage').value.trim();
@@ -3089,7 +3128,7 @@
                     const d = document.createElement('div');
                     d.className = 'row-card';
                     d.onclick = () => ClientsModule.load(c.id);
-                    d.innerHTML = `<div class="main-info"><div class="name">${lock}${mail}${c.name}</div>
+                    d.innerHTML = `<div><div class="name">${lock}${mail}${c.name}</div>
                         <div class="meta">${c.phone || ''} ${c.email ? '| ' + c.email : ''} ${spCount}</div></div>
                         <div class="amount">${(c.balance || 0).toFixed(3)} TND</div>`;
                     list.appendChild(d);
@@ -3113,7 +3152,7 @@
                     const d = document.createElement('div');
                     d.className = 'row-card';
                     d.onclick = () => FournisseursModule.load(f.id);
-                    d.innerHTML = `<div class="main-info"><div class="name">${lock}${f.name}</div>
+                    d.innerHTML = `<div><div class="name">${lock}${f.name}</div>
                         <div class="meta">${f.phone || ''}</div></div>
                         <div class="amount">${(f.balance || 0).toFixed(3)} TND</div>`;
                     list.appendChild(d);
@@ -3143,7 +3182,7 @@
                     const d = document.createElement('div');
                     d.className = 'row-card';
                     d.onclick = () => ArticlesModule.load(a.id);
-                    d.innerHTML = `<div class="main-info"><div class="name">${lock}${a.name}</div>
+                    d.innerHTML = `<div><div class="name">${lock}${a.name}</div>
                         <div class="meta">Stock: ${st} ${stockDep}</div></div>
                         <div class="amount">${(a.price || 0).toFixed(3)} TND ${badge}</div>`;
                     list.appendChild(d);
@@ -3165,7 +3204,6 @@
                     const paid = (v.reglements || []).reduce((a, r) => a + r.amount, 0);
                     const isPaymentOnly = (!v.lines || v.lines.length === 0);
                     let badge, namePrefix, amountDisplay;
-
                     if (isPaymentOnly) {
                         badge = '<span class="badge payment-only">💰 Règlement</span>';
                         namePrefix = '💰 ';
@@ -3178,11 +3216,10 @@
                         namePrefix = '';
                         amountDisplay = v.total.toFixed(3);
                     }
-
                     const d = document.createElement('div');
                     d.className = 'row-card';
                     d.onclick = () => { VentesModule.load(v.id); };
-                    d.innerHTML = `<div class="main-info"><div class="name">${namePrefix}${v.num}</div>
+                    d.innerHTML = `<div><div class="name">${namePrefix}${v.num}</div>
                         <div class="meta">${v.client} - ${v.date} | ${badge}</div></div>
                         <div class="amount">${amountDisplay} TND</div>`;
                     list.appendChild(d);
@@ -3204,7 +3241,6 @@
                     const paid = (a.reglements || []).reduce((s, r) => s + r.amount, 0);
                     const isPaymentOnly = (!a.lines || a.lines.length === 0);
                     let badge, namePrefix, amountDisplay;
-
                     if (isPaymentOnly) {
                         badge = '<span class="badge payment-only">💰 Règlement</span>';
                         namePrefix = '💰 ';
@@ -3214,11 +3250,10 @@
                         namePrefix = '';
                         amountDisplay = a.total.toFixed(3);
                     }
-
                     const d = document.createElement('div');
                     d.className = 'row-card';
                     d.onclick = () => { AchatsModule.load(a.id); };
-                    d.innerHTML = `<div class="main-info"><div class="name">${namePrefix}${a.num}</div>
+                    d.innerHTML = `<div><div class="name">${namePrefix}${a.num}</div>
                         <div class="meta">${a.supplier} - ${a.date} | ${badge}</div></div>
                         <div class="amount">${amountDisplay} TND</div>`;
                     list.appendChild(d);
@@ -3261,10 +3296,7 @@
                 const hasV = State.ventes.some(v => v.client === c.name);
                 const hasP = State.caisseClients.some(x => x.clientName === c.name);
                 if (!hasV && !hasP) return true;
-                const parts = [];
-                if (hasV) parts.push(`${State.ventes.filter(v => v.client === c.name).length} facture(s)`);
-                if (hasP) parts.push(`${State.caisseClients.filter(x => x.clientName === c.name).length} règlement(s)`);
-                Toast.show(`🚫 Impossible: ${parts.join(', ')}`);
+                Toast.show(`🚫 Impossible: factures ou règlements existants`);
                 return false;
             },
             onReset() {
@@ -3368,10 +3400,7 @@
                 const hasA = State.achats.some(a => a.supplier === f.name);
                 const hasP = State.caisseFournisseurs.some(x => x.fournisseurName === f.name);
                 if (!hasA && !hasP) return true;
-                const parts = [];
-                if (hasA) parts.push(`${State.achats.filter(a => a.supplier === f.name).length} facture(s)`);
-                if (hasP) parts.push(`${State.caisseFournisseurs.filter(x => x.fournisseurName === f.name).length} règlement(s)`);
-                Toast.show(`🚫 Impossible: ${parts.join(', ')}`);
+                Toast.show(`🚫 Impossible: factures ou règlements existants`);
                 return false;
             },
             onReset() { this.updateSummary(); },
@@ -3422,10 +3451,7 @@
                 const iv = State.ventes.some(v => v.lines.some(l => l.name === a.name));
                 const ia = State.achats.some(ac => ac.lines.some(l => l.name === a.name));
                 if (!iv && !ia) return true;
-                const parts = [];
-                if (iv) parts.push(`${State.ventes.filter(v => v.lines.some(l => l.name === a.name)).length} vente(s)`);
-                if (ia) parts.push(`${State.achats.filter(x => x.lines.some(l => l.name === a.name)).length} achat(s)`);
-                Toast.show(`🚫 Impossible: ${parts.join(', ')}`);
+                Toast.show(`🚫 Impossible: utilisé dans des ventes ou achats`);
                 return false;
             }
         });
@@ -3527,11 +3553,12 @@
                 Toast.show(this.editingId ? '✅ Modifié' : '✅ Enregistré');
             },
             edit() { if (!this.editingId) { Toast.show('Choisissez'); return; } this.save(); },
-            remove() {
+            async remove() {
                 if (!this.editingId) { Toast.show('Choisissez'); return; }
                 const i = State.expenses.findIndex(e => e.id === this.editingId);
                 if (i === -1) return;
-                if (!confirm('⚠️ Supprimer cette dépense ?')) return;
+                const ok = await CustomConfirm.show('⚠️ Supprimer cette dépense ?');
+                if (!ok) return;
                 State.expenses.splice(i, 1);
                 Persistence.save();
                 this.render();
@@ -3559,8 +3586,7 @@
                 const q = ($('expSearch')?.value || '').trim().toLowerCase();
                 const filtered = State.expenses
                     .filter(e => !q || e.category.toLowerCase().includes(q) ||
-                        e.description.toLowerCase().includes(q) ||
-                        (e.code || '').toLowerCase().includes(q))
+                        e.description.toLowerCase().includes(q))
                     .sort((a, b) => a.date < b.date ? 1 : -1);
                 if (!filtered.length) { list.innerHTML = '<div class="empty-msg">Aucune dépense</div>'; return; }
                 filtered.slice(0, 100).forEach(e => {
@@ -3568,7 +3594,7 @@
                     d.className = 'row-card';
                     d.onclick = () => this.load(e.id);
                     const code = e.code || 'EXP-' + String(e.id).padStart(4, '0');
-                    d.innerHTML = `<div class="main-info"><div class="name">${code} - ${e.category}</div>
+                    d.innerHTML = `<div><div class="name">${code} - ${e.category}</div>
                         <div class="meta">${e.date}${e.description !== '-' ? ' - ' + e.description : ''}</div></div>
                         <div class="amount" style="color:var(--danger);">-${e.amount.toFixed(3)} TND</div>`;
                     list.appendChild(d);
@@ -3899,10 +3925,10 @@
                 const totalIn = movements.filter(m => m.direction === 'in').reduce((s, m) => s + m.amount, 0);
                 const totalOut = movements.filter(m => m.direction === 'out').reduce((s, m) => s + m.amount, 0);
                 const balance = totalIn - totalOut;
-                let html = `<div class="caisse-summary-card"><div class="grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-                    <div><span class="label">💰 Entrées</span><span class="value income">${totalIn.toFixed(3)} TND</span></div>
-                    <div><span class="label">💸 Sorties</span><span class="value expense">${totalOut.toFixed(3)} TND</span></div>
-                    <div><span class="label">📊 Solde</span><span class="value ${balance >= 0 ? 'income' : 'expense'}">${balance.toFixed(3)} TND</span></div>
+                let html = `<div class="client-summary-card"><div class="grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+                    <div><span class="label">💰 Entrées</span><span class="value positive">${totalIn.toFixed(3)} TND</span></div>
+                    <div><span class="label">💸 Sorties</span><span class="value negative">${totalOut.toFixed(3)} TND</span></div>
+                    <div><span class="label">📊 Solde</span><span class="value">${balance.toFixed(3)} TND</span></div>
                 </div></div>
                 <div style="display:flex;gap:6px;margin:8px 0;">
                     <button class="btn print small" onclick="CaisseHistory.printReport()">🖨️ Imprimer</button>
@@ -3947,9 +3973,9 @@
                 if (!rows) rows = `<tr><td colspan="8" style="text-align:center;padding:15px;color:#999;">📭 Aucun mouvement</td></tr>`;
                 const content = `
                     <div class="kpi-row">
-                        <div class="kpi-card" style="border-top:3px solid #2ecc71;"><div class="val">${totalIn.toFixed(3)} TND</div><div class="lbl">💰 Entrées</div></div>
-                        <div class="kpi-card" style="border-top:3px solid #e74c5e;"><div class="val">${totalOut.toFixed(3)} TND</div><div class="lbl">💸 Sorties</div></div>
-                        <div class="kpi-card" style="border-top:3px solid ${balance >= 0 ? '#2ecc71' : '#e74c5e'};"><div class="val">${balance.toFixed(3)} TND</div><div class="lbl">📊 Solde</div></div>
+                        <div class="kpi-card"><div class="val">${totalIn.toFixed(3)} TND</div><div class="lbl">💰 Entrées</div></div>
+                        <div class="kpi-card"><div class="val">${totalOut.toFixed(3)} TND</div><div class="lbl">💸 Sorties</div></div>
+                        <div class="kpi-card"><div class="val">${balance.toFixed(3)} TND</div><div class="lbl">📊 Solde</div></div>
                     </div>
                     <table>
                         <thead><tr><th>Date</th><th>Type</th><th>Partie</th><th>Facture</th><th>Méthode</th><th>Libellé</th><th>Montant</th><th>Direction</th></tr></thead>
@@ -4019,10 +4045,6 @@
                 b.textContent = d.benefice.toFixed(3);
                 b.style.color = d.benefice >= 0 ? '#2ecc71' : '#e74c5e';
                 $('fjCapitalFixe').textContent = d.capitalFixe.toFixed(3) + ' TND';
-                $('fjCapClientDepart').textContent = d.clientDepart.toFixed(3);
-                $('fjCapStockDepart').textContent = d.stockDepart.toFixed(3);
-                $('fjCapCashDepart').textContent = d.cashDepart.toFixed(3);
-                $('fjCapSupplierBalance').textContent = d.supplierDepart.toFixed(3);
                 const tb = $('fjMouvementsBody');
                 if (!tb) return;
                 if (!d.movements.length) {
@@ -4238,16 +4260,6 @@
                     values: [this.data.totalSales, this.data.totalPurchases, this.data.totalExp, this.data.profit],
                     colors: ['#4a6cf7', '#e74c5e', '#f39c12', '#2ecc71']
                 });
-                const products = this.data.topProducts.slice(0, 6);
-                ChartRenderer.drawBars($('biTopProductsChart'), {
-                    labels: products.map(p => p.name),
-                    values: products.map(p => p.total)
-                });
-                const clients = this.data.topClients.slice(0, 6);
-                ChartRenderer.drawBars($('biTopClientsChart'), {
-                    labels: clients.map(c => c.name),
-                    values: clients.map(c => c.total)
-                });
             },
             getSalesChartData(period) {
                 const g = {};
@@ -4285,28 +4297,6 @@
                 }
             },
             refresh() { this.render(); Toast.show('🔄 Actualisé', 'success'); },
-            printTopProducts() {
-                if (!this.data.topProducts.length) { Toast.show('Aucune donnée', 'warning'); return; }
-                const rows = this.data.topProducts.map((p, i) => `
-                    <tr><td>${i+1}</td><td>${p.name}</td><td>${p.qty}</td>
-                    <td>${p.total.toFixed(3)}</td><td>${p.percentage.toFixed(1)}%</td></tr>`).join('');
-                PrintSystem.openPrintWindow('🏆 Meilleurs produits', `
-                    <table>
-                        <thead><tr><th>#</th><th>Produit</th><th>Qté</th><th>Ventes</th><th>%</th></tr></thead>
-                        <tbody>${rows}</tbody>
-                    </table>`);
-            },
-            printTopClients() {
-                if (!this.data.topClients.length) { Toast.show('Aucune donnée', 'warning'); return; }
-                const rows = this.data.topClients.map((c, i) => `
-                    <tr><td>${i+1}</td><td>${c.name}</td><td>${c.count}</td>
-                    <td>${c.total.toFixed(3)}</td><td>${c.percentage.toFixed(1)}%</td></tr>`).join('');
-                PrintSystem.openPrintWindow('🏆 Meilleurs clients', `
-                    <table>
-                        <thead><tr><th>#</th><th>Client</th><th>Factures</th><th>Total</th><th>%</th></tr></thead>
-                        <tbody>${rows}</tbody>
-                    </table>`);
-            },
             exportCSV() {
                 if (!this.data.topProducts.length) { Toast.show('Aucune donnée', 'warning'); return; }
                 let csv = 'Produit,Quantité,Ventes,%\n';
@@ -4338,27 +4328,15 @@
                         const h = (canvas.height * w) / canvas.width;
                         pdf.setFontSize(16);
                         pdf.text('📊 Analyses BI', w / 2, 15, { align: 'center' });
-                        pdf.setFontSize(10);
-                        pdf.text(`${State.companyInfo.name} - ${new Date().toLocaleDateString('fr-FR')}`, w / 2, 22, { align: 'center' });
                         pdf.addImage(img, 'PNG', 0, 28, w, h);
                         pdf.save(`BI_${Utils.today()}.pdf`);
                         Toast.show('✅ PDF exporté', 'success');
                     })
                     .catch(() => Toast.show('❌ Erreur', 'error'));
-            },
-            exportFullReport() { this.exportPDF(); setTimeout(() => this.exportCSV(), 1000); }
+            }
         };
 
         const AdvancedReports = {
-            setupDatePicker() {
-                if ($('reportDateFrom')) $('reportDateFrom').value = Utils.monthStart();
-                if ($('reportDateTo')) $('reportDateTo').value = Utils.today();
-                ['reportDateFrom', 'reportDateTo'].forEach(id => {
-                    $(id)?.addEventListener('change', () => this.generateReport());
-                });
-                document.querySelectorAll('#reportClientFilter, #reportProductFilter, #reportStatusFilter, #reportType')
-                    .forEach(el => el?.addEventListener('change', () => this.generateReport()));
-            },
             updateFilters() {
                 const cs = $('reportClientFilter');
                 if (cs) cs.innerHTML = '<option value="all">Tous</option>' +
@@ -4371,11 +4349,8 @@
                 const type = $('reportType')?.value || 'sales';
                 const from = $('reportDateFrom')?.value || '';
                 const to = $('reportDateTo')?.value || '';
-                const clientId = $('reportClientFilter')?.value || 'all';
-                const productId = $('reportProductFilter')?.value || 'all';
-                const status = $('reportStatusFilter')?.value || 'all';
                 const config = {
-                    sales: { data: () => this.getSalesData(from, to, clientId, productId, status),
+                    sales: { data: () => this.getSalesData(from, to),
                         headers: ['Date','Client','N° facture','Montant','Payé','Reste','Statut'],
                         title: 'Rapport des ventes' },
                     purchases: { data: () => this.getPurchasesData(from, to),
@@ -4407,27 +4382,9 @@
                 this.updateKPIs(data, type);
                 this.renderCharts(data, type);
             },
-            getSalesData(from, to, clientId, productId, status) {
+            getSalesData(from, to) {
                 let list = [...State.ventes];
                 if (from && to) list = list.filter(v => v.date >= from && v.date <= to);
-                if (clientId !== 'all') {
-                    const cl = State.clients.find(c => c.id === parseInt(clientId));
-                    if (cl) list = list.filter(v => v.client === cl.name);
-                }
-                if (productId !== 'all') {
-                    const a = State.articles.find(a => a.id === parseInt(productId));
-                    if (a) list = list.filter(v => v.lines.some(l => l.name === a.name));
-                }
-                if (status !== 'all') {
-                    list = list.filter(v => {
-                        const paid = (v.reglements || []).reduce((s, r) => s + r.amount, 0);
-                        const rem = v.total - paid;
-                        if (status === 'paid') return rem <= 0;
-                        if (status === 'pending') return rem >= v.total;
-                        if (status === 'partial') return rem > 0 && rem < v.total;
-                        return true;
-                    });
-                }
                 return list.map(v => {
                     const paid = (v.reglements || []).reduce((s, r) => s + r.amount, 0);
                     const rem = v.total - paid;
@@ -4606,8 +4563,6 @@
                         const title = document.querySelector('#sec-reports .section-title')?.textContent || 'Rapport';
                         pdf.setFontSize(16);
                         pdf.text(title, w / 2, 15, { align: 'center' });
-                        pdf.setFontSize(10);
-                        pdf.text(`${State.companyInfo.name} - ${new Date().toLocaleDateString('fr-FR')}`, w / 2, 22, { align: 'center' });
                         pdf.addImage(img, 'PNG', 0, 28, w, h);
                         pdf.save(`Rapport_${Utils.today()}.pdf`);
                         Toast.show('✅ PDF exporté', 'success');
@@ -4746,70 +4701,47 @@
             async enter() {
                 const el = document.documentElement;
                 try {
-                    if (el.requestFullscreen) {
-                        await el.requestFullscreen();
-                    } else if (el.webkitRequestFullscreen) {
-                        await el.webkitRequestFullscreen();
-                    } else if (el.mozRequestFullScreen) {
-                        await el.mozRequestFullScreen();
-                    } else if (el.msRequestFullscreen) {
-                        await el.msRequestFullscreen();
-                    }
+                    if (el.requestFullscreen) await el.requestFullscreen();
+                    else if (el.webkitRequestFullscreen) await el.webkitRequestFullscreen();
+                    else if (el.mozRequestFullScreen) await el.mozRequestFullScreen();
+                    else if (el.msRequestFullscreen) await el.msRequestFullscreen();
                     this.updateButton();
                     Toast.show('⛶ Mode plein écran activé', 'success');
                 } catch(err) {
-                    console.warn('Fullscreen error:', err);
                     Toast.show('⚠️ Plein écran non supporté', 'warning');
                 }
             },
             async exit() {
                 try {
-                    if (document.exitFullscreen) {
-                        await document.exitFullscreen();
-                    } else if (document.webkitExitFullscreen) {
-                        await document.webkitExitFullscreen();
-                    } else if (document.mozCancelFullScreen) {
-                        await document.mozCancelFullScreen();
-                    } else if (document.msExitFullscreen) {
-                        await document.msExitFullscreen();
-                    }
+                    if (document.exitFullscreen) await document.exitFullscreen();
+                    else if (document.webkitExitFullscreen) await document.webkitExitFullscreen();
+                    else if (document.mozCancelFullScreen) await document.mozCancelFullScreen();
+                    else if (document.msExitFullscreen) await document.msExitFullscreen();
                     this.updateButton();
                     Toast.show('🗗 Mode normal', 'info');
-                } catch(err) {
-                    console.warn('Exit fullscreen error:', err);
-                }
+                } catch(err) {}
             },
             toggle() {
-                if (this.isActive()) {
-                    this.exit();
-                } else {
-                    this.enter();
-                }
+                if (this.isActive()) this.exit();
+                else this.enter();
             },
             updateButton() {
                 const btn = $('fullscreenBtn');
                 if (!btn) return;
                 if (this.isActive()) {
                     btn.textContent = '🗗';
-                    btn.title = 'Quitter le plein écran';
                     btn.classList.add('active');
                 } else {
                     btn.textContent = '⛶';
-                    btn.title = 'Plein écran';
                     btn.classList.remove('active');
                 }
             },
             init() {
                 ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange']
                     .forEach(evt => document.addEventListener(evt, () => this.updateButton()));
-
                 document.addEventListener('keydown', e => {
-                    if (e.key === 'F11') {
-                        e.preventDefault();
-                        this.toggle();
-                    }
+                    if (e.key === 'F11') { e.preventDefault(); this.toggle(); }
                 });
-
                 this.updateButton();
             }
         };
@@ -4848,7 +4780,7 @@
                     finance: () => this.updateCapitalCard(),
                     'finance-jour': () => FinanceJour.init(),
                     'bi-dashboard': () => setTimeout(() => { BIAnalytics.init(); BIAnalytics.render(); }, 300),
-                    reports: () => setTimeout(() => { AdvancedReports.updateFilters(); AdvancedReports.generateReport(); }, 300),
+                    reports: () => setTimeout(() => { AdvancedReports.generateReport(); }, 300),
                     marges: () => setTimeout(() => { Marges.init(); Marges.render(); }, 200)
                 };
                 if (loaders[id]) loaders[id]();
@@ -4975,6 +4907,7 @@
                 const e = $('loginEmail').value.trim();
                 const p = $('loginPassword').value;
                 if (!e || !p) { $('loginError').textContent = 'Email et mot de passe requis'; return; }
+                if (p.length < 6) { $('loginError').textContent = 'Mot de passe: min 6 caractères'; return; }
                 $('loginError').textContent = '';
                 $('loginLoading').style.display = 'block';
                 auth.createUserWithEmailAndPassword(e, p)
@@ -4989,9 +4922,11 @@
                     .catch(err => { $('loginError').textContent = err.message; })
                     .finally(() => { $('loginLoading').style.display = 'none'; });
             },
-            logout() {
-                if (!confirm('⚠️ Êtes-vous sûr de vouloir quitter ?')) return;
+            async logout() {
+                const ok = await CustomConfirm.show('⚠️ Êtes-vous sûr de vouloir quitter ?');
+                if (!ok) return;
                 Persistence.save();
+                ClientPortal.hide();
                 auth.signOut();
                 App.closeSheet();
                 Toast.show('👋 Déconnecté');
@@ -5026,16 +4961,26 @@
                     if (user) {
                         State.currentUser = user;
                         $('accountEmailDisplay2').textContent = user.email || '';
-                        const isAdmin = user.email?.toLowerCase() === APP_CONFIG.adminEmail;
-                        if (isAdmin) {
-                            if (State.storageMode === 'cloud') {
-                                await Persistence.loadFromCloud(user.uid);
-                            } else {
-                                Persistence.load();
-                            }
+                        
+                        if (State.storageMode === 'cloud') {
+                            await Persistence.loadFromCloud(user.uid);
+                        } else {
+                            Persistence.load();
+                        }
+                        
+                        const role = RoleManager.getRole();
+                        
+                        if (role === 'client') {
+                            console.log('👤 Client connecté:', State.currentClient.name);
+                            setTimeout(() => ClientPortal.show(), 300);
+                            return;
+                        }
+                        
+                        if (role === 'admin') {
                             this._showApp();
                             return;
                         }
+                        
                         if (window.db) {
                             try {
                                 const doc = await window.db.collection('approvals').doc(user.uid).get();
@@ -5047,11 +4992,6 @@
                                     });
                                     this._showPending();
                                 } else if (doc.data().approved === true) {
-                                    if (State.storageMode === 'cloud') {
-                                        await Persistence.loadFromCloud(user.uid);
-                                    } else {
-                                        Persistence.load();
-                                    }
                                     this._showApp();
                                 } else {
                                     this._showPending();
@@ -5062,14 +5002,19 @@
                         }
                     } else {
                         State.currentUser = null;
+                        State.currentClient = null;
                         $('loginOverlay').classList.remove('hide');
                         $('pendingOverlay').classList.add('hide');
+                        $('clientPortal')?.classList.remove('show');
+                        document.querySelector('.phone').style.display = 'flex';
                     }
                 });
             },
             _showApp() {
                 $('loginOverlay').classList.add('hide');
                 $('pendingOverlay').classList.add('hide');
+                $('clientPortal').classList.remove('show');
+                document.querySelector('.phone').style.display = 'flex';
                 App.reloadAll();
                 App.showSection('dashboard');
                 Toast.show(`✅ Bienvenue ${APP_CONFIG.version}`, 'success');
@@ -5086,6 +5031,8 @@
             _showPending() {
                 $('loginOverlay').classList.add('hide');
                 $('pendingOverlay').classList.remove('hide');
+                $('clientPortal').classList.remove('show');
+                document.querySelector('.phone').style.display = 'flex';
             }
         };
 
@@ -5151,7 +5098,6 @@
                     <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
                     <tbody>${rows}</tbody>
                 </table>
-                ${data.length > 20 ? `<div style="text-align:center;color:var(--muted);font-size:9px;padding:4px;">... et ${data.length - 20} autres</div>` : ''}
             `;
             preview.style.display = 'block';
             cb.style.display = 'block';
@@ -5187,7 +5133,7 @@
                     });
                     imported++;
                     pf.style.width = ((i + 1) / total * 100) + '%';
-                    st.textContent = `Importation: ${i + 1}/${total} (${imported} importés, ${errors} erreurs)`;
+                    st.textContent = `Importation: ${i + 1}/${total}`;
                 } catch(err) { errors++; }
             });
             setTimeout(() => {
@@ -5269,10 +5215,8 @@
             const title = isClient ? 'Relevé de compte client' : 'Relevé de compte fournisseur';
             const partyLabel = isClient ? 'Client' : 'Fournisseur';
             const docLabel = isClient ? 'Facture de vente' : "Facture d'achat";
-
             let cumulative = entity.openingBalance || 0;
             let movements = [{ date:'---', doc:'Ouverture', description:"Solde d'ouverture", debit:0, credit:0, balance:cumulative }];
-
             const all = [];
             docs.forEach(d => {
                 const dp = payments.filter(p => p.invoiceNum === d.num);
@@ -5289,16 +5233,11 @@
                 else cumulative -= m.credit;
                 movements.push({ ...m, balance: cumulative });
             });
-
             const totalDebit = movements.reduce((s, m) => s + (m.debit || 0), 0);
             const totalCredit = movements.reduce((s, m) => s + (m.credit || 0), 0);
             const finalBalance = entity.balance || cumulative;
-
             PreviewModal.showStatement(type, {
-                title,
-                partyLabel,
-                entity,
-                movements,
+                title, partyLabel, entity, movements,
                 totals: { debit: totalDebit, credit: totalCredit },
                 finalBalance
             });
@@ -5308,7 +5247,6 @@
             const from = new Date($('articleHistoryFrom').value);
             const to = new Date($('articleHistoryTo').value);
             to.setHours(23, 59, 59);
-
             const movements = [];
             State.ventes.forEach(v => {
                 const dt = new Date(v.date);
@@ -5329,7 +5267,6 @@
                 });
             });
             movements.sort((a, b) => a.date < b.date ? -1 : 1);
-
             const stockDepart = article.stockDepart !== undefined ? article.stockDepart : (article.stock || 0);
             let cumul = stockDepart;
             let rows = `<tr style="background:#f0f4ff;">
@@ -5349,11 +5286,9 @@
                     <td style="font-weight:700;">${cumul}</td>
                 </tr>`;
             });
-
             PreviewModal.showStatement('article', {
                 title: 'Historique - ' + article.name,
-                article,
-                rows
+                article, rows
             });
         }
 
@@ -5381,6 +5316,7 @@
                     if ($('shortcutHelp').classList.contains('show')) closeShortcutHelp();
                     if ($('notificationPanel').classList.contains('show')) closeNotificationPanel();
                     if ($('previewModal').classList.contains('show')) PreviewModal.close();
+                    if ($('customConfirmModal').classList.contains('show')) CustomConfirm.handle(false);
                 }
             });
             const dz = $('fileDropZone');
@@ -5419,6 +5355,7 @@
         window.Theme = Theme;
         window.PrintSystem = PrintSystem;
         window.PreviewModal = PreviewModal;
+        window.CustomConfirm = CustomConfirm;
         window.NotificationSystem = NotificationSystem;
         window.Dashboard = Dashboard;
         window.Fullscreen = Fullscreen;
@@ -5429,6 +5366,8 @@
         window.ArticlesRenderer = ArticlesRenderer;
         window.VentesRenderer = VentesRenderer;
         window.AchatsRenderer = AchatsRenderer;
+        window.RoleManager = RoleManager;
+        window.ClientPortal = ClientPortal;
         window.downloadTemplate = downloadTemplate;
         window.handleImportFile = handleImportFile;
         window.confirmImport = confirmImport;
@@ -5451,6 +5390,7 @@
             NotificationSystem.load();
             Dashboard.load();
             Fullscreen.init();
+            CustomConfirm.init();
             bindEvents();
             Auth.init();
             Persistence.load();
