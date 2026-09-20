@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="GTR POS">
     <meta name="theme-color" content="#1e2f66">
-    <title>GTR POS V 0.8.3 - Système intégré</title>
+    <title>GTR POS V 0.8.4 - Système intégré</title>
     <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkdUUiBQT1MiLAogICJzaG9ydF9uYW1lIjogIkdUUiBQT1MiLAogICJkZXNjcmlwdGlvbiI6ICJQb2ludCBkZSB2ZW50ZSBwcm9mZXNzaW9ubmVsIiwKICAic3RhcnRfdXJsIjogIi9pbmRleC5odG1sIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAib3JpZW50YXRpb24iOiAicG9ydHJhaXQiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMxYTJhNWMiLAogICJ0aGVtZV9jb2xvciI6ICIjMWEyYTVjIgp9">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -45,9 +45,7 @@
             background: linear-gradient(145deg, #6b8aff, #3a56d4); display: flex;
             align-items: center; justify-content: center; font-size: 20px; font-weight: 900;
             color: #fff; margin-right: 10px; flex-shrink: 0;
-            box-shadow: 0 4px 16px rgba(74, 108, 247, 0.45); position: relative;
-            transition: var(--transition); letter-spacing: -0.5px;
-            font-family: 'Cairo', sans-serif; }
+            box-shadow: 0 4px 16px rgba(74, 108, 247, 0.45); position: relative; }
         .appbar .logo-icon .logo-text { position: relative; z-index: 1; display: flex;
             align-items: center; gap: 0; }
         .appbar .logo-icon .logo-text .gtr { font-size: 18px; font-weight: 900; }
@@ -87,13 +85,11 @@
         .login-logo-icon .version-tag { position: absolute; bottom: -6px; right: -6px;
             background: linear-gradient(135deg, var(--warning), #f39c12); color: #fff;
             font-size: 8px; padding: 2px 10px; border-radius: 20px; font-weight: 700; z-index: 2; }
-        /* ✅ تعديل 1: تقليل padding-top من 60px إلى 10px */
         .content { flex: 1; overflow-y: auto; padding: 8px 10px 20px;
             -webkit-overflow-scrolling: touch; position: relative; background: var(--bg); padding-top: 10px; }
         .section { display: none !important; animation: fadeIn .3s ease; }
         .section.active { display: block !important; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-        /* ✅ تعديل 2: تقليل gap من 14px إلى 10px */
         .dashboard-grid { display: grid; gap: 10px; padding: 4px 0 4px; width: 100%;
             grid-template-columns: repeat(4, 1fr); }
         .dashboard-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
@@ -151,6 +147,17 @@
         .btn.whatsapp { background: linear-gradient(135deg, #25d366, #128C7E); }
         .btn.email { background: linear-gradient(135deg, #3498db, #2980b9); }
         .btn.bluetooth { background: linear-gradient(135deg, #4a6cf7, #2a4ac7); }
+        .btn-invoice-view {
+            background: linear-gradient(135deg, #6b8aff, #4a6cf7);
+            border: none; color: #fff; border-radius: 5px;
+            padding: 2px 6px; font-size: 9px; cursor: pointer;
+            margin-left: 4px; transition: var(--transition);
+        }
+        .btn-invoice-view:active { transform: scale(0.9); }
+        .invoice-num-link {
+            color: var(--primary); cursor: pointer;
+            text-decoration: underline dotted; font-weight: 700;
+        }
         .toast { position: absolute; top: 64px; left: 50%; transform: translateX(-50%) translateY(-10px);
             background: var(--secondary); color: #fff; padding: 6px 18px; border-radius: 14px;
             font-size: 12px; font-weight: 700; opacity: 0; pointer-events: none;
@@ -626,6 +633,18 @@
         .cp-btn.print { background: linear-gradient(135deg, #6c7ae0, #4a56b0); }
         .cp-btn.whatsapp { background: linear-gradient(135deg, #25d366, #128C7E); }
         .cp-empty { text-align: center; color: var(--muted); font-size: 11px; padding: 20px 0; }
+
+        /* ===== STAFF ROLE BADGE ===== */
+        .staff-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: #fff;
+            font-size: 8px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 6px;
+        }
     </style>
 </head>
 <body>
@@ -638,7 +657,7 @@
                     <span class="gtr-big">GTR</span>
                     <span class="pos-badge">POS</span>
                 </div>
-                <span class="version-tag">V 0.8.3</span>
+                <span class="version-tag">V 0.8.4</span>
             </div>
             <div class="login-logo">GTR POS</div>
             <div class="login-sub" id="loginModeLabel">Connexion à votre compte</div>
@@ -702,7 +721,7 @@
                 <div>
                     <div class="title" id="pageTitle">Accueil</div>
                     <div class="sub" onclick="App.openSheet('company')">
-                        GTR POS <span style="opacity:.6;font-weight:400;">V 0.8.3</span>
+                        GTR POS <span style="opacity:.6;font-weight:400;">V 0.8.4</span>
                     </div>
                 </div>
             </div>
@@ -840,6 +859,7 @@
                 <div style="margin-top:12px;padding:12px;background:var(--bg);border-radius:12px;border:1px solid var(--border);">
                     <div style="font-size:12px;font-weight:700;color:var(--secondary);margin-bottom:4px;">🔐 Sécurité</div>
                     <button class="btn save small" style="width:auto;padding:4px 14px;font-size:10px;" onclick="openChangePasswordModal()">🔑 Changer mot de passe</button>
+                    <button class="btn edit small" style="width:auto;padding:4px 14px;font-size:10px;margin-left:4px;" onclick="openStaffPasswordModal()">🔑 Changer (Staff)</button>
                     <div id="accountEmailDisplay2" style="font-size:10px;color:var(--muted);margin-top:4px;"></div>
                 </div>
             </div>
@@ -1043,7 +1063,6 @@
                 <div class="field"><label>📧 Email (pour accès client)</label><input id="cEmail" type="email" placeholder="exemple@email.com" style="direction:ltr;text-align:left;">
                     <div id="cEmailError" style="font-size:8px;color:var(--danger);min-height:12px;"></div>
                 </div>
-                <!-- ✅ حقل كلمة السر الجديد -->
                 <div class="field-row-2">
                     <div class="field">
                         <label>🔐 Mot de passe client (unique)</label>
@@ -1358,6 +1377,10 @@
                 <button class="btn outline small" onclick="Fullscreen.toggle()" style="width:100%;">⛶ Plein écran</button>
                 <div class="section-title">👤 Compte</div>
                 <div id="accountEmailDisplay" style="font-size:11px;color:var(--muted);margin-bottom:3px;"></div>
+                <button class="btn save small" style="width:auto;padding:6px 14px;font-size:11px;margin-bottom:4px;" 
+                        onclick="App.closeSheet(); openStaffPasswordModal();">
+                    🔑 Changer mot de passe (Staff)
+                </button>
                 <button class="btn del" onclick="Auth.logout()">🚪 Se déconnecter</button>
             </div>
         </div>
@@ -1389,6 +1412,33 @@
             <div class="modal-actions">
                 <button class="btn save" onclick="Auth.changePassword()">💾 Modifier</button>
                 <button class="btn del" onclick="closeChangePasswordModal()">Annuler</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ MODAL CHANGEMENT MOT DE PASSE STAFF -->
+    <div class="modal-overlay" id="staffPasswordModal">
+        <div class="modal-box">
+            <h3>🔑 Changer mot de passe <span class="staff-badge">STAFF</span></h3>
+            <div class="field"><label>Mot de passe actuel</label>
+                <div class="password-wrapper"><input type="password" id="staffCurrentPassword">
+                    <button class="password-toggle" type="button" onclick="Auth.togglePassword('staffCurrentPassword')">👁️</button>
+                </div>
+            </div>
+            <div class="field"><label>Nouveau mot de passe</label>
+                <div class="password-wrapper"><input type="password" id="staffNewPassword">
+                    <button class="password-toggle" type="button" onclick="Auth.togglePassword('staffNewPassword')">👁️</button>
+                </div>
+            </div>
+            <div class="field"><label>Confirmer</label>
+                <div class="password-wrapper"><input type="password" id="staffConfirmPassword">
+                    <button class="password-toggle" type="button" onclick="Auth.togglePassword('staffConfirmPassword')">👁️</button>
+                </div>
+            </div>
+            <div class="modal-error" id="staffPasswordError"></div>
+            <div class="modal-actions">
+                <button class="btn save" onclick="Auth.changeStaffPassword()">💾 Modifier</button>
+                <button class="btn del" onclick="closeStaffPasswordModal()">Annuler</button>
             </div>
         </div>
     </div>
@@ -1556,12 +1606,13 @@
         'use strict';
 
         const APP_CONFIG = {
-            version: 'V 0.8.3',
-            storageKey: 'gtrpos_data_v32',
+            version: 'V 0.8.4',
+            storageKey: 'gtrpos_data_v33',
             themeKey: 'gtrpos_theme',
             printKey: 'gtrpos_print_settings',
             dashboardKey: 'gtrpos_dashboard_cols',
             clientSessionKey: 'gtrpos_client_session',
+            staffCredsKey: 'gtrpos_staff_creds',
             adminEmail: 'krimi.neji@gmail.com',
             maxNotifications: 50
         };
@@ -2206,7 +2257,7 @@
         };
 
         // ============================================================
-        // ROLE MANAGER
+        // ✅ RoleManager - Détection Admin / Staff / Client
         // ============================================================
         const RoleManager = {
             getRole() {
@@ -2215,17 +2266,18 @@
                 if (user.isClient) return 'client';
                 const email = user.email.toLowerCase().trim();
                 if (email === APP_CONFIG.adminEmail.toLowerCase()) return 'admin';
+                if (user.isStaff) return 'staff';
                 const client = State.clients.find(c =>
                     (c.email || '').toLowerCase().trim() === email
                 );
                 if (client) { State.currentClient = client; return 'client'; }
                 return 'staff';
-            }
+            },
+            isAdmin() { return this.getRole() === 'admin'; },
+            isStaff() { return this.getRole() === 'staff'; },
+            isClient() { return this.getRole() === 'client'; }
         };
 
-        // ============================================================
-        // CLIENT PORTAL
-        // ============================================================
         const ClientPortal = {
             show() {
                 const client = State.currentClient;
@@ -2315,8 +2367,6 @@
                 const client = State.currentClient;
                 if (!client) return;
                 BalanceCalculator.recalculateClient(client.name);
-                const from = new Date('2020-01-01');
-                const to = new Date();
                 const docs = State.ventes.filter(v => v.client === client.name).sort((a, b) => a.date < b.date ? -1 : 1);
                 const pays = State.caisseClients.filter(p => p.clientName === client.name);
                 showPreviewReleve('client', client, docs, pays);
@@ -2771,7 +2821,6 @@
                     if (this.editingId == null) { Toast.show('⚠️ Enregistrez'); return; }
                     const rec = cfg.list().find(x => x.id === this.editingId);
                     if (!rec) return;
-                    const p = cfg.partyList().find(x => x.name === rec[cfg.partyKey]);
                     const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0);
                     const prevBalance = rec.prevBalance || 0;
                     let text = `${State.companyInfo.name}\n${rec.num}\n${rec.date}\n${rec[cfg.partyKey]}\n`;
@@ -2784,7 +2833,6 @@
                     if (this.editingId == null) { Toast.show('⚠️ Enregistrez'); return; }
                     const rec = cfg.list().find(x => x.id === this.editingId);
                     if (!rec) return;
-                    Toast.show('⏳ Création...', 'info');
                     const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0);
                     const phone = cfg.partyList().find(x => x.name === rec[cfg.partyKey])?.phone || '';
                     const formatted = phone.replace(/\D/g, '');
@@ -2941,9 +2989,6 @@
             }
         };
 
-        // ============================================================
-        // CLIENT MODULE (مع كلمة السر)
-        // ============================================================
         const ClientsModule = createEntityModule({
             table: 'clients', prefix: 'CL', sheet: 'clients',
             list: () => State.clients,
@@ -3385,11 +3430,20 @@
                     html += this.buildMovementsTable(movements);
                     result.innerHTML = html;
                 },
+                openInvoice(num) {
+                    if (!num) return;
+                    const inv = cfg.docs().find(d => d.num === num);
+                    if (!inv) { Toast.show('❌ Facture introuvable', 'error'); return; }
+                    const module = cfg.invoiceModule();
+                    if (!module || !module.load) { Toast.show('⚠️ Non disponible', 'warning'); return; }
+                    Toast.show(`📄 ${num}`, 'info');
+                    module.load(inv.id);
+                },
                 buildSummaryCard(e, ti, tp, tpay, cb) {
                     return `<div class="client-summary-card"><div class="grid">
                         <div><span class="label">👤 ${cfg.entityLabel}:</span><span class="value">${e.name}</span></div>
                         <div><span class="label">📞 Tél:</span><span class="value">${e.phone || '-'}</span></div>
-                        <div><span class="label">📄 Factures:</span><span class="value">${ti}</span></div>
+                        <div><span class="label">📄 Nb factures:</span><span class="value">${ti}</span></div>
                         <div><span class="label">💰 Total:</span><span class="value positive">${Utils.formatNum(tp)} TND</span></div>
                         <div><span class="label">💳 Règlements:</span><span class="value">${Utils.formatNum(tpay)} TND</span></div>
                         <div><span class="label">📊 Solde:</span><span class="value ${cb >= 0 ? 'positive' : 'negative'}">${Utils.formatNum(cb)} TND</span></div>
@@ -3423,34 +3477,51 @@
                             else if (rem > 0.001) { st = '🔄 Partielle'; sc = 'var(--warning)'; }
                             else { st = '✅ Payée'; sc = 'var(--success)'; }
                             rows += `<tr>
-                                <td style="font-weight:700;">${d.num}</td>
+                                <td style="text-align:left;padding-left:8px;">
+                                    <span class="invoice-num-link" onclick="${cfg.name}.openInvoice('${d.num}')" title="Voir la facture">${d.num}</span>
+                                    <button class="btn-invoice-view" onclick="${cfg.name}.openInvoice('${d.num}')" title="Voir la facture">📄</button>
+                                </td>
                                 <td>${Utils.formatDate(d.date)}</td>
                                 <td>${Utils.formatNum(d.total)}</td>
                                 <td style="color:var(--success);">${Utils.formatNum(paid)}</td>
                                 <td style="color:${rem > 0.001 ? 'var(--danger)' : 'var(--success)'};">${Utils.formatNum(rem)}</td>
                                 <td style="color:${sc};font-weight:700;">${st}</td>
                                 <td>
-                                    <button class="btn edit small" onclick="${cfg.name}.editInvoice('${d.id}')" style="padding:1px 6px;font-size:7px;">✏️</button>
-                                    <button class="btn save small" onclick="${cfg.name}.payInvoice('${d.id}')" style="padding:1px 6px;font-size:7px;">💰</button>
+                                    <button class="btn edit small" onclick="${cfg.name}.editInvoice('${d.id}')" style="padding:1px 6px;font-size:7px;margin:0 1px;">✏️</button>
+                                    <button class="btn save small" onclick="${cfg.name}.payInvoice('${d.id}')" style="padding:1px 6px;font-size:7px;margin:0 1px;">💰</button>
                                 </td></tr>`;
                         });
                     }
-                    return `<div class="section-title" style="margin-top:10px;">📋 Factures</div>
+                    return `<div class="section-title" style="margin-top:10px;">📋 Liste des factures</div>
                         <div class="history-table-wrapper"><table class="history-table" style="min-width:700px;">
-                            <thead><tr><th>N°</th><th>Date</th><th>Montant</th><th>Payé</th><th>Reste</th><th>Statut</th><th>Actions</th></tr></thead>
+                            <thead><tr><th>N° Facture</th><th>Date</th><th>Montant</th><th>Payé</th><th>Reste</th><th>Statut</th><th>Actions</th></tr></thead>
                             <tbody>${rows}</tbody></table></div>`;
                 },
                 buildMovementsTable(movements) {
-                    let rows = movements.map(m => `
-                        <tr>
+                    let rows = movements.map(m => {
+                        const isInvoice = m.doc && 
+                                         m.doc !== 'Ouverture' && 
+                                         m.doc !== '' &&
+                                         (m.doc.startsWith('VTE-') || m.doc.startsWith('ACH-'));
+                        const docCell = isInvoice 
+                            ? `<td style="font-weight:700;">
+                                   <span class="invoice-num-link" onclick="${cfg.name}.openInvoice('${m.doc}')" title="Voir la facture">${m.doc}</span>
+                                   <button class="btn-invoice-view" onclick="${cfg.name}.openInvoice('${m.doc}')" title="Voir la facture">📄</button>
+                               </td>`
+                            : `<td style="font-weight:700;">${m.doc || '-'}</td>`;
+                        return `<tr>
                             <td>${m.date}</td>
-                            <td style="font-weight:700;">${m.doc}</td>
+                            ${docCell}
                             <td>${m.description}</td>
                             <td style="text-align:right;">${(m.debit || 0).toFixed(3)}</td>
                             <td style="color:var(--success);text-align:right;">${(m.credit || 0).toFixed(3)}</td>
                             <td style="font-weight:800;text-align:right;">${m.balance.toFixed(3)}</td>
-                        </tr>`).join('');
-                    return `<div class="section-title" style="margin-top:10px;">📊 Mouvements</div>
+                        </tr>`;
+                    }).join('');
+                    return `<div class="section-title" style="margin-top:10px;">📊 Détail des mouvements</div>
+                        <div style="text-align:center;font-size:9px;color:var(--muted);margin-bottom:4px;">
+                            💡 Cliquez sur 📄 pour voir la facture
+                        </div>
                         <div class="history-table-wrapper"><table class="history-table" style="min-width:650px;">
                             <thead><tr><th>Date</th><th>N°</th><th>Libellé</th><th>Débit</th><th>Crédit</th><th>Solde</th></tr></thead>
                             <tbody>${rows}</tbody></table></div>`;
@@ -3555,9 +3626,16 @@
                         const tl = m.type === 'vente' ? '📤 Vente' : '📥 Achat';
                         const qd = m.qty > 0 ? '+' + m.qty : m.qty;
                         const color = m.qty > 0 ? 'var(--success)' : 'var(--danger)';
+                        const isInvoice = m.doc && (m.doc.startsWith('VTE-') || m.doc.startsWith('ACH-'));
+                        const docCell = isInvoice 
+                            ? `<td style="font-weight:700;">
+                                   <span class="invoice-num-link" onclick="ArticleHistory.openInvoice('${m.doc}', '${m.type}')" title="Voir la facture">${m.doc}</span>
+                                   <button class="btn-invoice-view" onclick="ArticleHistory.openInvoice('${m.doc}', '${m.type}')" title="Voir la facture">📄</button>
+                               </td>`
+                            : `<td style="font-weight:700;">${m.doc}</td>`;
                         html += `<tr>
                             <td>${Utils.formatDate(m.date)}</td>
-                            <td style="font-weight:700;">${m.doc}</td>
+                            ${docCell}
                             <td>${tl}</td><td>${m.party}</td>
                             <td style="color:${color};font-weight:700;">${qd}</td>
                             <td>${Utils.formatNum(m.price)}</td>
@@ -3568,6 +3646,15 @@
                 }
                 html += `</tbody></table></div>`;
                 result.innerHTML = html;
+            },
+            openInvoice(num, type) {
+                if (!num) return;
+                const list = type === 'vente' ? State.ventes : State.achats;
+                const inv = list.find(d => d.num === num);
+                if (!inv) { Toast.show('❌ Introuvable', 'error'); return; }
+                const module = type === 'vente' ? VentesModule : AchatsModule;
+                Toast.show(`📄 ${num}`, 'info');
+                module.load(inv.id);
             }
         };
 
@@ -3639,9 +3726,17 @@
                     movements.forEach(m => {
                         const isIn = m.direction === 'in';
                         const color = isIn ? 'var(--success)' : 'var(--danger)';
+                        const isInvoice = m.invoiceNum && m.invoiceNum !== '-' && 
+                                         (m.invoiceNum.startsWith('VTE-') || m.invoiceNum.startsWith('ACH-'));
+                        const docCell = isInvoice 
+                            ? `<td>
+                                   <span class="invoice-num-link" onclick="CaisseHistory.openInvoice('${m.invoiceNum}', '${m.type}')" title="Voir la facture">${m.invoiceNum}</span>
+                                   <button class="btn-invoice-view" onclick="CaisseHistory.openInvoice('${m.invoiceNum}', '${m.type}')" title="Voir la facture">📄</button>
+                               </td>`
+                            : `<td>${m.invoiceNum}</td>`;
                         html += `<tr>
                             <td>${m.date}</td><td>${m.type === 'client' ? 'Client' : 'Fourn.'}</td>
-                            <td>${m.party}</td><td>${m.invoiceNum}</td><td>${m.method}</td>
+                            <td>${m.party}</td>${docCell}<td>${m.method}</td>
                             <td style="font-weight:700;color:${color};">${m.amount.toFixed(3)}</td>
                             <td style="color:${color};">${isIn ? '⬆️' : '⬇️'}</td>
                         </tr>`;
@@ -3649,6 +3744,15 @@
                 }
                 html += `</tbody></table></div>`;
                 result.innerHTML = html;
+            },
+            openInvoice(num, type) {
+                if (!num) return;
+                const list = type === 'client' ? State.ventes : State.achats;
+                const inv = list.find(d => d.num === num);
+                if (!inv) { Toast.show('❌ Introuvable', 'error'); return; }
+                const module = type === 'client' ? VentesModule : AchatsModule;
+                Toast.show(`📄 ${num}`, 'info');
+                module.load(inv.id);
             },
             printReport() {
                 const movements = this.collect();
@@ -3747,13 +3851,29 @@
                 tb.innerHTML = d.movements.map(m => {
                     const isIn = m.direction === 'in';
                     const color = isIn ? '#2ecc71' : '#e74c5e';
+                    const isInvoice = m.invoice && m.invoice !== '-' && 
+                                     (m.invoice.startsWith('VTE-') || m.invoice.startsWith('ACH-'));
+                    const docCell = isInvoice 
+                        ? `<td>
+                               <span class="invoice-num-link" onclick="FinanceJour.openInvoice('${m.invoice}')" title="Voir la facture">${m.invoice}</span>
+                               <button class="btn-invoice-view" onclick="FinanceJour.openInvoice('${m.invoice}')" title="Voir la facture">📄</button>
+                           </td>`
+                        : `<td style="font-weight:700;">${m.invoice}</td>`;
                     return `<tr>
-                        <td>${m.type}</td><td>${m.party}</td><td style="font-weight:700;">${m.invoice}</td>
+                        <td>${m.type}</td><td>${m.party}</td>${docCell}
                         <td>${m.description}</td>
                         <td style="font-weight:700;color:${color};">${m.amount.toFixed(3)}</td>
                         <td style="color:${color};">${isIn ? '⬆️' : '⬇️'}</td>
                     </tr>`;
                 }).join('');
+            },
+            openInvoice(num) {
+                if (!num) return;
+                const vente = State.ventes.find(d => d.num === num);
+                if (vente) { Toast.show(`📄 ${num}`, 'info'); VentesModule.load(vente.id); return; }
+                const achat = State.achats.find(d => d.num === num);
+                if (achat) { Toast.show(`📄 ${num}`, 'info'); AchatsModule.load(achat.id); return; }
+                Toast.show('❌ Introuvable', 'error');
             },
             printReport() {
                 const d = this.data;
@@ -3807,7 +3927,10 @@
                     tv += v.total; tm += m;
                     rows += `<tr>
                         <td>${v.client}</td><td>${v.date}</td>
-                        <td style="font-weight:700;">${v.num}</td>
+                        <td style="text-align:left;padding-left:8px;">
+                            <span class="invoice-num-link" onclick="VentesModule.load(${v.id})" title="Voir la facture">${v.num}</span>
+                            <button class="btn-invoice-view" onclick="VentesModule.load(${v.id})" title="Voir la facture">📄</button>
+                        </td>
                         <td style="font-weight:700;color:${m >= 0 ? 'var(--success)' : 'var(--danger)'};">${m.toFixed(3)}</td>
                     </tr>`;
                 });
@@ -4125,8 +4248,25 @@
                 }
                 tb.innerHTML = data.map(item => {
                     const vals = Object.values(item);
-                    return `<tr>${vals.map(v => typeof v === 'number' ? `<td style="text-align:right;">${v.toFixed(3)}</td>` : `<td>${v}</td>`).join('')}</tr>`;
+                    return `<tr>${vals.map((v, idx) => {
+                        if (typeof v === 'number') return `<td style="text-align:right;">${v.toFixed(3)}</td>`;
+                        if (idx === 2 && typeof v === 'string' && (v.startsWith('VTE-') || v.startsWith('ACH-'))) {
+                            return `<td>
+                                <span class="invoice-num-link" onclick="AdvancedReports.openInvoice('${v}')">${v}</span>
+                                <button class="btn-invoice-view" onclick="AdvancedReports.openInvoice('${v}')">📄</button>
+                            </td>`;
+                        }
+                        return `<td>${v}</td>`;
+                    }).join('')}</tr>`;
                 }).join('');
+            },
+            openInvoice(num) {
+                if (!num) return;
+                const vente = State.ventes.find(d => d.num === num);
+                if (vente) { VentesModule.load(vente.id); return; }
+                const achat = State.achats.find(d => d.num === num);
+                if (achat) { AchatsModule.load(achat.id); return; }
+                Toast.show('❌ Introuvable', 'error');
             },
             updateKPIs(data, type) {
                 let ts = 0, tp = 0, tpr = 0, np = 0;
@@ -4455,7 +4595,7 @@
         };
 
         // ============================================================
-        // AUTH - مع دعم كلمة السر للحرفاء
+        // ✅ Auth - avec support Staff
         // ============================================================
         const Auth = {
             isSignup: false,
@@ -4505,7 +4645,6 @@
                 input.type = isPwd ? 'text' : 'password';
                 if (btnId) $(btnId).textContent = isPwd ? '🙈' : '👁️';
             },
-            // ✅ دوال جديدة لمعالجة جلسة الحريف
             _tryClientLogin() {
                 const e = $('loginEmail').value.trim().toLowerCase();
                 const p = $('loginPassword').value.trim();
@@ -4515,37 +4654,71 @@
                     (c.password || '').toLowerCase() === p.toLowerCase()
                 );
                 if (!client) return false;
-                
                 State.currentClient = client;
-                State.currentUser = { 
-                    email: e, 
-                    uid: 'client_' + client.id, 
-                    isClient: true 
-                };
-                
+                State.currentUser = { email: e, uid: 'client_' + client.id, isClient: true };
                 try {
                     localStorage.setItem(APP_CONFIG.clientSessionKey, JSON.stringify({
-                        clientId: client.id,
-                        email: e,
-                        timestamp: Date.now()
+                        clientId: client.id, email: e, timestamp: Date.now()
                     }));
                 } catch(err) {}
-                
                 $('loginError').textContent = '';
                 $('loginOverlay').classList.add('hide');
                 ClientPortal.show();
                 Toast.show(`👋 Bienvenue ${client.name}`, 'success');
                 return true;
             },
+            // ✅ Login Staff local
+            loginStaffLocal(email, password) {
+                try {
+                    const saved = localStorage.getItem(APP_CONFIG.staffCredsKey);
+                    if (!saved) return false;
+                    const creds = JSON.parse(saved);
+                    if (creds.email.toLowerCase() !== email.toLowerCase()) return false;
+                    if (creds.password !== password) return false;
+                    
+                    State.currentUser = {
+                        email: email,
+                        uid: 'staff_' + Date.now(),
+                        isStaff: true,
+                        isLocalStaff: true,
+                        password: password
+                    };
+                    $('accountEmailDisplay2').textContent = email;
+                    $('accountEmailDisplay').textContent = email;
+                    this._showApp();
+                    Toast.show(`👋 Bienvenue Staff`, 'success');
+                    return true;
+                } catch(e) { return false; }
+            },
+            // ✅ Créer Staff local
+            createStaffLocal(email, password) {
+                if (!email || !password) return false;
+                if (password.length < 6) {
+                    $('loginError').textContent = '⚠️ Min 6 caractères';
+                    return false;
+                }
+                try {
+                    localStorage.setItem(APP_CONFIG.staffCredsKey, JSON.stringify({
+                        email: email.toLowerCase(),
+                        password: password,
+                        createdAt: new Date().toISOString()
+                    }));
+                    Toast.show('✅ Compte Staff créé', 'success');
+                    this.loginStaffLocal(email, password);
+                    return true;
+                } catch(e) { 
+                    $('loginError').textContent = '❌ Erreur création';
+                    return false;
+                }
+            },
             login() {
                 const e = $('loginEmail').value.trim().toLowerCase();
                 const p = $('loginPassword').value;
                 if (!e || !p) { $('loginError').textContent = 'Email et mot de passe requis'; return; }
                 
-                // ✅ 1) محاولة دخول الحريف
+                // 1. Client local
                 if (this._tryClientLogin()) return;
                 
-                // ✅ 2) إذا كان الإيميل لحريف لكن كلمة السر غلط
                 const clientByEmail = State.clients.find(c => 
                     (c.email || '').toLowerCase().trim() === e
                 );
@@ -4554,7 +4727,10 @@
                     return;
                 }
                 
-                // ✅ 3) محاولة دخول Admin/Staff عبر Firebase
+                // 2. Staff local
+                if (this.loginStaffLocal(e, p)) return;
+                
+                // 3. Firebase Auth (Admin + Staff Firebase)
                 $('loginError').textContent = '';
                 $('loginLoading').style.display = 'block';
                 auth.signInWithEmailAndPassword(e, p)
@@ -4565,8 +4741,8 @@
                 const e = $('loginEmail').value.trim().toLowerCase();
                 const p = $('loginPassword').value;
                 if (!e || !p) { $('loginError').textContent = 'Email et mot de passe requis'; return; }
+                if (p.length < 6) { $('loginError').textContent = 'Min 6 caractères'; return; }
                 
-                // ✅ منع الحرفاء من التسجيل (يجب على الأدمن إنشاء حسابهم)
                 const existingClient = State.clients.find(c => 
                     (c.email || '').toLowerCase().trim() === e
                 );
@@ -4575,12 +4751,18 @@
                     return;
                 }
                 
-                if (p.length < 6) { $('loginError').textContent = 'Min 6 caractères'; return; }
-                $('loginError').textContent = '';
-                $('loginLoading').style.display = 'block';
-                auth.createUserWithEmailAndPassword(e, p)
-                    .catch(err => { $('loginError').textContent = err.message; })
-                    .finally(() => { $('loginLoading').style.display = 'none'; });
+                CustomConfirm.show(
+                    'Créer un compte Staff ?\n\n' +
+                    '• Email: ' + e + '\n' +
+                    '• Rôle: Staff (موظف)\n\n' +
+                    'Ce compte sera stocké localement.',
+                    '👤 Nouveau Staff'
+                ).then(ok => {
+                    if (!ok) return;
+                    if (this.createStaffLocal(e, p)) {
+                        $('loginError').textContent = '';
+                    }
+                });
             },
             googleLogin() {
                 const provider = new firebase.auth.GoogleAuthProvider();
@@ -4597,8 +4779,7 @@
                 try { localStorage.removeItem(APP_CONFIG.clientSessionKey); } catch(e) {}
                 ClientPortal.hide();
                 State.currentClient = null;
-                
-                if (State.currentUser && !State.currentUser.isClient) {
+                if (State.currentUser && !State.currentUser.isClient && !State.currentUser.isLocalStaff) {
                     auth.signOut();
                 } else {
                     State.currentUser = null;
@@ -4627,25 +4808,84 @@
                     .then(() => { err.textContent = ''; $('passwordModal').classList.remove('show'); Toast.show('✅ Changé'); })
                     .catch(e => { err.textContent = '❌ ' + e.message; });
             },
+            // ✅ Changement mot de passe Staff
+            changeStaffPassword() {
+                const c = $('staffCurrentPassword').value;
+                const n = $('staffNewPassword').value;
+                const cf = $('staffConfirmPassword').value;
+                const err = $('staffPasswordError');
+                
+                if (!c || !n || !cf) { err.textContent = '⚠️ Tous les champs requis'; return; }
+                if (n.length < 6) { err.textContent = '⚠️ Min 6 caractères'; return; }
+                if (n !== cf) { err.textContent = '⚠️ Non concordance'; return; }
+                
+                err.textContent = '⏳...';
+                
+                // Cas 1 : Staff Firebase Auth
+                const user = window.auth?.currentUser;
+                if (user && user.email) {
+                    const cred = firebase.auth.EmailAuthProvider.credential(user.email, c);
+                    user.reauthenticateWithCredential(cred)
+                        .then(() => user.updatePassword(n))
+                        .then(() => {
+                            err.textContent = '';
+                            $('staffPasswordModal').classList.remove('show');
+                            Toast.show('✅ Mot de passe Staff changé', 'success');
+                            NotificationSystem.add(
+                                'Mot de passe modifié',
+                                'Votre mot de passe Staff a été changé avec succès.',
+                                'SUCCESS'
+                            );
+                        })
+                        .catch(e => { 
+                            err.textContent = '❌ ' + (e.message || 'Erreur');
+                        });
+                    return;
+                }
+                
+                // Cas 2 : Staff local
+                if (State.currentUser && State.currentUser.isLocalStaff) {
+                    const storedPwd = State.currentUser.password || '';
+                    if (storedPwd && storedPwd !== c) {
+                        err.textContent = '❌ Mot de passe actuel incorrect';
+                        return;
+                    }
+                    State.currentUser.password = n;
+                    try {
+                        localStorage.setItem(APP_CONFIG.staffCredsKey, JSON.stringify({
+                            email: State.currentUser.email,
+                            password: n,
+                            updatedAt: new Date().toISOString()
+                        }));
+                    } catch(e) {}
+                    err.textContent = '';
+                    $('staffPasswordModal').classList.remove('show');
+                    Toast.show('✅ Mot de passe Staff changé', 'success');
+                    NotificationSystem.add(
+                        'Mot de passe modifié',
+                        'Votre mot de passe Staff a été changé avec succès.',
+                        'SUCCESS'
+                    );
+                    return;
+                }
+                
+                err.textContent = '❌ Aucun utilisateur Staff connecté';
+            },
             _watchAuthState() {
                 if (!auth) return;
                 auth.onAuthStateChanged(async user => {
                     if (user) {
-                        // ✅ إذا كان حريف مسجّل من قبل، ما ندخلوهش في Firebase
                         if (State.currentUser && State.currentUser.isClient) return;
-                        
                         State.currentUser = user;
                         $('accountEmailDisplay2').textContent = user.email || '';
+                        $('accountEmailDisplay').textContent = user.email || '';
                         if (State.storageMode === 'cloud') await Persistence.loadFromCloud(user.uid);
                         else Persistence.load();
-                        
                         const email = user.email.toLowerCase().trim();
-                        
                         if (email === APP_CONFIG.adminEmail.toLowerCase()) {
-                            this._showApp();
-                            return;
+                            State.currentUser.isStaff = false;
+                            this._showApp(); return;
                         }
-                        
                         const client = State.clients.find(c => 
                             (c.email || '').toLowerCase().trim() === email
                         );
@@ -4660,7 +4900,6 @@
                             setTimeout(() => ClientPortal.show(), 300);
                             return;
                         }
-                        
                         if (window.db) {
                             try {
                                 const doc = await window.db.collection('approvals').doc(user.uid).get();
@@ -4672,12 +4911,17 @@
                                     });
                                     this._showPending();
                                 } else if (doc.data().approved === true) {
+                                    const approvalData = doc.data();
+                                    if (approvalData.role === 'staff' || approvalData.isStaff === true) {
+                                        State.currentUser.isStaff = true;
+                                        State.currentUser.role = 'staff';
+                                    }
                                     this._showApp();
                                 } else this._showPending();
                             } catch(e) { this._showPending(); }
                         } else this._showPending();
                     } else {
-                        if (State.currentUser && State.currentUser.isClient) return;
+                        if (State.currentUser && (State.currentUser.isClient || State.currentUser.isLocalStaff)) return;
                         State.currentUser = null;
                         State.currentClient = null;
                         $('loginOverlay').classList.remove('hide');
@@ -4843,6 +5087,21 @@
             $('passwordError').textContent = '';
         }
         function closeChangePasswordModal() { $('passwordModal').classList.remove('show'); }
+        // ✅ Fonctions Staff password
+        function openStaffPasswordModal() {
+            if (!State.currentUser || State.currentUser.isClient) { 
+                Toast.show('⚠️ Non disponible pour client'); 
+                return; 
+            }
+            $('staffPasswordModal').classList.add('show');
+            $('staffCurrentPassword').value = '';
+            $('staffNewPassword').value = '';
+            $('staffConfirmPassword').value = '';
+            $('staffPasswordError').textContent = '';
+        }
+        function closeStaffPasswordModal() { 
+            $('staffPasswordModal').classList.remove('show'); 
+        }
         function closeEmailModal() { $('emailModal').classList.remove('show'); $('emailError').textContent = ''; }
         function showShortcutHelp() {
             $('shortcutHelp').classList.add('show');
@@ -5041,6 +5300,8 @@
         window.closeNotificationPanel = closeNotificationPanel;
         window.openChangePasswordModal = openChangePasswordModal;
         window.closeChangePasswordModal = closeChangePasswordModal;
+        window.openStaffPasswordModal = openStaffPasswordModal;
+        window.closeStaffPasswordModal = closeStaffPasswordModal;
         window.closeEmailModal = closeEmailModal;
         window.showShortcutHelp = showShortcutHelp;
         window.closeShortcutHelp = closeShortcutHelp;
@@ -5060,7 +5321,6 @@
             Auth.init();
             Persistence.load();
             
-            // ✅ استرجاع جلسة حريف محفوظة
             setTimeout(() => {
                 try {
                     const saved = localStorage.getItem(APP_CONFIG.clientSessionKey);
