@@ -754,8 +754,11 @@
                     <div class="dash-item" data-section="achats"><span class="dash-icon">🛒</span><span class="dash-label">Achats</span></div>
                     <div class="dash-item" data-section="expenses"><span class="dash-icon">💸</span><span class="dash-label">Dépenses</span></div>
                     <div class="dash-item" data-section="caisse"><span class="dash-icon">💰</span><span class="dash-label">Caisse</span></div>
+                    <div class="dash-item" data-section="orders" style="background:linear-gradient(135deg,#e67e22,#d35400);color:#fff;">
+                        <span class="dash-icon">🛒</span>
+                        <span class="dash-label" style="color:#fff;">Commandes</span>
+                    </div>
                     <div class="dash-item" data-section="accounts" id="dashAccounts"><span class="dash-icon">👑</span><span class="dash-label">Comptes</span></div>
-                    <div class="dash-item" data-section="finance"><span class="dash-icon">📊</span><span class="dash-label">Finances</span></div>
                     <div class="dash-item" data-section="bi-dashboard" style="background:linear-gradient(135deg,#4a6cf7,#1a2a5c);color:#fff;">
                         <span class="dash-icon">📈</span><span class="dash-label" style="color:#fff;">Analyses BI</span>
                     </div>
@@ -846,6 +849,18 @@
                 <div id="caisseHistoryContent"></div>
             </div>
 
+            <!-- ===== COMMANDES À DISTANCE ===== -->
+            <div class="section" id="sec-orders">
+                <div class="section-title">🛒 Commandes reçues</div>
+                <div style="display:flex;gap:6px;margin-bottom:8px;">
+                    <button class="btn save small" onclick="Orders.filter='pending'; Orders.render();" style="flex:1;">⏳ En attente</button>
+                    <button class="btn print small" onclick="Orders.filter='approved'; Orders.render();" style="flex:1;">✅ Acceptées</button>
+                    <button class="btn outline small" onclick="Orders.filter='all'; Orders.render();" style="flex:1;">📋 Toutes</button>
+                </div>
+                <input class="search-box" id="ordersSearch" placeholder="🔍 Rechercher..." oninput="Orders.render()">
+                <div id="ordersList"></div>
+            </div>
+
             <div class="section" id="sec-accounts">
                 <div class="account-stats">
                     <div class="stat"><div class="num" id="statTotal">0</div><div class="lbl">Total</div></div>
@@ -861,20 +876,6 @@
                     <button class="btn save small" style="width:auto;padding:4px 14px;font-size:10px;" onclick="openChangePasswordModal()">🔑 Changer mot de passe</button>
                     <button class="btn edit small" style="width:auto;padding:4px 14px;font-size:10px;margin-left:4px;" onclick="openStaffPasswordModal()">🔑 Changer (Staff)</button>
                     <div id="accountEmailDisplay2" style="font-size:10px;color:var(--muted);margin-top:4px;"></div>
-                </div>
-            </div>
-
-            <div class="section" id="sec-finance">
-                <div class="section-title">📊 Indicateurs financiers</div>
-                <div class="capital-card">
-                    <div class="capital-label">💰 Capital de l'entreprise</div>
-                    <div class="capital-value" id="capitalValue">0.000 TND</div>
-                    <div class="capital-details">
-                        <div class="item"><span class="lbl">Solde client départ</span><span class="val" id="capClientDepart">0.000</span></div>
-                        <div class="item"><span class="lbl">Valeur stock départ</span><span class="val" id="capStockDepart">0.000</span></div>
-                        <div class="item"><span class="lbl">Caisse départ</span><span class="val" id="capCashDepart">0.000</span></div>
-                        <div class="item"><span class="lbl">Solde fournisseur départ</span><span class="val" id="capSupplierBalance">0.000</span></div>
-                    </div>
                 </div>
             </div>
 
@@ -1443,6 +1444,50 @@
         </div>
     </div>
 
+    <!-- ✅ MODAL COMMANDE CLIENT -->
+    <div class="modal-overlay" id="clientOrderModal">
+        <div class="modal-box" style="max-width:420px;">
+            <h3>🛒 Nouvelle commande</h3>
+            <div class="field">
+                <label>📦 Produit</label>
+                <select id="coArticle" onchange="ClientOrder.fillPrice()">
+                    <option value="">-- Choisir --</option>
+                </select>
+                <span class="stock-hint" id="coStockHint">Stock: -</span>
+            </div>
+            <div class="field-row-2">
+                <div class="field"><label>Prix (TND)</label>
+                    <input type="number" step="0.001" id="coPrice" readonly style="background:#eef0f6;">
+                </div>
+                <div class="field"><label>Quantité</label>
+                    <input type="number" min="1" value="1" id="coQty">
+                </div>
+            </div>
+            <button class="btn save small" style="width:100%;margin-bottom:8px;" onclick="ClientOrder.addLine()">
+                ➕ Ajouter au panier
+            </button>
+
+            <div class="section-title" style="margin-top:8px;">🛒 Panier</div>
+            <div id="coLinesList" style="max-height:180px;overflow-y:auto;margin-bottom:8px;"></div>
+
+            <div class="invoice-total-modern" style="margin:8px 0;">
+                <span class="label">💰 Total</span>
+                <span class="amount" id="coTotal" style="font-size:16px;">0.000 TND</span>
+            </div>
+
+            <div class="field">
+                <label>📝 Note (optionnel)</label>
+                <input type="text" id="coNote" placeholder="Ex: livraison demain...">
+            </div>
+
+            <div class="modal-error" id="coError"></div>
+            <div class="modal-actions">
+                <button class="btn save" onclick="ClientOrder.submit()">📤 Envoyer</button>
+                <button class="btn del" onclick="ClientOrder.close()">Annuler</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="emailModal">
         <div class="modal-box">
             <h3>✉️ Envoyer par email</h3>
@@ -1577,6 +1622,15 @@
             <div id="cpInvoicesList"></div>
             <div class="cp-section-title">💳 Mes paiements</div>
             <div id="cpPaymentsList"></div>
+
+            <div class="cp-section-title">🛒 Passer une commande</div>
+            <button class="cp-btn" style="width:100%;background:linear-gradient(135deg,#4a6cf7,#2a4ac7);margin-bottom:8px;"
+                    onclick="ClientOrder.open()">
+                ➕ Nouvelle commande
+            </button>
+            <div class="cp-section-title">📋 Mes commandes</div>
+            <div id="cpOrdersList"></div>
+
             <div class="cp-actions">
                 <button class="cp-btn print" onclick="ClientPortal.printStatement()">🖨️ Mon relevé</button>
                 <button class="cp-btn whatsapp" onclick="ClientPortal.shareWhatsapp()">📱 WhatsApp</button>
@@ -1647,9 +1701,10 @@
             clients: [], fournisseurs: [], articles: [],
             ventes: [], achats: [], expenses: [],
             caisseClients: [], caisseFournisseurs: [],
+            orders: [],
             companyInfo: { name:'GTR POS', address:'', phone1:'', taxId:'', cashOpening:0 },
             nextId: { clients:1, fournisseurs:1, articles:1, ventes:1, achats:1,
-                      expenses:1, caisseClients:1, caisseFournisseurs:1, reglements:1 },
+                      expenses:1, caisseClients:1, caisseFournisseurs:1, reglements:1, orders:1 },
             currentUser: null,
             currentClient: null,
             storageMode: 'local',
@@ -1850,6 +1905,7 @@
                     articles: State.articles, ventes: State.ventes, achats: State.achats,
                     expenses: State.expenses, caisseClients: State.caisseClients,
                     caisseFournisseurs: State.caisseFournisseurs,
+                    orders: State.orders,
                     nextId: State.nextId, companyInfo: State.companyInfo
                 };
             },
@@ -1863,7 +1919,8 @@
                 State.expenses = data.expenses || [];
                 State.caisseClients = data.caisseClients || [];
                 State.caisseFournisseurs = data.caisseFournisseurs || [];
-                State.nextId = data.nextId || { clients:1, fournisseurs:1, articles:1, ventes:1, achats:1, expenses:1, caisseClients:1, caisseFournisseurs:1, reglements:1 };
+                State.orders = data.orders || [];
+                State.nextId = data.nextId || { clients:1, fournisseurs:1, articles:1, ventes:1, achats:1, expenses:1, caisseClients:1, caisseFournisseurs:1, reglements:1, orders:1 };
                 State.companyInfo = data.companyInfo || { name:'GTR POS', address:'', phone1:'', taxId:'', cashOpening:0 };
                 if (!State.companyInfo.cashOpening) State.companyInfo.cashOpening = 0;
             },
@@ -2278,6 +2335,133 @@
             isClient() { return this.getRole() === 'client'; }
         };
 
+        // ============================================================
+        // ✅ ClientOrder - Commande client à distance
+        // ============================================================
+        const ClientOrder = {
+            lines: [],
+
+            open() {
+                this.lines = [];
+                this.renderArticles();
+                this.renderLines();
+                $('coQty').value = 1;
+                $('coPrice').value = '';
+                $('coNote').value = '';
+                $('coError').textContent = '';
+                $('clientOrderModal').classList.add('show');
+            },
+
+            close() {
+                $('clientOrderModal').classList.remove('show');
+            },
+
+            renderArticles() {
+                const sel = $('coArticle');
+                if (!sel) return;
+                sel.innerHTML = '<option value="">-- Choisir --</option>' +
+                    State.articles
+                        .filter(a => (a.stock || 0) > 0)
+                        .map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+            },
+
+            fillPrice() {
+                const a = State.articles.find(x => x.id == $('coArticle').value);
+                const hint = $('coStockHint');
+                if (!a) { $('coPrice').value = ''; hint.textContent = 'Stock: -'; return; }
+                let price = a.price;
+                const client = State.currentClient;
+                if (client && client.specialPrices) {
+                    const sp = client.specialPrices.find(s => s.name === a.name);
+                    if (sp) { price = sp.price; hint.textContent = `⭐ Prix spécial (Stock: ${a.stock})`; }
+                    else hint.textContent = `Stock: ${a.stock}`;
+                } else {
+                    hint.textContent = `Stock: ${a.stock}`;
+                }
+                $('coPrice').value = price.toFixed(3);
+            },
+
+            addLine() {
+                const a = State.articles.find(x => x.id == $('coArticle').value);
+                if (!a) { $('coError').textContent = '⚠️ Choisissez un produit'; return; }
+                const price = parseFloat($('coPrice').value) || 0;
+                const qty = parseFloat($('coQty').value) || 0;
+                if (price <= 0 || qty <= 0) { $('coError').textContent = '⚠️ Prix/Qté invalides'; return; }
+                if (qty > (a.stock || 0)) { $('coError').textContent = `⚠️ Stock insuffisant: ${a.stock}`; return; }
+
+                const existing = this.lines.find(l => l.name === a.name);
+                if (existing) {
+                    existing.qty += qty;
+                    existing.total = existing.price * existing.qty;
+                } else {
+                    this.lines.push({ name: a.name, articleId: a.id, price, qty, total: price * qty });
+                }
+                $('coError').textContent = '';
+                $('coArticle').value = '';
+                $('coPrice').value = '';
+                $('coQty').value = 1;
+                $('coStockHint').textContent = 'Stock: -';
+                this.renderLines();
+                Toast.show('✅ Ajouté', 'success');
+            },
+
+            removeLine(i) {
+                this.lines.splice(i, 1);
+                this.renderLines();
+            },
+
+            renderLines() {
+                const c = $('coLinesList');
+                if (!c) return;
+                if (!this.lines.length) {
+                    c.innerHTML = '<div class="cp-empty" style="padding:10px;">🛒 Panier vide</div>';
+                } else {
+                    c.innerHTML = this.lines.map((l, i) => `
+                        <div class="special-price-item">
+                            <span class="sp-article">${l.name} × ${l.qty}</span>
+                            <span class="sp-price">${l.total.toFixed(3)} TND</span>
+                            <span class="sp-del" onclick="ClientOrder.removeLine(${i})">✕</span>
+                        </div>`).join('');
+                }
+                const total = this.lines.reduce((s, l) => s + l.total, 0);
+                $('coTotal').textContent = total.toFixed(3) + ' TND';
+            },
+
+            submit() {
+                if (!this.lines.length) { $('coError').textContent = '⚠️ Panier vide'; return; }
+                const client = State.currentClient;
+                if (!client) { $('coError').textContent = '❌ Client introuvable'; return; }
+
+                const total = this.lines.reduce((s, l) => s + l.total, 0);
+                const order = {
+                    id: State.nextId.orders++,
+                    num: 'CMD-' + String(State.nextId.orders).padStart(4, '0'),
+                    date: Utils.today(),
+                    time: new Date().toLocaleTimeString('fr-FR'),
+                    clientId: client.id,
+                    clientName: client.name,
+                    phone: client.phone || '',
+                    lines: [...this.lines],
+                    total,
+                    note: $('coNote').value.trim(),
+                    status: 'pending',
+                    createdAt: new Date().toISOString()
+                };
+                State.orders.push(order);
+                Persistence.save();
+
+                NotificationSystem.add(
+                    '🛒 Nouvelle commande',
+                    `${client.name} — ${total.toFixed(3)} TND (${this.lines.length} article(s))`,
+                    'WARNING'
+                );
+
+                Toast.show('✅ Commande envoyée au vendeur', 'success');
+                this.close();
+                ClientPortal.render();
+            }
+        };
+
         const ClientPortal = {
             show() {
                 const client = State.currentClient;
@@ -2320,6 +2504,7 @@
                 $('cpTotalPaid').textContent = totalPaid.toFixed(3);
                 this.renderInvoices(invoices, payments);
                 this.renderPayments(payments);
+                this.renderOrders();
             },
             renderInvoices(invoices, payments) {
                 const container = $('cpInvoicesList');
@@ -2362,6 +2547,38 @@
                         </div>
                     </div>
                 `).join('');
+            },
+            renderOrders() {
+                const c = $('cpOrdersList');
+                if (!c) return;
+                const client = State.currentClient;
+                if (!client) return;
+                const orders = State.orders
+                    .filter(o => o.clientId === client.id)
+                    .sort((a, b) => b.date < a.date ? -1 : 1);
+
+                if (!orders.length) {
+                    c.innerHTML = '<div class="cp-empty">📭 Aucune commande</div>';
+                    return;
+                }
+
+                const statusMap = {
+                    pending:  { lbl: '⏳ En attente', cls: 'pending' },
+                    approved: { lbl: '✅ Acceptée',   cls: 'paid' },
+                    rejected: { lbl: '❌ Refusée',    cls: 'partial' },
+                    delivered:{ lbl: '🚚 Livrée',     cls: 'paid' }
+                };
+
+                c.innerHTML = orders.slice(0, 10).map(o => {
+                    const s = statusMap[o.status] || statusMap.pending;
+                    return `<div class="cp-row">
+                        <div class="cp-row-info">
+                            <div class="name">${o.num}<span class="cp-badge ${s.cls}">${s.lbl}</span></div>
+                            <div class="meta">${Utils.formatDate(o.date)} ${o.time || ''} • ${o.lines.length} article(s)</div>
+                        </div>
+                        <div class="cp-row-amount">${o.total.toFixed(3)} TND</div>
+                    </div>`;
+                }).join('');
             },
             printStatement() {
                 const client = State.currentClient;
@@ -3280,6 +3497,147 @@
             paymentOnlyNotice: 'pPaymentOnlyNotice',
             renderer: AchatsRenderer
         });
+
+        // ============================================================
+        // ✅ Orders - Gestion des commandes reçues (Staff/Admin)
+        // ============================================================
+        const Orders = {
+            filter: 'pending',
+
+            render() {
+                const list = $('ordersList');
+                if (!list) return;
+                const q = ($('ordersSearch')?.value || '').trim().toLowerCase();
+
+                let filtered = [...State.orders].sort((a, b) => 
+                    b.createdAt < a.createdAt ? -1 : 1
+                );
+                if (this.filter !== 'all') {
+                    filtered = filtered.filter(o => o.status === this.filter);
+                }
+                if (q) {
+                    filtered = filtered.filter(o =>
+                        o.clientName.toLowerCase().includes(q) ||
+                        o.num.toLowerCase().includes(q)
+                    );
+                }
+
+                if (!filtered.length) {
+                    list.innerHTML = '<div class="empty-msg">📭 Aucune commande</div>';
+                    return;
+                }
+
+                const statusMap = {
+                    pending:  { lbl: '⏳ En attente', cls: 'pending' },
+                    approved: { lbl: '✅ Acceptée',   cls: 'paid' },
+                    rejected: { lbl: '❌ Refusée',    cls: 'partial' },
+                    delivered:{ lbl: '🚚 Livrée',     cls: 'paid' }
+                };
+
+                list.innerHTML = filtered.map(o => {
+                    const s = statusMap[o.status] || statusMap.pending;
+                    const linesPreview = o.lines.slice(0, 3).map(l =>
+                        `<div style="font-size:9px;color:var(--muted);">• ${l.name} × ${l.qty} = ${l.total.toFixed(3)} TND</div>`
+                    ).join('');
+                    const more = o.lines.length > 3 ? `<div style="font-size:8px;color:var(--muted);">... +${o.lines.length - 3}</div>` : '';
+                    return `
+                    <div class="row-card" style="flex-direction:column;align-items:stretch;cursor:default;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <div>
+                                <div class="name">${o.num} <span class="cp-badge ${s.cls}" style="margin-left:4px;">${s.lbl}</span></div>
+                                <div class="meta">👤 ${o.clientName} • 📅 ${Utils.formatDate(o.date)} ${o.time || ''}</div>
+                            </div>
+                            <div class="amount" style="font-size:13px;">${o.total.toFixed(3)} TND</div>
+                        </div>
+                        <div style="margin-top:6px;padding:6px;background:var(--bg);border-radius:8px;">
+                            ${linesPreview}
+                            ${more}
+                        </div>
+                        ${o.note ? `<div style="font-size:9px;color:var(--muted);margin-top:4px;">📝 ${o.note}</div>` : ''}
+                        <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">
+                            ${o.status === 'pending' ? `
+                                <button class="btn save small" style="flex:1;padding:4px;font-size:9px;" onclick="Orders.approve(${o.id})">✅ Accepter</button>
+                                <button class="btn del small" style="flex:1;padding:4px;font-size:9px;" onclick="Orders.reject(${o.id})">❌ Refuser</button>
+                            ` : ''}
+                            ${o.status === 'approved' ? `
+                                <button class="btn save small" style="flex:1;padding:4px;font-size:9px;" onclick="Orders.convertToSale(${o.id})">📄 → Facture</button>
+                            ` : ''}
+                            <button class="btn outline small" style="flex:1;padding:4px;font-size:9px;" onclick="Orders.callClient(${o.id})">📞 Appeler</button>
+                            <button class="btn del small" style="padding:4px;font-size:9px;" onclick="Orders.remove(${o.id})">🗑️</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            },
+
+            get(id) { return State.orders.find(o => o.id === id); },
+
+            approve(id) {
+                const o = this.get(id);
+                if (!o) return;
+                o.status = 'approved';
+                o.approvedAt = new Date().toISOString();
+                Persistence.save();
+                this.render();
+                Toast.show('✅ Commande acceptée', 'success');
+                NotificationSystem.add('Commande acceptée', `${o.num} — ${o.clientName}`, 'SUCCESS');
+            },
+
+            reject(id) {
+                const o = this.get(id);
+                if (!o) return;
+                o.status = 'rejected';
+                o.rejectedAt = new Date().toISOString();
+                Persistence.save();
+                this.render();
+                Toast.show('❌ Commande refusée');
+            },
+
+            async remove(id) {
+                const o = this.get(id);
+                if (!o) return;
+                const ok = await CustomConfirm.show(`Supprimer la commande ${o.num} ?`);
+                if (!ok) return;
+                const idx = State.orders.findIndex(x => x.id === id);
+                State.orders.splice(idx, 1);
+                Persistence.save();
+                this.render();
+                Toast.show('🗑️ Supprimée');
+            },
+
+            callClient(id) {
+                const o = this.get(id);
+                if (!o || !o.phone) { Toast.show('⚠️ Pas de téléphone'); return; }
+                const phone = o.phone.replace(/\D/g, '');
+                window.location.href = `tel:${phone}`;
+            },
+
+            convertToSale(id) {
+                const o = this.get(id);
+                if (!o) return;
+                VentesModule.reset();
+                App.openSheet('ventes');
+                const client = State.clients.find(c => c.id === o.clientId);
+                if (client) {
+                    const sel = $('vClient');
+                    const opt = [...sel.options].find(x => x.textContent === client.name);
+                    if (opt) { sel.value = opt.value; VentesModule.fillParty(); }
+                }
+                setTimeout(() => {
+                    o.lines.forEach(l => {
+                        VentesModule.lines.push({
+                            name: l.name, price: l.price, qty: l.qty, total: l.total
+                        });
+                    });
+                    VentesModule.renderLines();
+                    VentesModule.refreshArticleOptions();
+                    VentesModule.updateAccountSummary();
+                    o.status = 'delivered';
+                    o.deliveredAt = new Date().toISOString();
+                    Persistence.save();
+                    Toast.show('📄 Commande chargée dans la facture', 'success');
+                }, 400);
+            }
+        };
 
         const Expenses = {
             editingId: null,
@@ -4507,7 +4865,7 @@
                     fournisseurs:'Fournisseurs', 'fournisseur-history':'Relevé fournisseur',
                     articles:'Articles', 'article-history':'Historique article',
                     ventes:'Ventes', achats:'Achats', expenses:'Dépenses',
-                    caisse:'Caisse', accounts:'Comptes', finance:'Finances',
+                    caisse:'Caisse', accounts:'Comptes', orders:'Commandes',
                     'finance-jour':'Rapport du jour', 'bi-dashboard':'Analyses BI',
                     reports:'Rapports', marges:'Marge bénéficiaire'
                 };
@@ -4526,7 +4884,7 @@
                     expenses: () => Expenses.render(),
                     caisse: () => CaisseHistory.render(),
                     accounts: () => Accounts.render(),
-                    finance: () => this.updateCapitalCard(),
+                    orders: () => Orders.render(),
                     'finance-jour': () => FinanceJour.init(),
                     'bi-dashboard': () => setTimeout(() => { BIAnalytics.init(); BIAnalytics.render(); }, 300),
                     reports: () => setTimeout(() => { AdvancedReports.generateReport(); }, 300),
@@ -4538,19 +4896,6 @@
                 const fab = $('fabBtn');
                 if (!fab) return;
                 fab.classList.toggle('show', ['clients','fournisseurs','articles','ventes','achats','expenses'].includes(id));
-            },
-            updateCapitalCard() {
-                const cd = State.clients.reduce((s, c) => s + (c.openingBalance || 0), 0);
-                const sd = Stock.getOpeningValue();
-                const cash = State.companyInfo.cashOpening || 0;
-                const sup = State.fournisseurs.reduce((s, f) => s + (f.openingBalance || 0), 0);
-                const cap = cd + sd + cash - sup;
-                const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
-                set('capitalValue', cap.toFixed(3) + ' TND');
-                set('capClientDepart', cd.toFixed(3));
-                set('capStockDepart', sd.toFixed(3));
-                set('capCashDepart', cash.toFixed(3));
-                set('capSupplierBalance', sup.toFixed(3));
             },
             openSheet(name) {
                 $('overlay').classList.add('show');
@@ -4586,7 +4931,6 @@
                 VentesModule.refreshArticleOptions();
                 AchatsModule.refreshPartyOptions();
                 AchatsModule.refreshArticleOptions();
-                this.updateCapitalCard();
                 FinanceJour.init();
                 Marges.init();
                 Marges.render();
@@ -4594,9 +4938,6 @@
             }
         };
 
-        // ============================================================
-        // ✅ Auth - avec support Staff
-        // ============================================================
         const Auth = {
             isSignup: false,
             init() {
@@ -4667,7 +5008,6 @@
                 Toast.show(`👋 Bienvenue ${client.name}`, 'success');
                 return true;
             },
-            // ✅ Login Staff local
             loginStaffLocal(email, password) {
                 try {
                     const saved = localStorage.getItem(APP_CONFIG.staffCredsKey);
@@ -4690,7 +5030,6 @@
                     return true;
                 } catch(e) { return false; }
             },
-            // ✅ Créer Staff local
             createStaffLocal(email, password) {
                 if (!email || !password) return false;
                 if (password.length < 6) {
@@ -4716,7 +5055,6 @@
                 const p = $('loginPassword').value;
                 if (!e || !p) { $('loginError').textContent = 'Email et mot de passe requis'; return; }
                 
-                // 1. Client local
                 if (this._tryClientLogin()) return;
                 
                 const clientByEmail = State.clients.find(c => 
@@ -4727,10 +5065,8 @@
                     return;
                 }
                 
-                // 2. Staff local
                 if (this.loginStaffLocal(e, p)) return;
                 
-                // 3. Firebase Auth (Admin + Staff Firebase)
                 $('loginError').textContent = '';
                 $('loginLoading').style.display = 'block';
                 auth.signInWithEmailAndPassword(e, p)
@@ -4808,7 +5144,6 @@
                     .then(() => { err.textContent = ''; $('passwordModal').classList.remove('show'); Toast.show('✅ Changé'); })
                     .catch(e => { err.textContent = '❌ ' + e.message; });
             },
-            // ✅ Changement mot de passe Staff
             changeStaffPassword() {
                 const c = $('staffCurrentPassword').value;
                 const n = $('staffNewPassword').value;
@@ -4821,7 +5156,6 @@
                 
                 err.textContent = '⏳...';
                 
-                // Cas 1 : Staff Firebase Auth
                 const user = window.auth?.currentUser;
                 if (user && user.email) {
                     const cred = firebase.auth.EmailAuthProvider.credential(user.email, c);
@@ -4843,7 +5177,6 @@
                     return;
                 }
                 
-                // Cas 2 : Staff local
                 if (State.currentUser && State.currentUser.isLocalStaff) {
                     const storedPwd = State.currentUser.password || '';
                     if (storedPwd && storedPwd !== c) {
@@ -5087,7 +5420,6 @@
             $('passwordError').textContent = '';
         }
         function closeChangePasswordModal() { $('passwordModal').classList.remove('show'); }
-        // ✅ Fonctions Staff password
         function openStaffPasswordModal() {
             if (!State.currentUser || State.currentUser.isClient) { 
                 Toast.show('⚠️ Non disponible pour client'); 
@@ -5264,6 +5596,8 @@
         window.VentesModule = VentesModule;
         window.AchatsModule = AchatsModule;
         window.Expenses = Expenses;
+        window.Orders = Orders;
+        window.ClientOrder = ClientOrder;
         window.ClientHistory = ClientHistory;
         window.FournisseurHistory = FournisseurHistory;
         window.ArticleHistory = ArticleHistory;
