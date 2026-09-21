@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
@@ -147,17 +147,12 @@
         .btn.whatsapp { background: linear-gradient(135deg, #25d366, #128C7E); }
         .btn.email { background: linear-gradient(135deg, #3498db, #2980b9); }
         .btn.bluetooth { background: linear-gradient(135deg, #4a6cf7, #2a4ac7); }
-        .btn-invoice-view {
-            background: linear-gradient(135deg, #6b8aff, #4a6cf7);
-            border: none; color: #fff; border-radius: 5px;
-            padding: 2px 6px; font-size: 9px; cursor: pointer;
-            margin-left: 4px; transition: var(--transition);
-        }
+        .btn-invoice-view { background: linear-gradient(135deg, #6b8aff, #4a6cf7);
+            border: none; color: #fff; border-radius: 5px; padding: 2px 6px;
+            font-size: 9px; cursor: pointer; margin-left: 4px; transition: var(--transition); }
         .btn-invoice-view:active { transform: scale(0.9); }
-        .invoice-num-link {
-            color: var(--primary); cursor: pointer;
-            text-decoration: underline dotted; font-weight: 700;
-        }
+        .invoice-num-link { color: var(--primary); cursor: pointer;
+            text-decoration: underline dotted; font-weight: 700; }
         .toast { position: absolute; top: 64px; left: 50%; transform: translateX(-50%) translateY(-10px);
             background: var(--secondary); color: #fff; padding: 6px 18px; border-radius: 14px;
             font-size: 12px; font-weight: 700; opacity: 0; pointer-events: none;
@@ -571,7 +566,6 @@
         }
         #fullscreenBtn.active { background: rgba(255,255,255,0.3) !important; }
 
-        /* ===== CLIENT PORTAL ===== */
         .client-portal { position: fixed; inset: 0; z-index: 250; display: none;
             flex-direction: column; background: var(--bg); color: var(--text); overflow: hidden; }
         .client-portal.show { display: flex; }
@@ -634,21 +628,13 @@
         .cp-btn.whatsapp { background: linear-gradient(135deg, #25d366, #128C7E); }
         .cp-empty { text-align: center; color: var(--muted); font-size: 11px; padding: 20px 0; }
 
-        /* ===== STAFF ROLE BADGE ===== */
-        .staff-badge {
-            display: inline-block;
+        .staff-badge { display: inline-block;
             background: linear-gradient(135deg, #9b59b6, #8e44ad);
-            color: #fff;
-            font-size: 8px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 10px;
-            margin-left: 6px;
-        }
+            color: #fff; font-size: 8px; font-weight: 700;
+            padding: 2px 8px; border-radius: 10px; margin-left: 6px; }
     </style>
 </head>
 <body>
-
     <!-- ===== LOGIN ===== -->
     <div class="login-overlay" id="loginOverlay">
         <div class="login-box">
@@ -1417,7 +1403,6 @@
         </div>
     </div>
 
-    <!-- ✅ MODAL CHANGEMENT MOT DE PASSE STAFF -->
     <div class="modal-overlay" id="staffPasswordModal">
         <div class="modal-box">
             <h3>🔑 Changer mot de passe <span class="staff-badge">STAFF</span></h3>
@@ -1444,7 +1429,6 @@
         </div>
     </div>
 
-    <!-- ✅ MODAL COMMANDE CLIENT -->
     <div class="modal-overlay" id="clientOrderModal">
         <div class="modal-box" style="max-width:420px;">
             <h3>🛒 Nouvelle commande</h3>
@@ -1654,7 +1638,6 @@
         <div style="text-align:center;color:#aaa;font-size:10px;margin-bottom:3px;">💡 Choisissez l'imprimante</div>
         <div class="invoice-doc paper-80" id="printDoc"></div>
     </div>
-
     <script>
     (function() {
         'use strict';
@@ -1688,13 +1671,9 @@
         };
 
         const SHORTCUTS = {
-            'Ctrl+N': 'Nouvelle facture',
-            'Ctrl+S': 'Enregistrer',
-            'Ctrl+F': 'Rechercher',
-            'Ctrl+P': 'Imprimer',
-            'F11': 'Plein écran',
-            'Esc': 'Fermer',
-            'F1': 'Aide'
+            'Ctrl+N': 'Nouvelle facture', 'Ctrl+S': 'Enregistrer',
+            'Ctrl+F': 'Rechercher', 'Ctrl+P': 'Imprimer',
+            'F11': 'Plein écran', 'Esc': 'Fermer', 'F1': 'Aide'
         };
 
         const State = {
@@ -1705,13 +1684,9 @@
             companyInfo: { name:'GTR POS', address:'', phone1:'', taxId:'', cashOpening:0 },
             nextId: { clients:1, fournisseurs:1, articles:1, ventes:1, achats:1,
                       expenses:1, caisseClients:1, caisseFournisseurs:1, reglements:1, orders:1 },
-            currentUser: null,
-            currentClient: null,
-            storageMode: 'local',
-            currentSection: 'dashboard',
-            dashboardColumns: 4,
-            isSaving: false,
-            notifications: []
+            currentUser: null, currentClient: null,
+            storageMode: 'local', currentSection: 'dashboard',
+            dashboardColumns: 4, isSaving: false, notifications: []
         };
 
         const Utils = {
@@ -1770,8 +1745,7 @@
                 State.notifications.unshift({
                     id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
                     title, message, type,
-                    timestamp: new Date().toISOString(),
-                    read: false
+                    timestamp: new Date().toISOString(), read: false
                 });
                 this.save();
                 this.updateBadge();
@@ -1862,9 +1836,7 @@
                 return { available: (a?.stock || 0) >= qty, stock: a?.stock || 0 };
             },
             getValue() {
-                return State.articles.reduce((s, a) => {
-                    return s + ((a.stock || 0) * (a.costPrice || a.price || 0));
-                }, 0);
+                return State.articles.reduce((s, a) => s + ((a.stock || 0) * (a.costPrice || a.price || 0)), 0);
             },
             getOpeningValue() {
                 return State.articles.reduce((s, a) => {
@@ -1954,9 +1926,7 @@
                         this.load();
                         window.db.collection('users').doc(uid).set(this.serialize()).catch(e => console.error(e));
                     }
-                } catch(e) {
-                    this.load();
-                }
+                } catch(e) { this.load(); }
             },
             export() {
                 const data = { ...this.serialize(), exportedAt: new Date().toISOString() };
@@ -2313,9 +2283,6 @@
             }
         };
 
-        // ============================================================
-        // ✅ RoleManager - Détection Admin / Staff / Client
-        // ============================================================
         const RoleManager = {
             getRole() {
                 const user = State.currentUser;
@@ -2336,7 +2303,7 @@
         };
 
         // ============================================================
-        // ✅ ClientOrder - Commande client à distance
+        // ✅ ClientOrder — Commande client à distance (SYNC FIRESTORE)
         // ============================================================
         const ClientOrder = {
             lines: [],
@@ -2450,19 +2417,45 @@
                 State.orders.push(order);
                 Persistence.save();
 
-                NotificationSystem.add(
-                    '🛒 Nouvelle commande',
-                    `${client.name} — ${total.toFixed(3)} TND (${this.lines.length} article(s))`,
-                    'WARNING'
-                );
+                // ✅ SYNC FIRESTORE
+                this.syncToCloud(order);
 
                 Toast.show('✅ Commande envoyée au vendeur', 'success');
                 this.close();
                 ClientPortal.render();
+            },
+
+            // ✅ Envoyer la commande dans Firestore
+            async syncToCloud(order) {
+                if (typeof firebase === 'undefined') {
+                    Toast.show('⚠️ Firebase non disponible', 'warning');
+                    return;
+                }
+                try {
+                    if (!firebase.auth().currentUser) {
+                        await firebase.auth().signInAnonymously();
+                        console.log('✅ Connexion anonyme établie');
+                    }
+                    const client = State.currentClient;
+                    const db = firebase.firestore();
+                    await db.collection('orders').doc('order_' + order.id + '_' + Date.now()).set({
+                        ...order,
+                        clientEmail: client?.email || '',
+                        syncedAt: new Date().toISOString(),
+                        source: 'client-portal'
+                    });
+                    console.log('✅ Commande synchronisée au cloud');
+                    Toast.show('☁️ Commande envoyée au vendeur', 'success');
+                } catch(e) {
+                    console.error('❌ Sync error:', e);
+                    Toast.show('⚠️ Erreur sync : ' + e.message, 'warning');
+                }
             }
         };
 
         const ClientPortal = {
+            _ordersUnsub: null,
+
             show() {
                 const client = State.currentClient;
                 if (!client) { Toast.show('❌ Client introuvable', 'error'); return; }
@@ -2473,12 +2466,50 @@
                 $('cpClientName').textContent = client.name || 'Client';
                 BalanceCalculator.recalculateClient(client.name);
                 this.render();
+                this.startClientOrderListener();
             },
+
             hide() {
+                this.stopClientOrderListener();
                 $('clientPortal').classList.remove('show');
                 document.querySelector('.phone').style.display = 'flex';
                 State.currentClient = null;
             },
+
+            // ✅ Écoute temps réel des commandes du client
+            startClientOrderListener() {
+                if (typeof firebase === 'undefined') return;
+                if (this._ordersUnsub) this._ordersUnsub();
+                const client = State.currentClient;
+                if (!client) return;
+                try {
+                    this._ordersUnsub = firebase.firestore().collection('orders')
+                        .where('clientName', '==', client.name)
+                        .onSnapshot(snapshot => {
+                            snapshot.docChanges().forEach(change => {
+                                const data = change.doc.data();
+                                const cloudId = change.doc.id;
+                                const idx = State.orders.findIndex(o => 
+                                    o.cloudId === cloudId || 
+                                    (o.num === data.num && o.clientName === data.clientName)
+                                );
+                                if (idx === -1 && change.type !== 'removed') {
+                                    State.orders.push({ ...data, cloudId });
+                                } else if (idx !== -1) {
+                                    if (change.type === 'removed') State.orders.splice(idx, 1);
+                                    else State.orders[idx] = { ...State.orders[idx], ...data, cloudId };
+                                }
+                            });
+                            Persistence.save();
+                            this.renderOrders();
+                        }, err => console.error('Client orders listener:', err));
+                } catch(e) { console.error(e); }
+            },
+
+            stopClientOrderListener() {
+                if (this._ordersUnsub) { this._ordersUnsub(); this._ordersUnsub = null; }
+            },
+
             render() {
                 const client = State.currentClient;
                 if (!client) return;
@@ -2506,6 +2537,7 @@
                 this.renderPayments(payments);
                 this.renderOrders();
             },
+
             renderInvoices(invoices, payments) {
                 const container = $('cpInvoicesList');
                 if (!invoices.length) { container.innerHTML = '<div class="cp-empty">📭 Aucune facture</div>'; return; }
@@ -2532,6 +2564,7 @@
                     </div>`;
                 }).join('');
             },
+
             renderPayments(payments) {
                 const container = $('cpPaymentsList');
                 if (!payments.length) { container.innerHTML = '<div class="cp-empty">📭 Aucun paiement</div>'; return; }
@@ -2548,14 +2581,15 @@
                     </div>
                 `).join('');
             },
+
             renderOrders() {
                 const c = $('cpOrdersList');
                 if (!c) return;
                 const client = State.currentClient;
                 if (!client) return;
                 const orders = State.orders
-                    .filter(o => o.clientId === client.id)
-                    .sort((a, b) => b.date < a.date ? -1 : 1);
+                    .filter(o => o.clientId === client.id || o.clientName === client.name)
+                    .sort((a, b) => (b.createdAt || b.date) < (a.createdAt || a.date) ? -1 : 1);
 
                 if (!orders.length) {
                     c.innerHTML = '<div class="cp-empty">📭 Aucune commande</div>';
@@ -2580,6 +2614,7 @@
                     </div>`;
                 }).join('');
             },
+
             printStatement() {
                 const client = State.currentClient;
                 if (!client) return;
@@ -2588,6 +2623,7 @@
                 const pays = State.caisseClients.filter(p => p.clientName === client.name);
                 showPreviewReleve('client', client, docs, pays);
             },
+
             shareWhatsapp() {
                 const client = State.currentClient;
                 if (!client) return;
@@ -2606,13 +2642,9 @@
 
         function createEntityModule(cfg) {
             return {
-                editingId: null,
-                list: cfg.list,
-                prefix: cfg.prefix,
-                _specialPrices: [],
+                editingId: null, list: cfg.list, prefix: cfg.prefix, _specialPrices: [],
                 reset() {
-                    this.editingId = null;
-                    this._specialPrices = [];
+                    this.editingId = null; this._specialPrices = [];
                     const id = State.nextId[cfg.table];
                     $(cfg.fields.code).value = cfg.prefix + '-' + String(id).padStart(4, '0');
                     Object.entries(cfg.fields).forEach(([key, elId]) => {
@@ -2678,15 +2710,13 @@
             return {
                 editingId: null, lines: [], reglements: [],
                 originalBalance: 0, originalPartyId: null,
-                editingRowIndex: null, stockSnapshot: [],
-                isSaved: false, partyTaxId: '', partyAddress: '',
-                partyEmail: '', partySpecialPrices: [],
+                editingRowIndex: null, isSaved: false,
+                partyTaxId: '', partyAddress: '', partyEmail: '', partySpecialPrices: [],
                 reset() {
                     this.editingId = null; this.lines = []; this.reglements = [];
                     this.originalBalance = 0; this.originalPartyId = null;
-                    this.editingRowIndex = null; this.stockSnapshot = [];
-                    this.isSaved = false; this.partyTaxId = ''; this.partyAddress = '';
-                    this.partyEmail = ''; this.partySpecialPrices = [];
+                    this.editingRowIndex = null; this.isSaved = false;
+                    this.partyTaxId = ''; this.partyAddress = ''; this.partyEmail = ''; this.partySpecialPrices = [];
                     const num = cfg.prefix + '-' + String(State.nextId[cfg.table]).padStart(4, '0');
                     const date = Utils.today();
                     $(cfg.numDisplay).textContent = '#' + num;
@@ -2872,8 +2902,7 @@
                         date,
                         [cfg.caissePartyKey]: partyName,
                         [cfg.caissePartyKey.replace('Name','Id')]: party ? party.id : null,
-                        type: cfg.caisseType,
-                        amount, regType: method,
+                        type: cfg.caisseType, amount, regType: method,
                         description: 'Règlement de facture ' + $(cfg.numField).value,
                         invoiceId: this.editingId || null,
                         invoiceNum: $(cfg.numField).value,
@@ -3193,7 +3222,6 @@
                 const filtered = State.achats.filter(a => !q || a.num.toLowerCase().includes(q) || a.supplier.toLowerCase().includes(q)).slice().reverse();
                 if (!filtered.length) { list.innerHTML = '<div class="empty-msg">Aucune facture</div>'; return; }
                 filtered.slice(0, 50).forEach(a => {
-                    const paid = (a.reglements || []).reduce((s, r) => s + r.amount, 0);
                     const isPaymentOnly = (!a.lines || a.lines.length === 0);
                     const d = document.createElement('div');
                     d.className = 'row-card';
@@ -3291,13 +3319,10 @@
             },
             generatePassword() {
                 const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-                let pwd = '';
-                let attempts = 0;
+                let pwd = '', attempts = 0;
                 do {
                     pwd = '';
-                    for (let i = 0; i < 6; i++) {
-                        pwd += chars.charAt(Math.floor(Math.random() * chars.length));
-                    }
+                    for (let i = 0; i < 6; i++) pwd += chars.charAt(Math.floor(Math.random() * chars.length));
                     attempts++;
                 } while (State.clients.some(c => c.password === pwd) && attempts < 100);
                 $('cPassword').value = pwd;
@@ -3457,9 +3482,7 @@
         const VentesModule = createTransactionModule({
             name: 'VentesModule', prefix: 'VTE', table: 'ventes', sheet: 'ventes',
             isPurchase: false, balanceType: 'client', caisseType: 'in', caisseTable: 'caisseClients',
-            list: () => State.ventes,
-            partyList: () => State.clients,
-            caisseList: () => State.caisseClients,
+            list: () => State.ventes, partyList: () => State.clients, caisseList: () => State.caisseClients,
             partyKey: 'client', caissePartyKey: 'clientName',
             taxIdField: 'clientTaxId', addressField: 'clientAddress', emailField: 'clientEmail',
             numField: 'vNum', dateField: 'vDate',
@@ -3479,9 +3502,7 @@
         const AchatsModule = createTransactionModule({
             name: 'AchatsModule', prefix: 'ACH', table: 'achats', sheet: 'achats',
             isPurchase: true, balanceType: 'supplier', caisseType: 'out', caisseTable: 'caisseFournisseurs',
-            list: () => State.achats,
-            partyList: () => State.fournisseurs,
-            caisseList: () => State.caisseFournisseurs,
+            list: () => State.achats, partyList: () => State.fournisseurs, caisseList: () => State.caisseFournisseurs,
             partyKey: 'supplier', caissePartyKey: 'fournisseurName',
             taxIdField: 'supplierTaxId', addressField: 'supplierAddress',
             numField: 'pNum', dateField: 'pDate',
@@ -3499,33 +3520,83 @@
         });
 
         // ============================================================
-        // ✅ Orders - Gestion des commandes reçues (Staff/Admin)
+        // ✅ Orders — Gestion des commandes (STAFF/ADMIN) + Firestore
         // ============================================================
         const Orders = {
             filter: 'pending',
+            _unsubscribe: null,
+
+            // ✅ Écoute temps réel Firestore
+            startRealtimeListener() {
+                if (typeof firebase === 'undefined') return;
+                if (this._unsubscribe) this._unsubscribe();
+                try {
+                    this._unsubscribe = firebase.firestore().collection('orders')
+                        .orderBy('createdAt', 'desc')
+                        .limit(100)
+                        .onSnapshot(snapshot => {
+                            let changed = false;
+                            snapshot.docChanges().forEach(change => {
+                                const data = change.doc.data();
+                                const cloudId = change.doc.id;
+                                const existingIdx = State.orders.findIndex(o => 
+                                    o.cloudId === cloudId || 
+                                    (o.num === data.num && o.clientName === data.clientName)
+                                );
+                                if (change.type === 'added' || change.type === 'modified') {
+                                    const merged = { ...data, cloudId };
+                                    if (existingIdx === -1) {
+                                        State.orders.push(merged);
+                                        changed = true;
+                                        NotificationSystem.add(
+                                            '🛒 Nouvelle commande',
+                                            `${data.clientName} — ${(data.total || 0).toFixed(3)} TND`,
+                                            'WARNING'
+                                        );
+                                    } else {
+                                        State.orders[existingIdx] = { ...State.orders[existingIdx], ...merged };
+                                        changed = true;
+                                    }
+                                } else if (change.type === 'removed') {
+                                    if (existingIdx !== -1) { State.orders.splice(existingIdx, 1); changed = true; }
+                                }
+                            });
+                            if (changed) {
+                                Persistence.save();
+                                if (State.currentSection === 'orders') this.render();
+                            }
+                        }, err => console.error('❌ Firestore listener error:', err));
+                    console.log('👂 Écoute temps réel des commandes démarrée');
+                } catch(e) { console.error('❌ Cannot start listener:', e); }
+            },
+
+            stopRealtimeListener() {
+                if (this._unsubscribe) { this._unsubscribe(); this._unsubscribe = null; }
+            },
+
+            async updateCloudStatus(order, newStatus) {
+                if (typeof firebase === 'undefined' || !order.cloudId) return;
+                try {
+                    await firebase.firestore().collection('orders').doc(order.cloudId).update({
+                        status: newStatus,
+                        updatedAt: new Date().toISOString()
+                    });
+                    console.log('✅ Statut mis à jour au cloud :', newStatus);
+                } catch(e) { console.error('❌ Update cloud error:', e); }
+            },
 
             render() {
                 const list = $('ordersList');
                 if (!list) return;
                 const q = ($('ordersSearch')?.value || '').trim().toLowerCase();
-
                 let filtered = [...State.orders].sort((a, b) => 
-                    b.createdAt < a.createdAt ? -1 : 1
+                    (b.createdAt || b.date) < (a.createdAt || a.date) ? -1 : 1
                 );
-                if (this.filter !== 'all') {
-                    filtered = filtered.filter(o => o.status === this.filter);
-                }
-                if (q) {
-                    filtered = filtered.filter(o =>
-                        o.clientName.toLowerCase().includes(q) ||
-                        o.num.toLowerCase().includes(q)
-                    );
-                }
-
-                if (!filtered.length) {
-                    list.innerHTML = '<div class="empty-msg">📭 Aucune commande</div>';
-                    return;
-                }
+                if (this.filter !== 'all') filtered = filtered.filter(o => o.status === this.filter);
+                if (q) filtered = filtered.filter(o =>
+                    o.clientName.toLowerCase().includes(q) || o.num.toLowerCase().includes(q)
+                );
+                if (!filtered.length) { list.innerHTML = '<div class="empty-msg">📭 Aucune commande</div>'; return; }
 
                 const statusMap = {
                     pending:  { lbl: '⏳ En attente', cls: 'pending' },
@@ -3550,8 +3621,7 @@
                             <div class="amount" style="font-size:13px;">${o.total.toFixed(3)} TND</div>
                         </div>
                         <div style="margin-top:6px;padding:6px;background:var(--bg);border-radius:8px;">
-                            ${linesPreview}
-                            ${more}
+                            ${linesPreview}${more}
                         </div>
                         ${o.note ? `<div style="font-size:9px;color:var(--muted);margin-top:4px;">📝 ${o.note}</div>` : ''}
                         <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">
@@ -3577,6 +3647,7 @@
                 o.status = 'approved';
                 o.approvedAt = new Date().toISOString();
                 Persistence.save();
+                this.updateCloudStatus(o, 'approved');
                 this.render();
                 Toast.show('✅ Commande acceptée', 'success');
                 NotificationSystem.add('Commande acceptée', `${o.num} — ${o.clientName}`, 'SUCCESS');
@@ -3588,6 +3659,7 @@
                 o.status = 'rejected';
                 o.rejectedAt = new Date().toISOString();
                 Persistence.save();
+                this.updateCloudStatus(o, 'rejected');
                 this.render();
                 Toast.show('❌ Commande refusée');
             },
@@ -3597,6 +3669,9 @@
                 if (!o) return;
                 const ok = await CustomConfirm.show(`Supprimer la commande ${o.num} ?`);
                 if (!ok) return;
+                if (typeof firebase !== 'undefined' && o.cloudId) {
+                    try { await firebase.firestore().collection('orders').doc(o.cloudId).delete(); } catch(e) {}
+                }
                 const idx = State.orders.findIndex(x => x.id === id);
                 State.orders.splice(idx, 1);
                 Persistence.save();
@@ -3624,9 +3699,7 @@
                 }
                 setTimeout(() => {
                     o.lines.forEach(l => {
-                        VentesModule.lines.push({
-                            name: l.name, price: l.price, qty: l.qty, total: l.total
-                        });
+                        VentesModule.lines.push({ name: l.name, price: l.price, qty: l.qty, total: l.total });
                     });
                     VentesModule.renderLines();
                     VentesModule.refreshArticleOptions();
@@ -3634,6 +3707,7 @@
                     o.status = 'delivered';
                     o.deliveredAt = new Date().toISOString();
                     Persistence.save();
+                    this.updateCloudStatus(o, 'delivered');
                     Toast.show('📄 Commande chargée dans la facture', 'success');
                 }, 400);
             }
@@ -3836,8 +3910,8 @@
                             else { st = '✅ Payée'; sc = 'var(--success)'; }
                             rows += `<tr>
                                 <td style="text-align:left;padding-left:8px;">
-                                    <span class="invoice-num-link" onclick="${cfg.name}.openInvoice('${d.num}')" title="Voir la facture">${d.num}</span>
-                                    <button class="btn-invoice-view" onclick="${cfg.name}.openInvoice('${d.num}')" title="Voir la facture">📄</button>
+                                    <span class="invoice-num-link" onclick="${cfg.name}.openInvoice('${d.num}')">${d.num}</span>
+                                    <button class="btn-invoice-view" onclick="${cfg.name}.openInvoice('${d.num}')">📄</button>
                                 </td>
                                 <td>${Utils.formatDate(d.date)}</td>
                                 <td>${Utils.formatNum(d.total)}</td>
@@ -3857,19 +3931,16 @@
                 },
                 buildMovementsTable(movements) {
                     let rows = movements.map(m => {
-                        const isInvoice = m.doc && 
-                                         m.doc !== 'Ouverture' && 
-                                         m.doc !== '' &&
+                        const isInvoice = m.doc && m.doc !== 'Ouverture' && m.doc !== '' &&
                                          (m.doc.startsWith('VTE-') || m.doc.startsWith('ACH-'));
                         const docCell = isInvoice 
                             ? `<td style="font-weight:700;">
-                                   <span class="invoice-num-link" onclick="${cfg.name}.openInvoice('${m.doc}')" title="Voir la facture">${m.doc}</span>
-                                   <button class="btn-invoice-view" onclick="${cfg.name}.openInvoice('${m.doc}')" title="Voir la facture">📄</button>
+                                   <span class="invoice-num-link" onclick="${cfg.name}.openInvoice('${m.doc}')">${m.doc}</span>
+                                   <button class="btn-invoice-view" onclick="${cfg.name}.openInvoice('${m.doc}')">📄</button>
                                </td>`
                             : `<td style="font-weight:700;">${m.doc || '-'}</td>`;
                         return `<tr>
-                            <td>${m.date}</td>
-                            ${docCell}
+                            <td>${m.date}</td>${docCell}
                             <td>${m.description}</td>
                             <td style="text-align:right;">${(m.debit || 0).toFixed(3)}</td>
                             <td style="color:var(--success);text-align:right;">${(m.credit || 0).toFixed(3)}</td>
@@ -3987,13 +4058,12 @@
                         const isInvoice = m.doc && (m.doc.startsWith('VTE-') || m.doc.startsWith('ACH-'));
                         const docCell = isInvoice 
                             ? `<td style="font-weight:700;">
-                                   <span class="invoice-num-link" onclick="ArticleHistory.openInvoice('${m.doc}', '${m.type}')" title="Voir la facture">${m.doc}</span>
-                                   <button class="btn-invoice-view" onclick="ArticleHistory.openInvoice('${m.doc}', '${m.type}')" title="Voir la facture">📄</button>
+                                   <span class="invoice-num-link" onclick="ArticleHistory.openInvoice('${m.doc}', '${m.type}')">${m.doc}</span>
+                                   <button class="btn-invoice-view" onclick="ArticleHistory.openInvoice('${m.doc}', '${m.type}')">📄</button>
                                </td>`
                             : `<td style="font-weight:700;">${m.doc}</td>`;
                         html += `<tr>
-                            <td>${Utils.formatDate(m.date)}</td>
-                            ${docCell}
+                            <td>${Utils.formatDate(m.date)}</td>${docCell}
                             <td>${tl}</td><td>${m.party}</td>
                             <td style="color:${color};font-weight:700;">${qd}</td>
                             <td>${Utils.formatNum(m.price)}</td>
@@ -4088,8 +4158,8 @@
                                          (m.invoiceNum.startsWith('VTE-') || m.invoiceNum.startsWith('ACH-'));
                         const docCell = isInvoice 
                             ? `<td>
-                                   <span class="invoice-num-link" onclick="CaisseHistory.openInvoice('${m.invoiceNum}', '${m.type}')" title="Voir la facture">${m.invoiceNum}</span>
-                                   <button class="btn-invoice-view" onclick="CaisseHistory.openInvoice('${m.invoiceNum}', '${m.type}')" title="Voir la facture">📄</button>
+                                   <span class="invoice-num-link" onclick="CaisseHistory.openInvoice('${m.invoiceNum}', '${m.type}')">${m.invoiceNum}</span>
+                                   <button class="btn-invoice-view" onclick="CaisseHistory.openInvoice('${m.invoiceNum}', '${m.type}')">📄</button>
                                </td>`
                             : `<td>${m.invoiceNum}</td>`;
                         html += `<tr>
@@ -4213,8 +4283,8 @@
                                      (m.invoice.startsWith('VTE-') || m.invoice.startsWith('ACH-'));
                     const docCell = isInvoice 
                         ? `<td>
-                               <span class="invoice-num-link" onclick="FinanceJour.openInvoice('${m.invoice}')" title="Voir la facture">${m.invoice}</span>
-                               <button class="btn-invoice-view" onclick="FinanceJour.openInvoice('${m.invoice}')" title="Voir la facture">📄</button>
+                               <span class="invoice-num-link" onclick="FinanceJour.openInvoice('${m.invoice}')">${m.invoice}</span>
+                               <button class="btn-invoice-view" onclick="FinanceJour.openInvoice('${m.invoice}')">📄</button>
                            </td>`
                         : `<td style="font-weight:700;">${m.invoice}</td>`;
                     return `<tr>
@@ -4286,8 +4356,8 @@
                     rows += `<tr>
                         <td>${v.client}</td><td>${v.date}</td>
                         <td style="text-align:left;padding-left:8px;">
-                            <span class="invoice-num-link" onclick="VentesModule.load(${v.id})" title="Voir la facture">${v.num}</span>
-                            <button class="btn-invoice-view" onclick="VentesModule.load(${v.id})" title="Voir la facture">📄</button>
+                            <span class="invoice-num-link" onclick="VentesModule.load(${v.id})">${v.num}</span>
+                            <button class="btn-invoice-view" onclick="VentesModule.load(${v.id})">📄</button>
                         </td>
                         <td style="font-weight:700;color:${m >= 0 ? 'var(--success)' : 'var(--danger)'};">${m.toFixed(3)}</td>
                     </tr>`;
@@ -4884,7 +4954,7 @@
                     expenses: () => Expenses.render(),
                     caisse: () => CaisseHistory.render(),
                     accounts: () => Accounts.render(),
-                    orders: () => Orders.render(),
+                    orders: () => { Orders.startRealtimeListener(); Orders.render(); },
                     'finance-jour': () => FinanceJour.init(),
                     'bi-dashboard': () => setTimeout(() => { BIAnalytics.init(); BIAnalytics.render(); }, 300),
                     reports: () => setTimeout(() => { AdvancedReports.generateReport(); }, 300),
@@ -4940,11 +5010,7 @@
 
         const Auth = {
             isSignup: false,
-            init() {
-                this._initFirebase();
-                this._bindEvents();
-                this._watchAuthState();
-            },
+            init() { this._initFirebase(); this._bindEvents(); this._watchAuthState(); },
             _initFirebase() {
                 try {
                     if (typeof firebase === 'undefined') return;
@@ -5015,13 +5081,9 @@
                     const creds = JSON.parse(saved);
                     if (creds.email.toLowerCase() !== email.toLowerCase()) return false;
                     if (creds.password !== password) return false;
-                    
                     State.currentUser = {
-                        email: email,
-                        uid: 'staff_' + Date.now(),
-                        isStaff: true,
-                        isLocalStaff: true,
-                        password: password
+                        email: email, uid: 'staff_' + Date.now(),
+                        isStaff: true, isLocalStaff: true, password: password
                     };
                     $('accountEmailDisplay2').textContent = email;
                     $('accountEmailDisplay').textContent = email;
@@ -5054,9 +5116,7 @@
                 const e = $('loginEmail').value.trim().toLowerCase();
                 const p = $('loginPassword').value;
                 if (!e || !p) { $('loginError').textContent = 'Email et mot de passe requis'; return; }
-                
                 if (this._tryClientLogin()) return;
-                
                 const clientByEmail = State.clients.find(c => 
                     (c.email || '').toLowerCase().trim() === e
                 );
@@ -5064,9 +5124,7 @@
                     $('loginError').textContent = '❌ Mot de passe incorrect';
                     return;
                 }
-                
                 if (this.loginStaffLocal(e, p)) return;
-                
                 $('loginError').textContent = '';
                 $('loginLoading').style.display = 'block';
                 auth.signInWithEmailAndPassword(e, p)
@@ -5078,7 +5136,6 @@
                 const p = $('loginPassword').value;
                 if (!e || !p) { $('loginError').textContent = 'Email et mot de passe requis'; return; }
                 if (p.length < 6) { $('loginError').textContent = 'Min 6 caractères'; return; }
-                
                 const existingClient = State.clients.find(c => 
                     (c.email || '').toLowerCase().trim() === e
                 );
@@ -5086,7 +5143,6 @@
                     $('loginError').textContent = '❌ Email réservé au client. Cliquez sur "Se connecter".';
                     return;
                 }
-                
                 CustomConfirm.show(
                     'Créer un compte Staff ?\n\n' +
                     '• Email: ' + e + '\n' +
@@ -5095,9 +5151,7 @@
                     '👤 Nouveau Staff'
                 ).then(ok => {
                     if (!ok) return;
-                    if (this.createStaffLocal(e, p)) {
-                        $('loginError').textContent = '';
-                    }
+                    if (this.createStaffLocal(e, p)) $('loginError').textContent = '';
                 });
             },
             googleLogin() {
@@ -5149,13 +5203,10 @@
                 const n = $('staffNewPassword').value;
                 const cf = $('staffConfirmPassword').value;
                 const err = $('staffPasswordError');
-                
                 if (!c || !n || !cf) { err.textContent = '⚠️ Tous les champs requis'; return; }
                 if (n.length < 6) { err.textContent = '⚠️ Min 6 caractères'; return; }
                 if (n !== cf) { err.textContent = '⚠️ Non concordance'; return; }
-                
                 err.textContent = '⏳...';
-                
                 const user = window.auth?.currentUser;
                 if (user && user.email) {
                     const cred = firebase.auth.EmailAuthProvider.credential(user.email, c);
@@ -5165,18 +5216,12 @@
                             err.textContent = '';
                             $('staffPasswordModal').classList.remove('show');
                             Toast.show('✅ Mot de passe Staff changé', 'success');
-                            NotificationSystem.add(
-                                'Mot de passe modifié',
-                                'Votre mot de passe Staff a été changé avec succès.',
-                                'SUCCESS'
-                            );
+                            NotificationSystem.add('Mot de passe modifié',
+                                'Votre mot de passe Staff a été changé avec succès.', 'SUCCESS');
                         })
-                        .catch(e => { 
-                            err.textContent = '❌ ' + (e.message || 'Erreur');
-                        });
+                        .catch(e => { err.textContent = '❌ ' + (e.message || 'Erreur'); });
                     return;
                 }
-                
                 if (State.currentUser && State.currentUser.isLocalStaff) {
                     const storedPwd = State.currentUser.password || '';
                     if (storedPwd && storedPwd !== c) {
@@ -5186,22 +5231,17 @@
                     State.currentUser.password = n;
                     try {
                         localStorage.setItem(APP_CONFIG.staffCredsKey, JSON.stringify({
-                            email: State.currentUser.email,
-                            password: n,
+                            email: State.currentUser.email, password: n,
                             updatedAt: new Date().toISOString()
                         }));
                     } catch(e) {}
                     err.textContent = '';
                     $('staffPasswordModal').classList.remove('show');
                     Toast.show('✅ Mot de passe Staff changé', 'success');
-                    NotificationSystem.add(
-                        'Mot de passe modifié',
-                        'Votre mot de passe Staff a été changé avec succès.',
-                        'SUCCESS'
-                    );
+                    NotificationSystem.add('Mot de passe modifié',
+                        'Votre mot de passe Staff a été changé avec succès.', 'SUCCESS');
                     return;
                 }
-                
                 err.textContent = '❌ Aucun utilisateur Staff connecté';
             },
             _watchAuthState() {
@@ -5431,9 +5471,7 @@
             $('staffConfirmPassword').value = '';
             $('staffPasswordError').textContent = '';
         }
-        function closeStaffPasswordModal() { 
-            $('staffPasswordModal').classList.remove('show'); 
-        }
+        function closeStaffPasswordModal() { $('staffPasswordModal').classList.remove('show'); }
         function closeEmailModal() { $('emailModal').classList.remove('show'); $('emailError').textContent = ''; }
         function showShortcutHelp() {
             $('shortcutHelp').classList.add('show');
