@@ -5112,11 +5112,19 @@
                     return false;
                 }
             },
+            // ✅ MODIFICATION : L'admin ne peut JAMAIS se connecter via "Staff Local"
             login() {
                 const e = $('loginEmail').value.trim().toLowerCase();
                 const p = $('loginPassword').value;
-                if (!e || !p) { $('loginError').textContent = 'Email et mot de passe requis'; return; }
+                if (!e || !p) { 
+                    $('loginError').textContent = 'Email et mot de passe requis'; 
+                    return; 
+                }
+                
+                // 1. Client local (portail client)
                 if (this._tryClientLogin()) return;
+                
+                // 2. Vérifier si l'email est réservé à un client
                 const clientByEmail = State.clients.find(c => 
                     (c.email || '').toLowerCase().trim() === e
                 );
@@ -5124,12 +5132,30 @@
                     $('loginError').textContent = '❌ Mot de passe incorrect';
                     return;
                 }
-                if (this.loginStaffLocal(e, p)) return;
+                
+                // 3. ⚠️ Bloquer la connexion locale pour l'admin
+                const isAdminEmail = e === APP_CONFIG.adminEmail.toLowerCase();
+                
+                // 4. Staff local uniquement si ce n'est pas l'admin
+                if (!isAdminEmail && this.loginStaffLocal(e, p)) return;
+                
+                // 5. Firebase Auth (obligatoire pour l'admin)
                 $('loginError').textContent = '';
                 $('loginLoading').style.display = 'block';
+                
+                if (!auth) {
+                    $('loginError').textContent = '❌ Firebase non disponible';
+                    $('loginLoading').style.display = 'none';
+                    return;
+                }
+                
                 auth.signInWithEmailAndPassword(e, p)
-                    .catch(err => { $('loginError').textContent = err.message; })
-                    .finally(() => { $('loginLoading').style.display = 'none'; });
+                    .catch(err => { 
+                        $('loginError').textContent = err.message; 
+                    })
+                    .finally(() => { 
+                        $('loginLoading').style.display = 'none'; 
+                    });
             },
             signup() {
                 const e = $('loginEmail').value.trim().toLowerCase();
