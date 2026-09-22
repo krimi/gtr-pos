@@ -1806,7 +1806,6 @@
                 State.caisseFournisseurs = data.caisseFournisseurs || [];
                 State.orders = data.orders || [];
                 State.nextId = data.nextId || { clients:1, fournisseurs:1, articles:1, ventes:1, achats:1, expenses:1, caisseClients:1, caisseFournisseurs:1, reglements:1, orders:1 };
-                // ✅ FIX : s'assurer que nextId.orders est un nombre valide
                 if (typeof State.nextId.orders !== 'number' || isNaN(State.nextId.orders)) {
                     State.nextId.orders = 1;
                 }
@@ -2304,7 +2303,6 @@
                 if (!client) { $('coError').textContent = '❌ Client introuvable'; return; }
 
                 const total = this.lines.reduce((s, l) => s + l.total, 0);
-                // ✅ FIX : garantir que nextId.orders est un nombre valide
                 if (typeof State.nextId.orders !== 'number' || isNaN(State.nextId.orders)) {
                     State.nextId.orders = 1;
                 }
@@ -2342,10 +2340,12 @@
                         console.log('✅ Connexion anonyme établie');
                     }
                     const client = State.currentClient;
+                    const currentUser = firebase.auth().currentUser;
                     const db = firebase.firestore();
                     await db.collection('orders').doc('order_' + order.id + '_' + Date.now()).set({
                         ...order,
                         clientEmail: client?.email || '',
+                        clientUid: currentUser ? currentUser.uid : '',
                         syncedAt: new Date().toISOString(),
                         source: 'client-portal'
                     });
@@ -3444,7 +3444,6 @@
                     });
                 } catch(e) { console.error('❌ Update cloud error:', e); }
             },
-            // ✅ FIX : chercher par id OU cloudId
             get(id) { 
                 return State.orders.find(o => o.id === id || o.cloudId === id); 
             },
@@ -3470,7 +3469,6 @@
 
                 list.innerHTML = filtered.map(o => {
                     const s = statusMap[o.status] || statusMap.pending;
-                    // ✅ FIX : utiliser cloudId (string) en priorité
                     const orderKey = o.cloudId || o.id;
                     const keyStr = String(orderKey).replace(/'/g, "\\'");
                     const linesPreview = o.lines.slice(0, 3).map(l =>
@@ -5368,6 +5366,80 @@
         window.Toast = Toast;
         window.Utils = Utils;
 
+        // ═══════════════════════════════════════════════════
+        // ✅ FONCTION DE RÉPARATION DES ANCIENNES COMMANDES
+        //    Re-numérote automatiquement les CMD-0NaN
+        // ═══════════════════════════════════════════════════
+        async function repairOldOrders() {
+            const brokenOrders = State.orders.filter(o => 
+                !o.num || o.num === 'CMD-0NaN' || o.num.includes('NaN')
+            );
+            
+            if (!brokenOrders.length) {
+                console.log('✅ Aucune commande à réparer');
+                return 0;
+            }
+            
+            console.log(`🔧 ${brokenOrders.length} commande(s) à réparer...`);
+            
+            brokenOrders.sort((a, b) => {
+                const dateA = a.createdAt || a.date + ' ' + (a.time || '00:00:00');
+                const dateB = b.createdAt || b.date + ' ' + (b.time || '00:00:00');
+                return dateA < dateB ? -1 : 1;
+            });
+            
+            let maxId = 0;
+            State.orders.forEach(o => {
+                if (o.id && typeof o.id === 'number' && o.id > maxId) maxId = o.id;
+            });
+            
+            State.orders.forEach(o => {
+                if (o.num && o.num.startsWith('CMD-') && !o.num.includes('NaN')) {
+                    const numPart = parseInt(o.num.replace('CMD-', ''));
+                    if (!isNaN(numPart) && numPart > maxId) maxId = numPart;
+                }
+            });
+            
+            let nextNum = maxId + 1;
+            let repaired = 0;
+            
+            for (const order of brokenOrders) {
+                const newNum = 'CMD-' + String(nextNum).padStart(4, '0');
+                const oldNum = order.num;
+                
+                order.num = newNum;
+                order.id = nextNum;
+                order.repairedAt = new Date().toISOString();
+                
+                if (typeof firebase !== 'undefined' && order.cloudId) {
+                    try {
+                        await firebase.firestore().collection('orders').doc(order.cloudId).update({
+                            num: newNum,
+                            id: nextNum,
+                            repairedAt: order.repairedAt
+                        });
+                        console.log(`✅ ${oldNum} → ${newNum} (cloud)`);
+                    } catch (e) {
+                        console.warn(`⚠️ Échec cloud pour ${oldNum}:`, e.message);
+                    }
+                } else {
+                    console.log(`✅ ${oldNum} → ${newNum} (local)`);
+                }
+                
+                repaired++;
+                nextNum++;
+            }
+            
+            if (nextNum > State.nextId.orders) {
+                State.nextId.orders = nextNum;
+            }
+            
+            Persistence.save();
+            
+            console.log(`🎉 ${repaired} commande(s) réparée(s)`);
+            return repaired;
+        }
+
         function bootstrap() {
             console.log(`🚀 GTR POS ${APP_CONFIG.version}...`);
             Theme.load();
@@ -5379,6 +5451,23 @@
             bindEvents();
             Auth.init();
             Persistence.load();
+            
+            // ✅ Réparer les anciennes commandes CMD-0NaN
+            setTimeout(async () => {
+                try {
+                    const repaired = await repairOldOrders();
+                    if (repaired > 0) {
+                        Toast.show(`🔧 ${repaired} commande(s) réparée(s)`, 'success');
+                        NotificationSystem.add(
+                            'Commandes réparées',
+                            `${repaired} ancienne(s) commande(s) ont été renumérotées automatiquement.`,
+                            'SUCCESS'
+                        );
+                    }
+                } catch (e) {
+                    console.error('❌ Erreur réparation:', e);
+                }
+            }, 1500);
             
             setTimeout(() => {
                 try {
