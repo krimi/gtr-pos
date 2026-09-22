@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
     <meta charset="UTF-8">
@@ -634,8 +634,7 @@
             padding: 2px 8px; border-radius: 10px; margin-left: 6px; }
     </style>
 </head>
-<body>
-    <!-- ===== LOGIN ===== -->
+<body>    <!-- ===== LOGIN ===== -->
     <div class="login-overlay" id="loginOverlay">
         <div class="login-box">
             <div class="login-logo-icon">
@@ -745,9 +744,6 @@
                         <span class="dash-label" style="color:#fff;">Commandes</span>
                     </div>
                     <div class="dash-item" data-section="accounts" id="dashAccounts"><span class="dash-icon">👑</span><span class="dash-label">Comptes</span></div>
-                    <div class="dash-item" data-section="bi-dashboard" style="background:linear-gradient(135deg,#4a6cf7,#1a2a5c);color:#fff;">
-                        <span class="dash-icon">📈</span><span class="dash-label" style="color:#fff;">Analyses BI</span>
-                    </div>
                     <div class="dash-item" data-section="reports"><span class="dash-icon">📊</span><span class="dash-label">Rapports</span></div>
                     <div class="dash-item" data-section="marges" style="background:linear-gradient(135deg,#2ecc71,#1a7a40);color:#fff;">
                         <span class="dash-icon">📈</span><span class="dash-label" style="color:#fff;">Marge bénéficiaire</span>
@@ -901,69 +897,6 @@
                 </div>
             </div>
 
-            <div class="section" id="sec-bi-dashboard">
-                <div class="section-title">📈 Analyses BI</div>
-                <div class="bi-filters">
-                    <div class="field"><label>📅 Du</label><input type="date" id="biDateFrom" onchange="BIAnalytics.render()"></div>
-                    <div class="field"><label>📅 Au</label><input type="date" id="biDateTo" onchange="BIAnalytics.render()"></div>
-                    <div class="field"><label>📊 Période</label>
-                        <select id="biPeriod" onchange="BIAnalytics.render()">
-                            <option value="daily">Quotidien</option>
-                            <option value="weekly">Hebdomadaire</option>
-                            <option value="monthly" selected>Mensuel</option>
-                            <option value="yearly">Annuel</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="bi-kpi-grid">
-                    <div class="bi-kpi" style="border-top:3px solid #4a6cf7;">
-                        <div class="num" id="biTotalSales">0.000</div>
-                        <div class="lbl">Total des ventes</div>
-                        <div class="trend up" id="biSalesTrend">▲ 0%</div>
-                    </div>
-                    <div class="bi-kpi" style="border-top:3px solid #2ecc71;">
-                        <div class="num" id="biTotalProfit">0.000</div>
-                        <div class="lbl">Bénéfice net</div>
-                        <div class="trend up" id="biProfitTrend">▲ 0%</div>
-                    </div>
-                    <div class="bi-kpi" style="border-top:3px solid #f39c12;">
-                        <div class="num" id="biAvgTicket">0.000</div>
-                        <div class="lbl">Panier moyen</div>
-                        <div class="trend up" id="biTicketTrend">▲ 0%</div>
-                    </div>
-                    <div class="bi-kpi" style="border-top:3px solid #9b59b6;">
-                        <div class="num" id="biTotalTransactions">0</div>
-                        <div class="lbl">Transactions</div>
-                        <div class="trend up" id="biTransTrend">▲ 0%</div>
-                    </div>
-                </div>
-                <div class="bi-chart-container">
-                    <div class="bi-chart-box"><div class="chart-title">📊 Évolution des ventes</div><canvas id="biSalesChart"></canvas></div>
-                    <div class="bi-chart-box"><div class="chart-title">📊 Répartition des coûts</div><canvas id="biProfitChart"></canvas></div>
-                </div>
-                <div class="bi-top-table">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                        <span style="font-size:11px;font-weight:800;color:var(--secondary);">🏆 Meilleurs produits</span>
-                    </div>
-                    <table><thead><tr><th>#</th><th>Produit</th><th>Qté</th><th>Ventes</th><th>%</th></tr></thead>
-                        <tbody id="biTopProductsBody"></tbody>
-                    </table>
-                </div>
-                <div class="bi-top-table">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                        <span style="font-size:11px;font-weight:800;color:var(--secondary);">🏆 Meilleurs clients</span>
-                    </div>
-                    <table><thead><tr><th>#</th><th>Client</th><th>Factures</th><th>Total</th><th>%</th></tr></thead>
-                        <tbody id="biTopClientsBody"></tbody>
-                    </table>
-                </div>
-                <div class="bi-actions">
-                    <button class="btn print small" onclick="BIAnalytics.exportPDF()">📄 PDF</button>
-                    <button class="btn outline small" onclick="BIAnalytics.exportCSV()">📥 CSV</button>
-                    <button class="btn edit small" onclick="BIAnalytics.refresh()">🔄 Actualiser</button>
-                </div>
-            </div>
-
             <div class="section" id="sec-reports">
                 <div class="section-title">📊 Rapports et statistiques</div>
                 <div class="reports-toolbar">
@@ -987,7 +920,6 @@
                         <button class="btn save" onclick="AdvancedReports.generateReport()">📊 Générer</button>
                         <button class="btn print" onclick="AdvancedReports.printReport()">🖨️ Imprimer</button>
                         <button class="btn outline" onclick="AdvancedReports.exportCSV()">📥 CSV</button>
-                        <button class="btn outline" onclick="AdvancedReports.exportPDF()">📄 PDF</button>
                     </div>
                 </div>
                 <div class="kpi-row" id="reportsKPIs">
@@ -1215,7 +1147,6 @@
                 </div>
                 <div class="invoice-actions-modern">
                     <button class="btn-action whatsapp" onclick="VentesModule.shareWhatsapp()">📱 WhatsApp</button>
-                    <button class="btn-action email" onclick="VentesModule.sendEmail()">✉️ Email</button>
                     <button class="btn-action print" onclick="VentesModule.printInvoice()">🖨️ Imprimer</button>
                     <button class="btn-action bluetooth" onclick="VentesModule.printBluetooth()">📡 Bluetooth</button>
                 </div>
@@ -1472,23 +1403,6 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="emailModal">
-        <div class="modal-box">
-            <h3>✉️ Envoyer par email</h3>
-            <div class="field"><label>📧 Email</label>
-                <input type="email" id="emailRecipient" style="direction:ltr;text-align:left;">
-            </div>
-            <div class="field"><label>📝 Message</label>
-                <textarea id="emailMessage" rows="3" style="width:100%;padding:6px 10px;border:2px solid var(--border);border-radius:8px;font-family:'Cairo',sans-serif;font-size:11px;background:var(--bg);resize:vertical;"></textarea>
-            </div>
-            <div class="modal-error" id="emailError"></div>
-            <div class="modal-actions">
-                <button class="btn save" onclick="VentesModule.sendEmailNow()">✉️ Envoyer</button>
-                <button class="btn del" onclick="closeEmailModal()">Annuler</button>
-            </div>
-        </div>
-    </div>
-
     <div class="modal-overlay" id="printCustomizerModal">
         <div class="modal-box">
             <h3>🖨️ Impression</h3>
@@ -1637,8 +1551,7 @@
         </div>
         <div style="text-align:center;color:#aaa;font-size:10px;margin-bottom:3px;">💡 Choisissez l'imprimante</div>
         <div class="invoice-doc paper-80" id="printDoc"></div>
-    </div>
-    <script>
+    </div>    <script>
     (function() {
         'use strict';
 
@@ -1893,6 +1806,10 @@
                 State.caisseFournisseurs = data.caisseFournisseurs || [];
                 State.orders = data.orders || [];
                 State.nextId = data.nextId || { clients:1, fournisseurs:1, articles:1, ventes:1, achats:1, expenses:1, caisseClients:1, caisseFournisseurs:1, reglements:1, orders:1 };
+                // ✅ FIX : s'assurer que nextId.orders est un nombre valide
+                if (typeof State.nextId.orders !== 'number' || isNaN(State.nextId.orders)) {
+                    State.nextId.orders = 1;
+                }
                 State.companyInfo = data.companyInfo || { name:'GTR POS', address:'', phone1:'', taxId:'', cashOpening:0 };
                 if (!State.companyInfo.cashOpening) State.companyInfo.cashOpening = 0;
             },
@@ -2302,12 +2219,8 @@
             isClient() { return this.getRole() === 'client'; }
         };
 
-        // ============================================================
-        // ✅ ClientOrder — Commande client à distance (SYNC FIRESTORE)
-        // ============================================================
         const ClientOrder = {
             lines: [],
-
             open() {
                 this.lines = [];
                 this.renderArticles();
@@ -2318,11 +2231,7 @@
                 $('coError').textContent = '';
                 $('clientOrderModal').classList.add('show');
             },
-
-            close() {
-                $('clientOrderModal').classList.remove('show');
-            },
-
+            close() { $('clientOrderModal').classList.remove('show'); },
             renderArticles() {
                 const sel = $('coArticle');
                 if (!sel) return;
@@ -2331,7 +2240,6 @@
                         .filter(a => (a.stock || 0) > 0)
                         .map(a => `<option value="${a.id}">${a.name}</option>`).join('');
             },
-
             fillPrice() {
                 const a = State.articles.find(x => x.id == $('coArticle').value);
                 const hint = $('coStockHint');
@@ -2347,7 +2255,6 @@
                 }
                 $('coPrice').value = price.toFixed(3);
             },
-
             addLine() {
                 const a = State.articles.find(x => x.id == $('coArticle').value);
                 if (!a) { $('coError').textContent = '⚠️ Choisissez un produit'; return; }
@@ -2371,12 +2278,10 @@
                 this.renderLines();
                 Toast.show('✅ Ajouté', 'success');
             },
-
             removeLine(i) {
                 this.lines.splice(i, 1);
                 this.renderLines();
             },
-
             renderLines() {
                 const c = $('coLinesList');
                 if (!c) return;
@@ -2393,16 +2298,20 @@
                 const total = this.lines.reduce((s, l) => s + l.total, 0);
                 $('coTotal').textContent = total.toFixed(3) + ' TND';
             },
-
             submit() {
                 if (!this.lines.length) { $('coError').textContent = '⚠️ Panier vide'; return; }
                 const client = State.currentClient;
                 if (!client) { $('coError').textContent = '❌ Client introuvable'; return; }
 
                 const total = this.lines.reduce((s, l) => s + l.total, 0);
+                // ✅ FIX : garantir que nextId.orders est un nombre valide
+                if (typeof State.nextId.orders !== 'number' || isNaN(State.nextId.orders)) {
+                    State.nextId.orders = 1;
+                }
+                const orderId = State.nextId.orders;
                 const order = {
-                    id: State.nextId.orders++,
-                    num: 'CMD-' + String(State.nextId.orders).padStart(4, '0'),
+                    id: orderId,
+                    num: 'CMD-' + String(orderId).padStart(4, '0'),
                     date: Utils.today(),
                     time: new Date().toLocaleTimeString('fr-FR'),
                     clientId: client.id,
@@ -2414,18 +2323,14 @@
                     status: 'pending',
                     createdAt: new Date().toISOString()
                 };
+                State.nextId.orders = orderId + 1;
                 State.orders.push(order);
                 Persistence.save();
-
-                // ✅ SYNC FIRESTORE
                 this.syncToCloud(order);
-
                 Toast.show('✅ Commande envoyée au vendeur', 'success');
                 this.close();
                 ClientPortal.render();
             },
-
-            // ✅ Envoyer la commande dans Firestore
             async syncToCloud(order) {
                 if (typeof firebase === 'undefined') {
                     Toast.show('⚠️ Firebase non disponible', 'warning');
@@ -2455,7 +2360,6 @@
 
         const ClientPortal = {
             _ordersUnsub: null,
-
             show() {
                 const client = State.currentClient;
                 if (!client) { Toast.show('❌ Client introuvable', 'error'); return; }
@@ -2468,15 +2372,12 @@
                 this.render();
                 this.startClientOrderListener();
             },
-
             hide() {
                 this.stopClientOrderListener();
                 $('clientPortal').classList.remove('show');
                 document.querySelector('.phone').style.display = 'flex';
                 State.currentClient = null;
             },
-
-            // ✅ Écoute temps réel des commandes du client
             startClientOrderListener() {
                 if (typeof firebase === 'undefined') return;
                 if (this._ordersUnsub) this._ordersUnsub();
@@ -2505,11 +2406,9 @@
                         }, err => console.error('Client orders listener:', err));
                 } catch(e) { console.error(e); }
             },
-
             stopClientOrderListener() {
                 if (this._ordersUnsub) { this._ordersUnsub(); this._ordersUnsub = null; }
             },
-
             render() {
                 const client = State.currentClient;
                 if (!client) return;
@@ -2537,7 +2436,6 @@
                 this.renderPayments(payments);
                 this.renderOrders();
             },
-
             renderInvoices(invoices, payments) {
                 const container = $('cpInvoicesList');
                 if (!invoices.length) { container.innerHTML = '<div class="cp-empty">📭 Aucune facture</div>'; return; }
@@ -2564,7 +2462,6 @@
                     </div>`;
                 }).join('');
             },
-
             renderPayments(payments) {
                 const container = $('cpPaymentsList');
                 if (!payments.length) { container.innerHTML = '<div class="cp-empty">📭 Aucun paiement</div>'; return; }
@@ -2581,7 +2478,6 @@
                     </div>
                 `).join('');
             },
-
             renderOrders() {
                 const c = $('cpOrdersList');
                 if (!c) return;
@@ -2614,7 +2510,6 @@
                     </div>`;
                 }).join('');
             },
-
             printStatement() {
                 const client = State.currentClient;
                 if (!client) return;
@@ -2623,7 +2518,6 @@
                 const pays = State.caisseClients.filter(p => p.clientName === client.name);
                 showPreviewReleve('client', client, docs, pays);
             },
-
             shareWhatsapp() {
                 const client = State.currentClient;
                 if (!client) return;
@@ -3085,29 +2979,6 @@
                     const text = `📄 *${rec.num}*\n📅 ${rec.date}\n👤 ${rec[cfg.partyKey]}\n💰 ${rec.total.toFixed(3)} TND\n💳 ${paid.toFixed(3)} TND\n📊 ${(rec.total - paid).toFixed(3)} TND\n\n${State.companyInfo.name}`;
                     window.open('https://wa.me/' + (formatted ? '216' + formatted : '') + '?text=' + encodeURIComponent(text), '_blank');
                     Toast.show('✅ WhatsApp ouvert', 'success');
-                },
-                sendEmail() {
-                    if (this.editingId == null) { Toast.show('⚠️ Enregistrez'); return; }
-                    const rec = cfg.list().find(x => x.id === this.editingId);
-                    if (!rec) return;
-                    const party = cfg.partyList().find(c => c.name === rec[cfg.partyKey]);
-                    const email = (cfg.emailField ? rec[cfg.emailField] : '') || (party ? party.email : '');
-                    if (!email || !Utils.isValidEmail(email)) { Toast.show('⚠️ Email invalide', 'warning'); return; }
-                    const paid = (rec.reglements || []).reduce((s, r) => s + r.amount, 0);
-                    $('emailRecipient').value = email;
-                    $('emailMessage').value = `Bonjour,\n\nFacture ${rec.num} du ${rec.date}.\n\nTotal: ${rec.total.toFixed(3)} TND\nPayé: ${paid.toFixed(3)} TND\nReste: ${(rec.total - paid).toFixed(3)} TND\n\n${State.companyInfo.name}`;
-                    $('emailError').textContent = '';
-                    $('emailModal').classList.add('show');
-                },
-                sendEmailNow() {
-                    const recipient = $('emailRecipient').value.trim();
-                    const message = $('emailMessage').value.trim();
-                    if (!recipient || !Utils.isValidEmail(recipient)) { $('emailError').textContent = '⚠️ Email invalide'; return; }
-                    const subject = encodeURIComponent(`Facture - ${State.companyInfo.name}`);
-                    const body = encodeURIComponent(message);
-                    window.open(`mailto:${recipient}?subject=${subject}&body=${body}`, '_blank');
-                    closeEmailModal();
-                    Toast.show(`✅ Email ouvert`, 'success');
                 }
             };
         }
@@ -3232,9 +3103,7 @@
                     list.appendChild(d);
                 });
             }
-        };
-
-        const ClientsModule = createEntityModule({
+        };        const ClientsModule = createEntityModule({
             table: 'clients', prefix: 'CL', sheet: 'clients',
             list: () => State.clients,
             fields: {
@@ -3519,14 +3388,9 @@
             renderer: AchatsRenderer
         });
 
-        // ============================================================
-        // ✅ Orders — Gestion des commandes (STAFF/ADMIN) + Firestore
-        // ============================================================
         const Orders = {
             filter: 'pending',
             _unsubscribe: null,
-
-            // ✅ Écoute temps réel Firestore
             startRealtimeListener() {
                 if (typeof firebase === 'undefined') return;
                 if (this._unsubscribe) this._unsubscribe();
@@ -3566,14 +3430,11 @@
                                 if (State.currentSection === 'orders') this.render();
                             }
                         }, err => console.error('❌ Firestore listener error:', err));
-                    console.log('👂 Écoute temps réel des commandes démarrée');
                 } catch(e) { console.error('❌ Cannot start listener:', e); }
             },
-
             stopRealtimeListener() {
                 if (this._unsubscribe) { this._unsubscribe(); this._unsubscribe = null; }
             },
-
             async updateCloudStatus(order, newStatus) {
                 if (typeof firebase === 'undefined' || !order.cloudId) return;
                 try {
@@ -3581,10 +3442,12 @@
                         status: newStatus,
                         updatedAt: new Date().toISOString()
                     });
-                    console.log('✅ Statut mis à jour au cloud :', newStatus);
                 } catch(e) { console.error('❌ Update cloud error:', e); }
             },
-
+            // ✅ FIX : chercher par id OU cloudId
+            get(id) { 
+                return State.orders.find(o => o.id === id || o.cloudId === id); 
+            },
             render() {
                 const list = $('ordersList');
                 if (!list) return;
@@ -3607,6 +3470,9 @@
 
                 list.innerHTML = filtered.map(o => {
                     const s = statusMap[o.status] || statusMap.pending;
+                    // ✅ FIX : utiliser cloudId (string) en priorité
+                    const orderKey = o.cloudId || o.id;
+                    const keyStr = String(orderKey).replace(/'/g, "\\'");
                     const linesPreview = o.lines.slice(0, 3).map(l =>
                         `<div style="font-size:9px;color:var(--muted);">• ${l.name} × ${l.qty} = ${l.total.toFixed(3)} TND</div>`
                     ).join('');
@@ -3626,24 +3492,21 @@
                         ${o.note ? `<div style="font-size:9px;color:var(--muted);margin-top:4px;">📝 ${o.note}</div>` : ''}
                         <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">
                             ${o.status === 'pending' ? `
-                                <button class="btn save small" style="flex:1;padding:4px;font-size:9px;" onclick="Orders.approve(${o.id})">✅ Accepter</button>
-                                <button class="btn del small" style="flex:1;padding:4px;font-size:9px;" onclick="Orders.reject(${o.id})">❌ Refuser</button>
+                                <button class="btn save small" style="flex:1;padding:4px;font-size:9px;" onclick="Orders.approve('${keyStr}')">✅ Accepter</button>
+                                <button class="btn del small" style="flex:1;padding:4px;font-size:9px;" onclick="Orders.reject('${keyStr}')">❌ Refuser</button>
                             ` : ''}
                             ${o.status === 'approved' ? `
-                                <button class="btn save small" style="flex:1;padding:4px;font-size:9px;" onclick="Orders.convertToSale(${o.id})">📄 → Facture</button>
+                                <button class="btn save small" style="flex:1;padding:4px;font-size:9px;" onclick="Orders.convertToSale('${keyStr}')">📄 → Facture</button>
                             ` : ''}
-                            <button class="btn outline small" style="flex:1;padding:4px;font-size:9px;" onclick="Orders.callClient(${o.id})">📞 Appeler</button>
-                            <button class="btn del small" style="padding:4px;font-size:9px;" onclick="Orders.remove(${o.id})">🗑️</button>
+                            <button class="btn outline small" style="flex:1;padding:4px;font-size:9px;" onclick="Orders.callClient('${keyStr}')">📞 Appeler</button>
+                            <button class="btn del small" style="padding:4px;font-size:9px;" onclick="Orders.remove('${keyStr}')">🗑️</button>
                         </div>
                     </div>`;
                 }).join('');
             },
-
-            get(id) { return State.orders.find(o => o.id === id); },
-
             approve(id) {
                 const o = this.get(id);
-                if (!o) return;
+                if (!o) { Toast.show('❌ Commande introuvable', 'error'); return; }
                 o.status = 'approved';
                 o.approvedAt = new Date().toISOString();
                 Persistence.save();
@@ -3652,10 +3515,9 @@
                 Toast.show('✅ Commande acceptée', 'success');
                 NotificationSystem.add('Commande acceptée', `${o.num} — ${o.clientName}`, 'SUCCESS');
             },
-
             reject(id) {
                 const o = this.get(id);
-                if (!o) return;
+                if (!o) { Toast.show('❌ Commande introuvable', 'error'); return; }
                 o.status = 'rejected';
                 o.rejectedAt = new Date().toISOString();
                 Persistence.save();
@@ -3663,7 +3525,6 @@
                 this.render();
                 Toast.show('❌ Commande refusée');
             },
-
             async remove(id) {
                 const o = this.get(id);
                 if (!o) return;
@@ -3672,20 +3533,21 @@
                 if (typeof firebase !== 'undefined' && o.cloudId) {
                     try { await firebase.firestore().collection('orders').doc(o.cloudId).delete(); } catch(e) {}
                 }
-                const idx = State.orders.findIndex(x => x.id === id);
-                State.orders.splice(idx, 1);
+                const idx = State.orders.findIndex(x => 
+                    (x.cloudId && x.cloudId === o.cloudId) || 
+                    (!x.cloudId && x.id === o.id)
+                );
+                if (idx !== -1) State.orders.splice(idx, 1);
                 Persistence.save();
                 this.render();
                 Toast.show('🗑️ Supprimée');
             },
-
             callClient(id) {
                 const o = this.get(id);
                 if (!o || !o.phone) { Toast.show('⚠️ Pas de téléphone'); return; }
                 const phone = o.phone.replace(/\D/g, '');
                 window.location.href = `tel:${phone}`;
             },
-
             convertToSale(id) {
                 const o = this.get(id);
                 if (!o) return;
@@ -4398,168 +4260,6 @@
             }
         };
 
-        const BIAnalytics = {
-            data: {},
-            init() {
-                const t = new Date();
-                const f = new Date(t.getFullYear(), t.getMonth(), 1);
-                if ($('biDateFrom')) $('biDateFrom').value = f.toISOString().slice(0, 10);
-                if ($('biDateTo')) $('biDateTo').value = t.toISOString().slice(0, 10);
-            },
-            render() {
-                const from = $('biDateFrom')?.value;
-                const to = $('biDateTo')?.value;
-                const period = $('biPeriod')?.value || 'monthly';
-                if (!from || !to) return;
-                this.calculate(from, to, period);
-                this.renderKPIs();
-                this.renderCharts(period);
-                this.renderTopTables();
-            },
-            calculate(from, to, period) {
-                const filtered = State.ventes.filter(v => v.date >= from && v.date <= to);
-                const totalSales = filtered.reduce((s, v) => s + v.total, 0);
-                const totalTransactions = filtered.length;
-                const avgTicket = totalTransactions > 0 ? totalSales / totalTransactions : 0;
-                const totalPurchases = State.achats.filter(a => a.date >= from && a.date <= to).reduce((s, a) => s + a.total, 0);
-                const totalExp = State.expenses.filter(e => e.date >= from && e.date <= to).reduce((s, e) => s + e.amount, 0);
-                const profit = totalSales - totalPurchases - totalExp;
-                const trend = (c, p) => p > 0 ? ((c - p) / p * 100) : 0;
-                Object.assign(this.data, {
-                    totalSales, totalTransactions, avgTicket, profit, filteredVentes: filtered,
-                    totalPurchases, totalExp,
-                    salesTrend: trend(totalSales, totalSales * 0.9),
-                    transTrend: trend(totalTransactions, totalTransactions * 0.9),
-                    ticketTrend: trend(avgTicket, avgTicket * 0.9),
-                    profitTrend: trend(profit, profit * 0.9)
-                });
-                this.calculateTopProducts(filtered);
-                this.calculateTopClients(filtered);
-            },
-            calculateTopProducts(ventes) {
-                const map = {};
-                ventes.forEach(v => {
-                    if (!v.lines || !v.lines.length) return;
-                    v.lines.forEach(l => {
-                        if (!map[l.name]) map[l.name] = { qty: 0, total: 0 };
-                        map[l.name].qty += l.qty;
-                        map[l.name].total += l.total;
-                    });
-                });
-                const list = Object.entries(map)
-                    .map(([name, d]) => ({ name, qty: d.qty, total: d.total }))
-                    .sort((a, b) => b.total - a.total).slice(0, 10);
-                const ta = list.reduce((s, p) => s + p.total, 0);
-                list.forEach(p => p.percentage = ta > 0 ? (p.total / ta * 100) : 0);
-                this.data.topProducts = list;
-            },
-            calculateTopClients(ventes) {
-                const map = {};
-                ventes.forEach(v => {
-                    if (!map[v.client]) map[v.client] = { count: 0, total: 0 };
-                    map[v.client].count++;
-                    map[v.client].total += v.total;
-                });
-                const list = Object.entries(map)
-                    .map(([name, d]) => ({ name, count: d.count, total: d.total }))
-                    .sort((a, b) => b.total - a.total).slice(0, 10);
-                const ta = list.reduce((s, c) => s + c.total, 0);
-                list.forEach(c => c.percentage = ta > 0 ? (c.total / ta * 100) : 0);
-                this.data.topClients = list;
-            },
-            renderKPIs() {
-                const d = this.data;
-                $('biTotalSales').textContent = d.totalSales.toFixed(3);
-                $('biTotalProfit').textContent = d.profit.toFixed(3);
-                $('biAvgTicket').textContent = d.avgTicket.toFixed(3);
-                $('biTotalTransactions').textContent = d.totalTransactions;
-                const setTrend = (id, val) => {
-                    const el = $(id);
-                    if (!el) return;
-                    el.className = 'trend ' + (val >= 0 ? 'up' : 'down');
-                    el.textContent = (val >= 0 ? '▲' : '▼') + ' ' + Math.abs(val).toFixed(1) + '%';
-                };
-                setTrend('biSalesTrend', d.salesTrend);
-                setTrend('biProfitTrend', d.profitTrend);
-                setTrend('biTicketTrend', d.ticketTrend);
-                setTrend('biTransTrend', d.transTrend);
-            },
-            renderCharts(period) {
-                const g = {};
-                this.data.filteredVentes.forEach(v => {
-                    const dt = new Date(v.date);
-                    let key;
-                    if (period === 'daily') key = v.date;
-                    else if (period === 'weekly') key = 'S' + Math.ceil(dt.getDate() / 7);
-                    else if (period === 'monthly') key = ['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Août','Sep','Oct','Nov','Déc'][dt.getMonth()];
-                    else key = dt.getFullYear().toString();
-                    g[key] = (g[key] || 0) + v.total;
-                });
-                ChartRenderer.drawBars($('biSalesChart'), { labels: Object.keys(g), values: Object.values(g) });
-                ChartRenderer.drawPie($('biProfitChart'), {
-                    labels: ['Ventes', 'Achats', 'Dépenses', 'Bénéfice'],
-                    values: [this.data.totalSales, this.data.totalPurchases, this.data.totalExp, this.data.profit],
-                    colors: ['#4a6cf7', '#e74c5e', '#f39c12', '#2ecc71']
-                });
-            },
-            renderTopTables() {
-                const pb = $('biTopProductsBody');
-                if (pb) {
-                    pb.innerHTML = !this.data.topProducts.length
-                        ? `<tr><td colspan="5" style="text-align:center;padding:10px;color:#999;">Aucun produit</td></tr>`
-                        : this.data.topProducts.map((p, i) => `
-                            <tr class="${i < 3 ? 'highlight' : ''}">
-                                <td class="rank">${i+1}</td><td>${p.name}</td>
-                                <td>${p.qty}</td><td>${p.total.toFixed(3)}</td><td>${p.percentage.toFixed(1)}%</td>
-                            </tr>`).join('');
-                }
-                const cb = $('biTopClientsBody');
-                if (cb) {
-                    cb.innerHTML = !this.data.topClients.length
-                        ? `<tr><td colspan="5" style="text-align:center;padding:10px;color:#999;">Aucun client</td></tr>`
-                        : this.data.topClients.map((c, i) => `
-                            <tr class="${i < 3 ? 'highlight' : ''}">
-                                <td class="rank">${i+1}</td><td>${c.name}</td>
-                                <td>${c.count}</td><td>${c.total.toFixed(3)}</td><td>${c.percentage.toFixed(1)}%</td>
-                            </tr>`).join('');
-                }
-            },
-            refresh() { this.render(); Toast.show('🔄 Actualisé', 'success'); },
-            exportCSV() {
-                if (!this.data.topProducts?.length) { Toast.show('Aucune donnée'); return; }
-                let csv = 'Produit,Quantité,Ventes,%\n';
-                this.data.topProducts.forEach(p => {
-                    csv += `${p.name},${p.qty},${p.total.toFixed(3)},${p.percentage.toFixed(1)}%\n`;
-                });
-                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url; a.download = `BI_${Utils.today()}.csv`;
-                document.body.appendChild(a); a.click(); document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                Toast.show('✅ Exporté', 'success');
-            },
-            exportPDF() {
-                Toast.show('⏳ Création...', 'info');
-                const c = document.querySelector('#sec-bi-dashboard');
-                if (!c) return;
-                html2canvas(c, { scale: 2, backgroundColor: '#ffffff' })
-                    .then(canvas => {
-                        const img = canvas.toDataURL('image/png');
-                        const { jsPDF } = window.jspdf;
-                        const pdf = new jsPDF('p', 'mm', 'a4');
-                        const w = pdf.internal.pageSize.getWidth();
-                        const h = (canvas.height * w) / canvas.width;
-                        pdf.setFontSize(16);
-                        pdf.text('Analyses BI', w / 2, 15, { align: 'center' });
-                        pdf.addImage(img, 'PNG', 0, 28, w, h);
-                        pdf.save(`BI_${Utils.today()}.pdf`);
-                        Toast.show('✅ PDF exporté', 'success');
-                    })
-                    .catch(() => Toast.show('❌ Erreur', 'error'));
-            }
-        };
-
         const AdvancedReports = {
             generateReport() {
                 const type = $('reportType')?.value || 'sales';
@@ -4739,26 +4439,6 @@
                 document.body.appendChild(a); a.click(); document.body.removeChild(a);
                 URL.revokeObjectURL(url);
                 Toast.show('✅ Exporté', 'success');
-            },
-            exportPDF() {
-                Toast.show('⏳ Création...', 'info');
-                const c = $('reportTableWrapper');
-                if (!c) return;
-                html2canvas(c, { scale: 2, backgroundColor: '#ffffff' })
-                    .then(canvas => {
-                        const img = canvas.toDataURL('image/png');
-                        const { jsPDF } = window.jspdf;
-                        const pdf = new jsPDF('p', 'mm', 'a4');
-                        const w = pdf.internal.pageSize.getWidth();
-                        const h = (canvas.height * w) / canvas.width;
-                        const title = document.querySelector('#sec-reports .section-title')?.textContent || 'Rapport';
-                        pdf.setFontSize(16);
-                        pdf.text(title, w / 2, 15, { align: 'center' });
-                        pdf.addImage(img, 'PNG', 0, 28, w, h);
-                        pdf.save(`Rapport_${Utils.today()}.pdf`);
-                        Toast.show('✅ PDF exporté', 'success');
-                    })
-                    .catch(() => Toast.show('❌ Erreur', 'error'));
             }
         };
 
@@ -4936,7 +4616,7 @@
                     articles:'Articles', 'article-history':'Historique article',
                     ventes:'Ventes', achats:'Achats', expenses:'Dépenses',
                     caisse:'Caisse', accounts:'Comptes', orders:'Commandes',
-                    'finance-jour':'Rapport du jour', 'bi-dashboard':'Analyses BI',
+                    'finance-jour':'Rapport du jour',
                     reports:'Rapports', marges:'Marge bénéficiaire'
                 };
                 $('pageTitle').textContent = names[id] || id;
@@ -4956,7 +4636,6 @@
                     accounts: () => Accounts.render(),
                     orders: () => { Orders.startRealtimeListener(); Orders.render(); },
                     'finance-jour': () => FinanceJour.init(),
-                    'bi-dashboard': () => setTimeout(() => { BIAnalytics.init(); BIAnalytics.render(); }, 300),
                     reports: () => setTimeout(() => { AdvancedReports.generateReport(); }, 300),
                     marges: () => setTimeout(() => { Marges.init(); Marges.render(); }, 200)
                 };
@@ -5112,7 +4791,6 @@
                     return false;
                 }
             },
-            // ✅ MODIFICATION : L'admin ne peut JAMAIS se connecter via "Staff Local"
             login() {
                 const e = $('loginEmail').value.trim().toLowerCase();
                 const p = $('loginPassword').value;
@@ -5120,11 +4798,7 @@
                     $('loginError').textContent = 'Email et mot de passe requis'; 
                     return; 
                 }
-                
-                // 1. Client local (portail client)
                 if (this._tryClientLogin()) return;
-                
-                // 2. Vérifier si l'email est réservé à un client
                 const clientByEmail = State.clients.find(c => 
                     (c.email || '').toLowerCase().trim() === e
                 );
@@ -5132,23 +4806,15 @@
                     $('loginError').textContent = '❌ Mot de passe incorrect';
                     return;
                 }
-                
-                // 3. ⚠️ Bloquer la connexion locale pour l'admin
                 const isAdminEmail = e === APP_CONFIG.adminEmail.toLowerCase();
-                
-                // 4. Staff local uniquement si ce n'est pas l'admin
                 if (!isAdminEmail && this.loginStaffLocal(e, p)) return;
-                
-                // 5. Firebase Auth (obligatoire pour l'admin)
                 $('loginError').textContent = '';
                 $('loginLoading').style.display = 'block';
-                
                 if (!auth) {
                     $('loginError').textContent = '❌ Firebase non disponible';
                     $('loginLoading').style.display = 'none';
                     return;
                 }
-                
                 auth.signInWithEmailAndPassword(e, p)
                     .catch(err => { 
                         $('loginError').textContent = err.message; 
@@ -5340,8 +5006,6 @@
                 Toast.show(`✅ Bienvenue`, 'success');
                 setTimeout(() => {
                     AdvancedReports.generateReport();
-                    BIAnalytics.init();
-                    BIAnalytics.render();
                     Marges.init();
                     Marges.render();
                     FinanceJour.init();
@@ -5498,7 +5162,6 @@
             $('staffPasswordError').textContent = '';
         }
         function closeStaffPasswordModal() { $('staffPasswordModal').classList.remove('show'); }
-        function closeEmailModal() { $('emailModal').classList.remove('show'); $('emailError').textContent = ''; }
         function showShortcutHelp() {
             $('shortcutHelp').classList.add('show');
             const l = $('shortcutList');
@@ -5668,7 +5331,6 @@
         window.CaisseHistory = CaisseHistory;
         window.FinanceJour = FinanceJour;
         window.Marges = Marges;
-        window.BIAnalytics = BIAnalytics;
         window.AdvancedReports = AdvancedReports;
         window.Accounts = Accounts;
         window.CompanyInfo = CompanyInfo;
@@ -5700,7 +5362,6 @@
         window.closeChangePasswordModal = closeChangePasswordModal;
         window.openStaffPasswordModal = openStaffPasswordModal;
         window.closeStaffPasswordModal = closeStaffPasswordModal;
-        window.closeEmailModal = closeEmailModal;
         window.showShortcutHelp = showShortcutHelp;
         window.closeShortcutHelp = closeShortcutHelp;
         window.printStatement = printStatement;
