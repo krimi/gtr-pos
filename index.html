@@ -3388,6 +3388,9 @@
             renderer: AchatsRenderer
         });
 
+        // ═══════════════════════════════════════════════════
+        // ✅ ORDERS avec GESTION AUTOMATIQUE DU STOCK
+        // ═══════════════════════════════════════════════════
         const Orders = {
             filter: 'pending',
             _unsubscribe: null,
@@ -3475,11 +3478,12 @@
                         `<div style="font-size:9px;color:var(--muted);">• ${l.name} × ${l.qty} = ${l.total.toFixed(3)} TND</div>`
                     ).join('');
                     const more = o.lines.length > 3 ? `<div style="font-size:8px;color:var(--muted);">... +${o.lines.length - 3}</div>` : '';
+                    const stockBadge = o.stockDecremented ? '<span style="font-size:8px;background:#d4f4dd;color:#27ae60;padding:1px 6px;border-radius:8px;margin-left:4px;">📦 Stock -</span>' : '';
                     return `
                     <div class="row-card" style="flex-direction:column;align-items:stretch;cursor:default;">
                         <div style="display:flex;justify-content:space-between;align-items:center;">
                             <div>
-                                <div class="name">${o.num} <span class="cp-badge ${s.cls}" style="margin-left:4px;">${s.lbl}</span></div>
+                                <div class="name">${o.num} <span class="cp-badge ${s.cls}" style="margin-left:4px;">${s.lbl}</span>${stockBadge}</div>
                                 <div class="meta">👤 ${o.clientName} • 📅 ${Utils.formatDate(o.date)} ${o.time || ''}</div>
                             </div>
                             <div class="amount" style="font-size:13px;">${o.total.toFixed(3)} TND</div>
@@ -3502,32 +3506,77 @@
                     </div>`;
                 }).join('');
             },
+            // ✅ MODIFIÉ : Décrémente le stock à l'approbation
             approve(id) {
                 const o = this.get(id);
                 if (!o) { Toast.show('❌ Commande introuvable', 'error'); return; }
+                
+                // ✅ Décrémenter le stock (une seule fois)
+                if (!o.stockDecremented) {
+                    const warnings = [];
+                    o.lines.forEach(line => {
+                        const article = State.articles.find(a => a.name === line.name);
+                        if (!article) {
+                            warnings.push(`"${line.name}" introuvable`);
+                            return;
+                        }
+                        if ((article.stock || 0) < line.qty) {
+                            warnings.push(`"${line.name}": stock ${article.stock || 0} < ${line.qty}`);
+                        }
+                        Stock.adjust(line.name, -line.qty, { silent: true, allowNegative: true });
+                    });
+                    o.stockDecremented = true;
+                    o.stockDecrementedAt = new Date().toISOString();
+                    
+                    if (warnings.length) {
+                        Toast.show(`⚠️ Stock insuffisant: ${warnings.length} article(s)`, 'warning');
+                        console.warn('Stock warnings:', warnings);
+                    }
+                }
+                
                 o.status = 'approved';
                 o.approvedAt = new Date().toISOString();
                 Persistence.save();
                 this.updateCloudStatus(o, 'approved');
                 this.render();
-                Toast.show('✅ Commande acceptée', 'success');
+                Toast.show('✅ Commande acceptée (stock mis à jour)', 'success');
                 NotificationSystem.add('Commande acceptée', `${o.num} — ${o.clientName}`, 'SUCCESS');
             },
+            // ✅ MODIFIÉ : Restaure le stock au refus (si déjà décrémenté)
             reject(id) {
                 const o = this.get(id);
                 if (!o) { Toast.show('❌ Commande introuvable', 'error'); return; }
+                
+                // ✅ Si le stock a été décrémenté, le restaurer
+                if (o.stockDecremented) {
+                    o.lines.forEach(line => {
+                        Stock.adjust(line.name, line.qty, { silent: true, allowNegative: true });
+                    });
+                    o.stockDecremented = false;
+                    o.stockRestoredAt = new Date().toISOString();
+                }
+                
                 o.status = 'rejected';
                 o.rejectedAt = new Date().toISOString();
                 Persistence.save();
                 this.updateCloudStatus(o, 'rejected');
                 this.render();
-                Toast.show('❌ Commande refusée');
+                Toast.show('❌ Commande refusée (stock restauré)');
             },
+            // ✅ MODIFIÉ : Restaure le stock à la suppression
             async remove(id) {
                 const o = this.get(id);
                 if (!o) return;
                 const ok = await CustomConfirm.show(`Supprimer la commande ${o.num} ?`);
                 if (!ok) return;
+                
+                // ✅ Restaurer le stock si décrémenté
+                if (o.stockDecremented) {
+                    o.lines.forEach(line => {
+                        Stock.adjust(line.name, line.qty, { silent: true, allowNegative: true });
+                    });
+                }
+                
                 if (typeof firebase !== 'undefined' && o.cloudId) {
                     try { await firebase.firestore().collection('orders').doc(o.cloudId).delete(); } catch(e) {}
                 }
@@ -3538,7 +3587,7 @@
                 if (idx !== -1) State.orders.splice(idx, 1);
                 Persistence.save();
                 this.render();
-                Toast.show('🗑️ Supprimée');
+                Toast.show('🗑️ Supprimée (stock restauré)');
             },
             callClient(id) {
                 const o = this.get(id);
@@ -3546,6 +3595,7 @@
                 const phone = o.phone.replace(/\D/g, '');
                 window.location.href = `tel:${phone}`;
             },
+            // ✅ MODIFIÉ : Évite la double décrémentation lors de la conversion
             convertToSale(id) {
                 const o = this.get(id);
                 if (!o) return;
@@ -3558,17 +3608,21 @@
                     if (opt) { sel.value = opt.value; VentesModule.fillParty(); }
                 }
                 setTimeout(() => {
+                    // ✅ Le stock a déjà été décrémenté à l'approbation
+                    //    On pousse les lignes SANS re-décrémenter le stock
                     o.lines.forEach(l => {
                         VentesModule.lines.push({ name: l.name, price: l.price, qty: l.qty, total: l.total });
                     });
                     VentesModule.renderLines();
                     VentesModule.refreshArticleOptions();
                     VentesModule.updateAccountSummary();
+                    // ⚠️ Marquer pour ne pas décrémenter à nouveau
+                    VentesModule._stockAlreadyDecremented = true;
                     o.status = 'delivered';
                     o.deliveredAt = new Date().toISOString();
                     Persistence.save();
                     this.updateCloudStatus(o, 'delivered');
-                    Toast.show('📄 Commande chargée dans la facture', 'success');
+                    Toast.show('📄 Commande chargée dans la facture (stock déjà mis à jour)', 'success');
                 }, 400);
             }
         };
@@ -5366,51 +5420,38 @@
         window.Toast = Toast;
         window.Utils = Utils;
 
-        // ═══════════════════════════════════════════════════
-        // ✅ FONCTION DE RÉPARATION DES ANCIENNES COMMANDES
-        //    Re-numérote automatiquement les CMD-0NaN
-        // ═══════════════════════════════════════════════════
         async function repairOldOrders() {
             const brokenOrders = State.orders.filter(o => 
                 !o.num || o.num === 'CMD-0NaN' || o.num.includes('NaN')
             );
-            
             if (!brokenOrders.length) {
                 console.log('✅ Aucune commande à réparer');
                 return 0;
             }
-            
             console.log(`🔧 ${brokenOrders.length} commande(s) à réparer...`);
-            
             brokenOrders.sort((a, b) => {
                 const dateA = a.createdAt || a.date + ' ' + (a.time || '00:00:00');
                 const dateB = b.createdAt || b.date + ' ' + (b.time || '00:00:00');
                 return dateA < dateB ? -1 : 1;
             });
-            
             let maxId = 0;
             State.orders.forEach(o => {
                 if (o.id && typeof o.id === 'number' && o.id > maxId) maxId = o.id;
             });
-            
             State.orders.forEach(o => {
                 if (o.num && o.num.startsWith('CMD-') && !o.num.includes('NaN')) {
                     const numPart = parseInt(o.num.replace('CMD-', ''));
                     if (!isNaN(numPart) && numPart > maxId) maxId = numPart;
                 }
             });
-            
             let nextNum = maxId + 1;
             let repaired = 0;
-            
             for (const order of brokenOrders) {
                 const newNum = 'CMD-' + String(nextNum).padStart(4, '0');
                 const oldNum = order.num;
-                
                 order.num = newNum;
                 order.id = nextNum;
                 order.repairedAt = new Date().toISOString();
-                
                 if (typeof firebase !== 'undefined' && order.cloudId) {
                     try {
                         await firebase.firestore().collection('orders').doc(order.cloudId).update({
@@ -5425,17 +5466,13 @@
                 } else {
                     console.log(`✅ ${oldNum} → ${newNum} (local)`);
                 }
-                
                 repaired++;
                 nextNum++;
             }
-            
             if (nextNum > State.nextId.orders) {
                 State.nextId.orders = nextNum;
             }
-            
             Persistence.save();
-            
             console.log(`🎉 ${repaired} commande(s) réparée(s)`);
             return repaired;
         }
@@ -5452,7 +5489,6 @@
             Auth.init();
             Persistence.load();
             
-            // ✅ Réparer les anciennes commandes CMD-0NaN
             setTimeout(async () => {
                 try {
                     const repaired = await repairOldOrders();
