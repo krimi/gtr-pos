@@ -31,7 +31,8 @@
             --bg: #0a0e1a; --panel: #141b2d; --text: #e8ecf4;
             --muted: #8892b0; --border: #2a3a5c; --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
-        .phone { width: 100%; height: 100dvh; background: var(--bg); display: flex;
+        /* ✅ FIX 1 : height 100vh ET 100dvh pour compatibilité maximale */
+        .phone { width: 100%; height: 100vh; height: 100dvh; background: var(--bg); display: flex;
             flex-direction: column; position: relative; overflow: hidden; max-width: 100%;
             margin: 0 auto; color: var(--text); }
         @media(min-width:768px) {
@@ -85,8 +86,10 @@
         .login-logo-icon .version-tag { position: absolute; bottom: -6px; right: -6px;
             background: linear-gradient(135deg, var(--warning), #f39c12); color: #fff;
             font-size: 8px; padding: 2px 10px; border-radius: 20px; font-weight: 700; z-index: 2; }
-        .content { flex: 1; overflow-y: auto; padding: 8px 10px 20px;
-            -webkit-overflow-scrolling: touch; position: relative; background: var(--bg); padding-top: 10px; }
+        /* ✅ FIX 2 : padding-bottom augmenté + safe-area pour iPhone/Android */
+        .content { flex: 1; overflow-y: auto; padding: 8px 10px 80px;
+            -webkit-overflow-scrolling: touch; position: relative; background: var(--bg); padding-top: 10px;
+            padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
         .section { display: none !important; animation: fadeIn .3s ease; }
         .section.active { display: block !important; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
@@ -2026,8 +2029,9 @@
                 $('previewModalBody').innerHTML = `<div class="preview-doc">${content}</div>`;
                 $('previewModal').classList.add('show');
             },
+            // ✅ MODIFIÉ : Section "Commandes en cours" ajoutée
             buildStatementHTML(data) {
-                const { entity, movements, totals, partyLabel, finalBalance } = data;
+                const { entity, movements, totals, partyLabel, finalBalance, pendingOrders } = data;
                 const rows = movements.map(m => `
                     <tr>
                         <td>${m.date}</td>
@@ -2037,6 +2041,44 @@
                         <td style="text-align:right;color:#27ae60;">${(m.credit || 0).toFixed(3)}</td>
                         <td style="text-align:right;font-weight:700;">${(m.balance || 0).toFixed(3)}</td>
                     </tr>`).join('');
+                
+                let pendingHTML = '';
+                if (pendingOrders && pendingOrders.length) {
+                    const statusLbl = {
+                        pending:  '⏳ En attente',
+                        approved: '✅ Acceptée (non facturée)'
+                    };
+                    const pRows = pendingOrders.map(o => `
+                        <tr style="background:#fff8e1;">
+                            <td>${o.date} ${o.time || ''}</td>
+                            <td style="font-weight:700;">${o.num}</td>
+                            <td style="text-align:left;">🛒 ${o.lines.length} article(s) — ${statusLbl[o.status] || o.status}</td>
+                            <td style="text-align:right;font-weight:700;color:#e67e22;">${o.total.toFixed(3)}</td>
+                            <td colspan="2" style="text-align:center;color:#999;">En cours</td>
+                        </tr>`).join('');
+                    const totalPending = pendingOrders.reduce((s, o) => s + o.total, 0);
+                    pendingHTML = `
+                        <div style="margin-top:16px;border-top:3px dashed #f39c12;padding-top:10px;">
+                            <div style="font-size:12px;font-weight:800;color:#e67e22;margin-bottom:6px;">
+                                🛒 Commandes en cours (non facturées)
+                            </div>
+                            <table>
+                                <thead><tr style="background:#e67e22;">
+                                    <th>Date</th><th>N°</th><th>Statut</th><th>Montant</th><th colspan="2">Note</th>
+                                </tr></thead>
+                                <tbody>${pRows}</tbody>
+                                <tfoot><tr>
+                                    <td colspan="3" style="text-align:right;font-weight:700;">Total en attente :</td>
+                                    <td style="text-align:right;font-weight:700;color:#e67e22;">${totalPending.toFixed(3)} TND</td>
+                                    <td colspan="2"></td>
+                                </tr></tfoot>
+                            </table>
+                            <div style="font-size:9px;color:#888;margin-top:6px;font-style:italic;">
+                                💡 Ces commandes n'affectent pas votre solde tant qu'elles ne sont pas facturées par le vendeur.
+                            </div>
+                        </div>`;
+                }
+                
                 return `
                     <div style="text-align:center;border-bottom:2px solid #1e2f66;padding-bottom:6px;margin-bottom:8px;">
                         <div style="font-size:14px;font-weight:800;">${data.title}</div>
@@ -2056,7 +2098,8 @@
                             <td style="text-align:right;">${totals.credit.toFixed(3)}</td>
                             <td style="text-align:right;color:#c0392b;">${finalBalance.toFixed(3)}</td>
                         </tr></tfoot>
-                    </table>`;
+                    </table>
+                    ${pendingHTML}`;
             },
             buildArticleHTML(data) {
                 return `
@@ -2510,13 +2553,18 @@
                     </div>`;
                 }).join('');
             },
+            // ✅ MODIFIÉ : Ajouter les commandes en attente
             printStatement() {
                 const client = State.currentClient;
                 if (!client) return;
                 BalanceCalculator.recalculateClient(client.name);
                 const docs = State.ventes.filter(v => v.client === client.name).sort((a, b) => a.date < b.date ? -1 : 1);
                 const pays = State.caisseClients.filter(p => p.clientName === client.name);
-                showPreviewReleve('client', client, docs, pays);
+                const pendingOrders = State.orders.filter(o => 
+                    (o.clientId === client.id || o.clientName === client.name) &&
+                    (o.status === 'pending' || o.status === 'approved')
+                );
+                showPreviewReleve('client', client, docs, pays, pendingOrders);
             },
             shareWhatsapp() {
                 const client = State.currentClient;
@@ -3388,9 +3436,6 @@
             renderer: AchatsRenderer
         });
 
-        // ═══════════════════════════════════════════════════
-        // ✅ ORDERS avec GESTION AUTOMATIQUE DU STOCK
-        // ═══════════════════════════════════════════════════
         const Orders = {
             filter: 'pending',
             _unsubscribe: null,
@@ -3506,12 +3551,11 @@
                     </div>`;
                 }).join('');
             },
-            // ✅ MODIFIÉ : Décrémente le stock à l'approbation
+            // ✅ Décrémente le stock à l'approbation
             approve(id) {
                 const o = this.get(id);
                 if (!o) { Toast.show('❌ Commande introuvable', 'error'); return; }
                 
-                // ✅ Décrémenter le stock (une seule fois)
                 if (!o.stockDecremented) {
                     const warnings = [];
                     o.lines.forEach(line => {
@@ -3542,12 +3586,11 @@
                 Toast.show('✅ Commande acceptée (stock mis à jour)', 'success');
                 NotificationSystem.add('Commande acceptée', `${o.num} — ${o.clientName}`, 'SUCCESS');
             },
-            // ✅ MODIFIÉ : Restaure le stock au refus (si déjà décrémenté)
+            // ✅ Restaure le stock au refus
             reject(id) {
                 const o = this.get(id);
                 if (!o) { Toast.show('❌ Commande introuvable', 'error'); return; }
                 
-                // ✅ Si le stock a été décrémenté, le restaurer
                 if (o.stockDecremented) {
                     o.lines.forEach(line => {
                         Stock.adjust(line.name, line.qty, { silent: true, allowNegative: true });
@@ -3563,14 +3606,13 @@
                 this.render();
                 Toast.show('❌ Commande refusée (stock restauré)');
             },
-            // ✅ MODIFIÉ : Restaure le stock à la suppression
+            // ✅ Restaure le stock à la suppression
             async remove(id) {
                 const o = this.get(id);
                 if (!o) return;
                 const ok = await CustomConfirm.show(`Supprimer la commande ${o.num} ?`);
                 if (!ok) return;
                 
-                // ✅ Restaurer le stock si décrémenté
                 if (o.stockDecremented) {
                     o.lines.forEach(line => {
                         Stock.adjust(line.name, line.qty, { silent: true, allowNegative: true });
@@ -3595,7 +3637,7 @@
                 const phone = o.phone.replace(/\D/g, '');
                 window.location.href = `tel:${phone}`;
             },
-            // ✅ MODIFIÉ : Évite la double décrémentation lors de la conversion
+            // ✅ Évite la double décrémentation
             convertToSale(id) {
                 const o = this.get(id);
                 if (!o) return;
@@ -3608,15 +3650,12 @@
                     if (opt) { sel.value = opt.value; VentesModule.fillParty(); }
                 }
                 setTimeout(() => {
-                    // ✅ Le stock a déjà été décrémenté à l'approbation
-                    //    On pousse les lignes SANS re-décrémenter le stock
                     o.lines.forEach(l => {
                         VentesModule.lines.push({ name: l.name, price: l.price, qty: l.qty, total: l.total });
                     });
                     VentesModule.renderLines();
                     VentesModule.refreshArticleOptions();
                     VentesModule.updateAccountSummary();
-                    // ⚠️ Marquer pour ne pas décrémenter à nouveau
                     VentesModule._stockAlreadyDecremented = true;
                     o.status = 'delivered';
                     o.deliveredAt = new Date().toISOString();
@@ -4600,12 +4639,13 @@
                     item.style.minHeight = s.minH + 'px';
                 });
             },
+            // ✅ FIX : forcer au moins 3 colonnes (ignorer 2)
             load() {
                 try {
                     const saved = localStorage.getItem(APP_CONFIG.dashboardKey);
                     if (saved) {
                         const cols = parseInt(saved);
-                        if (cols >= 2 && cols <= 4) { this.setColumns(cols); return; }
+                        if (cols >= 3 && cols <= 4) { this.setColumns(cols); return; }
                     }
                 } catch(e) {}
                 this.setColumns(4);
@@ -5233,7 +5273,11 @@
                 const docs = State.ventes.filter(v => v.client === c.name && new Date(v.date) >= from && new Date(v.date) <= to)
                     .sort((a, b) => a.date < b.date ? -1 : 1);
                 const pays = State.caisseClients.filter(p => p.clientName === c.name);
-                showPreviewReleve('client', c, docs, pays);
+                const pendingOrders = State.orders.filter(o => 
+                    (o.clientId === c.id || o.clientName === c.name) &&
+                    (o.status === 'pending' || o.status === 'approved')
+                );
+                showPreviewReleve('client', c, docs, pays, pendingOrders);
             } else if (type === 'fournisseur') {
                 const f = State.fournisseurs.find(x => x.id === id);
                 if (!f) return;
@@ -5252,7 +5296,8 @@
             }
         }
 
-        function showPreviewReleve(type, entity, docs, payments) {
+        function showPreviewReleve(type, entity, docs, payments, pendingOrders) {
+            pendingOrders = pendingOrders || [];
             const isClient = type === 'client';
             const title = isClient ? 'Relevé de compte client' : 'Relevé de compte fournisseur';
             const partyLabel = isClient ? 'Client' : 'Fournisseur';
@@ -5281,7 +5326,8 @@
             PreviewModal.showStatement(type, {
                 title, partyLabel, entity, movements,
                 totals: { debit: totalDebit, credit: totalCredit },
-                finalBalance
+                finalBalance,
+                pendingOrders
             });
         }
 
