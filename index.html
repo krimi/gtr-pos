@@ -213,10 +213,9 @@
         .login-error { color: var(--danger); font-size: 11px; min-height: 16px; }
         .login-toggle { font-size: 12px; color: var(--primary); cursor: pointer; font-weight: 700; margin-top: 4px; }
         .login-loading { font-size: 12px; color: var(--muted); margin-top: 4px; display: none; }
-        .storage-selector { display: flex; gap: 8px; margin: 8px 0; justify-content: center; }
-        .storage-selector .btn { flex: 1; padding: 6px; font-size: 11px; margin: 0;
-            background: #eee; color: #333; border: 2px solid var(--border); }
-        .storage-selector .btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .cloud-badge { display: inline-block; background: linear-gradient(135deg, #4a6cf7, #2a4ac7);
+            color: #fff; font-size: 10px; font-weight: 700; padding: 4px 12px;
+            border-radius: 12px; margin-top: 8px; }
         .capital-card { background: linear-gradient(135deg, var(--secondary), #2a3f7a);
             color: #fff; border-radius: var(--card-radius); padding: 16px 20px;
             margin-bottom: 12px; text-align: center; }
@@ -666,12 +665,10 @@
             </button>
             <div class="login-error" id="loginError"></div>
             <div class="login-loading" id="loginLoading">Chargement...</div>
-            <div class="login-divider">Mode de stockage</div>
-            <div class="storage-selector">
-                <button class="btn active" id="storageLocalBtn" onclick="Auth.setStorageMode('local')">📱 Local</button>
-                <button class="btn" id="storageCloudBtn" onclick="Auth.setStorageMode('cloud')">☁️ Cloud</button>
+            <!-- ✅ Cloud uniquement -->
+            <div style="text-align:center;">
+                <span class="cloud-badge">☁️ Mode Cloud - Synchronisation automatique</span>
             </div>
-            <div style="font-size:9px;color:var(--muted);margin-top:4px;" id="storageStatus">Actuellement : stockage local</div>
         </div>
     </div>
 
@@ -1590,6 +1587,7 @@
             'F11': 'Plein écran', 'Esc': 'Fermer', 'F1': 'Aide'
         };
 
+        // ✅ MODIFIÉ : Cloud uniquement
         const State = {
             clients: [], fournisseurs: [], articles: [],
             ventes: [], achats: [], expenses: [],
@@ -1599,7 +1597,7 @@
             nextId: { clients:1, fournisseurs:1, articles:1, ventes:1, achats:1,
                       expenses:1, caisseClients:1, caisseFournisseurs:1, reglements:1, orders:1 },
             currentUser: null, currentClient: null,
-            storageMode: 'local', currentSection: 'dashboard',
+            storageMode: 'cloud', currentSection: 'dashboard',
             dashboardColumns: 4, isSaving: false, notifications: []
         };
 
@@ -1784,6 +1782,9 @@
             }
         };
 
+        // ═══════════════════════════════════════════════════
+        // ✅ PERSISTENCE - CLOUD UNIQUEMENT
+        // ═══════════════════════════════════════════════════
         const Persistence = {
             serialize() {
                 return {
@@ -1813,16 +1814,55 @@
                 State.companyInfo = data.companyInfo || { name:'GTR POS', address:'', phone1:'', taxId:'', cashOpening:0 };
                 if (!State.companyInfo.cashOpening) State.companyInfo.cashOpening = 0;
             },
+            // ✅ MODIFIÉ : Sauvegarde TOUJOURS dans Firestore + localStorage (cache)
             save() {
                 try {
+                    // Cache local (pour affichage rapide)
                     localStorage.setItem(APP_CONFIG.storageKey, JSON.stringify(this.serialize()));
-                    if (State.storageMode === 'cloud' && State.currentUser && window.db && !State.currentUser.isClient) {
+                    
+                    // ✅ TOUJOURS envoyer à Firestore (si utilisateur connecté non-client)
+                    if (window.db && State.currentUser && !State.currentUser.isClient) {
                         window.db.collection('users').doc(State.currentUser.uid).set(this.serialize())
-                            .catch(e => console.error('Firestore save:', e));
+                            .then(() => console.log('☁️ Données cloud sauvegardées'))
+                            .catch(e => console.warn('⚠️ Erreur cloud save:', e.message));
                     }
+                    
+                    // Sync ventes vers shared_ventes (pour les clients)
+                    this.syncVentesToShared();
                     return true;
                 } catch(e) { return false; }
             },
+            // ✅ Sync ventes vers Firestore (accessible aux clients)
+            async syncVentesToShared() {
+                if (typeof firebase === 'undefined' || !window.db) return;
+                if (!State.currentUser || State.currentUser.isClient) return;
+                try {
+                    if (!firebase.auth().currentUser) {
+                        await firebase.auth().signInAnonymously();
+                    }
+                    const batch = window.db.batch();
+                    const ventesWithEmail = State.ventes.filter(v => {
+                        const client = State.clients.find(c => c.name === v.client);
+                        return client && client.email;
+                    });
+                    const toSync = ventesWithEmail.slice(0, 500);
+                    toSync.forEach(v => {
+                        const client = State.clients.find(c => c.name === v.client);
+                        const ref = window.db.collection('shared_ventes').doc('v_' + v.id);
+                        batch.set(ref, {
+                            ...v,
+                            clientEmail: client.email,
+                            clientId: client.id,
+                            syncedAt: new Date().toISOString()
+                        }, { merge: true });
+                    });
+                    await batch.commit();
+                    console.log(`✅ ${toSync.length} ventes synchronisées vers shared_ventes`);
+                } catch(e) {
+                    console.warn('⚠️ syncVentesToShared:', e.message);
+                }
+            },
+            // ✅ MODIFIÉ : Chargement depuis localStorage (cache rapide)
             load() {
                 try {
                     const raw = localStorage.getItem(APP_CONFIG.storageKey);
@@ -1831,19 +1871,36 @@
                     return true;
                 } catch(e) { return false; }
             },
+            // ✅ Chargement depuis Cloud (à appeler après connexion)
             async loadFromCloud(uid) {
-                if (State.storageMode !== 'cloud' || !window.db) return;
+                if (!window.db) {
+                    console.warn('⚠️ Firestore non disponible');
+                    this.load();
+                    return;
+                }
                 try {
+                    console.log('☁️ Chargement des données cloud...');
                     const doc = await window.db.collection('users').doc(uid).get();
                     if (doc.exists) {
                         this.deserialize(doc.data());
-                        this.save();
-                        Toast.show('✅ Données cloud chargées', 'success');
+                        // Cache local
+                        try {
+                            localStorage.setItem(APP_CONFIG.storageKey, JSON.stringify(this.serialize()));
+                        } catch(e) {}
+                        Toast.show('☁️ Données cloud chargées', 'success');
+                        console.log('✅ Données cloud chargées avec succès');
                     } else {
+                        console.log('⚠️ Aucune donnée cloud, création initiale');
                         this.load();
-                        window.db.collection('users').doc(uid).set(this.serialize()).catch(e => console.error(e));
+                        try {
+                            await window.db.collection('users').doc(uid).set(this.serialize());
+                        } catch(e) { console.warn('Init cloud error:', e.message); }
                     }
-                } catch(e) { this.load(); }
+                } catch(e) {
+                    console.error('❌ Erreur chargement cloud:', e.message);
+                    this.load();
+                    Toast.show('⚠️ Mode hors ligne (cache local)', 'warning');
+                }
             },
             export() {
                 const data = { ...this.serialize(), exportedAt: new Date().toISOString() };
@@ -2400,6 +2457,7 @@
 
         const ClientPortal = {
             _ordersUnsub: null,
+            _ventesUnsub: null,
             show() {
                 const client = State.currentClient;
                 if (!client) { Toast.show('❌ Client introuvable', 'error'); return; }
@@ -2411,9 +2469,11 @@
                 BalanceCalculator.recalculateClient(client.name);
                 this.render();
                 this.startClientOrderListener();
+                this.startClientVentesListener();
             },
             hide() {
                 this.stopClientOrderListener();
+                if (this._ventesUnsub) { this._ventesUnsub(); this._ventesUnsub = null; }
                 $('clientPortal').classList.remove('show');
                 document.querySelector('.phone').style.display = 'flex';
                 State.currentClient = null;
@@ -2448,6 +2508,59 @@
             },
             stopClientOrderListener() {
                 if (this._ordersUnsub) { this._ordersUnsub(); this._ordersUnsub = null; }
+            },
+            startClientVentesListener() {
+                if (typeof firebase === 'undefined') return;
+                if (this._ventesUnsub) this._ventesUnsub();
+                const client = State.currentClient;
+                if (!client || !client.email) {
+                    console.log('⚠️ Client sans email, pas de sync ventes');
+                    return;
+                }
+                try {
+                    (async () => {
+                        try {
+                            if (!firebase.auth().currentUser) {
+                                await firebase.auth().signInAnonymously();
+                            }
+                            this._ventesUnsub = firebase.firestore().collection('shared_ventes')
+                                .where('clientEmail', '==', client.email)
+                                .onSnapshot(snapshot => {
+                                    let changed = false;
+                                    snapshot.docChanges().forEach(change => {
+                                        const data = change.doc.data();
+                                        const cloudId = change.doc.id;
+                                        const vId = data.id;
+                                        const idx = State.ventes.findIndex(v => 
+                                            v.cloudVenteId === cloudId || v.id === vId
+                                        );
+                                        if (change.type === 'added' || change.type === 'modified') {
+                                            const merged = { ...data, cloudVenteId: cloudId };
+                                            if (idx === -1) {
+                                                State.ventes.push(merged);
+                                                changed = true;
+                                            } else {
+                                                State.ventes[idx] = { ...State.ventes[idx], ...merged };
+                                                changed = true;
+                                            }
+                                        } else if (change.type === 'removed') {
+                                            if (idx !== -1) { State.ventes.splice(idx, 1); changed = true; }
+                                        }
+                                    });
+                                    if (changed) {
+                                        try {
+                                            localStorage.setItem(APP_CONFIG.storageKey, JSON.stringify(Persistence.serialize()));
+                                        } catch(e) {}
+                                        BalanceCalculator.recalculateClient(client.name);
+                                        this.render();
+                                        console.log('✅ Ventes client mises à jour');
+                                    }
+                                }, err => console.warn('⚠️ Ventes listener:', err.message));
+                        } catch(e) {
+                            console.warn('⚠️ startClientVentesListener:', e.message);
+                        }
+                    })();
+                } catch(e) { console.error(e); }
             },
             render() {
                 const client = State.currentClient;
@@ -2650,10 +2763,8 @@
                 originalBalance: 0, originalPartyId: null,
                 editingRowIndex: null, isSaved: false,
                 partyTaxId: '', partyAddress: '', partyEmail: '', partySpecialPrices: [],
-                // ✅ MODIFIÉ : Reset avec reset scroll
                 reset() {
                     this.editingId = null; this.lines = []; this.reglements = [];
-                    // ✅ Reset scroll du sheet body immédiatement
                     const sheetEl = $('sheet-' + cfg.sheet);
                     if (sheetEl) {
                         const body = sheetEl.querySelector('.sheet-body');
@@ -4736,7 +4847,6 @@
                 if (!fab) return;
                 fab.classList.toggle('show', ['clients','fournisseurs','articles','ventes','achats','expenses'].includes(id));
             },
-            // ✅ MODIFIÉ : Reset scroll en haut
             openSheet(name) {
                 $('overlay').classList.add('show');
                 const s = $('sheet-' + name);
@@ -4798,23 +4908,10 @@
                     window.auth = firebase.auth();
                     window.db = firebase.firestore();
                     window.storage = firebase.storage();
+                    State.storageMode = 'cloud';
                 } catch(e) { console.error('Firebase error:', e); }
             },
-            _bindEvents() {
-                try {
-                    const saved = localStorage.getItem('gtrpos_storage_mode');
-                    if (saved === 'cloud' || saved === 'local') this.setStorageMode(saved);
-                } catch(e) {}
-            },
-            setStorageMode(mode) {
-                State.storageMode = mode;
-                document.querySelectorAll('.storage-selector .btn').forEach(b => b.classList.remove('active'));
-                const btn = mode === 'local' ? $('storageLocalBtn') : $('storageCloudBtn');
-                if (btn) btn.classList.add('active');
-                const st = $('storageStatus');
-                if (st) st.textContent = `Actuellement : ${mode === 'local' ? 'local' : 'cloud'}`;
-                try { localStorage.setItem('gtrpos_storage_mode', mode); } catch(e) {}
-            },
+            _bindEvents() {},
             toggleMode() {
                 this.isSignup = !this.isSignup;
                 $('loginMainBtn').textContent = this.isSignup ? 'Créer un compte' : 'Se connecter';
@@ -5045,8 +5142,8 @@
                         State.currentUser = user;
                         $('accountEmailDisplay2').textContent = user.email || '';
                         $('accountEmailDisplay').textContent = user.email || '';
-                        if (State.storageMode === 'cloud') await Persistence.loadFromCloud(user.uid);
-                        else Persistence.load();
+                        // ✅ TOUJOURS charger depuis Cloud
+                        await Persistence.loadFromCloud(user.uid);
                         const email = user.email.toLowerCase().trim();
                         if (email === APP_CONFIG.adminEmail.toLowerCase()) {
                             State.currentUser.isStaff = false;
@@ -5104,7 +5201,7 @@
                 document.querySelector('.phone').style.display = 'flex';
                 App.reloadAll();
                 App.showSection('dashboard');
-                Toast.show(`✅ Bienvenue`, 'success');
+                Toast.show(`☁️ Connecté (Cloud)`, 'success');
                 setTimeout(() => {
                     AdvancedReports.generateReport();
                     Marges.init();
@@ -5533,7 +5630,7 @@
         }
 
         function bootstrap() {
-            console.log(`🚀 GTR POS ${APP_CONFIG.version}...`);
+            console.log(`🚀 GTR POS ${APP_CONFIG.version} (Cloud only)...`);
             Theme.load();
             PrintSystem.load();
             NotificationSystem.load();
@@ -5549,11 +5646,6 @@
                     const repaired = await repairOldOrders();
                     if (repaired > 0) {
                         Toast.show(`🔧 ${repaired} commande(s) réparée(s)`, 'success');
-                        NotificationSystem.add(
-                            'Commandes réparées',
-                            `${repaired} ancienne(s) commande(s) ont été renumérotées automatiquement.`,
-                            'SUCCESS'
-                        );
                     }
                 } catch (e) {
                     console.error('❌ Erreur réparation:', e);
@@ -5581,7 +5673,7 @@
                 } catch(e) { console.warn('Session restore:', e); }
             }, 400);
             
-            console.log('✅ GTR POS ready');
+            console.log('✅ GTR POS ready (Cloud)');
         }
 
         if (document.readyState === 'loading') {
