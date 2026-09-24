@@ -8,7 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="GTR POS">
     <meta name="theme-color" content="#1e2f66">
-    <title>GTR POS V 0.8.4 - Système intégré</title>
+    <title>GTR POS V 0.8.5 - Système sécurisé</title>
     <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkdUUiBQT1MiLAogICJzaG9ydF9uYW1lIjogIkdUUiBQT1MiLAogICJkZXNjcmlwdGlvbiI6ICJQb2ludCBkZSB2ZW50ZSBwcm9mZXNzaW9ubmVsIiwKICAic3RhcnRfdXJsIjogIi9pbmRleC5odG1sIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAib3JpZW50YXRpb24iOiAicG9ydHJhaXQiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiMxYTJhNWMiLAogICJ0aGVtZV9jb2xvciI6ICIjMWEyYTVjIgp9">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -643,6 +643,10 @@
             margin-bottom: 10px; text-align: left; font-size: 10px; color: #856404; line-height: 1.6; }
         .approval-notice .icon { font-size: 16px; margin-right: 4px; }
         .approval-notice strong { color: #e67e22; }
+        .security-info { font-size: 9px; color: var(--muted); text-align: center;
+            margin-top: 8px; padding: 6px; background: rgba(46, 204, 113, 0.08);
+            border-radius: 8px; border: 1px dashed var(--success); }
+        .security-info strong { color: var(--success); }
     </style>
 </head>
 <body>
@@ -654,7 +658,7 @@
                     <span class="gtr-big">GTR</span>
                     <span class="pos-badge">POS</span>
                 </div>
-                <span class="version-tag">V 0.8.4</span>
+                <span class="version-tag">V 0.8.5</span>
             </div>
             <div class="login-logo">GTR POS</div>
             <div class="login-sub" id="loginModeLabel">Connexion à votre compte</div>
@@ -683,7 +687,10 @@
             <div class="login-error" id="loginError"></div>
             <div class="login-loading" id="loginLoading">Chargement...</div>
             <div style="text-align:center;">
-                <span class="cloud-badge">☁️ Mode Cloud - Synchronisation automatique</span>
+                <span class="cloud-badge">☁️ Mode Cloud Sécurisé</span>
+            </div>
+            <div class="security-info">
+                🔒 <strong>V 0.8.5</strong> — Mots de passe hachés (SHA-256) + Firestore Rules
             </div>
         </div>
     </div>
@@ -706,7 +713,9 @@
             </div>
             <button class="login-btn secondary" onclick="Auth.logout()">🚪 Se déconnecter</button>
         </div>
-    </div>    <!-- ===== APPLICATION ===== -->
+    </div>
+
+    <!-- ===== APPLICATION ===== -->
     <div class="phone">
         <div class="appbar">
             <div class="appbar-left">
@@ -720,7 +729,7 @@
                 <div>
                     <div class="title" id="pageTitle">Accueil</div>
                     <div class="sub" onclick="App.openSheet('company')">
-                        GTR POS <span style="opacity:.6;font-weight:400;">V 0.8.4</span>
+                        GTR POS <span style="opacity:.6;font-weight:400;">V 0.8.5</span>
                     </div>
                 </div>
             </div>
@@ -1444,7 +1453,7 @@
         </div>
     </div>
 
-    <!-- ===== NOTIFICATION PANEL (UPDATED) ===== -->
+    <!-- ===== NOTIFICATION PANEL ===== -->
     <div class="notification-panel" id="notificationPanel">
         <div class="notification-content">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:6px;">
@@ -1575,12 +1584,12 @@
         'use strict';
 
         const APP_CONFIG = {
-            version: 'V 0.8.4',
-            storageKey: 'gtrpos_data_v33',
+            version: 'V 0.8.5',
+            storageKey: 'gtrpos_data_v34',
             themeKey: 'gtrpos_theme',
             printKey: 'gtrpos_print_settings',
             dashboardKey: 'gtrpos_dashboard_cols',
-            clientSessionKey: 'gtrpos_client_session',
+            sessionKey: 'gtrpos_session',
             staffCredsKey: 'gtrpos_staff_creds',
             adminCredsKey: 'gtrpos_admin_creds',
             adminEmail: 'krimi.neji@gmail.com',
@@ -1623,23 +1632,92 @@
             dashboardColumns: 4, isSaving: false, notifications: []
         };
 
+        // ═══════════════════════════════════════════════════
+        // 🔒 Utils — escapeHTML + Hash SHA-256 + Salt
+        // ═══════════════════════════════════════════════════
         const Utils = {
             $(id) { return document.getElementById(id); },
             formatNum(n) { return Number(n || 0).toFixed(3).replace(/\./g, ','); },
             formatDate(s) {
                 if (!s || s === '---') return '---';
-                const p = s.split('-');
-                return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : s;
+                const p = String(s).split('-');
+                return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : String(s);
             },
             today() { return new Date().toISOString().slice(0, 10); },
             monthStart() {
                 const d = new Date();
                 return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().slice(0, 10);
             },
+
+            // ✅ FIX #1 : Protection XSS
+            escapeHTML(str) {
+                if (str == null) return '';
+                return String(str).replace(/[&<>"'`=\/]/g, c => ({
+                    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;',
+                    "'":'&#39;', '`':'&#96;', '=':'&#61;', '/':'&#47;'
+                }[c]));
+            },
+            escapeAttr(str) {
+                return String(str == null ? '' : str)
+                    .replace(/[^a-zA-Z0-9_\-\.]/g, '');
+            },
+
+            // ✅ FIX #3 : Hash SHA-256 + Salt
+            async hashPassword(password, salt) {
+                const enc = new TextEncoder();
+                const data = enc.encode(String(salt) + ':' + String(password) + ':gtrpos_v085');
+                const buf = await crypto.subtle.digest('SHA-256', data);
+                return Array.from(new Uint8Array(buf))
+                    .map(b => b.toString(16).padStart(2, '0')).join('');
+            },
+            generateSalt() {
+                const arr = new Uint8Array(16);
+                crypto.getRandomValues(arr);
+                return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
+            },
+            constantTimeEqual(a, b) {
+                if (typeof a !== 'string' || typeof b !== 'string') return false;
+                if (a.length !== b.length) return false;
+                let diff = 0;
+                for (let i = 0; i < a.length; i++)
+                    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+                return diff === 0;
+            },
             isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
         };
 
         const $ = Utils.$;
+        const esc = Utils.escapeHTML;
+
+        // ✅ FIX #9 : Rate Limiting
+        const LoginThrottle = {
+            KEY: 'gtrpos_login_attempts',
+            MAX: 5,
+            WINDOW_MS: 15 * 60 * 1000,
+            _get() {
+                try { return JSON.parse(sessionStorage.getItem(this.KEY) || '[]'); }
+                catch(e) { return []; }
+            },
+            _set(arr) { try { sessionStorage.setItem(this.KEY, JSON.stringify(arr)); } catch(e) {} },
+            check(identifier) {
+                const now = Date.now();
+                const attempts = this._get().filter(a => a.id === identifier && now - a.at < this.WINDOW_MS);
+                this._set(attempts);
+                if (attempts.length >= this.MAX) {
+                    const wait = Math.ceil((this.WINDOW_MS - (now - attempts[0].at)) / 60000);
+                    return { blocked: true, waitMin: wait };
+                }
+                return { blocked: false };
+            },
+            record(identifier) {
+                const arr = this._get();
+                arr.push({ id: identifier, at: Date.now() });
+                this._set(arr);
+            },
+            clear(identifier) {
+                this._set(this._get().filter(a => a.id !== identifier));
+            }
+        };
 
         const Toast = {
             _timer: null,
@@ -1649,7 +1727,7 @@
                 const colors = { info:'var(--secondary)', success:'var(--success)',
                                  error:'var(--danger)', warning:'var(--warning)' };
                 el.style.background = colors[type] || colors.info;
-                el.textContent = msg;
+                el.textContent = String(msg);
                 el.classList.add('show');
                 clearTimeout(this._timer);
                 this._timer = setTimeout(() => el.classList.remove('show'), 3000);
@@ -1657,10 +1735,7 @@
         };
 
         // ═══════════════════════════════════════════════════
-        // 🔔 NOTIFICATION SYSTEM — Implémentation Staff isolée
-        //    • Chaque Staff/Admin/User a ses propres notifications
-        //    • Mise en cache sous clé : gtrpos_notifications_<UID>
-        //    • Ajout : bouton "Effacer tout" (clearAll)
+        // 🔔 NotificationSystem
         // ═══════════════════════════════════════════════════
         const NotificationSystem = {
             TYPES: {
@@ -1669,16 +1744,14 @@
                 WARNING: { icon:'⚠️', color:'#f1c40f' },
                 ERROR: { icon:'❌', color:'#e74c5e' }
             },
-            // ✅ مفتاح الإشعارات خاص بكل مستخدم
             _getKey() {
                 const user = State.currentUser;
                 if (!user) return 'gtrpos_notifications_anonymous';
                 if (user.isLocalAdmin) return 'gtrpos_notifications_admin';
-                if (user.uid) return 'gtrpos_notifications_' + user.uid;
-                if (user.email) return 'gtrpos_notifications_' + user.email.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                if (user.uid) return 'gtrpos_notifications_' + Utils.escapeAttr(user.uid);
+                if (user.email) return 'gtrpos_notifications_' + Utils.escapeAttr(user.email.toLowerCase());
                 return 'gtrpos_notifications_default';
             },
-            // ✅ الحصول على اسم قصير للمستخدم للعرض
             _getUserLabel() {
                 const user = State.currentUser;
                 if (!user) return '';
@@ -1705,34 +1778,22 @@
                     title, message, type,
                     timestamp: new Date().toISOString(), read: false
                 });
-                this.save();
-                this.updateBadge();
-                Toast.show(`${this.TYPES[type].icon} ${title}`);
-            },
-            markAsRead(id) {
-                const n = State.notifications.find(x => x.id === id);
-                if (n) { n.read = true; this.save(); this.updateBadge(); }
+                this.save(); this.updateBadge();
+                Toast.show(`${this.TYPES[type]?.icon || 'ℹ️'} ${title}`);
             },
             markAllAsRead() {
                 State.notifications.forEach(n => n.read = true);
                 this.save(); this.updateBadge();
             },
-            // ✅ جديد: مسح جميع إشعارات المستخدم الحالي فقط
             async clearAll() {
-                if (!State.notifications.length) {
-                    Toast.show('⚠️ Aucune notification à effacer', 'warning');
-                    return;
-                }
+                if (!State.notifications.length) { Toast.show('⚠️ Aucune notification', 'warning'); return; }
                 const ok = await CustomConfirm.show(
-                    '⚠️ Supprimer TOUTES les notifications ?\n\n' +
-                    'Cette action est irréversible et ne concerne que votre compte.',
+                    '⚠️ Supprimer TOUTES les notifications ?\n\nCette action est irréversible.',
                     '🗑️ Effacer tout'
                 );
                 if (!ok) return;
                 State.notifications = [];
-                this.save();
-                this.updateBadge();
-                this.renderPanel();
+                this.save(); this.updateBadge(); this.renderPanel();
                 Toast.show('🗑️ Notifications effacées', 'success');
             },
             getUnreadCount() { return State.notifications.filter(n => !n.read).length; },
@@ -1745,7 +1806,6 @@
                 const panel = $('notificationPanel');
                 const list = $('notificationList');
                 if (!panel || !list) return;
-                // تحديث العنوان باسم المستخدم
                 const title = document.querySelector('#notificationPanel h2');
                 if (title) {
                     const userLabel = this._getUserLabel();
@@ -1761,10 +1821,10 @@
                              border:1px solid ${n.read?'var(--border)':t.color};
                              border-right:3px solid ${t.color};">
                             <div style="display:flex;justify-content:space-between;align-items:center;">
-                                <span style="font-weight:700;font-size:13px;">${t.icon} ${n.title}</span>
+                                <span style="font-weight:700;font-size:13px;">${t.icon} ${esc(n.title)}</span>
                                 <span style="font-size:10px;color:var(--muted);">${new Date(n.timestamp).toLocaleDateString('fr')} ${new Date(n.timestamp).toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'})}</span>
                             </div>
-                            <div style="font-size:12px;color:var(--muted);margin-top:4px;">${n.message}</div>
+                            <div style="font-size:12px;color:var(--muted);margin-top:4px;">${esc(n.message)}</div>
                         </div>`;
                     }).join('');
                 }
@@ -1885,16 +1945,17 @@
                 try {
                     const dataStr = JSON.stringify(this.serialize());
                     localStorage.setItem(APP_CONFIG.storageKey, dataStr);
-                    console.log('💾 localStorage sauvegardé (' + (dataStr.length / 1024).toFixed(1) + ' KB)');
-                    
-                    if (window.db && State.currentUser && State.currentUser.uid && !State.currentUser.isClient && !State.currentUser.isLocalAdmin) {
+
+                    // ✅ FIX #5 : seul un vrai Staff authentifié sync au cloud
+                    if (window.db && State.currentUser && State.currentUser.uid
+                        && !State.currentUser.isClient
+                        && !State.currentUser.isLocalAdmin
+                        && !String(State.currentUser.uid).startsWith('admin_')
+                        && !String(State.currentUser.uid).startsWith('client_')) {
                         window.db.collection('users').doc(State.currentUser.uid).set(this.serialize())
                             .then(() => console.log('☁️ Firestore sauvegardé'))
                             .catch(e => console.error('❌ Firestore error:', e.message));
-                    } else {
-                        console.warn('⚠️ Pas de sauvegarde cloud (user non connecté, client ou admin local)');
                     }
-                    
                     this.syncVentesToShared();
                     return true;
                 } catch(e) {
@@ -1904,11 +1965,10 @@
             },
             async syncVentesToShared() {
                 if (typeof firebase === 'undefined' || !window.db) return;
-                if (!State.currentUser || State.currentUser.isClient) return;
+                if (!State.currentUser || State.currentUser.isClient || State.currentUser.isLocalAdmin) return;
+                const fbUser = firebase.auth().currentUser;
+                if (!fbUser) return;
                 try {
-                    if (!firebase.auth().currentUser) {
-                        await firebase.auth().signInAnonymously();
-                    }
                     const batch = window.db.batch();
                     const ventesWithEmail = State.ventes.filter(v => {
                         const client = State.clients.find(c => c.name === v.client);
@@ -1922,11 +1982,12 @@
                             ...v,
                             clientEmail: client.email,
                             clientId: client.id,
+                            clientUid: 'client_' + client.id,
                             syncedAt: new Date().toISOString()
                         }, { merge: true });
                     });
                     await batch.commit();
-                    console.log(`✅ ${toSync.length} ventes synchronisées vers shared_ventes`);
+                    console.log(`✅ ${toSync.length} ventes synchronisées`);
                 } catch(e) {
                     console.warn('⚠️ syncVentesToShared:', e.message);
                 }
@@ -1934,38 +1995,35 @@
             load() {
                 try {
                     const raw = localStorage.getItem(APP_CONFIG.storageKey);
-                    if (!raw) return false;
+                    if (!raw) {
+                        const old = localStorage.getItem('gtrpos_data_v33');
+                        if (old) {
+                            console.log('🔄 Migration v33 → v34...');
+                            this.deserialize(JSON.parse(old));
+                            this.save();
+                        }
+                        return !!old;
+                    }
                     this.deserialize(JSON.parse(raw));
                     return true;
                 } catch(e) { return false; }
             },
             async loadFromCloud(uid) {
-                if (!window.db) {
-                    console.warn('⚠️ Firestore non disponible');
-                    this.load();
-                    return;
-                }
+                if (!window.db) { this.load(); return; }
                 try {
-                    console.log('☁️ Chargement des données cloud...');
                     const doc = await window.db.collection('users').doc(uid).get();
                     if (doc.exists) {
                         this.deserialize(doc.data());
-                        try {
-                            localStorage.setItem(APP_CONFIG.storageKey, JSON.stringify(this.serialize()));
-                        } catch(e) {}
+                        try { localStorage.setItem(APP_CONFIG.storageKey, JSON.stringify(this.serialize())); } catch(e) {}
                         Toast.show('☁️ Données cloud chargées', 'success');
-                        console.log('✅ Données cloud chargées');
                     } else {
-                        console.log('⚠️ Aucune donnée cloud, création initiale');
                         this.load();
-                        try {
-                            await window.db.collection('users').doc(uid).set(this.serialize());
-                        } catch(e) { console.warn('Init cloud error:', e.message); }
+                        try { await window.db.collection('users').doc(uid).set(this.serialize()); } catch(e) {}
                     }
                 } catch(e) {
-                    console.error('❌ Erreur chargement cloud:', e.message);
+                    console.error('❌ Erreur cloud:', e.message);
                     this.load();
-                    Toast.show('⚠️ Mode hors ligne (cache local)', 'warning');
+                    Toast.show('⚠️ Mode hors ligne', 'warning');
                 }
             },
             export() {
@@ -1980,9 +2038,7 @@
                 Toast.show('✅ Exporté');
             },
             import(file) {
-                if (!file || !file.name.endsWith('.json')) {
-                    Toast.show('⚠️ Fichier JSON requis'); return;
-                }
+                if (!file || !file.name.endsWith('.json')) { Toast.show('⚠️ Fichier JSON requis'); return; }
                 const reader = new FileReader();
                 reader.onload = e => {
                     try {
@@ -1997,6 +2053,9 @@
             }
         };
 
+        // ═══════════════════════════════════════════════════
+        // 🖨️ PrintSystem
+        // ═══════════════════════════════════════════════════
         const PrintSystem = {
             settings: { logo: null, footer: 'Merci de votre visite', fontSize: 'medium' },
             _currentData: null,
@@ -2034,6 +2093,8 @@
             handleLogoUpload(e) {
                 const file = e.target.files[0];
                 if (!file) return;
+                if (!file.type.startsWith('image/')) { Toast.show('⚠️ Image requise'); return; }
+                if (file.size > 500 * 1024) { Toast.show('⚠️ Image trop grande (max 500 KB)'); return; }
                 const reader = new FileReader();
                 reader.onload = ev => {
                     this.settings.logo = ev.target.result;
@@ -2057,28 +2118,28 @@
             getFontSize() { return { small:'7px', medium:'10px', large:'14px' }[this.settings.fontSize] || '10px'; },
             buildInvoiceHTML(data) {
                 const fs = this.getFontSize();
-                const logo = this.settings.logo ? `<div style="text-align:center;margin-bottom:4px;"><img src="${this.settings.logo}" style="max-width:120px;max-height:50px;"></div>` : '';
-                const footer = this.settings.footer ? `<div style="text-align:center;font-size:${fs};color:#666;margin-top:8px;border-top:1px dashed #ddd;padding-top:6px;">${this.settings.footer}</div>` : '';
+                const logo = this.settings.logo ? `<div style="text-align:center;margin-bottom:4px;"><img src="${esc(this.settings.logo)}" style="max-width:120px;max-height:50px;"></div>` : '';
+                const footer = this.settings.footer ? `<div style="text-align:center;font-size:${fs};color:#666;margin-top:8px;border-top:1px dashed #ddd;padding-top:6px;">${esc(this.settings.footer)}</div>` : '';
                 let lines = (data.lines || []).map((l, i) => `
                     <tr>
                         <td style="border:1px solid #999;padding:2px 4px;text-align:center;">${i+1}</td>
-                        <td style="border:1px solid #999;padding:2px 4px;">${l.name}</td>
-                        <td style="border:1px solid #999;padding:2px 4px;text-align:center;">${l.price.toFixed(3)}</td>
-                        <td style="border:1px solid #999;padding:2px 4px;text-align:center;">${l.qty}</td>
-                        <td style="border:1px solid #999;padding:2px 4px;text-align:right;font-weight:700;">${l.total.toFixed(3)}</td>
+                        <td style="border:1px solid #999;padding:2px 4px;">${esc(l.name)}</td>
+                        <td style="border:1px solid #999;padding:2px 4px;text-align:center;">${Number(l.price).toFixed(3)}</td>
+                        <td style="border:1px solid #999;padding:2px 4px;text-align:center;">${Number(l.qty)}</td>
+                        <td style="border:1px solid #999;padding:2px 4px;text-align:right;font-weight:700;">${Number(l.total).toFixed(3)}</td>
                     </tr>`).join('');
                 if (!lines) lines = `<tr><td colspan="5" style="border:1px solid #999;padding:10px;text-align:center;color:#2980b9;font-style:italic;background:#e3f2fd;">💰 Règlement de compte</td></tr>`;
                 return `
                     ${logo}
                     <div style="text-align:center;border-bottom:2px solid #1e2f66;padding-bottom:4px;margin-bottom:4px;">
-                        <div style="font-size:${fs};font-weight:800;">${data.title}</div>
-                        <div style="font-size:${fs};color:#666;">${new Date().toLocaleDateString('fr-FR')} - ${State.companyInfo.name}</div>
+                        <div style="font-size:${fs};font-weight:800;">${esc(data.title)}</div>
+                        <div style="font-size:${fs};color:#666;">${new Date().toLocaleDateString('fr-FR')} - ${esc(State.companyInfo.name)}</div>
                     </div>
-                    <div style="font-size:${fs};text-align:center;margin:2px 0;">${data.date}</div>
+                    <div style="font-size:${fs};text-align:center;margin:2px 0;">${esc(data.date)}</div>
                     <div style="display:flex;justify-content:space-between;font-size:${fs};border:1px solid #999;padding:3px;margin:3px 0;flex-wrap:wrap;">
-                        <span><strong>${data.partyLabel}:</strong> ${data.partyName}</span>
-                        <span><strong>Tél:</strong> ${data.partyPhone || '-'}</span>
-                        <span><strong>MF:</strong> ${data.partyTaxId || '-'}</span>
+                        <span><strong>${esc(data.partyLabel)}:</strong> ${esc(data.partyName)}</span>
+                        <span><strong>Tél:</strong> ${esc(data.partyPhone || '-')}</span>
+                        <span><strong>MF:</strong> ${esc(data.partyTaxId || '-')}</span>
                     </div>
                     <table style="width:100%;border-collapse:collapse;font-size:${fs};">
                         <thead><tr style="background:#1e2f66;color:#fff;">
@@ -2092,17 +2153,17 @@
                     </table>
                     <table style="width:100%;border-collapse:collapse;font-size:${fs};margin:4px 0;">
                         <tr><td style="border:1px solid #999;padding:2px 4px;">Solde préc.</td>
-                            <td style="border:1px solid #999;padding:2px 4px;text-align:right;">${data.prevBalance.toFixed(3)}</td></tr>
+                            <td style="border:1px solid #999;padding:2px 4px;text-align:right;">${Number(data.prevBalance).toFixed(3)}</td></tr>
                         <tr style="background:#d9ede2;font-weight:700;">
                             <td style="border:1px solid #999;padding:2px 4px;">Total facture</td>
-                            <td style="border:1px solid #999;padding:2px 4px;text-align:right;">${data.total.toFixed(3)}</td></tr>
+                            <td style="border:1px solid #999;padding:2px 4px;text-align:right;">${Number(data.total).toFixed(3)}</td></tr>
                         <tr><td style="border:1px solid #999;padding:2px 4px;">Payé</td>
-                            <td style="border:1px solid #999;padding:2px 4px;text-align:right;">${data.paid.toFixed(3)}</td></tr>
+                            <td style="border:1px solid #999;padding:2px 4px;text-align:right;">${Number(data.paid).toFixed(3)}</td></tr>
                         <tr style="background:#fbdcc9;font-weight:700;">
                             <td style="border:1px solid #999;padding:2px 4px;">Solde actuel</td>
-                            <td style="border:1px solid #999;padding:2px 4px;text-align:right;color:#c0392b;">${data.currentBalance.toFixed(3)}</td></tr>
+                            <td style="border:1px solid #999;padding:2px 4px;text-align:right;color:#c0392b;">${Number(data.currentBalance).toFixed(3)}</td></tr>
                     </table>
-                    <div style="text-align:center;font-size:${fs};font-weight:700;margin:4px 0;">${data.num}</div>
+                    <div style="text-align:center;font-size:${fs};font-weight:700;margin:4px 0;">${esc(data.num)}</div>
                     ${footer}`;
             },
             showInvoice(data) {
@@ -2113,9 +2174,10 @@
             },
             close() { $('printOverlay').classList.remove('show'); this._currentData = null; },
             openPrintWindow(title, content) {
+                const safeTitle = esc(title);
                 const w = window.open('', '_blank', 'width=1000,height=700');
                 w.document.write(`
-                    <html dir="ltr"><head><title>${title}</title>
+                    <html dir="ltr"><head><title>${safeTitle}</title>
                     <style>
                         body { font-family: 'Cairo', sans-serif; padding: 20px; direction: ltr; background: #fff; }
                         table { width: 100%; border-collapse: collapse; }
@@ -2129,8 +2191,8 @@
                     </style></head>
                     <body>
                         <div class="header">
-                            <h1>${title}</h1>
-                            <p>${State.companyInfo.name} - ${new Date().toLocaleDateString('fr-FR')}</p>
+                            <h1>${safeTitle}</h1>
+                            <p>${esc(State.companyInfo.name)} - ${new Date().toLocaleDateString('fr-FR')}</p>
                         </div>
                         ${content}
                         <script>window.onload=function(){window.print();setTimeout(function(){window.close();},500);};<\/script>
@@ -2154,26 +2216,23 @@
                 const { entity, movements, totals, partyLabel, finalBalance, pendingOrders } = data;
                 const rows = movements.map(m => `
                     <tr>
-                        <td>${m.date}</td>
-                        <td style="font-weight:700;">${m.doc || '-'}</td>
-                        <td style="text-align:left;">${m.description}</td>
-                        <td style="text-align:right;color:#c0392b;">${(m.debit || 0).toFixed(3)}</td>
-                        <td style="text-align:right;color:#27ae60;">${(m.credit || 0).toFixed(3)}</td>
-                        <td style="text-align:right;font-weight:700;">${(m.balance || 0).toFixed(3)}</td>
+                        <td>${esc(m.date)}</td>
+                        <td style="font-weight:700;">${esc(m.doc || '-')}</td>
+                        <td style="text-align:left;">${esc(m.description)}</td>
+                        <td style="text-align:right;color:#c0392b;">${Number(m.debit || 0).toFixed(3)}</td>
+                        <td style="text-align:right;color:#27ae60;">${Number(m.credit || 0).toFixed(3)}</td>
+                        <td style="text-align:right;font-weight:700;">${Number(m.balance || 0).toFixed(3)}</td>
                     </tr>`).join('');
-                
+
                 let pendingHTML = '';
                 if (pendingOrders && pendingOrders.length) {
-                    const statusLbl = {
-                        pending:  '⏳ En attente',
-                        approved: '✅ Acceptée (non facturée)'
-                    };
+                    const statusLbl = { pending:'⏳ En attente', approved:'✅ Acceptée (non facturée)' };
                     const pRows = pendingOrders.map(o => `
                         <tr style="background:#fff8e1;">
-                            <td>${o.date} ${o.time || ''}</td>
-                            <td style="font-weight:700;">${o.num}</td>
-                            <td style="text-align:left;">🛒 ${o.lines.length} article(s) — ${statusLbl[o.status] || o.status}</td>
-                            <td style="text-align:right;font-weight:700;color:#e67e22;">${o.total.toFixed(3)}</td>
+                            <td>${esc(o.date)} ${esc(o.time || '')}</td>
+                            <td style="font-weight:700;">${esc(o.num)}</td>
+                            <td style="text-align:left;">🛒 ${o.lines.length} article(s) — ${statusLbl[o.status] || esc(o.status)}</td>
+                            <td style="text-align:right;font-weight:700;color:#e67e22;">${Number(o.total).toFixed(3)}</td>
                             <td colspan="2" style="text-align:center;color:#999;">En cours</td>
                         </tr>`).join('');
                     const totalPending = pendingOrders.reduce((s, o) => s + o.total, 0);
@@ -2193,20 +2252,17 @@
                                     <td colspan="2"></td>
                                 </tr></tfoot>
                             </table>
-                            <div style="font-size:9px;color:#888;margin-top:6px;font-style:italic;">
-                                💡 Ces commandes n'affectent pas votre solde tant qu'elles ne sont pas facturées par le vendeur.
-                            </div>
                         </div>`;
                 }
-                
+
                 return `
                     <div style="text-align:center;border-bottom:2px solid #1e2f66;padding-bottom:6px;margin-bottom:8px;">
-                        <div style="font-size:14px;font-weight:800;">${data.title}</div>
-                        <div style="font-size:10px;color:#666;">${State.companyInfo.name} - ${new Date().toLocaleDateString('fr-FR')}</div>
+                        <div style="font-size:14px;font-weight:800;">${esc(data.title)}</div>
+                        <div style="font-size:10px;color:#666;">${esc(State.companyInfo.name)} - ${new Date().toLocaleDateString('fr-FR')}</div>
                     </div>
                     <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;font-size:10px;border:1px solid #999;padding:6px 8px;margin-bottom:8px;">
-                        <span><strong>${partyLabel}:</strong> ${entity.name}</span>
-                        <span><strong>Tél:</strong> ${entity.phone || '-'}</span>
+                        <span><strong>${esc(partyLabel)}:</strong> ${esc(entity.name)}</span>
+                        <span><strong>Tél:</strong> ${esc(entity.phone || '-')}</span>
                         <span><strong>Solde:</strong> <span style="color:${finalBalance >= 0 ? '#27ae60' : '#c0392b'};font-weight:700;">${finalBalance.toFixed(3)} TND</span></span>
                     </div>
                     <table>
@@ -2260,8 +2316,8 @@
             show(message, title = 'Confirmation') {
                 return new Promise((resolve) => {
                     this.resolvePromise = resolve;
-                    $('customConfirmTitle').textContent = title;
-                    $('customConfirmMessage').textContent = message;
+                    $('customConfirmTitle').textContent = String(title);
+                    $('customConfirmMessage').textContent = String(message);
                     $('customConfirmModal').classList.add('show');
                 });
             },
@@ -2368,7 +2424,7 @@
                 if (!user || !user.email) return 'anonymous';
                 if (user.isClient) return 'client';
                 if (user.isLocalAdmin) return 'admin';
-                if (user.email.toLowerCase().trim() === APP_CONFIG.adminEmail.toLowerCase() || 
+                if (user.email.toLowerCase().trim() === APP_CONFIG.adminEmail.toLowerCase() ||
                     user.email.toLowerCase().trim() === APP_CONFIG.adminLogin) return 'admin';
                 if (user.isStaff) return 'staff';
                 const client = State.clients.find(c =>
@@ -2382,6 +2438,9 @@
             isClient() { return this.getRole() === 'client'; }
         };
 
+        // ═══════════════════════════════════════════════════
+        // 🛒 ClientOrder — SÉCURISÉ
+        // ═══════════════════════════════════════════════════
         const ClientOrder = {
             lines: [],
             open() {
@@ -2401,7 +2460,7 @@
                 sel.innerHTML = '<option value="">-- Choisir --</option>' +
                     State.articles
                         .filter(a => (a.stock || 0) > 0)
-                        .map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+                        .map(a => `<option value="${esc(a.id)}">${esc(a.name)}</option>`).join('');
             },
             fillPrice() {
                 const a = State.articles.find(x => x.id == $('coArticle').value);
@@ -2441,10 +2500,7 @@
                 this.renderLines();
                 Toast.show('✅ Ajouté', 'success');
             },
-            removeLine(i) {
-                this.lines.splice(i, 1);
-                this.renderLines();
-            },
+            removeLine(i) { this.lines.splice(i, 1); this.renderLines(); },
             renderLines() {
                 const c = $('coLinesList');
                 if (!c) return;
@@ -2453,15 +2509,15 @@
                 } else {
                     c.innerHTML = this.lines.map((l, i) => `
                         <div class="special-price-item">
-                            <span class="sp-article">${l.name} × ${l.qty}</span>
-                            <span class="sp-price">${l.total.toFixed(3)} TND</span>
+                            <span class="sp-article">${esc(l.name)} × ${Number(l.qty)}</span>
+                            <span class="sp-price">${Number(l.total).toFixed(3)} TND</span>
                             <span class="sp-del" onclick="ClientOrder.removeLine(${i})">✕</span>
                         </div>`).join('');
                 }
                 const total = this.lines.reduce((s, l) => s + l.total, 0);
                 $('coTotal').textContent = total.toFixed(3) + ' TND';
             },
-            submit() {
+            async submit() {
                 if (!this.lines.length) { $('coError').textContent = '⚠️ Panier vide'; return; }
                 const client = State.currentClient;
                 if (!client) { $('coError').textContent = '❌ Client introuvable'; return; }
@@ -2488,39 +2544,51 @@
                 State.nextId.orders = orderId + 1;
                 State.orders.push(order);
                 Persistence.save();
-                this.syncToCloud(order);
-                Toast.show('✅ Commande envoyée au vendeur', 'success');
-                this.close();
-                ClientPortal.render();
+                const ok = await this.syncToCloud(order);
+                if (ok) {
+                    Toast.show('✅ Commande envoyée au vendeur', 'success');
+                    this.close();
+                    ClientPortal.render();
+                } else {
+                    $('coError').textContent = '⚠️ Synchronisation échouée — commande locale enregistrée';
+                }
             },
             async syncToCloud(order) {
+                // ✅ FIX #7 : plus de signInAnonymously
                 if (typeof firebase === 'undefined') {
-                    Toast.show('⚠️ Firebase non disponible', 'warning');
-                    return;
+                    console.warn('⚠️ Firebase non disponible');
+                    return false;
+                }
+                const currentUser = firebase.auth().currentUser;
+                if (!currentUser) {
+                    console.warn('⚠️ Pas de session Firebase — commande seulement locale');
+                    Toast.show('⚠️ Session Firebase expirée', 'warning');
+                    return false;
                 }
                 try {
-                    if (!firebase.auth().currentUser) {
-                        await firebase.auth().signInAnonymously();
-                        console.log('✅ Connexion anonyme établie');
-                    }
                     const client = State.currentClient;
-                    const currentUser = firebase.auth().currentUser;
                     const db = firebase.firestore();
                     await db.collection('orders').doc('order_' + order.id + '_' + Date.now()).set({
                         ...order,
                         clientEmail: client?.email || '',
-                        clientUid: currentUser ? currentUser.uid : '',
+                        clientUid: currentUser.uid,
                         syncedAt: new Date().toISOString(),
                         source: 'client-portal'
                     });
-                    console.log('✅ Commande synchronisée au cloud');
-                    Toast.show('☁️ Commande envoyée au vendeur', 'success');
+                    console.log('✅ Commande synchronisée');
+                    return true;
                 } catch(e) {
                     console.error('❌ Sync error:', e);
                     Toast.show('⚠️ Erreur sync : ' + e.message, 'warning');
+                    return false;
                 }
             }
-        };        const ClientPortal = {
+        };
+
+        // ═══════════════════════════════════════════════════
+        // 🧑‍💼 ClientPortal
+        // ═══════════════════════════════════════════════════
+        const ClientPortal = {
             _ordersUnsub: null,
             _ventesUnsub: null,
             show() {
@@ -2548,56 +2616,40 @@
                 if (this._ordersUnsub) this._ordersUnsub();
                 const client = State.currentClient;
                 if (!client) return;
-                
-                (async () => {
-                    try {
-                        if (!firebase.auth().currentUser) {
-                            await firebase.auth().signInAnonymously();
-                            console.log('✅ Auth anonyme établie pour client');
-                        }
-                        
-                        this._ordersUnsub = firebase.firestore().collection('orders')
-                            .where('clientName', '==', client.name)
-                            .onSnapshot(snapshot => {
-                                console.log(`📥 ${snapshot.size} commande(s) reçue(s) pour ${client.name}`);
-                                let changed = false;
-                                snapshot.docChanges().forEach(change => {
-                                    const data = change.doc.data();
-                                    const cloudId = change.doc.id;
-                                    const idx = State.orders.findIndex(o => 
-                                        o.cloudId === cloudId || 
-                                        (o.num === data.num && o.clientName === data.clientName)
-                                    );
-                                    if (idx === -1 && change.type !== 'removed') {
-                                        State.orders.push({ ...data, cloudId });
+                const currentUser = firebase.auth().currentUser;
+                if (!currentUser) {
+                    console.warn('⚠️ Pas de session Firebase pour listener');
+                    return;
+                }
+                try {
+                    this._ordersUnsub = firebase.firestore().collection('orders')
+                        .where('clientUid', '==', currentUser.uid)
+                        .onSnapshot(snapshot => {
+                            let changed = false;
+                            snapshot.docChanges().forEach(change => {
+                                const data = change.doc.data();
+                                const cloudId = change.doc.id;
+                                const idx = State.orders.findIndex(o =>
+                                    o.cloudId === cloudId ||
+                                    (o.num === data.num && o.clientName === data.clientName)
+                                );
+                                if (idx === -1 && change.type !== 'removed') {
+                                    State.orders.push({ ...data, cloudId });
+                                    changed = true;
+                                } else if (idx !== -1) {
+                                    if (change.type === 'removed') { State.orders.splice(idx, 1); changed = true; }
+                                    else {
+                                        State.orders[idx] = { ...State.orders[idx], ...data, cloudId };
                                         changed = true;
-                                        console.log(`✅ Nouvelle commande: ${data.num} (${data.status})`);
-                                    } else if (idx !== -1) {
-                                        if (change.type === 'removed') { 
-                                            State.orders.splice(idx, 1); 
-                                            changed = true;
-                                        } else {
-                                            State.orders[idx] = { ...State.orders[idx], ...data, cloudId };
-                                            changed = true;
-                                            console.log(`🔄 Commande mise à jour: ${data.num} → ${data.status}`);
-                                        }
                                     }
-                                });
-                                if (changed) {
-                                    try {
-                                        localStorage.setItem(APP_CONFIG.storageKey, JSON.stringify(Persistence.serialize()));
-                                    } catch(e) {}
-                                    this.renderOrders();
-                                    this.render();
-                                    console.log('✅ UI mise à jour');
                                 }
-                            }, err => {
-                                console.error('❌ Client orders listener error:', err.message);
                             });
-                    } catch(e) {
-                        console.error('❌ startClientOrderListener error:', e);
-                    }
-                })();
+                            if (changed) {
+                                try { localStorage.setItem(APP_CONFIG.storageKey, JSON.stringify(Persistence.serialize())); } catch(e) {}
+                                this.renderOrders(); this.render();
+                            }
+                        }, err => console.warn('⚠️ orders listener:', err.message));
+                } catch(e) { console.error(e); }
             },
             stopClientOrderListener() {
                 if (this._ordersUnsub) { this._ordersUnsub(); this._ordersUnsub = null; }
@@ -2606,53 +2658,36 @@
                 if (typeof firebase === 'undefined') return;
                 if (this._ventesUnsub) this._ventesUnsub();
                 const client = State.currentClient;
-                if (!client || !client.email) {
-                    console.log('⚠️ Client sans email, pas de sync ventes');
-                    return;
-                }
+                if (!client || !client.email) return;
+                const currentUser = firebase.auth().currentUser;
+                if (!currentUser) return;
                 try {
-                    (async () => {
-                        try {
-                            if (!firebase.auth().currentUser) {
-                                await firebase.auth().signInAnonymously();
+                    this._ventesUnsub = firebase.firestore().collection('shared_ventes')
+                        .where('clientEmail', '==', client.email)
+                        .onSnapshot(snapshot => {
+                            let changed = false;
+                            snapshot.docChanges().forEach(change => {
+                                const data = change.doc.data();
+                                const cloudId = change.doc.id;
+                                const vId = data.id;
+                                const idx = State.ventes.findIndex(v =>
+                                    v.cloudVenteId === cloudId || v.id === vId
+                                );
+                                if (change.type === 'added' || change.type === 'modified') {
+                                    const merged = { ...data, cloudVenteId: cloudId };
+                                    if (idx === -1) State.ventes.push(merged);
+                                    else State.ventes[idx] = { ...State.ventes[idx], ...merged };
+                                    changed = true;
+                                } else if (change.type === 'removed' && idx !== -1) {
+                                    State.ventes.splice(idx, 1); changed = true;
+                                }
+                            });
+                            if (changed) {
+                                try { localStorage.setItem(APP_CONFIG.storageKey, JSON.stringify(Persistence.serialize())); } catch(e) {}
+                                BalanceCalculator.recalculateClient(client.name);
+                                this.render();
                             }
-                            this._ventesUnsub = firebase.firestore().collection('shared_ventes')
-                                .where('clientEmail', '==', client.email)
-                                .onSnapshot(snapshot => {
-                                    let changed = false;
-                                    snapshot.docChanges().forEach(change => {
-                                        const data = change.doc.data();
-                                        const cloudId = change.doc.id;
-                                        const vId = data.id;
-                                        const idx = State.ventes.findIndex(v => 
-                                            v.cloudVenteId === cloudId || v.id === vId
-                                        );
-                                        if (change.type === 'added' || change.type === 'modified') {
-                                            const merged = { ...data, cloudVenteId: cloudId };
-                                            if (idx === -1) {
-                                                State.ventes.push(merged);
-                                                changed = true;
-                                            } else {
-                                                State.ventes[idx] = { ...State.ventes[idx], ...merged };
-                                                changed = true;
-                                            }
-                                        } else if (change.type === 'removed') {
-                                            if (idx !== -1) { State.ventes.splice(idx, 1); changed = true; }
-                                        }
-                                    });
-                                    if (changed) {
-                                        try {
-                                            localStorage.setItem(APP_CONFIG.storageKey, JSON.stringify(Persistence.serialize()));
-                                        } catch(e) {}
-                                        BalanceCalculator.recalculateClient(client.name);
-                                        this.render();
-                                        console.log('✅ Ventes client mises à jour');
-                                    }
-                                }, err => console.warn('⚠️ Ventes listener:', err.message));
-                        } catch(e) {
-                            console.warn('⚠️ startClientVentesListener:', e.message);
-                        }
-                    })();
+                        }, err => console.warn('⚠️ ventes listener:', err.message));
                 } catch(e) { console.error(e); }
             },
             render() {
@@ -2682,7 +2717,7 @@
                 this.renderPayments(payments);
                 this.renderOrders();
             },
-            renderInvoices(invoices, payments) {
+            renderInvoices(invoices) {
                 const container = $('cpInvoicesList');
                 if (!invoices.length) { container.innerHTML = '<div class="cp-empty">📭 Aucune facture</div>'; return; }
                 const sorted = [...invoices].sort((a, b) => a.date < b.date ? 1 : -1);
@@ -2698,8 +2733,8 @@
                     const amountDisplay = isPaymentOnly ? paid : (v.total || 0);
                     return `<div class="cp-row">
                         <div class="cp-row-info">
-                            <div class="name">${v.num}<span class="cp-badge ${badgeClass}">${badge}</span></div>
-                            <div class="meta">${Utils.formatDate(v.date)}</div>
+                            <div class="name">${esc(v.num)}<span class="cp-badge ${badgeClass}">${badge}</span></div>
+                            <div class="meta">${esc(Utils.formatDate(v.date))}</div>
                         </div>
                         <div class="cp-row-amount">
                             ${amountDisplay.toFixed(3)} TND
@@ -2715,8 +2750,8 @@
                 container.innerHTML = sorted.slice(0, 30).map(p => `
                     <div class="cp-row">
                         <div class="cp-row-info">
-                            <div class="name">💳 ${p.regType || 'Espèces'}</div>
-                            <div class="meta">${Utils.formatDate(p.date)} • ${p.invoiceNum || '-'}</div>
+                            <div class="name">💳 ${esc(p.regType || 'Espèces')}</div>
+                            <div class="meta">${esc(Utils.formatDate(p.date))} • ${esc(p.invoiceNum || '-')}</div>
                         </div>
                         <div class="cp-row-amount">
                             <span class="paid">${(p.amount || 0).toFixed(3)} TND</span>
@@ -2733,10 +2768,7 @@
                     .filter(o => o.clientId === client.id || o.clientName === client.name)
                     .sort((a, b) => (b.createdAt || b.date) < (a.createdAt || a.date) ? -1 : 1);
 
-                if (!orders.length) {
-                    c.innerHTML = '<div class="cp-empty">📭 Aucune commande</div>';
-                    return;
-                }
+                if (!orders.length) { c.innerHTML = '<div class="cp-empty">📭 Aucune commande</div>'; return; }
 
                 const statusMap = {
                     pending:  { lbl: '⏳ En attente', cls: 'pending' },
@@ -2749,8 +2781,8 @@
                     const s = statusMap[o.status] || statusMap.pending;
                     return `<div class="cp-row">
                         <div class="cp-row-info">
-                            <div class="name">${o.num}<span class="cp-badge ${s.cls}">${s.lbl}</span></div>
-                            <div class="meta">${Utils.formatDate(o.date)} ${o.time || ''} • ${o.lines.length} article(s)</div>
+                            <div class="name">${esc(o.num)}<span class="cp-badge ${s.cls}">${s.lbl}</span></div>
+                            <div class="meta">${esc(Utils.formatDate(o.date))} ${esc(o.time || '')} • ${o.lines.length} article(s)</div>
                         </div>
                         <div class="cp-row-amount">${o.total.toFixed(3)} TND</div>
                     </div>`;
@@ -2762,7 +2794,7 @@
                 BalanceCalculator.recalculateClient(client.name);
                 const docs = State.ventes.filter(v => v.client === client.name).sort((a, b) => a.date < b.date ? -1 : 1);
                 const pays = State.caisseClients.filter(p => p.clientName === client.name);
-                const pendingOrders = State.orders.filter(o => 
+                const pendingOrders = State.orders.filter(o =>
                     (o.clientId === client.id || o.clientName === client.name) &&
                     (o.status === 'pending' || o.status === 'approved')
                 );
@@ -2784,6 +2816,9 @@
             }
         };
 
+        // ═══════════════════════════════════════════════════
+        // 🏭 createEntityModule — save() async (hash)
+        // ═══════════════════════════════════════════════════
         function createEntityModule(cfg) {
             return {
                 editingId: null, list: cfg.list, prefix: cfg.prefix, _specialPrices: [],
@@ -2802,9 +2837,12 @@
                     });
                     if (cfg.onReset) cfg.onReset.call(this);
                 },
-                save() {
-                    if (cfg.validate && !cfg.validate.call(this)) return;
-                    const data = cfg.collect.call(this);
+                async save() {
+                    if (cfg.validate) {
+                        const ok = await cfg.validate.call(this);
+                        if (!ok) return;
+                    }
+                    const data = await cfg.collect.call(this);
                     if (this.editingId) {
                         const idx = this.list().findIndex(x => x.id === this.editingId);
                         if (idx !== -1) this.list()[idx] = { ...data, id: this.editingId };
@@ -2841,7 +2879,9 @@
                     this.editingId = id;
                     Object.entries(cfg.fields).forEach(([key, elId]) => {
                         const el = $(elId);
-                        if (el) el.value = item[key] !== undefined ? item[key] : '';
+                        if (!el) return;
+                        if (key === 'password') return; // ✅ jamais afficher le hash
+                        el.value = item[key] !== undefined ? item[key] : '';
                     });
                     $(cfg.fields.code).value = cfg.prefix + '-' + String(id).padStart(4, '0');
                     if (cfg.onLoad) cfg.onLoad.call(this, item);
@@ -2850,6 +2890,9 @@
             };
         }
 
+        // ═══════════════════════════════════════════════════
+        // 🏭 createTransactionModule — FIX #5 stock
+        // ═══════════════════════════════════════════════════
         function createTransactionModule(cfg) {
             return {
                 editingId: null, lines: [], reglements: [],
@@ -2888,14 +2931,14 @@
                 refreshPartyOptions() {
                     const s = $(cfg.partySelect);
                     if (s) s.innerHTML = '<option value="">-- Choisir --</option>' +
-                        cfg.partyList().map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+                        cfg.partyList().map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
                 },
                 refreshArticleOptions() {
                     const used = this.lines.map(l => l.name);
                     const avail = State.articles.filter(a => !used.includes(a.name));
                     const s = $(cfg.articleSelect);
                     if (s) s.innerHTML = '<option value="">-- Choisir --</option>' +
-                        avail.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+                        avail.map(a => `<option value="${esc(a.id)}">${esc(a.name)}</option>`).join('');
                 },
                 fillParty() {
                     const p = cfg.partyList().find(x => x.id == $(cfg.partySelect).value);
@@ -2943,17 +2986,23 @@
                     const q = parseFloat($(cfg.qtyInput).value) || 0;
                     $(cfg.totalInput).value = (p * q).toFixed(3);
                 },
+                // ✅ FIX #5 : plus de modification du stock à l'ajout
                 addLine() {
                     const sel = $(cfg.articleSelect);
                     const name = sel.value ? sel.options[sel.selectedIndex].textContent : '';
                     const price = parseFloat($(cfg.priceInput).value) || 0;
                     const qty = parseFloat($(cfg.qtyInput).value) || 0;
                     if (!name || price <= 0 || qty <= 0) { Toast.show('⚠️ Données invalides', 'warning'); return; }
+
                     if (!cfg.isPurchase) {
-                        const c = Stock.check(name, qty);
-                        if (!c.available) Toast.show(`⚠️ Stock insuffisant: ${c.stock}`, 'warning');
+                        const inCart = this.lines.filter(l => l.name === name).reduce((s, l) => s + l.qty, 0);
+                        const c = Stock.check(name, qty + inCart);
+                        if (!c.available) {
+                            Toast.show(`⚠️ Stock insuffisant: ${c.stock}`, 'warning');
+                            return;
+                        }
                     }
-                    Stock.adjust(name, cfg.isPurchase ? qty : -qty, { silent: true, allowNegative: true });
+
                     const existing = this.lines.find(l => l.name === name);
                     if (existing) {
                         existing.qty += qty;
@@ -2971,9 +3020,8 @@
                     if (cfg.paymentOnlyNotice && $(cfg.paymentOnlyNotice)) $(cfg.paymentOnlyNotice).style.display = 'none';
                     Toast.show('✅ Ajouté', 'success');
                 },
+                // ✅ FIX #5 : plus de modification du stock au retrait
                 removeLine(idx) {
-                    const line = this.lines[idx];
-                    Stock.adjust(line.name, cfg.isPurchase ? -line.qty : line.qty, { silent: true, allowNegative: true });
                     this.lines.splice(idx, 1);
                     if (this.editingRowIndex === idx) this.editingRowIndex = null;
                     this.renderLines(); this.refreshArticleOptions();
@@ -2987,8 +3035,11 @@
                     const qty = parseFloat(row.querySelector('.edit-qty').value) || 0;
                     if (price <= 0 || qty <= 0) return;
                     const old = this.lines[idx];
-                    const delta = cfg.isPurchase ? (qty - old.qty) : (old.qty - qty);
-                    Stock.adjust(old.name, delta, { silent: true, allowNegative: true });
+                    if (!cfg.isPurchase) {
+                        const inCartOthers = this.lines.filter((l, i) => i !== idx && l.name === old.name).reduce((s, l) => s + l.qty, 0);
+                        const c = Stock.check(old.name, qty + inCartOthers);
+                        if (!c.available) { Toast.show(`⚠️ Stock insuffisant: ${c.stock}`, 'warning'); return; }
+                    }
                     this.lines[idx] = { ...old, price, qty, total: price * qty };
                     this.editingRowIndex = null;
                     this.renderLines(); this.updateAccountSummary();
@@ -3010,14 +3061,14 @@
                     b.innerHTML = this.lines.map((l, i) => {
                         sum += l.total;
                         if (this.editingRowIndex === i) {
-                            return `<tr><td>${i+1}</td><td class="item-name">${l.name}</td>
+                            return `<tr><td>${i+1}</td><td class="item-name">${esc(l.name)}</td>
                                 <td><input type="number" step="0.001" value="${l.price}" class="edit-input edit-price"></td>
                                 <td><input type="number" min="1" value="${l.qty}" class="edit-input edit-qty"></td>
                                 <td class="item-total">${l.total.toFixed(3)}</td>
                                 <td><button class="btn-action save-edit" onclick="${cfg.name}.saveEditLine(${i})">💾</button>
                                 <button class="btn-action cancel-edit" onclick="${cfg.name}.cancelEdit()">✕</button></td></tr>`;
                         }
-                        return `<tr><td>${i+1}</td><td class="item-name">${l.name}</td>
+                        return `<tr><td>${i+1}</td><td class="item-name">${esc(l.name)}</td>
                             <td>${l.price.toFixed(3)}</td><td>${l.qty}</td>
                             <td class="item-total">${l.total.toFixed(3)}</td>
                             <td><button class="btn-action edit" onclick="${cfg.name}.editLine(${i})">✏️</button>
@@ -3031,7 +3082,7 @@
                     if (!this.reglements.length) { c.innerHTML = '<span style="font-size:10px;color:var(--muted);">Aucun paiement</span>'; return; }
                     c.innerHTML = this.reglements.map((r, i) => `
                         <div class="payment-item">
-                            <span class="method">${r.method || 'Espèces'}</span>
+                            <span class="method">${esc(r.method || 'Espèces')}</span>
                             <span class="amount">${r.amount.toFixed(3)} TND</span>
                             <span class="delete-payment" onclick="${cfg.name}.deleteReglement(${i})">✕</span>
                         </div>`).join('');
@@ -3085,6 +3136,7 @@
                     $(cfg.paidAmount).textContent = paid.toFixed(3);
                     $(cfg.currentBalance).textContent = cur.toFixed(3);
                 },
+                // ✅ FIX #5 : stock modifié UNIQUEMENT dans save()
                 async save() {
                     if (State.isSaving) { Toast.show('⏳ Enregistrement...'); return; }
                     if (this.editingRowIndex !== null) { Toast.show('⚠️ Terminez la modification', 'warning'); return; }
@@ -3108,6 +3160,14 @@
                     const total = this.lines.reduce((a, l) => a + l.total, 0);
                     const isNew = !this.editingId;
                     const id = this.editingId || State.nextId[cfg.table]++;
+
+                    // ✅ FIX #5 : calcul du delta stock AVANT modification
+                    const oldRec = isNew ? null : cfg.list().find(x => x.id === this.editingId);
+                    const oldLines = oldRec?.lines || [];
+                    const stockDeltas = {};
+                    oldLines.forEach(l => { stockDeltas[l.name] = (stockDeltas[l.name] || 0) + l.qty; });
+                    this.lines.forEach(l => { stockDeltas[l.name] = (stockDeltas[l.name] || 0) - l.qty; });
+
                     const rec = {
                         id, num: $(cfg.numField).value, date: $(cfg.dateField).value,
                         [cfg.partyKey]: pn, lines: [...this.lines], total,
@@ -3118,13 +3178,23 @@
                         isPaymentOnly: isPaymentOnly
                     };
                     if (cfg.emailField) rec[cfg.emailField] = party.email || '';
+
                     State.isSaving = true;
+                    const deltasApplied = [];
                     try {
+                        Object.entries(stockDeltas).forEach(([name, delta]) => {
+                            if (delta === 0) return;
+                            const applied = Stock.adjust(name, cfg.isPurchase ? -delta : delta, {
+                                silent: true, allowNegative: true
+                            });
+                            if (applied) deltasApplied.push([name, cfg.isPurchase ? -delta : delta]);
+                        });
+
                         const list = cfg.list();
                         if (isNew) list.push(rec);
                         else {
                             const idx = list.findIndex(x => x.id === this.editingId);
-                            if (idx === -1) return;
+                            if (idx === -1) throw new Error('Not found');
                             list[idx] = rec;
                         }
                         Persistence.save();
@@ -3135,8 +3205,15 @@
                         this.updateAccountSummary();
                         this.isSaved = true;
                         Toast.show(isNew ? '✅ Enregistré' : '✅ Modifié', 'success');
-                    } catch(e) { Toast.show('❌ Erreur', 'error'); }
-                    finally { State.isSaving = false; }
+                    } catch(e) {
+                        deltasApplied.forEach(([name, delta]) => {
+                            Stock.adjust(name, -delta, { silent: true, allowNegative: true });
+                        });
+                        console.error('Save error:', e);
+                        Toast.show('❌ Erreur — stock restauré', 'error');
+                    } finally {
+                        State.isSaving = false;
+                    }
                 },
                 edit() {
                     if (this.editingId == null) { Toast.show('⚠️ Choisissez'); return; }
@@ -3238,6 +3315,9 @@
             };
         }
 
+        // ═══════════════════════════════════════════════════
+        // 📋 Renderers
+        // ═══════════════════════════════════════════════════
         const ClientsRenderer = {
             render() {
                 const q = ($('cSearch')?.value || '').trim().toLowerCase();
@@ -3254,13 +3334,15 @@
                                    State.caisseClients.some(ca => ca.clientName === c.name);
                     const lock = hasAct ? '🔒 ' : '';
                     const mail = c.email ? '📧 ' : '';
-                    const pwd = c.password ? '🔐 ' : '';
+                    const pwd = c.passwordHash ? '🔐 ' : '';
                     const d = document.createElement('div');
                     d.className = 'row-card';
                     d.onclick = () => ClientsModule.load(c.id);
-                    d.innerHTML = `<div><div class="name">${lock}${mail}${pwd}${c.name}</div>
-                        <div class="meta">${c.phone || ''} ${c.email ? '| ' + c.email : ''}</div></div>
-                        <div class="amount">${(c.balance || 0).toFixed(3)} TND</div>`;
+                    d.innerHTML = `<div>
+                        <div class="name">${lock}${mail}${pwd}${esc(c.name)}</div>
+                        <div class="meta">${esc(c.phone || '')} ${c.email ? '| ' + esc(c.email) : ''}</div>
+                      </div>
+                      <div class="amount">${(c.balance || 0).toFixed(3)} TND</div>`;
                     list.appendChild(d);
                 });
             }
@@ -3278,7 +3360,7 @@
                     const d = document.createElement('div');
                     d.className = 'row-card';
                     d.onclick = () => FournisseursModule.load(f.id);
-                    d.innerHTML = `<div><div class="name">${f.name}</div><div class="meta">${f.phone || ''}</div></div>
+                    d.innerHTML = `<div><div class="name">${esc(f.name)}</div><div class="meta">${esc(f.phone || '')}</div></div>
                         <div class="amount">${(f.balance || 0).toFixed(3)} TND</div>`;
                     list.appendChild(d);
                 });
@@ -3303,7 +3385,7 @@
                     const d = document.createElement('div');
                     d.className = 'row-card';
                     d.onclick = () => ArticlesModule.load(a.id);
-                    d.innerHTML = `<div><div class="name">${a.name}</div><div class="meta">Stock: ${st}</div></div>
+                    d.innerHTML = `<div><div class="name">${esc(a.name)}</div><div class="meta">Stock: ${st}</div></div>
                         <div class="amount">${(a.price || 0).toFixed(3)} TND ${badge}</div>`;
                     list.appendChild(d);
                 });
@@ -3331,8 +3413,8 @@
                     const d = document.createElement('div');
                     d.className = 'row-card';
                     d.onclick = () => { VentesModule.load(v.id); };
-                    d.innerHTML = `<div><div class="name">${isPaymentOnly ? '💰 ' : ''}${v.num}</div>
-                        <div class="meta">${v.client} - ${v.date} | ${badge}</div></div>
+                    d.innerHTML = `<div><div class="name">${isPaymentOnly ? '💰 ' : ''}${esc(v.num)}</div>
+                        <div class="meta">${esc(v.client)} - ${esc(v.date)} | ${badge}</div></div>
                         <div class="amount">${amountDisplay} TND</div>`;
                     list.appendChild(d);
                 });
@@ -3352,25 +3434,27 @@
                     const d = document.createElement('div');
                     d.className = 'row-card';
                     d.onclick = () => { AchatsModule.load(a.id); };
-                    d.innerHTML = `<div><div class="name">${isPaymentOnly ? '💰 ' : ''}${a.num}</div>
-                        <div class="meta">${a.supplier} - ${a.date}</div></div>
+                    d.innerHTML = `<div><div class="name">${isPaymentOnly ? '💰 ' : ''}${esc(a.num)}</div>
+                        <div class="meta">${esc(a.supplier)} - ${esc(a.date)}</div></div>
                         <div class="amount">${a.total.toFixed(3)} TND</div>`;
                     list.appendChild(d);
                 });
             }
         };
 
+        // ═══════════════════════════════════════════════════
+        // 👥 ClientsModule — FIX #3 (hash)
+        // ═══════════════════════════════════════════════════
         const ClientsModule = createEntityModule({
             table: 'clients', prefix: 'CL', sheet: 'clients',
             list: () => State.clients,
             fields: {
                 code:'cCode', name:'cName', phone:'cPhone', phone2:'cPhone2',
                 email:'cEmail', address:'cAddress', taxId:'cTaxId',
-                openingBalance:'cOpeningBalance', balance:'cBalance',
-                password:'cPassword'
+                openingBalance:'cOpeningBalance', balance:'cBalance'
             },
             renderer: ClientsRenderer,
-            validate() {
+            async validate() {
                 const name = $('cName').value.trim();
                 const email = $('cEmail').value.trim().toLowerCase();
                 const password = $('cPassword').value.trim();
@@ -3380,26 +3464,38 @@
                     Toast.show('⚠️ Email invalide'); return false;
                 }
                 $('cEmailError').textContent = '';
-                if (!password) {
-                    $('cPasswordError').textContent = '⚠️ Mot de passe requis';
-                    Toast.show('⚠️ Mot de passe requis'); return false;
-                }
-                if (password.length < 4) {
-                    $('cPasswordError').textContent = '⚠️ Min 4 caractères';
-                    Toast.show('⚠️ Min 4 caractères'); return false;
-                }
-                const duplicate = State.clients.find(c =>
-                    c.id !== this.editingId &&
-                    (c.password || '').toLowerCase() === password.toLowerCase()
-                );
-                if (duplicate) {
-                    $('cPasswordError').textContent = `⚠️ Déjà utilisé par "${duplicate.name}"`;
-                    Toast.show(`⚠️ Déjà pris par ${duplicate.name}`); return false;
+                if (!this.editingId) {
+                    if (!password) {
+                        $('cPasswordError').textContent = '⚠️ Mot de passe requis';
+                        Toast.show('⚠️ Mot de passe requis'); return false;
+                    }
+                    if (password.length < 6) {
+                        $('cPasswordError').textContent = '⚠️ Min 6 caractères';
+                        Toast.show('⚠️ Min 6 caractères'); return false;
+                    }
+                    if (email) {
+                        const dupEmail = State.clients.find(c =>
+                            c.id !== this.editingId && (c.email || '').toLowerCase() === email);
+                        if (dupEmail) {
+                            $('cEmailError').textContent = `⚠️ Email déjà utilisé par "${dupEmail.name}"`;
+                            Toast.show(`⚠️ Email déjà pris`); return false;
+                        }
+                    }
                 }
                 $('cPasswordError').textContent = '';
                 return true;
             },
-            collect() {
+            async collect() {
+                const plainPwd = $('cPassword').value.trim();
+                let passwordHash, salt;
+                if (plainPwd) {
+                    salt = Utils.generateSalt();
+                    passwordHash = await Utils.hashPassword(plainPwd, salt);
+                } else if (this.editingId) {
+                    const existing = State.clients.find(c => c.id === this.editingId);
+                    passwordHash = existing?.passwordHash;
+                    salt = existing?.passwordSalt;
+                }
                 return {
                     name: $('cName').value.trim(),
                     phone: $('cPhone').value, phone2: $('cPhone2').value,
@@ -3407,7 +3503,7 @@
                     address: $('cAddress').value, taxId: $('cTaxId').value,
                     openingBalance: parseFloat($('cOpeningBalance').value) || 0,
                     balance: parseFloat($('cBalance').value) || 0,
-                    password: $('cPassword').value.trim(),
+                    passwordHash, passwordSalt: salt,
                     specialPrices: [...this._specialPrices]
                 };
             },
@@ -3424,6 +3520,7 @@
                 this.refreshSpArticleOptions();
                 this.updateSummary();
                 if ($('cPasswordError')) $('cPasswordError').textContent = '';
+                if ($('cPassword')) $('cPassword').value = '';
             },
             onLoad(c) {
                 this._specialPrices = c.specialPrices ? [...c.specialPrices] : [];
@@ -3431,6 +3528,7 @@
                 this.refreshSpArticleOptions();
                 this.updateSummary();
                 if ($('cPasswordError')) $('cPasswordError').textContent = '';
+                if ($('cPassword')) $('cPassword').value = '';
             },
             onSave(data) { BalanceCalculator.recalculateClient(data.name); }
         });
@@ -3445,12 +3543,8 @@
             },
             generatePassword() {
                 const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-                let pwd = '', attempts = 0;
-                do {
-                    pwd = '';
-                    for (let i = 0; i < 6; i++) pwd += chars.charAt(Math.floor(Math.random() * chars.length));
-                    attempts++;
-                } while (State.clients.some(c => c.password === pwd) && attempts < 100);
+                let pwd = '';
+                for (let i = 0; i < 8; i++) pwd += chars.charAt(Math.floor(Math.random() * chars.length));
                 $('cPassword').value = pwd;
                 $('cPasswordError').textContent = '';
                 Toast.show(`🎲 Mot de passe: ${pwd}`, 'success');
@@ -3464,7 +3558,7 @@
                 }
                 c.innerHTML = this._specialPrices.map((sp, i) => `
                     <div class="special-price-item">
-                        <span class="sp-article">${sp.name}</span>
+                        <span class="sp-article">${esc(sp.name)}</span>
                         <span class="sp-price">${sp.price.toFixed(3)} TND</span>
                         <span class="sp-del" onclick="ClientsModule.removeSpecialPrice(${i})">✕</span>
                     </div>`).join('');
@@ -3475,7 +3569,7 @@
                 const existing = this._specialPrices.map(sp => sp.name);
                 const avail = State.articles.filter(a => !existing.includes(a.name));
                 sel.innerHTML = '<option value="">-- Choisir --</option>' +
-                    avail.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+                    avail.map(a => `<option value="${esc(a.id)}">${esc(a.name)}</option>`).join('');
             },
             addSpecialPrice() {
                 const sel = $('spArticleSelect');
@@ -3645,12 +3739,17 @@
             renderer: AchatsRenderer
         });
 
+        // ═══════════════════════════════════════════════════
+        // 🛒 Orders
+        // ═══════════════════════════════════════════════════
         const Orders = {
             filter: 'pending',
             _unsubscribe: null,
             startRealtimeListener() {
                 if (typeof firebase === 'undefined') return;
                 if (this._unsubscribe) this._unsubscribe();
+                const fbUser = firebase.auth().currentUser;
+                if (!fbUser) { console.warn('⚠️ Pas de session pour listener orders'); return; }
                 try {
                     this._unsubscribe = firebase.firestore().collection('orders')
                         .orderBy('createdAt', 'desc')
@@ -3660,8 +3759,8 @@
                             snapshot.docChanges().forEach(change => {
                                 const data = change.doc.data();
                                 const cloudId = change.doc.id;
-                                const existingIdx = State.orders.findIndex(o => 
-                                    o.cloudId === cloudId || 
+                                const existingIdx = State.orders.findIndex(o =>
+                                    o.cloudId === cloudId ||
                                     (o.num === data.num && o.clientName === data.clientName)
                                 );
                                 if (change.type === 'added' || change.type === 'modified') {
@@ -3678,8 +3777,8 @@
                                         State.orders[existingIdx] = { ...State.orders[existingIdx], ...merged };
                                         changed = true;
                                     }
-                                } else if (change.type === 'removed') {
-                                    if (existingIdx !== -1) { State.orders.splice(existingIdx, 1); changed = true; }
+                                } else if (change.type === 'removed' && existingIdx !== -1) {
+                                    State.orders.splice(existingIdx, 1); changed = true;
                                 }
                             });
                             if (changed) {
@@ -3693,30 +3792,25 @@
                 if (this._unsubscribe) { this._unsubscribe(); this._unsubscribe = null; }
             },
             async updateCloudStatus(order, newStatus) {
-                if (typeof firebase === 'undefined' || !order.cloudId) {
-                    console.warn('⚠️ updateCloudStatus: pas de cloudId ou Firebase non disponible');
-                    return;
-                }
+                if (typeof firebase === 'undefined' || !order.cloudId) return;
                 try {
-                    console.log(`📤 Mise à jour cloud: ${order.num} → ${newStatus}`);
                     await firebase.firestore().collection('orders').doc(order.cloudId).update({
                         status: newStatus,
                         updatedAt: new Date().toISOString()
                     });
-                    console.log(`✅ Cloud mis à jour: ${order.num}`);
                 } catch(e) {
                     console.error('❌ Update cloud error:', e.message);
                     Toast.show('⚠️ Erreur sync cloud', 'warning');
                 }
             },
-            get(id) { 
-                return State.orders.find(o => o.id === id || o.cloudId === id); 
+            get(id) {
+                return State.orders.find(o => o.id === id || o.cloudId === id);
             },
             render() {
                 const list = $('ordersList');
                 if (!list) return;
                 const q = ($('ordersSearch')?.value || '').trim().toLowerCase();
-                let filtered = [...State.orders].sort((a, b) => 
+                let filtered = [...State.orders].sort((a, b) =>
                     (b.createdAt || b.date) < (a.createdAt || a.date) ? -1 : 1
                 );
                 if (this.filter !== 'all') filtered = filtered.filter(o => o.status === this.filter);
@@ -3735,9 +3829,9 @@
                 list.innerHTML = filtered.map(o => {
                     const s = statusMap[o.status] || statusMap.pending;
                     const orderKey = o.cloudId || o.id;
-                    const keyStr = String(orderKey).replace(/'/g, "\\'");
+                    const keyStr = Utils.escapeAttr(orderKey);
                     const linesPreview = o.lines.slice(0, 3).map(l =>
-                        `<div style="font-size:9px;color:var(--muted);">• ${l.name} × ${l.qty} = ${l.total.toFixed(3)} TND</div>`
+                        `<div style="font-size:9px;color:var(--muted);">• ${esc(l.name)} × ${Number(l.qty)||0} = ${(Number(l.total)||0).toFixed(3)} TND</div>`
                     ).join('');
                     const more = o.lines.length > 3 ? `<div style="font-size:8px;color:var(--muted);">... +${o.lines.length - 3}</div>` : '';
                     const stockBadge = o.stockDecremented ? '<span style="font-size:8px;background:#d4f4dd;color:#27ae60;padding:1px 6px;border-radius:8px;margin-left:4px;">📦 Stock -</span>' : '';
@@ -3745,15 +3839,15 @@
                     <div class="row-card" style="flex-direction:column;align-items:stretch;cursor:default;">
                         <div style="display:flex;justify-content:space-between;align-items:center;">
                             <div>
-                                <div class="name">${o.num} <span class="cp-badge ${s.cls}" style="margin-left:4px;">${s.lbl}</span>${stockBadge}</div>
-                                <div class="meta">👤 ${o.clientName} • 📅 ${Utils.formatDate(o.date)} ${o.time || ''}</div>
+                                <div class="name">${esc(o.num)} <span class="cp-badge ${s.cls}" style="margin-left:4px;">${s.lbl}</span>${stockBadge}</div>
+                                <div class="meta">👤 ${esc(o.clientName)} • 📅 ${esc(Utils.formatDate(o.date))} ${esc(o.time || '')}</div>
                             </div>
-                            <div class="amount" style="font-size:13px;">${o.total.toFixed(3)} TND</div>
+                            <div class="amount" style="font-size:13px;">${(Number(o.total)||0).toFixed(3)} TND</div>
                         </div>
                         <div style="margin-top:6px;padding:6px;background:var(--bg);border-radius:8px;">
                             ${linesPreview}${more}
                         </div>
-                        ${o.note ? `<div style="font-size:9px;color:var(--muted);margin-top:4px;">📝 ${o.note}</div>` : ''}
+                        ${o.note ? `<div style="font-size:9px;color:var(--muted);margin-top:4px;">📝 ${esc(o.note)}</div>` : ''}
                         <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">
                             ${o.status === 'pending' ? `
                                 <button class="btn save small" style="flex:1;padding:4px;font-size:9px;" onclick="Orders.approve('${keyStr}')">✅ Accepter</button>
@@ -3771,79 +3865,63 @@
             approve(id) {
                 const o = this.get(id);
                 if (!o) { Toast.show('❌ Commande introuvable', 'error'); return; }
-                
                 if (!o.stockDecremented) {
                     const warnings = [];
                     o.lines.forEach(line => {
                         const article = State.articles.find(a => a.name === line.name);
-                        if (!article) {
-                            warnings.push(`"${line.name}" introuvable`);
-                            return;
-                        }
-                        if ((article.stock || 0) < line.qty) {
-                            warnings.push(`"${line.name}": stock ${article.stock || 0} < ${line.qty}`);
-                        }
+                        if (!article) { warnings.push(`"${line.name}" introuvable`); return; }
+                        if ((article.stock || 0) < line.qty) warnings.push(`"${line.name}": stock ${article.stock || 0} < ${line.qty}`);
                         Stock.adjust(line.name, -line.qty, { silent: true, allowNegative: true });
                     });
                     o.stockDecremented = true;
                     o.stockDecrementedAt = new Date().toISOString();
-                    
-                    if (warnings.length) {
-                        Toast.show(`⚠️ Stock insuffisant: ${warnings.length} article(s)`, 'warning');
-                        console.warn('Stock warnings:', warnings);
-                    }
+                    if (warnings.length) Toast.show(`⚠️ Stock: ${warnings.length} article(s)`, 'warning');
                 }
-                
                 o.status = 'approved';
                 o.approvedAt = new Date().toISOString();
                 Persistence.save();
                 this.updateCloudStatus(o, 'approved');
                 this.render();
-                Toast.show('✅ Commande acceptée (stock mis à jour)', 'success');
+                Toast.show('✅ Commande acceptée', 'success');
                 NotificationSystem.add('Commande acceptée', `${o.num} — ${o.clientName}`, 'SUCCESS');
             },
             reject(id) {
                 const o = this.get(id);
-                if (!o) { Toast.show('❌ Commande introuvable', 'error'); return; }
-                
+                if (!o) return;
                 if (o.stockDecremented) {
                     o.lines.forEach(line => {
                         Stock.adjust(line.name, line.qty, { silent: true, allowNegative: true });
                     });
                     o.stockDecremented = false;
-                    o.stockRestoredAt = new Date().toISOString();
                 }
-                
                 o.status = 'rejected';
                 o.rejectedAt = new Date().toISOString();
                 Persistence.save();
                 this.updateCloudStatus(o, 'rejected');
                 this.render();
-                Toast.show('❌ Commande refusée (stock restauré)');
+                Toast.show('❌ Commande refusée');
             },
             async remove(id) {
                 const o = this.get(id);
                 if (!o) return;
                 const ok = await CustomConfirm.show(`Supprimer la commande ${o.num} ?`);
                 if (!ok) return;
-                
                 if (o.stockDecremented) {
                     o.lines.forEach(line => {
                         Stock.adjust(line.name, line.qty, { silent: true, allowNegative: true });
                     });
                 }
-                
                 if (typeof firebase !== 'undefined' && o.cloudId) {
                     try { await firebase.firestore().collection('orders').doc(o.cloudId).delete(); } catch(e) {}
                 }
-                const idx = State.orders.findIndex(x => 
-                    (x.cloudId && x.cloudId === o.cloudId) || 
+                const idx = State.orders.findIndex(x =>
+                    (x.cloudId && x.cloudId === o.cloudId) ||
                     (!x.cloudId && x.id === o.id)
                 );
                 if (idx !== -1) State.orders.splice(idx, 1);
                 Persistence.save();
                 this.render();
-                Toast.show('🗑️ Supprimée (stock restauré)');
+                Toast.show('🗑️ Supprimée');
             },
             callClient(id) {
                 const o = this.get(id);
@@ -3854,31 +3932,55 @@
             convertToSale(id) {
                 const o = this.get(id);
                 if (!o) return;
+                if (VentesModule.editingId || VentesModule.lines.length) {
+                    CustomConfirm.show('⚠️ Facture en cours non enregistrée. Continuer ?').then(ok => {
+                        if (ok) this._doConvert(o);
+                    });
+                } else {
+                    this._doConvert(o);
+                }
+            },
+            _doConvert(o) {
                 VentesModule.reset();
                 App.openSheet('ventes');
-                const client = State.clients.find(c => c.id === o.clientId);
-                if (client) {
-                    const sel = $('vClient');
-                    const opt = [...sel.options].find(x => x.textContent === client.name);
-                    if (opt) { sel.value = opt.value; VentesModule.fillParty(); }
+
+                if (o.clientId) {
+                    const client = State.clients.find(c => c.id === o.clientId);
+                    if (client) {
+                        VentesModule.refreshPartyOptions();
+                        const sel = $('vClient');
+                        const opt = [...sel.options].find(x => x.textContent === client.name);
+                        if (opt) {
+                            sel.value = opt.value;
+                            VentesModule.fillParty();
+                        }
+                    }
                 }
-                setTimeout(() => {
-                    o.lines.forEach(l => {
-                        VentesModule.lines.push({ name: l.name, price: l.price, qty: l.qty, total: l.total });
-                    });
-                    VentesModule.renderLines();
-                    VentesModule.refreshArticleOptions();
-                    VentesModule.updateAccountSummary();
-                    VentesModule._stockAlreadyDecremented = true;
-                    o.status = 'delivered';
-                    o.deliveredAt = new Date().toISOString();
-                    Persistence.save();
-                    this.updateCloudStatus(o, 'delivered');
-                    Toast.show('📄 Commande chargée dans la facture (stock déjà mis à jour)', 'success');
-                }, 400);
+
+                o.lines.forEach(l => {
+                    const existing = VentesModule.lines.find(x => x.name === l.name);
+                    if (existing) { existing.qty += l.qty; existing.total = existing.price * existing.qty; }
+                    else VentesModule.lines.push({ name: l.name, price: l.price, qty: l.qty, total: l.total });
+                });
+                VentesModule.renderLines();
+                VentesModule.refreshArticleOptions();
+                VentesModule.updateAccountSummary();
+                VentesModule._skipStockAdjust = true;
+
+                o.status = 'delivered';
+                o.deliveredAt = new Date().toISOString();
+                Persistence.save();
+                this.updateCloudStatus(o, 'delivered');
+                Toast.show('📄 Commande chargée (stock déjà mis à jour)', 'success');
             }
         };
 
+        // ═══════════════════════════════════════════════════
+        // ⏭️ Suite dans le PARTIE 4 :
+        //    const Expenses = { ... }
+        // ═══════════════════════════════════════════════════        // ═══════════════════════════════════════════════════
+        // 💸 Expenses
+        // ═══════════════════════════════════════════════════
         const Expenses = {
             editingId: null,
             reset() {
@@ -3950,14 +4052,17 @@
                     d.className = 'row-card';
                     d.onclick = () => this.load(e.id);
                     const code = e.code || 'EXP-' + String(e.id).padStart(4, '0');
-                    d.innerHTML = `<div><div class="name">${code} - ${e.category}</div>
-                        <div class="meta">${e.date}${e.description !== '-' ? ' - ' + e.description : ''}</div></div>
+                    d.innerHTML = `<div><div class="name">${esc(code)} - ${esc(e.category)}</div>
+                        <div class="meta">${esc(e.date)}${e.description !== '-' ? ' - ' + esc(e.description) : ''}</div></div>
                         <div class="amount" style="color:var(--danger);">-${e.amount.toFixed(3)} TND</div>`;
                     list.appendChild(d);
                 });
             }
         };
 
+        // ═══════════════════════════════════════════════════
+        // 📜 createHistoryModule
+        // ═══════════════════════════════════════════════════
         function createHistoryModule(cfg) {
             return {
                 currentId: null,
@@ -3974,7 +4079,7 @@
                         <div class="field"><label>Choisir</label>
                             <select id="${cfg.prefix}Select" onchange="${cfg.name}.show()">
                                 <option value="">-- Choisir --</option>
-                                ${cfg.list().map(x => `<option value="${x.id}">${x.name}</option>`).join('')}
+                                ${cfg.list().map(x => `<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('')}
                             </select>
                         </div>
                         <div id="${cfg.prefix}Result"></div>
@@ -4034,13 +4139,12 @@
                     if (!inv) { Toast.show('❌ Facture introuvable', 'error'); return; }
                     const module = cfg.invoiceModule();
                     if (!module || !module.load) { Toast.show('⚠️ Non disponible', 'warning'); return; }
-                    Toast.show(`📄 ${num}`, 'info');
                     module.load(inv.id);
                 },
                 buildSummaryCard(e, ti, tp, tpay, cb) {
                     return `<div class="client-summary-card"><div class="grid">
-                        <div><span class="label">👤 ${cfg.entityLabel}:</span><span class="value">${e.name}</span></div>
-                        <div><span class="label">📞 Tél:</span><span class="value">${e.phone || '-'}</span></div>
+                        <div><span class="label">👤 ${esc(cfg.entityLabel)}:</span><span class="value">${esc(e.name)}</span></div>
+                        <div><span class="label">📞 Tél:</span><span class="value">${esc(e.phone || '-')}</span></div>
                         <div><span class="label">📄 Nb factures:</span><span class="value">${ti}</span></div>
                         <div><span class="label">💰 Total:</span><span class="value positive">${Utils.formatNum(tp)} TND</span></div>
                         <div><span class="label">💳 Règlements:</span><span class="value">${Utils.formatNum(tpay)} TND</span></div>
@@ -4054,9 +4158,10 @@
                     </div>`;
                 },
                 buildActions(e) {
+                    const safeName = Utils.escapeAttr(e.name);
                     return `<div style="display:flex;gap:6px;margin:6px 0;flex-wrap:wrap;">
                         <button class="btn print small" onclick="printStatement('${cfg.statementType}', ${e.id})" style="flex:1;padding:6px;font-size:10px;">🖨️ Imprimer</button>
-                        <button class="btn save small" onclick="BalanceCalculator.recalculate('${cfg.balanceType}', '${e.name}'); ${cfg.name}.show();" style="flex:1;padding:6px;font-size:10px;">🔄 Actualiser</button>
+                        <button class="btn save small" onclick="BalanceCalculator.recalculate('${cfg.balanceType}', '${safeName}'); ${cfg.name}.show();" style="flex:1;padding:6px;font-size:10px;">🔄 Actualiser</button>
                     </div>`;
                 },
                 buildInvoicesTable(docs, payments) {
@@ -4074,12 +4179,13 @@
                             else if (rem > d.total * 0.9) { st = '⏳ Non payée'; sc = 'var(--danger)'; }
                             else if (rem > 0.001) { st = '🔄 Partielle'; sc = 'var(--warning)'; }
                             else { st = '✅ Payée'; sc = 'var(--success)'; }
+                            const safeNum = Utils.escapeAttr(d.num);
                             rows += `<tr>
                                 <td style="text-align:left;padding-left:8px;">
-                                    <span class="invoice-num-link" onclick="${cfg.name}.openInvoice('${d.num}')">${d.num}</span>
-                                    <button class="btn-invoice-view" onclick="${cfg.name}.openInvoice('${d.num}')">📄</button>
+                                    <span class="invoice-num-link" onclick="${cfg.name}.openInvoice('${safeNum}')">${esc(d.num)}</span>
+                                    <button class="btn-invoice-view" onclick="${cfg.name}.openInvoice('${safeNum}')">📄</button>
                                 </td>
-                                <td>${Utils.formatDate(d.date)}</td>
+                                <td>${esc(Utils.formatDate(d.date))}</td>
                                 <td>${Utils.formatNum(d.total)}</td>
                                 <td style="color:var(--success);">${Utils.formatNum(paid)}</td>
                                 <td style="color:${rem > 0.001 ? 'var(--danger)' : 'var(--success)'};">${Utils.formatNum(rem)}</td>
@@ -4099,24 +4205,22 @@
                     let rows = movements.map(m => {
                         const isInvoice = m.doc && m.doc !== 'Ouverture' && m.doc !== '' &&
                                          (m.doc.startsWith('VTE-') || m.doc.startsWith('ACH-'));
-                        const docCell = isInvoice 
+                        const safeDoc = Utils.escapeAttr(m.doc || '');
+                        const docCell = isInvoice
                             ? `<td style="font-weight:700;">
-                                   <span class="invoice-num-link" onclick="${cfg.name}.openInvoice('${m.doc}')">${m.doc}</span>
-                                   <button class="btn-invoice-view" onclick="${cfg.name}.openInvoice('${m.doc}')">📄</button>
+                                   <span class="invoice-num-link" onclick="${cfg.name}.openInvoice('${safeDoc}')">${esc(m.doc)}</span>
+                                   <button class="btn-invoice-view" onclick="${cfg.name}.openInvoice('${safeDoc}')">📄</button>
                                </td>`
-                            : `<td style="font-weight:700;">${m.doc || '-'}</td>`;
+                            : `<td style="font-weight:700;">${esc(m.doc || '-')}</td>`;
                         return `<tr>
-                            <td>${m.date}</td>${docCell}
-                            <td>${m.description}</td>
+                            <td>${esc(m.date)}</td>${docCell}
+                            <td>${esc(m.description)}</td>
                             <td style="text-align:right;">${(m.debit || 0).toFixed(3)}</td>
                             <td style="color:var(--success);text-align:right;">${(m.credit || 0).toFixed(3)}</td>
                             <td style="font-weight:800;text-align:right;">${m.balance.toFixed(3)}</td>
                         </tr>`;
                     }).join('');
                     return `<div class="section-title" style="margin-top:10px;">📊 Détail des mouvements</div>
-                        <div style="text-align:center;font-size:9px;color:var(--muted);margin-bottom:4px;">
-                            💡 Cliquez sur 📄 pour voir la facture
-                        </div>
                         <div class="history-table-wrapper"><table class="history-table" style="min-width:650px;">
                             <thead><tr><th>Date</th><th>N°</th><th>Libellé</th><th>Débit</th><th>Crédit</th><th>Solde</th></tr></thead>
                             <tbody>${rows}</tbody></table></div>`;
@@ -4154,6 +4258,9 @@
             list:() => State.fournisseurs, docs:() => State.achats, caisse:() => State.caisseFournisseurs
         });
 
+        // ═══════════════════════════════════════════════════
+        // 📜 ArticleHistory
+        // ═══════════════════════════════════════════════════
         const ArticleHistory = {
             render() {
                 const container = $('articleHistoryContent');
@@ -4166,7 +4273,7 @@
                     <div class="field"><label>Choisir</label>
                         <select id="articleHistorySelect" onchange="ArticleHistory.show()">
                             <option value="">-- Choisir --</option>
-                            ${State.articles.map(a => `<option value="${a.id}">${a.name}</option>`).join('')}
+                            ${State.articles.map(a => `<option value="${esc(a.id)}">${esc(a.name)}</option>`).join('')}
                         </select>
                     </div>
                     <div id="articleHistoryResult"></div>
@@ -4202,7 +4309,7 @@
                 movements.sort((a, b) => a.date < b.date ? -1 : 1);
                 const stockDepart = article.stockDepart !== undefined ? article.stockDepart : (article.stock || 0);
                 let html = `<div class="client-summary-card"><div class="grid">
-                    <div><span class="label">📦 Article:</span><span class="value">${article.name}</span></div>
+                    <div><span class="label">📦 Article:</span><span class="value">${esc(article.name)}</span></div>
                     <div><span class="label">📊 Stock:</span><span class="value">${article.stock || 0}</span></div>
                 </div></div>
                 <div style="display:flex;gap:6px;margin:6px 0;">
@@ -4222,15 +4329,16 @@
                         const qd = m.qty > 0 ? '+' + m.qty : m.qty;
                         const color = m.qty > 0 ? 'var(--success)' : 'var(--danger)';
                         const isInvoice = m.doc && (m.doc.startsWith('VTE-') || m.doc.startsWith('ACH-'));
-                        const docCell = isInvoice 
+                        const safeDoc = Utils.escapeAttr(m.doc);
+                        const docCell = isInvoice
                             ? `<td style="font-weight:700;">
-                                   <span class="invoice-num-link" onclick="ArticleHistory.openInvoice('${m.doc}', '${m.type}')">${m.doc}</span>
-                                   <button class="btn-invoice-view" onclick="ArticleHistory.openInvoice('${m.doc}', '${m.type}')">📄</button>
+                                   <span class="invoice-num-link" onclick="ArticleHistory.openInvoice('${safeDoc}', '${m.type}')">${esc(m.doc)}</span>
+                                   <button class="btn-invoice-view" onclick="ArticleHistory.openInvoice('${safeDoc}', '${m.type}')">📄</button>
                                </td>`
-                            : `<td style="font-weight:700;">${m.doc}</td>`;
+                            : `<td style="font-weight:700;">${esc(m.doc)}</td>`;
                         html += `<tr>
-                            <td>${Utils.formatDate(m.date)}</td>${docCell}
-                            <td>${tl}</td><td>${m.party}</td>
+                            <td>${esc(Utils.formatDate(m.date))}</td>${docCell}
+                            <td>${tl}</td><td>${esc(m.party)}</td>
                             <td style="color:${color};font-weight:700;">${qd}</td>
                             <td>${Utils.formatNum(m.price)}</td>
                             <td>${Utils.formatNum(m.total)}</td>
@@ -4247,11 +4355,13 @@
                 const inv = list.find(d => d.num === num);
                 if (!inv) { Toast.show('❌ Introuvable', 'error'); return; }
                 const module = type === 'vente' ? VentesModule : AchatsModule;
-                Toast.show(`📄 ${num}`, 'info');
                 module.load(inv.id);
             }
         };
 
+        // ═══════════════════════════════════════════════════
+        // 📜 CaisseHistory
+        // ═══════════════════════════════════════════════════
         const CaisseHistory = {
             render() {
                 const container = $('caisseHistoryContent');
@@ -4320,17 +4430,18 @@
                     movements.forEach(m => {
                         const isIn = m.direction === 'in';
                         const color = isIn ? 'var(--success)' : 'var(--danger)';
-                        const isInvoice = m.invoiceNum && m.invoiceNum !== '-' && 
+                        const isInvoice = m.invoiceNum && m.invoiceNum !== '-' &&
                                          (m.invoiceNum.startsWith('VTE-') || m.invoiceNum.startsWith('ACH-'));
-                        const docCell = isInvoice 
+                        const safeNum = Utils.escapeAttr(m.invoiceNum);
+                        const docCell = isInvoice
                             ? `<td>
-                                   <span class="invoice-num-link" onclick="CaisseHistory.openInvoice('${m.invoiceNum}', '${m.type}')">${m.invoiceNum}</span>
-                                   <button class="btn-invoice-view" onclick="CaisseHistory.openInvoice('${m.invoiceNum}', '${m.type}')">📄</button>
+                                   <span class="invoice-num-link" onclick="CaisseHistory.openInvoice('${safeNum}', '${m.type}')">${esc(m.invoiceNum)}</span>
+                                   <button class="btn-invoice-view" onclick="CaisseHistory.openInvoice('${safeNum}', '${m.type}')">📄</button>
                                </td>`
-                            : `<td>${m.invoiceNum}</td>`;
+                            : `<td>${esc(m.invoiceNum)}</td>`;
                         html += `<tr>
-                            <td>${m.date}</td><td>${m.type === 'client' ? 'Client' : 'Fourn.'}</td>
-                            <td>${m.party}</td>${docCell}<td>${m.method}</td>
+                            <td>${esc(m.date)}</td><td>${m.type === 'client' ? 'Client' : 'Fourn.'}</td>
+                            <td>${esc(m.party)}</td>${docCell}<td>${esc(m.method)}</td>
                             <td style="font-weight:700;color:${color};">${m.amount.toFixed(3)}</td>
                             <td style="color:${color};">${isIn ? '⬆️' : '⬇️'}</td>
                         </tr>`;
@@ -4345,7 +4456,6 @@
                 const inv = list.find(d => d.num === num);
                 if (!inv) { Toast.show('❌ Introuvable', 'error'); return; }
                 const module = type === 'client' ? VentesModule : AchatsModule;
-                Toast.show(`📄 ${num}`, 'info');
                 module.load(inv.id);
             },
             printReport() {
@@ -4357,8 +4467,8 @@
                     const isIn = m.direction === 'in';
                     const color = isIn ? '#27ae60' : '#c0392b';
                     return `<tr>
-                        <td>${m.date}</td><td>${m.type === 'client' ? 'Client' : 'Fournisseur'}</td>
-                        <td>${m.party}</td><td>${m.invoiceNum}</td><td>${m.method}</td>
+                        <td>${esc(m.date)}</td><td>${m.type === 'client' ? 'Client' : 'Fournisseur'}</td>
+                        <td>${esc(m.party)}</td><td>${esc(m.invoiceNum)}</td><td>${esc(m.method)}</td>
                         <td style="color:${color};">${m.amount.toFixed(3)}</td>
                         <td style="color:${color};">${isIn ? 'Entrée' : 'Sortie'}</td>
                     </tr>`;
@@ -4378,6 +4488,9 @@
             }
         };
 
+        // ═══════════════════════════════════════════════════
+        // 💰 FinanceJour
+        // ═══════════════════════════════════════════════════
         const FinanceJour = {
             data: {},
             init() {
@@ -4445,17 +4558,18 @@
                 tb.innerHTML = d.movements.map(m => {
                     const isIn = m.direction === 'in';
                     const color = isIn ? '#2ecc71' : '#e74c5e';
-                    const isInvoice = m.invoice && m.invoice !== '-' && 
+                    const isInvoice = m.invoice && m.invoice !== '-' &&
                                      (m.invoice.startsWith('VTE-') || m.invoice.startsWith('ACH-'));
-                    const docCell = isInvoice 
+                    const safeNum = Utils.escapeAttr(m.invoice);
+                    const docCell = isInvoice
                         ? `<td>
-                               <span class="invoice-num-link" onclick="FinanceJour.openInvoice('${m.invoice}')">${m.invoice}</span>
-                               <button class="btn-invoice-view" onclick="FinanceJour.openInvoice('${m.invoice}')">📄</button>
+                               <span class="invoice-num-link" onclick="FinanceJour.openInvoice('${safeNum}')">${esc(m.invoice)}</span>
+                               <button class="btn-invoice-view" onclick="FinanceJour.openInvoice('${safeNum}')">📄</button>
                            </td>`
-                        : `<td style="font-weight:700;">${m.invoice}</td>`;
+                        : `<td style="font-weight:700;">${esc(m.invoice)}</td>`;
                     return `<tr>
-                        <td>${m.type}</td><td>${m.party}</td>${docCell}
-                        <td>${m.description}</td>
+                        <td>${esc(m.type)}</td><td>${esc(m.party)}</td>${docCell}
+                        <td>${esc(m.description)}</td>
                         <td style="font-weight:700;color:${color};">${m.amount.toFixed(3)}</td>
                         <td style="color:${color};">${isIn ? '⬆️' : '⬇️'}</td>
                     </tr>`;
@@ -4464,9 +4578,9 @@
             openInvoice(num) {
                 if (!num) return;
                 const vente = State.ventes.find(d => d.num === num);
-                if (vente) { Toast.show(`📄 ${num}`, 'info'); VentesModule.load(vente.id); return; }
+                if (vente) { VentesModule.load(vente.id); return; }
                 const achat = State.achats.find(d => d.num === num);
-                if (achat) { Toast.show(`📄 ${num}`, 'info'); AchatsModule.load(achat.id); return; }
+                if (achat) { AchatsModule.load(achat.id); return; }
                 Toast.show('❌ Introuvable', 'error');
             },
             printReport() {
@@ -4475,8 +4589,8 @@
                     const isIn = m.direction === 'in';
                     const color = isIn ? '#2ecc71' : '#e74c5e';
                     return `<tr>
-                        <td>${m.type}</td><td>${m.party}</td><td>${m.invoice}</td>
-                        <td>${m.description}</td>
+                        <td>${esc(m.type)}</td><td>${esc(m.party)}</td><td>${esc(m.invoice)}</td>
+                        <td>${esc(m.description)}</td>
                         <td style="color:${color};">${m.amount.toFixed(3)}</td>
                         <td style="color:${color};">${isIn ? 'Entrée' : 'Sortie'}</td>
                     </tr>`;
@@ -4499,6 +4613,9 @@
             }
         };
 
+        // ═══════════════════════════════════════════════════
+        // 📈 Marges
+        // ═══════════════════════════════════════════════════
         const Marges = {
             init() {
                 if ($('margeDateFrom')) $('margeDateFrom').value = Utils.monthStart();
@@ -4520,9 +4637,9 @@
                     });
                     tv += v.total; tm += m;
                     rows += `<tr>
-                        <td>${v.client}</td><td>${v.date}</td>
+                        <td>${esc(v.client)}</td><td>${esc(v.date)}</td>
                         <td style="text-align:left;padding-left:8px;">
-                            <span class="invoice-num-link" onclick="VentesModule.load(${v.id})">${v.num}</span>
+                            <span class="invoice-num-link" onclick="VentesModule.load(${v.id})">${esc(v.num)}</span>
                             <button class="btn-invoice-view" onclick="VentesModule.load(${v.id})">📄</button>
                         </td>
                         <td style="font-weight:700;color:${m >= 0 ? 'var(--success)' : 'var(--danger)'};">${m.toFixed(3)}</td>
@@ -4552,7 +4669,7 @@
                 let csv = 'Client,Date,N° facture,Bénéfice (TND)\n';
                 rows.forEach(r => {
                     const c = r.querySelectorAll('td');
-                    csv += `${c[0].textContent},${c[1].textContent},${c[2].textContent},${c[3].textContent}\n`;
+                    csv += `"${c[0].textContent}","${c[1].textContent}","${c[2].textContent}","${c[3].textContent}"\n`;
                 });
                 const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
                 const url = URL.createObjectURL(blob);
@@ -4564,6 +4681,9 @@
             }
         };
 
+        // ═══════════════════════════════════════════════════
+        // 📊 AdvancedReports
+        // ═══════════════════════════════════════════════════
         const AdvancedReports = {
             generateReport() {
                 const type = $('reportType')?.value || 'sales';
@@ -4673,7 +4793,7 @@
                 if (!th || !tb) return;
                 const te = document.querySelector('#sec-reports .section-title');
                 if (te) te.textContent = `📊 ${title}`;
-                th.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+                th.innerHTML = `<tr>${headers.map(h => `<th>${esc(h)}</th>`).join('')}</tr>`;
                 if (!data.length) {
                     tb.innerHTML = `<tr><td colspan="${headers.length}" style="text-align:center;padding:20px;color:#999;">Aucune donnée</td></tr>`;
                     return;
@@ -4683,12 +4803,13 @@
                     return `<tr>${vals.map((v, idx) => {
                         if (typeof v === 'number') return `<td style="text-align:right;">${v.toFixed(3)}</td>`;
                         if (idx === 2 && typeof v === 'string' && (v.startsWith('VTE-') || v.startsWith('ACH-'))) {
+                            const safeNum = Utils.escapeAttr(v);
                             return `<td>
-                                <span class="invoice-num-link" onclick="AdvancedReports.openInvoice('${v}')">${v}</span>
-                                <button class="btn-invoice-view" onclick="AdvancedReports.openInvoice('${v}')">📄</button>
+                                <span class="invoice-num-link" onclick="AdvancedReports.openInvoice('${safeNum}')">${esc(v)}</span>
+                                <button class="btn-invoice-view" onclick="AdvancedReports.openInvoice('${safeNum}')">📄</button>
                             </td>`;
                         }
-                        return `<td>${v}</td>`;
+                        return `<td>${esc(v)}</td>`;
                     }).join('')}</tr>`;
                 }).join('');
             },
@@ -4733,7 +4854,7 @@
                 const headers = [...document.querySelectorAll('#reportTableHead th')].map(th => th.textContent);
                 let csv = headers.join(',') + '\n';
                 rows.forEach(r => {
-                    const c = [...r.querySelectorAll('td')].map(td => td.textContent.trim());
+                    const c = [...r.querySelectorAll('td')].map(td => `"${td.textContent.trim().replace(/"/g, '""')}"`);
                     csv += c.join(',') + '\n';
                 });
                 const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
@@ -4746,22 +4867,21 @@
             }
         };
 
+        // ═══════════════════════════════════════════════════
+        // 🏢 CompanyInfo
+        // ═══════════════════════════════════════════════════
         const CompanyInfo = {
             load() {
                 try {
-                    console.log('📋 CompanyInfo chargé:', State.companyInfo);
                     $('cpyName').value = State.companyInfo.name || 'GTR POS';
                     $('cpyAddress').value = State.companyInfo.address || '';
                     $('cpyPhone1').value = State.companyInfo.phone1 || '';
                     $('cpyTaxId').value = State.companyInfo.taxId || '';
                     $('cpyCashOpening').value = State.companyInfo.cashOpening || 0;
-                } catch(e) {
-                    console.error('❌ CompanyInfo.load error:', e);
-                }
+                } catch(e) { console.error(e); }
             },
             save() {
                 try {
-                    console.log('💾 Sauvegarde CompanyInfo...');
                     State.companyInfo = {
                         name: $('cpyName').value.trim() || 'GTR POS',
                         address: $('cpyAddress').value.trim(),
@@ -4769,21 +4889,20 @@
                         taxId: $('cpyTaxId').value.trim(),
                         cashOpening: parseFloat($('cpyCashOpening').value) || 0
                     };
-                    console.log('📋 Nouvelles valeurs:', State.companyInfo);
                     Persistence.save();
                     Toast.show('✅ Enregistré');
                     App.closeSheet();
-                } catch(e) {
-                    console.error('❌ CompanyInfo.save error:', e);
-                    Toast.show('❌ Erreur');
-                }
+                } catch(e) { Toast.show('❌ Erreur'); }
             }
         };
 
+        // ═══════════════════════════════════════════════════
+        // 👑 Accounts
+        // ═══════════════════════════════════════════════════
         const Accounts = {
             render() {
-                const isAdmin = State.currentUser && 
-                    (State.currentUser.isLocalAdmin || 
+                const isAdmin = State.currentUser &&
+                    (State.currentUser.isLocalAdmin ||
                      State.currentUser.email === APP_CONFIG.adminEmail ||
                      State.currentUser.email === APP_CONFIG.adminLogin);
                 const pending = $('pendingAccountsList');
@@ -4817,21 +4936,22 @@
                             const date = d.requestedAt?.slice(0, 10) || '';
                             const div = document.createElement('div');
                             div.className = 'account-item';
+                            const safeUid = Utils.escapeAttr(uid);
                             if (d.approved === true) {
                                 ac++;
-                                div.innerHTML = `<span class="email">${email}</span><span class="date">${date}</span>
+                                div.innerHTML = `<span class="email">${esc(email)}</span><span class="date">${esc(date)}</span>
                                     <span class="status approved">✅</span>
                                     <div class="actions">
-                                        <button class="btn del small" onclick="Accounts.setApproved('${uid}', false)">Annuler</button>
+                                        <button class="btn del small" onclick="Accounts.setApproved('${safeUid}', false)">Annuler</button>
                                     </div>`;
                                 approved.appendChild(div);
                             } else {
                                 pc++;
-                                div.innerHTML = `<span class="email">${email}</span><span class="date">${date}</span>
+                                div.innerHTML = `<span class="email">${esc(email)}</span><span class="date">${esc(date)}</span>
                                     <span class="status pending">⏳</span>
                                     <div class="actions">
-                                        <button class="btn save small" onclick="Accounts.setApproved('${uid}', true)">Approuver</button>
-                                        <button class="btn del small" onclick="Accounts.setApproved('${uid}', false)">Refuser</button>
+                                        <button class="btn save small" onclick="Accounts.setApproved('${safeUid}', true)">Approuver</button>
+                                        <button class="btn del small" onclick="Accounts.setApproved('${safeUid}', false)">Refuser</button>
                                     </div>`;
                                 pending.appendChild(div);
                             }
@@ -4852,6 +4972,9 @@
             }
         };
 
+        // ═══════════════════════════════════════════════════
+        // 📐 Dashboard
+        // ═══════════════════════════════════════════════════
         const Dashboard = {
             setColumns(cols) {
                 State.dashboardColumns = cols;
@@ -4864,8 +4987,10 @@
                 const sizes = { 2:{icon:40,label:13,pad:20,minH:80}, 3:{icon:32,label:11,pad:14,minH:76}, 4:{icon:26,label:10,pad:12,minH:70} };
                 const s = sizes[cols] || sizes[4];
                 document.querySelectorAll('.dash-item').forEach(item => {
-                    item.querySelector('.dash-icon').style.fontSize = s.icon + 'px';
-                    item.querySelector('.dash-label').style.fontSize = s.label + 'px';
+                    const icon = item.querySelector('.dash-icon');
+                    const label = item.querySelector('.dash-label');
+                    if (icon) icon.style.fontSize = s.icon + 'px';
+                    if (label) label.style.fontSize = s.label + 'px';
                     item.style.padding = s.pad + 'px 8px';
                     item.style.minHeight = s.minH + 'px';
                 });
@@ -4873,23 +4998,18 @@
             load() {
                 try {
                     const saved = localStorage.getItem(APP_CONFIG.dashboardKey);
-                    console.log('📐 Dashboard.load() - saved value:', saved);
                     if (saved) {
                         const cols = parseInt(saved);
-                        if (cols >= 2 && cols <= 4) {
-                            this.setColumns(cols);
-                            console.log(`✅ Colonnes appliquées: ${cols}`);
-                            return;
-                        }
+                        if (cols >= 2 && cols <= 4) { this.setColumns(cols); return; }
                     }
-                } catch(e) {
-                    console.error('❌ Dashboard.load error:', e);
-                }
+                } catch(e) {}
                 this.setColumns(4);
-                console.log('⚠️ Colonnes par défaut: 4');
             }
         };
 
+        // ═══════════════════════════════════════════════════
+        // ⛶ Fullscreen
+        // ═══════════════════════════════════════════════════
         const Fullscreen = {
             isActive() {
                 return !!(document.fullscreenElement || document.webkitFullscreenElement ||
@@ -4913,7 +5033,6 @@
                     else if (document.mozCancelFullScreen) await document.mozCancelFullScreen();
                     else if (document.msExitFullscreen) await document.msExitFullscreen();
                     this.updateButton();
-                    Toast.show('🗗 Normal', 'info');
                 } catch(err) {}
             },
             toggle() { if (this.isActive()) this.exit(); else this.enter(); },
@@ -4933,6 +5052,9 @@
             }
         };
 
+        // ═══════════════════════════════════════════════════
+        // 🚀 App
+        // ═══════════════════════════════════════════════════
         const App = {
             goHome() { this.showSection('dashboard'); },
             showSection(id) {
@@ -5023,13 +5145,15 @@
                 FinanceJour.init();
                 Marges.init();
                 Marges.render();
-                Toast.show('✅ Données rechargées', 'success');
             }
         };
 
+        // ═══════════════════════════════════════════════════
+        // 🔐 Auth — SÉCURISÉ
+        // ═══════════════════════════════════════════════════
         const Auth = {
             isSignup: false,
-            init() { this._initFirebase(); this._bindEvents(); this._watchAuthState(); },
+            init() { this._initFirebase(); this._watchAuthState(); },
             _initFirebase() {
                 try {
                     if (typeof firebase === 'undefined') return;
@@ -5040,7 +5164,6 @@
                     State.storageMode = 'cloud';
                 } catch(e) { console.error('Firebase error:', e); }
             },
-            _bindEvents() {},
             toggleMode() {
                 this.isSignup = !this.isSignup;
                 $('loginMainBtn').textContent = this.isSignup ? 'Créer un compte' : 'Se connecter';
@@ -5058,20 +5181,21 @@
                 input.type = isPwd ? 'text' : 'password';
                 if (btnId) $(btnId).textContent = isPwd ? '🙈' : '👁️';
             },
-            _tryClientLogin() {
+            async _tryClientLogin() {
                 const e = $('loginEmail').value.trim().toLowerCase();
                 const p = $('loginPassword').value.trim();
                 if (!e || !p) return false;
-                const client = State.clients.find(c => 
-                    (c.email || '').toLowerCase().trim() === e && 
-                    (c.password || '').toLowerCase() === p.toLowerCase()
+                const client = State.clients.find(c =>
+                    (c.email || '').toLowerCase().trim() === e
                 );
-                if (!client) return false;
+                if (!client || !client.passwordHash || !client.passwordSalt) return false;
+                const hash = await Utils.hashPassword(p, client.passwordSalt);
+                if (!Utils.constantTimeEqual(hash, client.passwordHash)) return false;
                 State.currentClient = client;
                 State.currentUser = { email: e, uid: 'client_' + client.id, isClient: true };
                 try {
-                    localStorage.setItem(APP_CONFIG.clientSessionKey, JSON.stringify({
-                        clientId: client.id, email: e, timestamp: Date.now()
+                    sessionStorage.setItem(APP_CONFIG.sessionKey, JSON.stringify({
+                        clientId: client.id, email: e, expiresAt: Date.now() + 8 * 60 * 60 * 1000
                     }));
                 } catch(err) {}
                 $('loginError').textContent = '';
@@ -5080,188 +5204,187 @@
                 Toast.show(`👋 Bienvenue ${client.name}`, 'success');
                 return true;
             },
-            loginAdminLocal(password) {
-                if (!password || password.length < 4) {
-                    $('loginError').textContent = '⚠️ كلمة السر قصيرة (4 أحرف على الأقل)';
+            async loginAdminLocal(password) {
+                if (!password || password.length < 8) {
+                    $('loginError').textContent = '⚠️ كلمة السر قصيرة (8 أحرف على الأقل)';
                     return false;
                 }
                 try {
                     const saved = localStorage.getItem(APP_CONFIG.adminCredsKey);
                     if (!saved) {
+                        const confirm = await CustomConfirm.show(
+                            '⚠️ Aucun compte Admin configuré.\n\nCréer un compte Admin avec ce mot de passe ?\n\n(Choisissez un mot de passe FORT — 8+ caractères)',
+                            '👑 Création Admin'
+                        );
+                        if (!confirm) return false;
+                        const salt = Utils.generateSalt();
+                        const hash = await Utils.hashPassword(password, salt);
                         localStorage.setItem(APP_CONFIG.adminCredsKey, JSON.stringify({
-                            password: password,
-                            createdAt: new Date().toISOString()
+                            hash, salt, createdAt: new Date().toISOString()
                         }));
                         State.currentUser = {
-                            email: APP_CONFIG.adminEmail,
-                            loginName: APP_CONFIG.adminLogin,
-                            uid: 'admin_local',
-                            isAdmin: true,
-                            isLocalAdmin: true
+                            email: APP_CONFIG.adminEmail, loginName: APP_CONFIG.adminLogin,
+                            uid: 'admin_local', isAdmin: true, isLocalAdmin: true
                         };
-                        NotificationSystem.load();
-                        NotificationSystem.updateBadge();
+                        NotificationSystem.load(); NotificationSystem.updateBadge();
                         $('accountEmailDisplay2').textContent = 'admin';
                         $('accountEmailDisplay').textContent = 'admin';
                         this._showApp();
-                        Toast.show('👑 تم إنشاء حساب Admin بنجاح', 'success');
-                        NotificationSystem.add('Admin', 'تم إنشاء حساب المدير', 'SUCCESS');
+                        Toast.show('👑 Admin créé', 'success');
+                        NotificationSystem.add('Admin', 'Compte Admin créé', 'SUCCESS');
                         return true;
                     }
                     const creds = JSON.parse(saved);
-                    if (creds.password !== password) {
-                        return false;
-                    }
+                    const hash = await Utils.hashPassword(password, creds.salt);
+                    if (!Utils.constantTimeEqual(hash, creds.hash)) return false;
                     State.currentUser = {
-                        email: APP_CONFIG.adminEmail,
-                        loginName: APP_CONFIG.adminLogin,
-                        uid: 'admin_local',
-                        isAdmin: true,
-                        isLocalAdmin: true
+                        email: APP_CONFIG.adminEmail, loginName: APP_CONFIG.adminLogin,
+                        uid: 'admin_local', isAdmin: true, isLocalAdmin: true
                     };
-                    NotificationSystem.load();
-                    NotificationSystem.updateBadge();
+                    NotificationSystem.load(); NotificationSystem.updateBadge();
                     $('accountEmailDisplay2').textContent = 'admin';
                     $('accountEmailDisplay').textContent = 'admin';
                     this._showApp();
-                    Toast.show('👑 مرحباً بك يا مدير', 'success');
+                    Toast.show('👑 Bienvenue', 'success');
                     return true;
                 } catch(e) {
                     console.error('Admin login error:', e);
                     return false;
                 }
             },
-            changeAdminPassword() {
+            async changeAdminPassword() {
                 const c = $('staffCurrentPassword').value;
                 const n = $('staffNewPassword').value;
                 const cf = $('staffConfirmPassword').value;
                 const err = $('staffPasswordError');
-                if (!c || !n || !cf) { err.textContent = '⚠️ جميع الحقول مطلوبة'; return; }
-                if (n.length < 4) { err.textContent = '⚠️ 4 أحرف على الأقل'; return; }
-                if (n !== cf) { err.textContent = '⚠️ غير متطابقتين'; return; }
-                
+                if (!c || !n || !cf) { err.textContent = '⚠️ Tous les champs requis'; return; }
+                if (n.length < 8) { err.textContent = '⚠️ Min 8 caractères'; return; }
+                if (n !== cf) { err.textContent = '⚠️ Non concordance'; return; }
                 if (State.currentUser && State.currentUser.isLocalAdmin) {
                     try {
                         const saved = localStorage.getItem(APP_CONFIG.adminCredsKey);
                         const creds = saved ? JSON.parse(saved) : null;
-                        if (creds && creds.password !== c) {
-                            err.textContent = '❌ كلمة السر الحالية خاطئة';
-                            return;
+                        if (creds) {
+                            const curHash = await Utils.hashPassword(c, creds.salt);
+                            if (!Utils.constantTimeEqual(curHash, creds.hash)) {
+                                err.textContent = '❌ Mot de passe actuel incorrect';
+                                return;
+                            }
                         }
+                        const salt = Utils.generateSalt();
+                        const hash = await Utils.hashPassword(n, salt);
                         localStorage.setItem(APP_CONFIG.adminCredsKey, JSON.stringify({
-                            password: n,
-                            updatedAt: new Date().toISOString()
+                            hash, salt, updatedAt: new Date().toISOString()
                         }));
                         err.textContent = '';
                         $('staffPasswordModal').classList.remove('show');
-                        Toast.show('✅ تم تغيير كلمة سر المدير', 'success');
+                        Toast.show('✅ Mot de passe Admin changé', 'success');
                         return;
-                    } catch(e) { err.textContent = '❌ خطأ'; return; }
+                    } catch(e) { err.textContent = '❌ Erreur'; return; }
                 }
                 this.changeStaffPassword();
             },
-            login() {
+            async login() {
                 const e = $('loginEmail').value.trim().toLowerCase();
                 const p = $('loginPassword').value;
-                if (!e || !p) { 
-                    $('loginError').textContent = 'Email et mot de passe requis'; 
-                    return; 
+                if (!e || !p) { $('loginError').textContent = 'Email et mot de passe requis'; return; }
+
+                const rl = LoginThrottle.check(e);
+                if (rl.blocked) {
+                    $('loginError').textContent = `🚫 Trop de tentatives. Réessayez dans ${rl.waitMin} min.`;
+                    return;
                 }
+
                 if (e === APP_CONFIG.adminLogin) {
-                    if (this.loginAdminLocal(p)) return;
+                    const ok = await this.loginAdminLocal(p);
+                    if (ok) { LoginThrottle.clear(e); return; }
+                    LoginThrottle.record(e);
                     $('loginError').textContent = '❌ Mot de passe admin incorrect';
                     return;
                 }
-                if (this._tryClientLogin()) return;
-                const clientByEmail = State.clients.find(c => 
+
+                const clientOk = await this._tryClientLogin();
+                if (clientOk) { LoginThrottle.clear(e); return; }
+
+                const clientByEmail = State.clients.find(c =>
                     (c.email || '').toLowerCase().trim() === e
                 );
                 if (clientByEmail) {
+                    LoginThrottle.record(e);
                     $('loginError').textContent = '❌ Mot de passe incorrect';
                     return;
                 }
+
                 $('loginError').textContent = '';
                 $('loginLoading').style.display = 'block';
-                if (!auth) {
+                if (!window.auth) {
                     $('loginError').textContent = '❌ Firebase non disponible';
                     $('loginLoading').style.display = 'none';
                     return;
                 }
-                auth.signInWithEmailAndPassword(e, p)
-                    .catch(err => { 
-                        $('loginError').textContent = err.message; 
+                window.auth.signInWithEmailAndPassword(e, p)
+                    .then(() => LoginThrottle.clear(e))
+                    .catch(err => {
+                        LoginThrottle.record(e);
+                        $('loginError').textContent = err.message;
                     })
-                    .finally(() => { 
-                        $('loginLoading').style.display = 'none'; 
-                    });
+                    .finally(() => { $('loginLoading').style.display = 'none'; });
             },
-            signup() {
+            async signup() {
                 const e = $('loginEmail').value.trim().toLowerCase();
                 const p = $('loginPassword').value;
                 if (!e || !p) { $('loginError').textContent = 'Email et mot de passe requis'; return; }
-                if (p.length < 6) { $('loginError').textContent = '⚠️ Min 6 caractères'; return; }
+                if (p.length < 8) { $('loginError').textContent = '⚠️ Min 8 caractères'; return; }
                 if (e === APP_CONFIG.adminLogin) {
-                    $('loginError').textContent = '❌ "admin" réservé. Cliquez sur "Se connecter".';
+                    $('loginError').textContent = '❌ "admin" réservé';
                     return;
                 }
-                const existingClient = State.clients.find(c => 
-                    (c.email || '').toLowerCase().trim() === e
-                );
+                const existingClient = State.clients.find(c => (c.email || '').toLowerCase().trim() === e);
                 if (existingClient) {
-                    $('loginError').textContent = '❌ Email réservé au client. Cliquez sur "Se connecter".';
+                    $('loginError').textContent = '❌ Email réservé au client';
                     return;
                 }
-                
-                if (typeof firebase === 'undefined' || !auth) {
-                    $('loginError').textContent = '❌ Firebase requis pour créer un compte';
+                if (typeof firebase === 'undefined' || !window.auth) {
+                    $('loginError').textContent = '❌ Firebase requis';
                     return;
                 }
-                
-                CustomConfirm.show(
-                    'Créer un compte Staff ?\n\n' +
-                    '• Email: ' + e + '\n' +
-                    '• Rôle: Staff (موظف)\n\n' +
-                    '⚠️ Votre compte devra être approuvé par l\'administrateur avant de pouvoir vous connecter.',
+                const ok = await CustomConfirm.show(
+                    'Créer un compte Staff ?\n\n• Email: ' + e + '\n\n⚠️ Compte à approuver par l\'admin.',
                     '👤 Nouveau Staff'
-                ).then(ok => {
-                    if (!ok) return;
-                    
-                    $('loginError').textContent = '⏳ Création du compte...';
-                    $('loginLoading').style.display = 'block';
-                    
-                    auth.createUserWithEmailAndPassword(e, p)
-                        .then(async (userCredential) => {
-                            const uid = userCredential.user.uid;
-                            console.log('✅ Firebase user created:', uid);
-                            try {
-                                if (window.db) {
-                                    await window.db.collection('approvals').doc(uid).set({
-                                        email: e,
-                                        requestedAt: new Date().toISOString(),
-                                        approved: false,
-                                        role: 'staff'
-                                    });
-                                    console.log('✅ Approval request sent');
-                                }
-                                Toast.show('✅ Demande envoyée à l\'admin', 'success');
-                            } catch (dbErr) {
-                                console.error('❌ Firestore error:', dbErr);
-                                Toast.show('⚠️ Compte créé mais approval échoué', 'warning');
-                                this._showPending();
+                );
+                if (!ok) return;
+
+                $('loginError').textContent = '⏳ Création...';
+                $('loginLoading').style.display = 'block';
+                window.auth.createUserWithEmailAndPassword(e, p)
+                    .then(async (cred) => {
+                        const uid = cred.user.uid;
+                        try {
+                            if (window.db) {
+                                await window.db.collection('approvals').doc(uid).set({
+                                    email: e,
+                                    requestedAt: new Date().toISOString(),
+                                    approved: false,
+                                    role: 'staff'
+                                });
                             }
-                        })
-                        .catch(err => {
-                            console.error('❌ Signup error:', err);
-                            $('loginError').textContent = '❌ ' + (err.message || 'Erreur');
-                            $('loginLoading').style.display = 'none';
-                        });
-                });
+                            Toast.show('✅ Demande envoyée à l\'admin', 'success');
+                        } catch (dbErr) {
+                            console.error('❌ Firestore error:', dbErr);
+                            Toast.show('⚠️ Compte créé mais approval échoué', 'warning');
+                            this._showPending();
+                        }
+                    })
+                    .catch(err => {
+                        $('loginError').textContent = '❌ ' + (err.message || 'Erreur');
+                        $('loginLoading').style.display = 'none';
+                    });
             },
             googleLogin() {
                 const provider = new firebase.auth.GoogleAuthProvider();
                 $('loginError').textContent = '';
                 $('loginLoading').style.display = 'block';
-                auth.signInWithPopup(provider)
+                window.auth.signInWithPopup(provider)
                     .catch(err => { $('loginError').textContent = err.message; })
                     .finally(() => { $('loginLoading').style.display = 'none'; });
             },
@@ -5269,11 +5392,11 @@
                 const ok = await CustomConfirm.show('⚠️ Quitter ?');
                 if (!ok) return;
                 Persistence.save();
-                try { localStorage.removeItem(APP_CONFIG.clientSessionKey); } catch(e) {}
+                try { sessionStorage.removeItem(APP_CONFIG.sessionKey); } catch(e) {}
                 ClientPortal.hide();
                 State.currentClient = null;
                 if (State.currentUser && !State.currentUser.isClient && !State.currentUser.isLocalAdmin) {
-                    auth.signOut();
+                    window.auth.signOut();
                 } else {
                     State.currentUser = null;
                     $('loginOverlay').classList.remove('hide');
@@ -5293,7 +5416,7 @@
                 if (n.length < 6) { err.textContent = '⚠️ Min 6 caractères'; return; }
                 if (n !== cf) { err.textContent = '⚠️ Non concordance'; return; }
                 err.textContent = '⏳...';
-                const user = auth.currentUser;
+                const user = window.auth?.currentUser;
                 if (!user) return;
                 const cred = firebase.auth.EmailAuthProvider.credential(user.email, c);
                 user.reauthenticateWithCredential(cred)
@@ -5306,7 +5429,6 @@
                     this.changeAdminPassword();
                     return;
                 }
-                
                 const c = $('staffCurrentPassword').value;
                 const n = $('staffNewPassword').value;
                 const cf = $('staffConfirmPassword').value;
@@ -5323,38 +5445,35 @@
                         .then(() => {
                             err.textContent = '';
                             $('staffPasswordModal').classList.remove('show');
-                            Toast.show('✅ Mot de passe Staff changé', 'success');
-                            NotificationSystem.add('Mot de passe modifié',
-                                'Votre mot de passe Staff a été changé avec succès.', 'SUCCESS');
+                            Toast.show('✅ Mot de passe changé', 'success');
+                            NotificationSystem.add('Mot de passe modifié', 'Votre mot de passe a été changé.', 'SUCCESS');
                         })
                         .catch(e => { err.textContent = '❌ ' + (e.message || 'Erreur'); });
                     return;
                 }
-                err.textContent = '❌ Aucun utilisateur Staff connecté';
+                err.textContent = '❌ Aucun utilisateur connecté';
             },
             _watchAuthState() {
-                if (!auth) return;
-                auth.onAuthStateChanged(async user => {
+                if (!window.auth) return;
+                window.auth.onAuthStateChanged(async user => {
                     if (user) {
                         if (State.currentUser && (State.currentUser.isClient || State.currentUser.isLocalAdmin)) return;
                         State.currentUser = user;
                         $('accountEmailDisplay2').textContent = user.email || '';
                         $('accountEmailDisplay').textContent = user.email || '';
                         await Persistence.loadFromCloud(user.uid);
-                        const email = user.email.toLowerCase().trim();
+                        const email = (user.email || '').toLowerCase().trim();
                         if (email === APP_CONFIG.adminEmail.toLowerCase()) {
                             State.currentUser.isStaff = false;
                             this._showApp(); return;
                         }
-                        const client = State.clients.find(c => 
-                            (c.email || '').toLowerCase().trim() === email
-                        );
+                        const client = State.clients.find(c => (c.email || '').toLowerCase().trim() === email);
                         if (client) {
                             State.currentClient = client;
                             State.currentUser = { email, uid: 'client_' + client.id, isClient: true };
                             try {
-                                localStorage.setItem(APP_CONFIG.clientSessionKey, JSON.stringify({
-                                    clientId: client.id, email, timestamp: Date.now()
+                                sessionStorage.setItem(APP_CONFIG.sessionKey, JSON.stringify({
+                                    clientId: client.id, email, expiresAt: Date.now() + 8 * 60 * 60 * 1000
                                 }));
                             } catch(e) {}
                             setTimeout(() => ClientPortal.show(), 300);
@@ -5374,7 +5493,6 @@
                                     const approvalData = doc.data();
                                     if (approvalData.role === 'staff' || approvalData.isStaff === true) {
                                         State.currentUser.isStaff = true;
-                                        State.currentUser.role = 'staff';
                                     }
                                     this._showApp();
                                 } else this._showPending();
@@ -5396,13 +5514,12 @@
                 $('pendingOverlay').classList.add('hide');
                 $('clientPortal').classList.remove('show');
                 document.querySelector('.phone').style.display = 'flex';
-                // ✅ تحميل إشعارات المستخدم الحالي
                 NotificationSystem.load();
                 NotificationSystem.updateBadge();
                 App.reloadAll();
                 App.showSection('dashboard');
                 Dashboard.load();
-                Toast.show(`☁️ Connecté (Cloud)`, 'success');
+                Toast.show(`☁️ Connecté (Cloud sécurisé)`, 'success');
                 setTimeout(() => {
                     AdvancedReports.generateReport();
                     Marges.init();
@@ -5419,13 +5536,16 @@
             }
         };
 
+        // ═══════════════════════════════════════════════════
+        // 📥 Import clients (Excel/CSV) — avec hash
+        // ═══════════════════════════════════════════════════
         let importData = [];
 
         function downloadTemplate() {
             const headers = ['Nom','Téléphone 1','Téléphone 2','Email','Adresse','MF',"Solde d'ouverture",'Mot de passe'];
             const sample = [
-                ['Client 1','12345678','','client1@email.com','Adresse 1','1234567','0','A1B2C3'],
-                ['Client 2','23456789','','client2@email.com','Adresse 2','7654321','1000','X9Y8Z7']
+                ['Client 1','12345678','','client1@email.com','Adresse 1','1234567','0','A1B2C3D4'],
+                ['Client 2','23456789','','client2@email.com','Adresse 2','7654321','1000','X9Y8Z7W6']
             ];
             const ws = XLSX.utils.aoa_to_sheet([headers, ...sample]);
             const wb = XLSX.utils.book_new();
@@ -5465,7 +5585,7 @@
             const rows = data.slice(0, 20).map(r => {
                 const isDup = r.Nom && existing.includes(r.Nom.toLowerCase());
                 return `<tr class="${isDup ? 'highlight-duplicate' : ''}">
-                    ${headers.map(h => `<td>${r[h] || ''}</td>`).join('')}
+                    ${headers.map(h => `<td>${esc(r[h] || '')}</td>`).join('')}
                 </tr>`;
             }).join('');
             preview.innerHTML = `
@@ -5476,7 +5596,7 @@
                     </span>
                 </div>
                 <table>
-                    <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+                    <thead><tr>${headers.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead>
                     <tbody>${rows}</tbody>
                 </table>`;
             preview.style.display = 'block';
@@ -5484,7 +5604,7 @@
             xb.style.display = 'block';
         }
 
-        function confirmImport() {
+        async function confirmImport() {
             if (!importData.length) { Toast.show('⚠️ Aucune donnée'); return; }
             const pd = $('importProgress');
             const pf = $('importProgressFill');
@@ -5494,12 +5614,18 @@
             pd.style.display = 'block';
             let imported = 0, errors = 0;
             const total = importData.length;
-            importData.forEach((row, i) => {
+            for (let i = 0; i < importData.length; i++) {
+                const row = importData[i];
                 try {
                     const name = (row.Nom || row.nom || row.name || '').trim();
-                    if (!name) { errors++; return; }
-                    if (State.clients.some(c => c.name.toLowerCase() === name.toLowerCase())) { errors++; return; }
-                    const pwd = String(row['Mot de passe'] || row.password || '').trim();
+                    if (!name) { errors++; continue; }
+                    if (State.clients.some(c => c.name.toLowerCase() === name.toLowerCase())) { errors++; continue; }
+                    const plainPwd = String(row['Mot de passe'] || row.password || '').trim();
+                    let passwordHash = null, passwordSalt = null;
+                    if (plainPwd && plainPwd.length >= 4) {
+                        passwordSalt = Utils.generateSalt();
+                        passwordHash = await Utils.hashPassword(plainPwd, passwordSalt);
+                    }
                     State.clients.push({
                         id: State.nextId.clients++,
                         name,
@@ -5510,14 +5636,14 @@
                         taxId: String(row['Matricule fiscal'] || row['MF'] || '').trim(),
                         openingBalance: parseFloat(row["Solde d'ouverture"] || row.Solde || 0) || 0,
                         balance: parseFloat(row["Solde d'ouverture"] || row.Solde || 0) || 0,
-                        password: pwd,
+                        passwordHash, passwordSalt,
                         specialPrices: []
                     });
                     imported++;
                     pf.style.width = ((i + 1) / total * 100) + '%';
                     st.textContent = `${i + 1}/${total}`;
                 } catch(err) { errors++; }
-            });
+            }
             setTimeout(() => {
                 Persistence.save();
                 ClientsRenderer.render();
@@ -5539,6 +5665,9 @@
             Toast.show('❌ Annulé');
         }
 
+        // ═══════════════════════════════════════════════════
+        // 🔧 Modales & Aide
+        // ═══════════════════════════════════════════════════
         function showNotificationPanel() { NotificationSystem.renderPanel(); }
         function closeNotificationPanel() { $('notificationPanel').classList.remove('show'); }
         function openChangePasswordModal() {
@@ -5551,9 +5680,8 @@
         }
         function closeChangePasswordModal() { $('passwordModal').classList.remove('show'); }
         function openStaffPasswordModal() {
-            if (!State.currentUser || State.currentUser.isClient) { 
-                Toast.show('⚠️ Non disponible pour client'); 
-                return; 
+            if (!State.currentUser || State.currentUser.isClient) {
+                Toast.show('⚠️ Non disponible pour client'); return;
             }
             $('staffPasswordModal').classList.add('show');
             $('staffCurrentPassword').value = '';
@@ -5566,10 +5694,13 @@
             $('shortcutHelp').classList.add('show');
             const l = $('shortcutList');
             if (l) l.innerHTML = Object.entries(SHORTCUTS).map(([k, v]) =>
-                `<tr><td><kbd>${k}</kbd></td><td>${v}</td></tr>`).join('');
+                `<tr><td><kbd>${esc(k)}</kbd></td><td>${esc(v)}</td></tr>`).join('');
         }
         function closeShortcutHelp() { $('shortcutHelp').classList.remove('show'); }
 
+        // ═══════════════════════════════════════════════════
+        // 🖨️ printStatement + showPreviewReleve + showPreviewArticle
+        // ═══════════════════════════════════════════════════
         function printStatement(type, id) {
             if (type === 'client') {
                 const c = State.clients.find(x => x.id === id);
@@ -5581,7 +5712,7 @@
                 const docs = State.ventes.filter(v => v.client === c.name && new Date(v.date) >= from && new Date(v.date) <= to)
                     .sort((a, b) => a.date < b.date ? -1 : 1);
                 const pays = State.caisseClients.filter(p => p.clientName === c.name);
-                const pendingOrders = State.orders.filter(o => 
+                const pendingOrders = State.orders.filter(o =>
                     (o.clientId === c.id || o.clientName === c.name) &&
                     (o.status === 'pending' || o.status === 'approved')
                 );
@@ -5671,8 +5802,8 @@
                 const qd = m.qty > 0 ? '+' + m.qty : m.qty;
                 const color = m.qty > 0 ? '#27ae60' : '#c0392b';
                 rows += `<tr>
-                    <td>${m.date}</td><td style="font-weight:700;">${m.doc}</td>
-                    <td>${tl}</td><td>${m.party}</td>
+                    <td>${esc(m.date)}</td><td style="font-weight:700;">${esc(m.doc)}</td>
+                    <td>${tl}</td><td>${esc(m.party)}</td>
                     <td style="color:${color};font-weight:700;">${qd}</td>
                     <td>${m.price.toFixed(3)}</td><td>${m.total.toFixed(3)}</td>
                     <td style="font-weight:700;">${cumul}</td>
@@ -5681,6 +5812,9 @@
             PreviewModal.showStatement('article', { title: 'Historique - ' + article.name, article, rows });
         }
 
+        // ═══════════════════════════════════════════════════
+        // 🎯 bindEvents
+        // ═══════════════════════════════════════════════════
         function bindEvents() {
             $('overlay')?.addEventListener('click', () => App.closeSheet());
             $('fabBtn')?.addEventListener('click', () => App.onFabClick());
@@ -5693,8 +5827,8 @@
             document.querySelectorAll('.dash-item').forEach(item => {
                 item.addEventListener('click', function() {
                     const id = this.dataset.section;
-                    const isAdmin = State.currentUser && 
-                        (State.currentUser.isLocalAdmin || 
+                    const isAdmin = State.currentUser &&
+                        (State.currentUser.isLocalAdmin ||
                          State.currentUser.email === APP_CONFIG.adminEmail ||
                          State.currentUser.email === APP_CONFIG.adminLogin);
                     if (id === 'accounts' && !isAdmin) {
@@ -5727,66 +5861,56 @@
             }
         }
 
-        window.ClientsModule = ClientsModule;
-        window.FournisseursModule = FournisseursModule;
-        window.ArticlesModule = ArticlesModule;
-        window.VentesModule = VentesModule;
-        window.AchatsModule = AchatsModule;
-        window.Expenses = Expenses;
-        window.Orders = Orders;
-        window.ClientOrder = ClientOrder;
-        window.ClientHistory = ClientHistory;
-        window.FournisseurHistory = FournisseurHistory;
-        window.ArticleHistory = ArticleHistory;
-        window.CaisseHistory = CaisseHistory;
-        window.FinanceJour = FinanceJour;
-        window.Marges = Marges;
-        window.AdvancedReports = AdvancedReports;
-        window.Accounts = Accounts;
-        window.CompanyInfo = CompanyInfo;
-        window.Auth = Auth;
-        window.App = App;
-        window.Theme = Theme;
-        window.PrintSystem = PrintSystem;
-        window.PreviewModal = PreviewModal;
-        window.CustomConfirm = CustomConfirm;
-        window.NotificationSystem = NotificationSystem;
-        window.Dashboard = Dashboard;
-        window.Fullscreen = Fullscreen;
-        window.Persistence = Persistence;
-        window.BalanceCalculator = BalanceCalculator;
-        window.ClientsRenderer = ClientsRenderer;
-        window.FournisseursRenderer = FournisseursRenderer;
-        window.ArticlesRenderer = ArticlesRenderer;
-        window.VentesRenderer = VentesRenderer;
-        window.AchatsRenderer = AchatsRenderer;
-        window.RoleManager = RoleManager;
-        window.ClientPortal = ClientPortal;
-        window.downloadTemplate = downloadTemplate;
-        window.handleImportFile = handleImportFile;
-        window.confirmImport = confirmImport;
-        window.cancelImport = cancelImport;
-        window.showNotificationPanel = showNotificationPanel;
-        window.closeNotificationPanel = closeNotificationPanel;
-        window.openChangePasswordModal = openChangePasswordModal;
-        window.closeChangePasswordModal = closeChangePasswordModal;
-        window.openStaffPasswordModal = openStaffPasswordModal;
-        window.closeStaffPasswordModal = closeStaffPasswordModal;
-        window.showShortcutHelp = showShortcutHelp;
-        window.closeShortcutHelp = closeShortcutHelp;
-        window.printStatement = printStatement;
-        window.Toast = Toast;
-        window.Utils = Utils;
+        // ═══════════════════════════════════════════════════
+        // 🌐 Exposition globale
+        // ═══════════════════════════════════════════════════
+        Object.assign(window, {
+            ClientsModule, FournisseursModule, ArticlesModule, VentesModule, AchatsModule,
+            Expenses, Orders, ClientOrder, ClientHistory, FournisseurHistory, ArticleHistory,
+            CaisseHistory, FinanceJour, Marges, AdvancedReports, Accounts, CompanyInfo,
+            Auth, App, Theme, PrintSystem, PreviewModal, CustomConfirm, NotificationSystem,
+            Dashboard, Fullscreen, Persistence, BalanceCalculator,
+            ClientsRenderer, FournisseursRenderer, ArticlesRenderer, VentesRenderer, AchatsRenderer,
+            RoleManager, ClientPortal, Toast, Utils,
+            downloadTemplate, handleImportFile, confirmImport, cancelImport,
+            showNotificationPanel, closeNotificationPanel,
+            openChangePasswordModal, closeChangePasswordModal,
+            openStaffPasswordModal, closeStaffPasswordModal,
+            showShortcutHelp, closeShortcutHelp, printStatement
+        });
 
+        // ═══════════════════════════════════════════════════
+        // 🔐 migratePasswords — SHA-256 au démarrage
+        // ═══════════════════════════════════════════════════
+        async function migratePasswords() {
+            let migrated = 0;
+            for (const c of State.clients) {
+                if (c.password && !c.passwordHash) {
+                    c.passwordSalt = Utils.generateSalt();
+                    c.passwordHash = await Utils.hashPassword(c.password, c.passwordSalt);
+                    delete c.password;
+                    migrated++;
+                }
+                if (c.passwordHash && c.password) delete c.password;
+            }
+            for (const f of State.fournisseurs) {
+                if (f.passwordHash && f.password) delete f.password;
+            }
+            if (migrated > 0) {
+                Persistence.save();
+                console.log(`🔐 ${migrated} mot(s) de passe migré(s) vers SHA-256`);
+                Toast.show(`🔐 ${migrated} mot(s) de passe migré(s)`, 'success');
+            }
+        }
+
+        // ═══════════════════════════════════════════════════
+        // 🔧 repairOldOrders
+        // ═══════════════════════════════════════════════════
         async function repairOldOrders() {
-            const brokenOrders = State.orders.filter(o => 
+            const brokenOrders = State.orders.filter(o =>
                 !o.num || o.num === 'CMD-0NaN' || o.num.includes('NaN')
             );
-            if (!brokenOrders.length) {
-                console.log('✅ Aucune commande à réparer');
-                return 0;
-            }
-            console.log(`🔧 ${brokenOrders.length} commande(s) à réparer...`);
+            if (!brokenOrders.length) return 0;
             brokenOrders.sort((a, b) => {
                 const dateA = a.createdAt || a.date + ' ' + (a.time || '00:00:00');
                 const dateB = b.createdAt || b.date + ' ' + (b.time || '00:00:00');
@@ -5795,8 +5919,6 @@
             let maxId = 0;
             State.orders.forEach(o => {
                 if (o.id && typeof o.id === 'number' && o.id > maxId) maxId = o.id;
-            });
-            State.orders.forEach(o => {
                 if (o.num && o.num.startsWith('CMD-') && !o.num.includes('NaN')) {
                     const numPart = parseInt(o.num.replace('CMD-', ''));
                     if (!isNaN(numPart) && numPart > maxId) maxId = numPart;
@@ -5806,37 +5928,28 @@
             let repaired = 0;
             for (const order of brokenOrders) {
                 const newNum = 'CMD-' + String(nextNum).padStart(4, '0');
-                const oldNum = order.num;
                 order.num = newNum;
                 order.id = nextNum;
                 order.repairedAt = new Date().toISOString();
                 if (typeof firebase !== 'undefined' && order.cloudId) {
                     try {
                         await firebase.firestore().collection('orders').doc(order.cloudId).update({
-                            num: newNum,
-                            id: nextNum,
-                            repairedAt: order.repairedAt
+                            num: newNum, id: nextNum, repairedAt: order.repairedAt
                         });
-                        console.log(`✅ ${oldNum} → ${newNum} (cloud)`);
-                    } catch (e) {
-                        console.warn(`⚠️ Échec cloud pour ${oldNum}:`, e.message);
-                    }
-                } else {
-                    console.log(`✅ ${oldNum} → ${newNum} (local)`);
+                    } catch (e) {}
                 }
-                repaired++;
-                nextNum++;
+                repaired++; nextNum++;
             }
-            if (nextNum > State.nextId.orders) {
-                State.nextId.orders = nextNum;
-            }
+            if (nextNum > State.nextId.orders) State.nextId.orders = nextNum;
             Persistence.save();
-            console.log(`🎉 ${repaired} commande(s) réparée(s)`);
             return repaired;
         }
 
-        function bootstrap() {
-            console.log(`🚀 GTR POS ${APP_CONFIG.version} (Cloud + Admin Local)...`);
+        // ═══════════════════════════════════════════════════
+        // 🚀 bootstrap
+        // ═══════════════════════════════════════════════════
+        async function bootstrap() {
+            console.log(`🚀 GTR POS ${APP_CONFIG.version} (Sécurisé)`);
             Theme.load();
             PrintSystem.load();
             NotificationSystem.load();
@@ -5846,43 +5959,39 @@
             bindEvents();
             Auth.init();
             Persistence.load();
-            
-            setTimeout(() => Dashboard.load(), 500);
-            setTimeout(() => Dashboard.load(), 2000);
-            
+
             setTimeout(async () => {
+                try { await migratePasswords(); } catch(e) { console.error('Migrate:', e); }
                 try {
                     const repaired = await repairOldOrders();
-                    if (repaired > 0) {
-                        Toast.show(`🔧 ${repaired} commande(s) réparée(s)`, 'success');
-                    }
-                } catch (e) {
-                    console.error('❌ Erreur réparation:', e);
-                }
-            }, 1500);
-            
+                    if (repaired > 0) Toast.show(`🔧 ${repaired} commande(s) réparée(s)`, 'success');
+                } catch (e) { console.error('Repair:', e); }
+            }, 800);
+
+            setTimeout(() => Dashboard.load(), 500);
+            setTimeout(() => Dashboard.load(), 2000);
+
             setTimeout(() => {
                 try {
-                    const saved = localStorage.getItem(APP_CONFIG.clientSessionKey);
-                    if (saved) {
-                        const session = JSON.parse(saved);
-                        if (Date.now() - session.timestamp < 7 * 24 * 60 * 60 * 1000) {
-                            const client = State.clients.find(c => c.id === session.clientId);
-                            if (client) {
-                                State.currentClient = client;
-                                State.currentUser = { email: session.email, uid: 'client_' + client.id, isClient: true };
-                                $('loginOverlay').classList.add('hide');
-                                ClientPortal.show();
-                                console.log('✅ Session client restaurée');
-                            }
-                        } else {
-                            localStorage.removeItem(APP_CONFIG.clientSessionKey);
-                        }
+                    const raw = sessionStorage.getItem(APP_CONFIG.sessionKey);
+                    if (!raw) return;
+                    const session = JSON.parse(raw);
+                    if (Date.now() > session.expiresAt) {
+                        sessionStorage.removeItem(APP_CONFIG.sessionKey);
+                        return;
                     }
-                } catch(e) { console.warn('Session restore:', e); }
+                    const client = State.clients.find(c => c.id === session.clientId);
+                    if (client) {
+                        State.currentClient = client;
+                        State.currentUser = { email: session.email, uid: 'client_' + client.id, isClient: true };
+                        $('loginOverlay').classList.add('hide');
+                        ClientPortal.show();
+                        console.log('✅ Session client restaurée');
+                    }
+                } catch(e) {}
             }, 400);
-            
-            console.log('✅ GTR POS ready (Cloud + Admin Local)');
+
+            console.log('✅ GTR POS V 0.8.5 ready (Sécurisé)');
         }
 
         if (document.readyState === 'loading') {
@@ -5894,3 +6003,49 @@
     </script>
 </body>
 </html>
+
+<!--
+═══════════════════════════════════════════════════════════════
+🔥 RÈGLES FIRESTORE OBLIGATOIRES — À COLLER DANS
+   Firebase Console → Firestore Database → Rules
+═══════════════════════════════════════════════════════════════
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAuth() { return request.auth != null; }
+    function isOwner(uid) { return isAuth() && request.auth.uid == uid; }
+    function isStaff() {
+      return isAuth() &&
+        exists(/databases/$(database)/documents/approvals/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/approvals/$(request.auth.uid)).data.approved == true;
+    }
+
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+    }
+
+    match /approvals/{uid} {
+      allow read: if isAuth() && (request.auth.uid == uid || isStaff());
+      allow create: if isOwner(uid);
+      allow update, delete: if isStaff();
+    }
+
+    match /orders/{orderId} {
+      allow create: if isAuth()
+                    && request.resource.data.clientUid == request.auth.uid;
+      allow read:   if isAuth() && (resource.data.clientUid == request.auth.uid || isStaff());
+      allow update, delete: if isStaff();
+    }
+
+    match /shared_ventes/{id} {
+      allow read:  if isAuth() && (isStaff() || resource.data.clientUid == request.auth.uid);
+      allow write: if isStaff();
+    }
+
+    match /{document=**} { allow read, write: if false; }
+  }
+}
+
+═══════════════════════════════════════════════════════════════
+-->
