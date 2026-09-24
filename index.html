@@ -1444,18 +1444,23 @@
         </div>
     </div>
 
+    <!-- ===== NOTIFICATION PANEL (UPDATED) ===== -->
     <div class="notification-panel" id="notificationPanel">
         <div class="notification-content">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                <h2 style="color:var(--secondary);">🔔 Notifications</h2>
-                <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:6px;">
+                <h2 style="color:var(--secondary);font-size:16px;margin:0;">🔔 Notifications</h2>
+                <div style="display:flex;gap:4px;flex-wrap:wrap;">
                     <button onclick="NotificationSystem.markAllAsRead(); NotificationSystem.renderPanel();"
-                            style="padding:4px 12px;border:none;border-radius:4px;background:var(--primary);color:#fff;font-size:11px;cursor:pointer;margin-left:4px;">
-                        Tout marquer
+                            style="padding:5px 12px;border:none;border-radius:6px;background:var(--primary);color:#fff;font-size:11px;cursor:pointer;">
+                        ✓ Tout marquer
+                    </button>
+                    <button onclick="NotificationSystem.clearAll();"
+                            style="padding:5px 12px;border:none;border-radius:6px;background:var(--warning);color:#fff;font-size:11px;cursor:pointer;font-weight:700;">
+                        🗑️ Effacer tout
                     </button>
                     <button onclick="closeNotificationPanel()"
-                            style="padding:4px 12px;border:none;border-radius:4px;background:var(--danger);color:#fff;font-size:11px;cursor:pointer;">
-                        Fermer
+                            style="padding:5px 12px;border:none;border-radius:6px;background:var(--danger);color:#fff;font-size:11px;cursor:pointer;">
+                        ✕ Fermer
                     </button>
                 </div>
             </div>
@@ -1651,6 +1656,12 @@
             }
         };
 
+        // ═══════════════════════════════════════════════════
+        // 🔔 NOTIFICATION SYSTEM — Implémentation Staff isolée
+        //    • Chaque Staff/Admin/User a ses propres notifications
+        //    • Mise en cache sous clé : gtrpos_notifications_<UID>
+        //    • Ajout : bouton "Effacer tout" (clearAll)
+        // ═══════════════════════════════════════════════════
         const NotificationSystem = {
             TYPES: {
                 INFO: { icon:'ℹ️', color:'#4a6cf7' },
@@ -1658,15 +1669,33 @@
                 WARNING: { icon:'⚠️', color:'#f1c40f' },
                 ERROR: { icon:'❌', color:'#e74c5e' }
             },
+            // ✅ مفتاح الإشعارات خاص بكل مستخدم
+            _getKey() {
+                const user = State.currentUser;
+                if (!user) return 'gtrpos_notifications_anonymous';
+                if (user.isLocalAdmin) return 'gtrpos_notifications_admin';
+                if (user.uid) return 'gtrpos_notifications_' + user.uid;
+                if (user.email) return 'gtrpos_notifications_' + user.email.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                return 'gtrpos_notifications_default';
+            },
+            // ✅ الحصول على اسم قصير للمستخدم للعرض
+            _getUserLabel() {
+                const user = State.currentUser;
+                if (!user) return '';
+                if (user.isLocalAdmin) return 'Admin';
+                return user.email || '';
+            },
             load() {
                 try {
-                    const saved = localStorage.getItem('gtrpos_notifications');
-                    if (saved) State.notifications = JSON.parse(saved);
-                } catch(e) {}
+                    const key = this._getKey();
+                    const saved = localStorage.getItem(key);
+                    State.notifications = saved ? JSON.parse(saved) : [];
+                } catch(e) { State.notifications = []; }
             },
             save() {
                 try {
-                    localStorage.setItem('gtrpos_notifications',
+                    const key = this._getKey();
+                    localStorage.setItem(key,
                         JSON.stringify(State.notifications.slice(0, APP_CONFIG.maxNotifications)));
                 } catch(e) {}
             },
@@ -1688,6 +1717,24 @@
                 State.notifications.forEach(n => n.read = true);
                 this.save(); this.updateBadge();
             },
+            // ✅ جديد: مسح جميع إشعارات المستخدم الحالي فقط
+            async clearAll() {
+                if (!State.notifications.length) {
+                    Toast.show('⚠️ Aucune notification à effacer', 'warning');
+                    return;
+                }
+                const ok = await CustomConfirm.show(
+                    '⚠️ Supprimer TOUTES les notifications ?\n\n' +
+                    'Cette action est irréversible et ne concerne que votre compte.',
+                    '🗑️ Effacer tout'
+                );
+                if (!ok) return;
+                State.notifications = [];
+                this.save();
+                this.updateBadge();
+                this.renderPanel();
+                Toast.show('🗑️ Notifications effacées', 'success');
+            },
             getUnreadCount() { return State.notifications.filter(n => !n.read).length; },
             updateBadge() {
                 const badge = $('notificationBadge');
@@ -1698,6 +1745,12 @@
                 const panel = $('notificationPanel');
                 const list = $('notificationList');
                 if (!panel || !list) return;
+                // تحديث العنوان باسم المستخدم
+                const title = document.querySelector('#notificationPanel h2');
+                if (title) {
+                    const userLabel = this._getUserLabel();
+                    title.textContent = '🔔 Notifications' + (userLabel ? ' — ' + userLabel : '');
+                }
                 if (!State.notifications.length) {
                     list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:20px;">Aucune notification</div>';
                 } else {
@@ -1709,7 +1762,7 @@
                              border-right:3px solid ${t.color};">
                             <div style="display:flex;justify-content:space-between;align-items:center;">
                                 <span style="font-weight:700;font-size:13px;">${t.icon} ${n.title}</span>
-                                <span style="font-size:10px;color:var(--muted);">${new Date(n.timestamp).toLocaleDateString('fr')}</span>
+                                <span style="font-size:10px;color:var(--muted);">${new Date(n.timestamp).toLocaleDateString('fr')} ${new Date(n.timestamp).toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'})}</span>
                             </div>
                             <div style="font-size:12px;color:var(--muted);margin-top:4px;">${n.message}</div>
                         </div>`;
@@ -5046,6 +5099,8 @@
                             isAdmin: true,
                             isLocalAdmin: true
                         };
+                        NotificationSystem.load();
+                        NotificationSystem.updateBadge();
                         $('accountEmailDisplay2').textContent = 'admin';
                         $('accountEmailDisplay').textContent = 'admin';
                         this._showApp();
@@ -5064,6 +5119,8 @@
                         isAdmin: true,
                         isLocalAdmin: true
                     };
+                    NotificationSystem.load();
+                    NotificationSystem.updateBadge();
                     $('accountEmailDisplay2').textContent = 'admin';
                     $('accountEmailDisplay').textContent = 'admin';
                     this._showApp();
@@ -5339,6 +5396,9 @@
                 $('pendingOverlay').classList.add('hide');
                 $('clientPortal').classList.remove('show');
                 document.querySelector('.phone').style.display = 'flex';
+                // ✅ تحميل إشعارات المستخدم الحالي
+                NotificationSystem.load();
+                NotificationSystem.updateBadge();
                 App.reloadAll();
                 App.showSection('dashboard');
                 Dashboard.load();
