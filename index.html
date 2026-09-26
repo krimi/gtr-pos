@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
 <meta charset="UTF-8">
@@ -8,8 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="GTR POS">
 <meta name="theme-color" content="#1e2f66">
-<title>GTR POS V 0.8.7</title>
-<link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkdUUiBQT1MiLAogICJzaG9ydF9uYW1lIjogIkdUUiBQT1MiLAogICJzdGFydF91cmwiOiAiL2luZGV4Lmh0bWwiLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJvcmllbnRhdGlvbiI6ICJwb3J0cmFpdCIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiIzFhMmE1YyIsCiAgInRoZW1lX2NvbG9yIjogIiMxYTJhNWMiCn0=">
+<title>GTR POS V 0.8.8</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -128,10 +127,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 .bi-kpi{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 6px;text-align:center}
 .bi-kpi .num{font-size:20px;font-weight:800;color:var(--secondary)}
 .bi-kpi .lbl{font-size:8px;color:var(--muted);text-transform:uppercase;margin-top:2px}
-.charts-container{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
-@media(max-width:550px){.charts-container{grid-template-columns:1fr}}
-.chart-box{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px;min-height:250px}
-.chart-box canvas{width:100%!important;height:auto!important;max-height:280px}
 .report-table-wrapper{overflow-x:auto;border-radius:12px;background:var(--panel);border:1px solid var(--border);margin-top:8px}
 .report-table{width:100%;min-width:600px;border-collapse:collapse;font-size:9px;direction:ltr;background:var(--panel)}
 .report-table th{background:var(--secondary);color:#fff;padding:6px 8px;font-weight:700;white-space:nowrap;text-align:center;font-size:8px}
@@ -349,11 +344,10 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
-<body>
-<!-- LOGIN -->
+<body><!-- LOGIN -->
 <div class="login-overlay" id="loginOverlay">
 <div class="login-box">
-<div class="login-logo-icon"><div class="logo-content"><span class="gtr-big">GTR</span><span class="pos-badge">POS</span></div><span class="version-tag">V 0.8.7</span></div>
+<div class="login-logo-icon"><div class="logo-content"><span class="gtr-big">GTR</span><span class="pos-badge">POS</span></div><span class="version-tag">V 0.8.8</span></div>
 <div class="login-logo">GTR POS</div>
 <div class="login-sub" id="loginModeLabel">Connexion à votre compte</div>
 <div class="login-hint">👑 <strong>Admin</strong>: Login = <code>admin</code><br>👤 <strong>Staff</strong>: email + mot de passe<br>🧑‍💼 <strong>Client</strong>: Login + mot de passe</div>
@@ -362,11 +356,11 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 <button class="login-btn" id="loginMainBtn" onclick="Auth.login()">Se connecter</button>
 <div class="login-toggle" id="loginToggleBtn" onclick="Auth.toggleMode()">Vous n'avez pas de compte ? Créez-en un</div>
 <div class="login-divider">Ou</div>
-<button class="login-btn google" onclick="Auth.googleLogin()"><svg width="14" height="14" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.85 2.09-1.81 2.73v2.27h2.92c1.71-1.57 2.69-3.88 2.69-6.64z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.27c-.81.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.34C2.44 15.98 5.48 18 9 18z"/><path fill="#FBBC05" d="M3.97 10.71c-.18-.54-.29-1.11-.29-1.71s.11-1.17.29-1.71V4.95H.96C.35 6.17 0 7.55 0 9s.35 2.83.96 4.05l3.01-2.34z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.95l3.01 2.34C4.68 5.16 6.66 3.58 9 3.58z"/></svg>Google</button>
+<button class="login-btn google" onclick="Auth.googleLogin()">Google</button>
 <div class="login-error" id="loginError"></div>
 <div class="login-loading" id="loginLoading">Chargement...</div>
 <div style="text-align:center;"><span class="cloud-badge">☁️ Mode Cloud Sécurisé</span></div>
-<div class="security-info">🔒 <strong>V 0.8.7</strong> — Login client sans email + SHA-256</div>
+<div class="security-info">🔒 <strong>V 0.8.8</strong> — Login client sans email + SHA-256</div>
 </div>
 </div>
 
@@ -375,7 +369,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 <div class="login-logo-icon" style="width:60px;height:60px;"><div class="logo-content"><span class="gtr-big" style="font-size:22px;">GTR</span><span class="pos-badge" style="font-size:9px;">⏳</span></div></div>
 <div class="login-logo">⏳ GTR POS</div>
 <div class="login-sub">Votre compte est en cours d'examen</div>
-<div class="approval-notice"><span class="icon">ℹ️</span><strong>Important :</strong> Votre demande a été envoyée à l'administrateur. Vous ne pouvez pas accéder à l'application tant que votre compte n'est pas approuvé. Reconnectez-vous plus tard.</div>
+<div class="approval-notice"><span class="icon">ℹ️</span><strong>Important :</strong> Votre demande a été envoyée à l'administrateur. Reconnectez-vous plus tard.</div>
 <button class="login-btn secondary" onclick="Auth.logout()">🚪 Se déconnecter</button>
 </div>
 </div>
@@ -385,7 +379,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 <div class="appbar">
 <div class="appbar-left">
 <div class="logo-icon"><span class="logo-text"><span class="gtr">G</span><span class="pos">POS</span></span><span class="badge-dot">✓</span></div>
-<div><div class="title" id="pageTitle">Accueil</div><div class="sub" onclick="App.openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">V 0.8.7</span></div></div>
+<div><div class="title" id="pageTitle">Accueil</div><div class="sub" onclick="App.openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">V 0.8.8</span></div></div>
 </div>
 <div style="display:flex;gap:6px;align-items:center;">
 <span class="offline-badge" id="offlineBadge">📴 Hors ligne</span>
@@ -399,7 +393,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 </div>
 <button class="fab-top" id="fabBtn">＋</button>
 <div class="content">
-<!-- DASHBOARD -->
+
 <div class="section active" id="sec-dashboard">
 <div class="dashboard-grid" id="dashboardGrid">
 <div class="dash-item" data-section="clients"><span class="dash-icon">👥</span><span class="dash-label">Clients</span></div>
@@ -421,7 +415,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 </div>
 </div>
 
-<!-- CLIENTS -->
 <div class="section" id="sec-clients">
 <div class="import-section">
 <div class="import-header"><h4>📥 Importer des clients</h4>
@@ -517,7 +510,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 
 <div class="section" id="sec-clients-logins">
 <div class="section-title">🔑 Liste des Logins clients</div>
-<div style="font-size:10px;color:var(--muted);margin-bottom:8px;">📋 Tous les Logins uniques des clients (partagés avec le Cloud)</div>
+<div style="font-size:10px;color:var(--muted);margin-bottom:8px;">📋 Tous les Logins uniques des clients</div>
 <input class="search-box" id="loginsSearch" placeholder="🔍 Rechercher un login..." oninput="ClientLogins.render()">
 <div style="display:flex;gap:6px;margin-bottom:8px;">
 <button class="btn save small" onclick="ClientLogins.syncAll()" style="flex:1;">☁️ Synchroniser tout</button>
@@ -602,23 +595,22 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 
 <div class="sheet-overlay" id="overlay"></div>
 
-<!-- SHEET CLIENTS -->
 <div class="sheet" id="sheet-clients">
 <div class="sheet-handle"></div>
 <div class="sheet-header"><h3>Données client</h3><button class="sheet-close" onclick="App.closeSheet()">✕</button></div>
 <div class="sheet-body">
 <div class="field"><label>Code client</label><input id="cCode" readonly></div>
-<div class="field"><label>🔑 Login (unique)</label><input id="cLogin" placeholder="Ex: Amine_2026" style="direction:ltr;text-align:left;font-family:monospace;letter-spacing:1px;"><div id="cLoginError" style="font-size:8px;color:var(--danger);min-height:12px;"></div></div>
-<div class="field"><label>Nom client</label><input id="cName"></div>
-<div class="field-row"><div class="field"><label>Téléphone 1</label><input id="cPhone"></div><div class="field"><label>Téléphone 2</label><input id="cPhone2"></div></div>
-<div class="field"><label>📧 Email (optionnel)</label><input id="cEmail" type="email" placeholder="exemple@email.com" style="direction:ltr;text-align:left;"><div id="cEmailError" style="font-size:8px;color:var(--danger);min-height:12px;"></div></div>
+<div class="field"><label>🔑 Login (unique)</label><input id="cLogin" placeholder="Ex: Amine_2026" style="direction:ltr;text-align:left;font-family:monospace;letter-spacing:1px;" autocomplete="off"><div id="cLoginError" style="font-size:8px;color:var(--danger);min-height:12px;"></div></div>
+<div class="field"><label>Nom client</label><input id="cName" autocomplete="off"></div>
+<div class="field-row"><div class="field"><label>Téléphone 1</label><input id="cPhone" autocomplete="off"></div><div class="field"><label>Téléphone 2</label><input id="cPhone2" autocomplete="off"></div></div>
+<div class="field"><label>📧 Email (optionnel)</label><input id="cEmail" type="email" placeholder="exemple@email.com" style="direction:ltr;text-align:left;" autocomplete="off"><div id="cEmailError" style="font-size:8px;color:var(--danger);min-height:12px;"></div></div>
 <div class="field-row-2">
-<div class="field"><label>🔐 Mot de passe client</label><div class="password-wrapper"><input type="text" id="cPassword" placeholder="Mot de passe" style="direction:ltr;text-align:left;font-family:monospace;"><button class="password-toggle" type="button" onclick="ClientsModule.togglePwd()" id="cPwdToggle">👁️</button></div><div id="cPasswordError" style="font-size:8px;color:var(--danger);min-height:12px;"></div></div>
+<div class="field"><label>🔐 Mot de passe client</label><div class="password-wrapper"><input type="text" id="cPassword" placeholder="Mot de passe" style="direction:ltr;text-align:left;font-family:monospace;" autocomplete="new-password"><button class="password-toggle" type="button" onclick="ClientsModule.togglePwd()" id="cPwdToggle">👁️</button></div><div id="cPasswordError" style="font-size:8px;color:var(--danger);min-height:12px;"></div></div>
 <div class="field"><label>🎲 Générer auto</label><button class="btn edit small" onclick="ClientsModule.generatePassword()" style="width:100%;height:32px;font-size:10px;">🎲 Générer</button></div>
 </div>
 <div class="login-credentials-box">💡 <strong>Le client se connecte avec:</strong><br>🔑 Login: <span id="cDisplayLogin">-</span><br>🔐 Mot de passe: celui que vous définissez</div>
-<div class="field"><label>Adresse</label><input id="cAddress"></div>
-<div class="field"><label>Matricule fiscal (MF)</label><input id="cTaxId"></div>
+<div class="field"><label>Adresse</label><input id="cAddress" autocomplete="off"></div>
+<div class="field"><label>Matricule fiscal (MF)</label><input id="cTaxId" autocomplete="off"></div>
 <div class="field-row-2">
 <div class="field"><label>💰 Solde d'ouverture (TND)</label><input id="cOpeningBalance" type="number" step="0.001" value="0"></div>
 <div class="field"><label>📊 Solde actuel (TND)</label><input id="cBalance" type="number" step="0.001" value="0" readonly style="background:#eef0f6;"></div>
@@ -644,7 +636,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 </div>
 </div>
 
-<!-- SHEET FOURNISSEURS -->
 <div class="sheet" id="sheet-fournisseurs">
 <div class="sheet-handle"></div>
 <div class="sheet-header"><h3>Fournisseur</h3><button class="sheet-close" onclick="App.closeSheet()">✕</button></div>
@@ -673,7 +664,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 </div>
 </div>
 
-<!-- SHEET ARTICLES -->
 <div class="sheet" id="sheet-articles">
 <div class="sheet-handle"></div>
 <div class="sheet-header"><h3>Article</h3><button class="sheet-close" onclick="App.closeSheet()">✕</button></div>
@@ -697,7 +687,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 </div>
 </div>
 
-<!-- SHEET VENTES -->
 <div class="sheet" id="sheet-ventes">
 <div class="sheet-handle"></div>
 <div class="sheet-header"><h3>📄 Facture de vente</h3><button class="sheet-close" onclick="App.closeSheet()">✕</button></div>
@@ -754,7 +743,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 </div>
 </div>
 
-<!-- SHEET ACHATS -->
 <div class="sheet" id="sheet-achats">
 <div class="sheet-handle"></div>
 <div class="sheet-header"><h3>📄 Facture d'achat</h3><button class="sheet-close" onclick="App.closeSheet()">✕</button></div>
@@ -811,7 +799,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 </div>
 </div>
 
-<!-- SHEET EXPENSES -->
 <div class="sheet" id="sheet-expenses">
 <div class="sheet-handle"></div>
 <div class="sheet-header"><h3>Dépense</h3><button class="sheet-close" onclick="App.closeSheet()">✕</button></div>
@@ -833,7 +820,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 </div>
 </div>
 
-<!-- SHEET COMPANY -->
 <div class="sheet" id="sheet-company">
 <div class="sheet-handle"></div>
 <div class="sheet-header"><h3>⚙️ Paramètres</h3><button class="sheet-close" onclick="App.closeSheet()">✕</button></div>
@@ -877,7 +863,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 <div class="toast-modern" id="toastModern"></div>
 </div>
 
-<!-- MODALS -->
 <div class="modal-overlay" id="passwordModal">
 <div class="modal-box">
 <h3>🔑 Changer mot de passe</h3>
@@ -991,7 +976,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 </div>
 </div>
 
-<!-- CLIENT PORTAL -->
 <div class="client-portal" id="clientPortal">
 <div class="cp-header">
 <div class="cp-logo">GTR<span>POS</span></div>
@@ -1029,14 +1013,13 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 <div style="text-align:center;color:#aaa;font-size:10px;margin-bottom:3px;">💡 Choisissez l'imprimante</div>
 <div class="invoice-doc paper-80" id="printDoc"></div>
 </div>
-
 <script>
 (function() {
 'use strict';
 
 const APP_CONFIG = {
-    version: 'V 0.8.7',
-    storageKey: 'gtrpos_data_v36',
+    version: 'V 0.8.8',
+    storageKey: 'gtrpos_data_v37',
     themeKey: 'gtrpos_theme',
     printKey: 'gtrpos_print_settings',
     dashboardKey: 'gtrpos_dashboard_cols',
@@ -1082,6 +1065,8 @@ const State = {
     dashboardColumns: 4, isSaving: false, notifications: []
 };
 
+const PasswordCache = { value: '' };
+
 const Utils = {
     $(id) { return document.getElementById(id); },
     formatNum(n) { return Number(n || 0).toFixed(3).replace(/\./g, ','); },
@@ -1107,7 +1092,7 @@ const Utils = {
     },
     async hashPassword(password, salt) {
         const enc = new TextEncoder();
-        const data = enc.encode(String(salt) + ':' + String(password) + ':gtrpos_v087');
+        const data = enc.encode(String(salt) + ':' + String(password) + ':gtrpos_v088');
         const buf = await crypto.subtle.digest('SHA-256', data);
         return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
     },
@@ -1188,7 +1173,7 @@ const NotificationSystem = {
     markAllAsRead() { State.notifications.forEach(n => n.read = true); this.save(); this.updateBadge(); },
     async clearAll() {
         if (!State.notifications.length) { Toast.show('⚠️ Aucune notification', 'warning'); return; }
-        const ok = await CustomConfirm.show('⚠️ Supprimer TOUTES les notifications ?\n\nCette action est irréversible.', '🗑️ Effacer tout');
+        const ok = await CustomConfirm.show('⚠️ Supprimer TOUTES les notifications ?', '🗑️ Effacer tout');
         if (!ok) return;
         State.notifications = []; this.save(); this.updateBadge(); this.renderPanel();
         Toast.show('🗑️ Notifications effacées', 'success');
@@ -1379,7 +1364,7 @@ const Persistence = {
                 && !String(State.currentUser.uid).startsWith('client_')) {
                 window.db.collection('users').doc(State.currentUser.uid).set(this.serialize())
                     .then(() => console.log('☁️ Firestore sauvegardé'))
-                    .catch(e => console.error('❌ Firestore error:', e.message));
+                    .catch(e => console.warn('⚠️ Firestore error:', e.message));
             }
             this.syncVentesToShared();
             return true;
@@ -1409,7 +1394,7 @@ const Persistence = {
         try {
             const raw = localStorage.getItem(APP_CONFIG.storageKey);
             if (!raw) {
-                const old = localStorage.getItem('gtrpos_data_v35') || localStorage.getItem('gtrpos_data_v34');
+                const old = localStorage.getItem('gtrpos_data_v36') || localStorage.getItem('gtrpos_data_v35');
                 if (old) { this.deserialize(JSON.parse(old)); this.save(); }
                 return !!old;
             }
@@ -1430,9 +1415,8 @@ const Persistence = {
                 try { await window.db.collection('users').doc(uid).set(this.serialize()); } catch(e) {}
             }
         } catch(e) {
-            console.error('❌ Erreur cloud:', e.message);
+            console.warn('⚠️ Cloud load failed:', e.message);
             this.load();
-            Toast.show('⚠️ Mode hors ligne', 'warning');
         }
     },
     export() {
@@ -1488,7 +1472,7 @@ const PrintSystem = {
         const file = e.target.files[0];
         if (!file) return;
         if (!file.type.startsWith('image/')) { Toast.show('⚠️ Image requise'); return; }
-        if (file.size > 500 * 1024) { Toast.show('⚠️ Image trop grande (max 500 KB)'); return; }
+        if (file.size > 500 * 1024) { Toast.show('⚠️ Image trop grande'); return; }
         const reader = new FileReader();
         reader.onload = ev => { this.settings.logo = ev.target.result; this.updateCustomizerUI(); Toast.show('✅ Logo téléchargé', 'success'); };
         reader.readAsDataURL(file);
@@ -1582,10 +1566,10 @@ const PreviewModal = {
         const rows = movements.map(m => `<tr><td>${esc(m.date)}</td><td style="font-weight:700;">${esc(m.doc || '-')}</td><td style="text-align:left;">${esc(m.description)}</td><td style="text-align:right;color:#c0392b;">${Number(m.debit || 0).toFixed(3)}</td><td style="text-align:right;color:#27ae60;">${Number(m.credit || 0).toFixed(3)}</td><td style="text-align:right;font-weight:700;">${Number(m.balance || 0).toFixed(3)}</td></tr>`).join('');
         let pendingHTML = '';
         if (pendingOrders && pendingOrders.length) {
-            const statusLbl = { pending:'⏳ En attente', approved:'✅ Acceptée (non facturée)' };
-            const pRows = pendingOrders.map(o => `<tr style="background:#fff8e1;"><td>${esc(o.date)} ${esc(o.time || '')}</td><td style="font-weight:700;">${esc(o.num)}</td><td style="text-align:left;">🛒 ${o.lines.length} article(s) — ${statusLbl[o.status] || esc(o.status)}</td><td style="text-align:right;font-weight:700;color:#e67e22;">${Number(o.total).toFixed(3)}</td><td colspan="2" style="text-align:center;color:#999;">En cours</td></tr>`).join('');
+            const statusLbl = { pending:'⏳ En attente', approved:'✅ Acceptée' };
+            const pRows = pendingOrders.map(o => `<tr style="background:#fff8e1;"><td>${esc(o.date)}</td><td style="font-weight:700;">${esc(o.num)}</td><td style="text-align:left;">🛒 ${o.lines.length} article(s) — ${statusLbl[o.status] || esc(o.status)}</td><td style="text-align:right;font-weight:700;color:#e67e22;">${Number(o.total).toFixed(3)}</td><td colspan="2"></td></tr>`).join('');
             const totalPending = pendingOrders.reduce((s, o) => s + o.total, 0);
-            pendingHTML = `<div style="margin-top:16px;border-top:3px dashed #f39c12;padding-top:10px;"><div style="font-size:12px;font-weight:800;color:#e67e22;margin-bottom:6px;">🛒 Commandes en cours (non facturées)</div><table><thead><tr style="background:#e67e22;"><th>Date</th><th>N°</th><th>Statut</th><th>Montant</th><th colspan="2">Note</th></tr></thead><tbody>${pRows}</tbody><tfoot><tr><td colspan="3" style="text-align:right;font-weight:700;">Total en attente :</td><td style="text-align:right;font-weight:700;color:#e67e22;">${totalPending.toFixed(3)} TND</td><td colspan="2"></td></tr></tfoot></table></div>`;
+            pendingHTML = `<div style="margin-top:16px;border-top:3px dashed #f39c12;padding-top:10px;"><div style="font-size:12px;font-weight:800;color:#e67e22;margin-bottom:6px;">🛒 Commandes en cours</div><table><thead><tr style="background:#e67e22;"><th>Date</th><th>N°</th><th>Statut</th><th>Montant</th><th colspan="2"></th></tr></thead><tbody>${pRows}</tbody><tfoot><tr><td colspan="3" style="text-align:right;font-weight:700;">Total :</td><td style="text-align:right;font-weight:700;color:#e67e22;">${totalPending.toFixed(3)} TND</td><td colspan="2"></td></tr></tfoot></table></div>`;
         }
         return `<div style="text-align:center;border-bottom:2px solid #1e2f66;padding-bottom:6px;margin-bottom:8px;"><div style="font-size:14px;font-weight:800;">${esc(data.title)}</div><div style="font-size:10px;color:#666;">${esc(State.companyInfo.name)} - ${new Date().toLocaleDateString('fr-FR')}</div></div>
         <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;font-size:10px;border:1px solid #999;padding:6px 8px;margin-bottom:8px;"><span><strong>${esc(partyLabel)}:</strong> ${esc(entity.name)}</span><span><strong>Tél:</strong> ${esc(entity.phone || '-')}</span><span><strong>Solde:</strong> <span style="color:${finalBalance >= 0 ? '#27ae60' : '#c0392b'};font-weight:700;">${finalBalance.toFixed(3)} TND</span></span></div>
@@ -1741,7 +1725,7 @@ const ClientOrder = {
             Toast.show('✅ Commande envoyée au vendeur', 'success');
             this.close();
             setTimeout(() => ClientPortal.render(), 150);
-        } else $('coError').textContent = '⚠️ Synchronisation échouée — commande locale enregistrée';
+        } else $('coError').textContent = '⚠️ Sync échouée — commande locale enregistrée';
     },
     async syncToCloud(order) {
         if (typeof firebase === 'undefined') return false;
@@ -1749,8 +1733,7 @@ const ClientOrder = {
         if (!currentUser) { Toast.show('⚠️ Session Firebase expirée', 'warning'); return false; }
         try {
             const client = State.currentClient;
-            const db = firebase.firestore();
-            await db.collection('orders').doc('order_' + order.id + '_' + Date.now()).set({
+            await firebase.firestore().collection('orders').doc('order_' + order.id + '_' + Date.now()).set({
                 ...order, clientLogin: client?.login || '', clientEmail: client?.email || '',
                 clientUid: currentUser.uid, syncedAt: new Date().toISOString(), source: 'client-portal'
             });
@@ -1801,10 +1784,7 @@ const ClientPortal = {
                         else { State.orders[idx] = { ...State.orders[idx], ...data, cloudId }; changed = true; }
                     }
                 });
-                if (changed) {
-                    try { localStorage.setItem(APP_CONFIG.storageKey, JSON.stringify(Persistence.serialize())); } catch(e) {}
-                    this.renderOrders(); this.render();
-                }
+                if (changed) { Persistence.save(); this.renderOrders(); this.render(); }
             }, err => console.warn('⚠️ orders listener:', err.message));
         } catch(e) { console.error(e); }
     },
@@ -1831,11 +1811,7 @@ const ClientPortal = {
                         changed = true;
                     } else if (change.type === 'removed' && idx !== -1) { State.ventes.splice(idx, 1); changed = true; }
                 });
-                if (changed) {
-                    try { localStorage.setItem(APP_CONFIG.storageKey, JSON.stringify(Persistence.serialize())); } catch(e) {}
-                    BalanceCalculator.recalculateClient(client.name);
-                    this.render();
-                }
+                if (changed) { Persistence.save(); BalanceCalculator.recalculateClient(client.name); this.render(); }
             }, err => console.warn('⚠️ ventes listener:', err.message));
         } catch(e) { console.error(e); }
     },
@@ -1926,6 +1902,7 @@ function createEntityModule(cfg) {
         editingId: null, list: cfg.list, prefix: cfg.prefix, _specialPrices: [],
         reset() {
             this.editingId = null; this._specialPrices = [];
+            PasswordCache.value = '';
             const id = State.nextId[cfg.table];
             $(cfg.fields.code).value = cfg.prefix + '-' + String(id).padStart(4, '0');
             Object.entries(cfg.fields).forEach(([key, elId]) => {
@@ -1972,6 +1949,7 @@ function createEntityModule(cfg) {
             const item = this.list().find(x => x.id === id);
             if (!item) return;
             this.editingId = id;
+            PasswordCache.value = '';
             Object.entries(cfg.fields).forEach(([key, elId]) => {
                 const el = $(elId);
                 if (!el) return;
@@ -2336,6 +2314,9 @@ function createTransactionModule(cfg) {
     };
 }
 
+// ⏭️ SUITE DANS LE PARTIE 4
+// (script tag removed - continues below)
+
 const ClientsRenderer = {
     render() {
         const q = ($('cSearch')?.value || '').trim().toLowerCase();
@@ -2536,22 +2517,17 @@ const ClientsModule = createEntityModule({
     fields: { code:'cCode', login:'cLogin', name:'cName', phone:'cPhone', phone2:'cPhone2', email:'cEmail', address:'cAddress', taxId:'cTaxId', openingBalance:'cOpeningBalance', balance:'cBalance' },
     renderer: ClientsRenderer,
     async validate() {
+        const pwdFromInput = ($('cPassword')?.value || '').trim();
+        const password = pwdFromInput || PasswordCache.value;
         const login = $('cLogin').value.trim();
         const name = $('cName').value.trim();
         const email = $('cEmail').value.trim().toLowerCase();
-        const password = $('cPassword').value.trim();
         if (!name) { Toast.show('Entrez le nom'); return false; }
         if (!login) { $('cLoginError').textContent = '⚠️ Login requis'; Toast.show('⚠️ Login requis'); return false; }
         if (!Utils.isValidLogin(login)) { $('cLoginError').textContent = '⚠️ Lettres, chiffres et _ (min 3)'; Toast.show('⚠️ Login invalide'); return false; }
         const loginLower = login.toLowerCase();
         const dupLogin = State.clients.find(c => c.id !== this.editingId && (c.login || '').toLowerCase() === loginLower);
         if (dupLogin) { $('cLoginError').textContent = `⚠️ Login "${login}" déjà utilisé par "${dupLogin.name}"`; Toast.show(`⚠️ Login déjà pris`); return false; }
-        if (window.db) {
-            try {
-                const existing = await ClientLoginsSync.lookup(login);
-                if (existing && existing.id !== this.editingId) { $('cLoginError').textContent = `⚠️ Login "${login}" existe déjà (cloud)`; Toast.show(`⚠️ Login déjà pris (cloud)`); return false; }
-            } catch(e) { console.warn('⚠️ Cloud check skipped:', e.message); }
-        }
         $('cLoginError').textContent = '';
         if (email && !Utils.isValidEmail(email)) { $('cEmailError').textContent = '⚠️ Email invalide'; Toast.show('⚠️ Email invalide'); return false; }
         $('cEmailError').textContent = '';
@@ -2563,7 +2539,7 @@ const ClientsModule = createEntityModule({
         return true;
     },
     async collect() {
-        const plainPwd = $('cPassword').value.trim();
+        const plainPwd = ($('cPassword')?.value || '').trim() || PasswordCache.value;
         let passwordHash, salt;
         if (plainPwd) { salt = Utils.generateSalt(); passwordHash = await Utils.hashPassword(plainPwd, salt); }
         else if (this.editingId) {
@@ -2589,7 +2565,9 @@ const ClientsModule = createEntityModule({
         return false;
     },
     onReset() {
-        this._specialPrices = []; this.renderSpecialPrices(); this.refreshSpArticleOptions(); this.updateSummary();
+        this._specialPrices = [];
+        PasswordCache.value = '';
+        this.renderSpecialPrices(); this.refreshSpArticleOptions(); this.updateSummary();
         if ($('cPasswordError')) $('cPasswordError').textContent = '';
         if ($('cLoginError')) $('cLoginError').textContent = '';
         if ($('cPassword')) $('cPassword').value = '';
@@ -2597,6 +2575,7 @@ const ClientsModule = createEntityModule({
     },
     onLoad(c) {
         this._specialPrices = c.specialPrices ? [...c.specialPrices] : [];
+        PasswordCache.value = '';
         this.renderSpecialPrices(); this.refreshSpArticleOptions(); this.updateSummary();
         if ($('cPasswordError')) $('cPasswordError').textContent = '';
         if ($('cLoginError')) $('cLoginError').textContent = '';
@@ -2623,8 +2602,9 @@ Object.assign(ClientsModule, {
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
         let pwd = '';
         for (let i = 0; i < 8; i++) pwd += chars.charAt(Math.floor(Math.random() * chars.length));
-        $('cPassword').value = pwd;
-        $('cPasswordError').textContent = '';
+        PasswordCache.value = pwd;
+        if ($('cPassword')) $('cPassword').value = pwd;
+        if ($('cPasswordError')) $('cPasswordError').textContent = '';
         Toast.show(`🎲 Mot de passe: ${pwd}`, 'success');
     },
     renderSpecialPrices() {
@@ -2659,7 +2639,7 @@ Object.assign(ClientsModule, {
     updateSummary() {
         const c = State.clients.find(x => x.id === this.editingId);
         const ids = { opening:'cDisplayOpening', purchases:'cDisplayTotalPurchases', payments:'cDisplayTotalPayments', balance:'cDisplayBalance' };
-        if (!c) { Object.values(ids).forEach(id => $(id).textContent = '0.000'); return; }
+        if (!c) { Object.values(ids).forEach(id => { const el = $(id); if (el) el.textContent = '0.000'; }); return; }
         const tp = State.ventes.filter(v => v.client === c.name).reduce((s, v) => s + v.total, 0);
         const tpay = State.caisseClients.filter(x => x.clientName === c.name).reduce((s, x) => s + x.amount, 0);
         const open = c.openingBalance || 0;
@@ -2700,7 +2680,7 @@ Object.assign(FournisseursModule, {
     updateSummary() {
         const f = State.fournisseurs.find(x => x.id === this.editingId);
         const ids = { opening:'fDisplayOpening', purchases:'fDisplayTotalPurchases', payments:'fDisplayTotalPayments', balance:'fDisplayBalance' };
-        if (!f) { Object.values(ids).forEach(id => $(id).textContent = '0.000'); return; }
+        if (!f) { Object.values(ids).forEach(id => { const el = $(id); if (el) el.textContent = '0.000'; }); return; }
         const tp = State.achats.filter(a => a.supplier === f.name).reduce((s, a) => s + a.total, 0);
         const tpay = State.caisseFournisseurs.filter(x => x.fournisseurName === f.name).reduce((s, x) => s + x.amount, 0);
         const open = f.openingBalance || 0;
@@ -2802,15 +2782,15 @@ const Orders = {
                     } else if (change.type === 'removed' && existingIdx !== -1) { State.orders.splice(existingIdx, 1); changed = true; }
                 });
                 if (changed) { Persistence.save(); if (State.currentSection === 'orders') this.render(); }
-            }, err => console.error('❌ Firestore listener error:', err));
-        } catch(e) { console.error('❌ Cannot start listener:', e); }
+            }, err => console.warn('⚠️ Firestore listener:', err.message));
+        } catch(e) { console.warn('⚠️ Cannot start listener:', e.message); }
     },
     stopRealtimeListener() { if (this._unsubscribe) { this._unsubscribe(); this._unsubscribe = null; } },
     async updateCloudStatus(order, newStatus) {
         if (typeof firebase === 'undefined' || !order.cloudId) return;
         try {
             await firebase.firestore().collection('orders').doc(order.cloudId).update({ status: newStatus, updatedAt: new Date().toISOString(), updatedByStaff: true });
-        } catch(e) { console.error('❌ Update cloud error:', e.message); }
+        } catch(e) { console.warn('⚠️ Update cloud:', e.message); }
     },
     get(id) { return State.orders.find(o => o.id === id || o.cloudId === id); },
     render() {
@@ -3310,8 +3290,7 @@ const CaisseHistory = {
             return `<tr><td>${esc(m.date)}</td><td>${m.type === 'client' ? 'Client' : 'Fournisseur'}</td><td>${esc(m.party)}</td><td>${esc(m.invoiceNum)}</td><td>${esc(m.method)}</td><td style="color:${color};">${m.amount.toFixed(3)}</td><td style="color:${color};">${isIn ? 'Entrée' : 'Sortie'}</td></tr>`;
         }).join('');
         if (!rows) rows = `<tr><td colspan="7" style="text-align:center;">Aucun mouvement</td></tr>`;
-        const content = `
-            <div class="kpi-row"><div class="kpi-card"><div class="val">${totalIn.toFixed(3)} TND</div><div class="lbl">💰 Entrées</div></div><div class="kpi-card"><div class="val">${totalOut.toFixed(3)} TND</div><div class="lbl">💸 Sorties</div></div><div class="kpi-card"><div class="val">${balance.toFixed(3)} TND</div><div class="lbl">📊 Solde</div></div></div>
+        const content = `<div class="kpi-row"><div class="kpi-card"><div class="val">${totalIn.toFixed(3)} TND</div><div class="lbl">💰 Entrées</div></div><div class="kpi-card"><div class="val">${totalOut.toFixed(3)} TND</div><div class="lbl">💸 Sorties</div></div><div class="kpi-card"><div class="val">${balance.toFixed(3)} TND</div><div class="lbl">📊 Solde</div></div></div>
             <table><thead><tr><th>Date</th><th>Type</th><th>Partie</th><th>Facture</th><th>Méthode</th><th>Montant</th><th>Direction</th></tr></thead><tbody>${rows}</tbody></table>`;
         PrintSystem.openPrintWindow('Rapport de caisse', content);
     }
@@ -3399,17 +3378,16 @@ const FinanceJour = {
             const color = isIn ? '#2ecc71' : '#e74c5e';
             return `<tr><td>${esc(m.type)}</td><td>${esc(m.party)}</td><td>${esc(m.invoice)}</td><td>${esc(m.description)}</td><td style="color:${color};">${m.amount.toFixed(3)}</td><td style="color:${color};">${isIn ? 'Entrée' : 'Sortie'}</td></tr>`;
         }).join('');
-        const content = `
-            <div class="kpi-row">
-                <div class="kpi-card"><div class="val">${d.soldeClient.toFixed(3)}</div><div class="lbl">💰 Solde client</div></div>
-                <div class="kpi-card"><div class="val">${d.valeurStock.toFixed(3)}</div><div class="lbl">📦 Stock</div></div>
-                <div class="kpi-card"><div class="val">${d.caisse.toFixed(3)}</div><div class="lbl">💰 Caisse</div></div>
-                <div class="kpi-card"><div class="val">${d.soldeFournisseur.toFixed(3)}</div><div class="lbl">📊 Fournisseurs</div></div>
-                <div class="kpi-card"><div class="val">${d.total.toFixed(3)}</div><div class="lbl">📈 Total</div></div>
-                <div class="kpi-card"><div class="val">${d.benefice.toFixed(3)}</div><div class="lbl">📈 Bénéfice</div></div>
-            </div>
-            <h3>📋 Mouvements du jour</h3>
-            <table><thead><tr><th>Type</th><th>Partie</th><th>Facture</th><th>Description</th><th>Montant</th><th>Direction</th></tr></thead><tbody>${rows || '<tr><td colspan="6" style="text-align:center;">Aucun mouvement</td></tr>'}</tbody></table>`;
+        const content = `<div class="kpi-row">
+            <div class="kpi-card"><div class="val">${d.soldeClient.toFixed(3)}</div><div class="lbl">💰 Solde client</div></div>
+            <div class="kpi-card"><div class="val">${d.valeurStock.toFixed(3)}</div><div class="lbl">📦 Stock</div></div>
+            <div class="kpi-card"><div class="val">${d.caisse.toFixed(3)}</div><div class="lbl">💰 Caisse</div></div>
+            <div class="kpi-card"><div class="val">${d.soldeFournisseur.toFixed(3)}</div><div class="lbl">📊 Fournisseurs</div></div>
+            <div class="kpi-card"><div class="val">${d.total.toFixed(3)}</div><div class="lbl">📈 Total</div></div>
+            <div class="kpi-card"><div class="val">${d.benefice.toFixed(3)}</div><div class="lbl">📈 Bénéfice</div></div>
+        </div>
+        <h3>📋 Mouvements du jour</h3>
+        <table><thead><tr><th>Type</th><th>Partie</th><th>Facture</th><th>Description</th><th>Montant</th><th>Direction</th></tr></thead><tbody>${rows || '<tr><td colspan="6" style="text-align:center;">Aucun mouvement</td></tr>'}</tbody></table>`;
         PrintSystem.openPrintWindow('Rapport financier du jour', content);
     },
     sendWhatsapp() {
@@ -3885,7 +3863,7 @@ const Auth = {
             window.db = firebase.firestore();
             window.storage = firebase.storage();
             State.storageMode = 'cloud';
-        } catch(e) { console.error('Firebase error:', e); }
+        } catch(e) { console.warn('⚠️ Firebase init:', e.message); }
     },
     toggleMode() {
         this.isSignup = !this.isSignup;
@@ -3960,7 +3938,7 @@ const Auth = {
             this._showApp();
             Toast.show('👑 Bienvenue', 'success');
             return true;
-        } catch(e) { console.error('Admin login error:', e); return false; }
+        } catch(e) { console.warn('⚠️ Admin login:', e.message); return false; }
     },
     async changeAdminPassword() {
         const c = $('staffCurrentPassword').value;
@@ -4039,7 +4017,7 @@ const Auth = {
                 if (window.db) await window.db.collection('approvals').doc(uid).set({ email: e, requestedAt: new Date().toISOString(), approved: false, role: 'staff' });
                 Toast.show('✅ Demande envoyée à l\'admin', 'success');
             } catch (dbErr) {
-                console.error('❌ Firestore error:', dbErr);
+                console.warn('⚠️ Firestore:', dbErr.message);
                 Toast.show('⚠️ Compte créé mais approval échoué', 'warning');
                 this._showPending();
             }
@@ -4049,6 +4027,7 @@ const Auth = {
         });
     },
     googleLogin() {
+        if (typeof firebase === 'undefined') return;
         const provider = new firebase.auth.GoogleAuthProvider();
         $('loginError').textContent = '';
         $('loginLoading').style.display = 'block';
@@ -4061,7 +4040,7 @@ const Auth = {
         try { sessionStorage.removeItem(APP_CONFIG.sessionKey); } catch(e) {}
         ClientPortal.hide();
         State.currentClient = null;
-        if (State.currentUser && !State.currentUser.isClient && !State.currentUser.isLocalAdmin) window.auth.signOut();
+        if (State.currentUser && !State.currentUser.isClient && !State.currentUser.isLocalAdmin && window.auth) window.auth.signOut();
         else {
             State.currentUser = null;
             $('loginOverlay').classList.remove('hide');
@@ -4288,7 +4267,11 @@ async function confirmImport() {
         ClientsRenderer.render();
         if (window.db && createdClients.length) {
             st.textContent = `☁️ Synchronisation...`;
-            for (const c of createdClients) if (c.passwordHash) await ClientLoginsSync.syncOne(c);
+            for (const c of createdClients) {
+                if (c.passwordHash) {
+                    try { await ClientLoginsSync.syncOne(c); } catch(e) { console.warn('Sync failed:', c.login); }
+                }
+            }
         }
         pf.style.width = '100%';
         st.textContent = `✅ ${imported} importés, ${errors} erreurs`;
@@ -4299,7 +4282,7 @@ async function confirmImport() {
 
 function cancelImport() {
     importData = [];
-    ['importPreview','importConfirmBtn','importCancelBtn','importProgress'].forEach(id => $(id).style.display = 'none');
+    ['importPreview','importConfirmBtn','importCancelBtn','importProgress'].forEach(id => { const el = $(id); if (el) el.style.display = 'none'; });
     $('importFileInput').value = '';
     Toast.show('❌ Annulé');
 }
@@ -4431,8 +4414,18 @@ function bindEvents() {
             App.showSection(id);
         });
     });
+    const cPasswordInput = $('cPassword');
+    if (cPasswordInput) {
+        cPasswordInput.addEventListener('input', function() {
+            PasswordCache.value = this.value;
+        });
+    }
     const cLoginInput = $('cLogin');
-    if (cLoginInput) cLoginInput.addEventListener('input', function() { if ($('cDisplayLogin')) $('cDisplayLogin').textContent = this.value.trim() || '-'; });
+    if (cLoginInput) {
+        cLoginInput.addEventListener('input', function() { 
+            if ($('cDisplayLogin')) $('cDisplayLogin').textContent = this.value.trim() || '-'; 
+        });
+    }
     document.addEventListener('keydown', e => {
         if (e.key === 'F1') { e.preventDefault(); showShortcutHelp(); }
         if (e.ctrlKey && e.key === 'p') {
@@ -4469,7 +4462,7 @@ Object.assign(window, {
     Auth, App, Theme, PrintSystem, PreviewModal, CustomConfirm, NotificationSystem,
     Dashboard, Fullscreen, Persistence, BalanceCalculator, ClientLogins, ClientLoginsSync,
     ClientsRenderer, FournisseursRenderer, ArticlesRenderer, VentesRenderer, AchatsRenderer,
-    RoleManager, ClientPortal, Toast, Utils,
+    RoleManager, ClientPortal, Toast, Utils, State,
     downloadTemplate, handleImportFile, confirmImport, cancelImport,
     showNotificationPanel, closeNotificationPanel,
     openChangePasswordModal, closeChangePasswordModal,
@@ -4541,9 +4534,9 @@ async function bootstrap() {
     Persistence.load();
 
     setTimeout(async () => {
-        try { await migratePasswords(); } catch(e) { console.error(e); }
-        try { await migrateClientLogins(); } catch(e) { console.error(e); }
-        try { const repaired = await repairOldOrders(); if (repaired > 0) Toast.show(`🔧 ${repaired} commande(s) réparée(s)`, 'success'); } catch(e) { console.error(e); }
+        try { await migratePasswords(); } catch(e) { console.warn('Migrate PW:', e.message); }
+        try { await migrateClientLogins(); } catch(e) { console.warn('Migrate Login:', e.message); }
+        try { const repaired = await repairOldOrders(); if (repaired > 0) Toast.show(`🔧 ${repaired} commande(s) réparée(s)`, 'success'); } catch(e) { console.warn('Repair:', e.message); }
     }, 800);
 
     setTimeout(() => Dashboard.load(), 500);
@@ -4566,7 +4559,7 @@ async function bootstrap() {
         } catch(e) {}
     }, 400);
 
-    console.log('✅ GTR POS V 0.8.7 ready');
+    console.log('✅ GTR POS V 0.8.8 ready');
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootstrap);
