@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
 <meta charset="UTF-8">
@@ -3418,11 +3418,14 @@ const CaisseHistory = {
             if (!soldes[method]) soldes[method] = { in: 0, out: 0 };
             soldes[method].in += c.amount || 0;
         });
-        State.caisseFournisseurs.forEach(c => {
-            const method = c.regType || 'Espèces';
+               State.caisseFournisseurs.forEach(c => {
+           const method = c.regType || 'Espèces';
             if (!soldes[method]) soldes[method] = { in: 0, out: 0 };
             soldes[method].out += c.amount || 0;
         });
+       
+        soldes['Espèces'].in += State.companyInfo.cashOpening || 0;  
+    
         const methodIcons = { 'Espèces': '💵', 'Chèque': '🧾', 'Virement': '🏦', 'Mobile': '📱', 'Carte': '💳' };
         const methodColors = { 'Espèces': '#2ecc71', 'Chèque': '#3498db', 'Virement': '#9b59b6', 'Mobile': '#e67e22', 'Carte': '#1abc9c' };
         let totalSolde = 0;
