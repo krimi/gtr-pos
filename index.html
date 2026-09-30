@@ -1247,22 +1247,20 @@ const Theme = {
 };
 
 const Stock = {
-    adjust(name, delta, opts = {}) {
+       adjust(name, delta, opts = {}) {
         const a = State.articles.find(x => x.name === name);
         if (!a) return false;
         const newStock = (a.stock || 0) + delta;
-        if (newStock < 0 && !opts.allowNegative) {
-            if (!opts.silent) Toast.show(`⚠️ Stock insuffisant`, 'warning');
-            return false;
-        }
-        a.stock = Math.max(0, newStock);
+        // ✅ تم حذف شرط منع المخزون السالب
+        a.stock = newStock;  // ✅ السماح بالمخزون السالب
         Persistence.save();
         if (!opts.silent) ArticlesRenderer.render();
         return true;
     },
-    check(name, qty) {
+       check(name, qty) {
         const a = State.articles.find(x => x.name === name);
-        return { available: (a?.stock || 0) >= qty, stock: a?.stock || 0 };
+        // ✅ السماح بالبيع دائماً حتى لو كان المخزون 0
+        return { available: true, stock: a?.stock || 0 };
     },
     getValue() { return State.articles.reduce((s, a) => s + ((a.stock || 0) * (a.costPrice || a.price || 0)), 0); },
     getOpeningValue() {
