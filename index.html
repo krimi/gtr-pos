@@ -631,10 +631,11 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
    <button class="btn save small" onclick="ClientsModule.addSpecialPrice(); ClientsModule.saveSpecialPricesNow();">+</button>
 </div>
 </div>
-<div class="sheet-footer">
-<button class="btn save" onclick="ClientsModule.save()">💾 Enregistrer</button>
-<button class="btn edit" onclick="ClientsModule.edit()">✏️ Modifier</button>
-<button class="btn del" onclick="ClientsModule.remove()">🗑 Supprimer</button>
+<div class="sheet-footer" style="flex-wrap: wrap;">
+    <button class="btn save" onclick="ClientsModule.save()" style="flex: 1;">💾 Enregistrer</button>
+    <button class="btn edit" onclick="ClientsModule.edit()" style="flex: 1;">✏️ Modifier</button>
+    <button class="btn del" onclick="ClientsModule.remove()" style="flex: 1;">🗑 Supprimer</button>
+    <button class="btn print" onclick="ClientsModule.loginAsClient()" style="flex: 1 0 100%; background: linear-gradient(135deg, #8e44ad, #6c3483); margin-top: 4px;">🔓 Login as Client</button>
 </div>
 </div>
 
@@ -1021,7 +1022,12 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 <div class="client-portal" id="clientPortal">
 <div class="cp-header">
 <div class="cp-logo">GTR<span>POS</span></div>
-<div class="cp-user"><span id="cpClientName">Client</span><button onclick="Auth.logout()" title="Déconnexion">🚪</button></div>
+<div class="cp-user">
+    <span id="cpClientName">Client</span>
+    <span id="cpStaffBadge" style="display: none; background: #8e44ad; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 9px; font-weight: 700;">👨‍💼 Vue Staff</span>
+    <button id="cpExitBtn" onclick="ClientsModule.exitClientView()" title="Retour au mode Staff" style="display: none; background: linear-gradient(135deg, #8e44ad, #6c3483);">🔓</button>
+    <button onclick="Auth.logout()" title="Déconnexion">🚪</button>
+</div>
 </div>
 <div class="cp-content">
 <div class="cp-balance-card">
@@ -1959,7 +1965,7 @@ const ClientOrder = {
 
 const ClientPortal = {
     _ordersUnsub: null, _ventesUnsub: null,
-    show() {
+        show() {
         const client = State.currentClient;
         if (!client) { Toast.show('❌ Client introuvable', 'error'); return; }
         $('clientPortal').classList.add('show');
@@ -1971,6 +1977,13 @@ const ClientPortal = {
         this.render();
         this.startClientOrderListener();
         this.startClientVentesListener();
+        
+        // ✅ إظهار/إخفاء زر الخروج وشارة Staff
+        const isStaffView = State.currentUser && State.currentUser.viewedByStaff;
+        const exitBtn = $('cpExitBtn');
+        const staffBadge = $('cpStaffBadge');
+        if (exitBtn) exitBtn.style.display = isStaffView ? 'flex' : 'none';
+        if (staffBadge) staffBadge.style.display = isStaffView ? 'inline-block' : 'none';
     },
     hide() {
         this.stopClientOrderListener();
@@ -2637,20 +2650,48 @@ function createTransactionModule(cfg) {
     };
 }
 
-const ClientsRenderer = {
+
+   const ClientsRenderer = {
+    // ✅ دالة للحصول على العملاء المرئيين للمستخدم الحالي
+    getVisibleClients() {
+        const user = State.currentUser;
+        if (!user) return [];
+        
+        // Admin يرى الكل
+        if (user.isLocalAdmin || user.email === APP_CONFIG.adminEmail || user.loginName === APP_CONFIG.adminLogin) {
+            return State.clients;
+        }
+        
+        // Staff يرى عملاءه فقط + عملاء Admin
+        if (user.uid) {
+            return State.clients.filter(c => 
+                c.staffOwner === user.uid || 
+                c.staffOwner === 'admin' || 
+                !c.staffOwner  // للعملاء القدامى (قبل التحديث)
+            );
+        }
+        
+        return State.clients;
+    },
+    
     render() {
         const q = ($('cSearch')?.value || '').trim().toLowerCase();
         const list = $('clientsList');
         if (!list) return;
         list.innerHTML = '';
-        const filtered = State.clients.filter(c => !q || c.name.toLowerCase().includes(q) || (c.login || '').toLowerCase().includes(q) || (c.phone || '').includes(q) || (c.email || '').toLowerCase().includes(q));
+        
+        // ✅ استخدام الفلترة حسب Staff
+        const visibleClients = this.getVisibleClients();
+        const filtered = visibleClients.filter(c => !q || c.name.toLowerCase().includes(q) || (c.login || '').toLowerCase().includes(q) || (c.phone || '').includes(q) || (c.email || '').toLowerCase().includes(q));
+        
         if (!filtered.length) { list.innerHTML = '<div class="empty-msg">Aucun client</div>'; return; }
+        
         filtered.forEach(c => {
             const hasAct = State.ventes.some(v => v.client === c.name) || State.caisseClients.some(ca => ca.clientName === c.name);
             const lock = hasAct ? '🔒 ' : '';
             const loginIcon = c.login ? '🔑 ' : '';
             const pwd = c.passwordHash ? '🔐 ' : '';
-                     const d = document.createElement('div');
+            const d = document.createElement('div');
             d.className = 'row-card';
             d.onclick = () => ClientsModule.load(c.id);
             const spIcon = (c.specialPrices && c.specialPrices.length > 0) ? `⭐${c.specialPrices.length} ` : '';
@@ -2867,6 +2908,32 @@ const ClientsModule = createEntityModule({
             const existing = State.clients.find(c => c.id === this.editingId);
             passwordHash = existing?.passwordHash; salt = existing?.passwordSalt;
         }
+                // ✅ تحديد الـ staffOwner
+        const currentUser = State.currentUser;
+        let staffOwner = null;
+        let staffName = 'Admin';
+        
+        if (currentUser && !currentUser.isClient) {
+            if (currentUser.isLocalAdmin || currentUser.email === APP_CONFIG.adminEmail) {
+                staffOwner = 'admin';
+                staffName = 'Admin';
+            } else if (currentUser.uid) {
+                staffOwner = currentUser.uid;
+                staffName = currentUser.email || currentUser.login || 'Staff';
+            }
+        }
+        
+        // ✅ الاحتفاظ بالـ staffOwner الأصلي عند التعديل
+        let finalStaffOwner = staffOwner;
+        let finalStaffName = staffName;
+        if (this.editingId) {
+            const existing = State.clients.find(c => c.id === this.editingId);
+            if (existing && existing.staffOwner) {
+                finalStaffOwner = existing.staffOwner;
+                finalStaffName = existing.staffName || 'Staff';
+            }
+        }
+        
         return {
             login: $('cLogin').value.trim(), name: $('cName').value.trim(),
             phone: $('cPhone').value, phone2: $('cPhone2').value,
@@ -2875,8 +2942,10 @@ const ClientsModule = createEntityModule({
             openingBalance: parseFloat($('cOpeningBalance').value) || 0,
             balance: parseFloat($('cBalance').value) || 0,
             passwordHash, passwordSalt: salt,
-            specialPrices: [...this._specialPrices]
-        };
+            specialPrices: [...this._specialPrices],
+            staffOwner: finalStaffOwner,
+            staffName: finalStaffName
+           };
     },
     canDelete(c) {
         const hasV = State.ventes.some(v => v.client === c.name);
@@ -2927,6 +2996,77 @@ const ClientsModule = createEntityModule({
 });
 
 Object.assign(ClientsModule, {
+    
+    // ✅ دخول كعميل (Staff/Admin)
+    loginAsClient() {
+        if (this.editingId == null) {
+            Toast.show('⚠️ Sélectionnez un client', 'warning');
+            return;
+        }
+        const client = State.clients.find(c => c.id === this.editingId);
+        if (!client) {
+            Toast.show('❌ Client introuvable', 'error');
+            return;
+        }
+        
+        if (!client.login) {
+            Toast.show('⚠️ Ce client n\'a pas de Login', 'warning');
+            return;
+        }
+        
+        // حفظ المستخدم الحالي (Staff/Admin) للعودة لاحقاً
+        if (State.currentUser && !State.currentUser.isClient) {
+            State._previousUser = { ...State.currentUser };
+        }
+        
+        // تعيين العميل كالمستخدم الحالي
+        State.currentClient = client;
+        State.currentUser = { 
+            login: client.login, 
+            uid: 'client_' + client.id, 
+            isClient: true,
+            viewedByStaff: true
+        };
+        
+        // إغلاق النوافذ
+        App.closeSheet();
+        
+        // عرض Client Portal
+        ClientPortal.show();
+        Toast.show(`🔓 Portail client: ${client.name}`, 'success');
+    },
+    
+    // ✅ الخروج من وضع العميل
+    exitClientView() {
+        if (!State.currentUser || !State.currentUser.viewedByStaff) {
+            Toast.show('⚠️ Vous n\'êtes pas en mode client', 'warning');
+            return;
+        }
+        
+        // إيقاف الـ listeners
+        ClientPortal.stopClientOrderListener();
+        if (ClientPortal._ventesUnsub) {
+            ClientPortal._ventesUnsub();
+            ClientPortal._ventesUnsub = null;
+        }
+        
+        // إخفاء Client Portal
+        $('clientPortal').classList.remove('show');
+        document.querySelector('.phone').style.display = 'flex';
+        
+        State.currentClient = null;
+        
+        // استعادة المستخدم السابق (Staff/Admin)
+        if (State._previousUser) {
+            State.currentUser = State._previousUser;
+            State._previousUser = null;
+        }
+        
+        // العودة إلى قائمة Clients
+        App.showSection('clients');
+        
+        Toast.show('👨‍💼 Retour au mode Staff/Admin', 'success');
+    },
     togglePwd() {
         const input = $('cPassword');
         if (!input) return;
