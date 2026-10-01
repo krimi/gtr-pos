@@ -2945,7 +2945,7 @@ const ClientsModule = createEntityModule({
             specialPrices: [...this._specialPrices],
             staffOwner: finalStaffOwner,
             staffName: finalStaffName
-           };
+             };
     },
     canDelete(c) {
         const hasV = State.ventes.some(v => v.client === c.name);
