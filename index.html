@@ -2271,26 +2271,71 @@ function createTransactionModule(cfg) {
                     } else {
                         priceSource = 'manual';
                     }
+                            } else {
+                priceSource = 'manual';
+            }
+        }
+        
+        // ✅ إذا كان السعر معدَّلاً يدوياً، اسأل عن الحفظ الدائم
+        if (priceSource === 'manual' && !cfg.isPurchase) {
+            const currentParty = $(cfg.partySelect).value ? cfg.partyList().find(p => p.id == $(cfg.partySelect).value) : null;
+            if (currentParty) {
+                const savePermanently = confirm(`💾 Enregistrer ce prix (${price.toFixed(3)} TND) comme PRIX SPÉCIAL PERMANENT pour "${currentParty.name}" ?\n\n✅ OK = Pour toutes les prochaines factures\n❌ Annuler = Uniquement cette facture`);
+                
+                if (savePermanently) {
+                    // حفظ السعر الخاص في بيانات العميل
+                    if (!currentParty.specialPrices) currentParty.specialPrices = [];
+                    const existingIdx = currentParty.specialPrices.findIndex(sp => sp.name === name);
+                    if (existingIdx !== -1) {
+                        currentParty.specialPrices[existingIdx].price = price;
+                    } else {
+                        currentParty.specialPrices.push({ name: name, price: price });
+                    }
+                    
+                    // حفظ في localStorage
+                    Persistence.save();
+                    
+                    // مزامنة مع Firebase
+                    if (currentParty.passwordHash && typeof ClientLoginsSync !== 'undefined') {
+                        ClientLoginsSync.syncOne(currentParty).then(ok => {
+                            if (ok) {
+                                Toast.show(`⭐ Prix spécial enregistré: ${name} → ${price.toFixed(3)} TND`, 'success');
+                            }
+                        });
+                    } else {
+                        Toast.show(`⭐ Prix spécial enregistré: ${name} → ${price.toFixed(3)} TND`, 'success');
+                    }
+                    
+                    priceSource = 'special'; // أصبح السعر خاصاً دائماً
                 } else {
-                    priceSource = 'manual';
+                    Toast.show(`✏️ Prix modifié pour cette facture uniquement`, 'info');
                 }
             }
-            
-            const existing = this.lines.find(l => l.name === name);
-            if (existing) { 
-                existing.qty += qty; 
-                existing.total = existing.price * existing.qty;
-                existing.priceSource = priceSource;
-            } else {
-                this.lines.push({ name, price, qty, total: price * qty, priceSource });
-            }
-            $(cfg.articleSelect).value = ''; $(cfg.priceInput).value = ''; $(cfg.qtyInput).value = 1; $(cfg.totalInput).value = '';
-            if (cfg.stockHint) $(cfg.stockHint).textContent = 'Stock: -';
-            this.renderLines(); this.refreshArticleOptions();
-            this.updateAccountSummary();
-            if (cfg.paymentOnlyNotice && $(cfg.paymentOnlyNotice)) $(cfg.paymentOnlyNotice).style.display = 'none';
-            Toast.show('✅ Ajouté', 'success');
-        },
+        }
+        
+        const existing = this.lines.find(l => l.name === name);
+        if (existing) { 
+            existing.qty += qty; 
+            existing.total = existing.price * existing.qty;
+            existing.priceSource = priceSource;
+        } else {
+            this.lines.push({ name, price, qty, total: price * qty, priceSource });
+        }
+        
+        $(cfg.articleSelect).value = ''; 
+        $(cfg.priceInput).value = ''; 
+        $(cfg.qtyInput).value = 1; 
+        $(cfg.totalInput).value = '';
+        if (cfg.stockHint) $(cfg.stockHint).textContent = 'Stock: -';
+        $(cfg.priceInput).style.borderColor = '';
+        $(cfg.priceInput).style.background = '';
+        
+        this.renderLines(); 
+        this.refreshArticleOptions();
+        this.updateAccountSummary();
+        if (cfg.paymentOnlyNotice && $(cfg.paymentOnlyNotice)) $(cfg.paymentOnlyNotice).style.display = 'none';
+        Toast.show('✅ Ajouté', 'success');
+    },
         removeLine(idx) {
             this.lines.splice(idx, 1);
             if (this.editingRowIndex === idx) this.editingRowIndex = null;
