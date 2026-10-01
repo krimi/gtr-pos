@@ -1297,10 +1297,17 @@ const BalanceCalculator = {
 
 const ClientLoginsSync = {
     COLLECTION: 'client_logins',
-    async syncOne(client) {
+        async syncOne(client) {
         if (typeof firebase === 'undefined' || !window.db) return false;
         if (!client || !client.login || !client.passwordHash || !client.passwordSalt) return false;
         try {
+            // ✅ التأكد من أن الأسعار الخاصة مصفوفة نظيفة
+            const cleanSpecialPrices = Array.isArray(client.specialPrices)
+                ? client.specialPrices
+                    .filter(sp => sp && sp.name && typeof sp.price === 'number')
+                    .map(sp => ({ name: String(sp.name), price: Number(sp.price) }))
+                : [];
+            
             await window.db.collection(this.COLLECTION).doc('login_' + client.login.toLowerCase()).set({
                 login: client.login.toLowerCase(),
                 clientData: {
@@ -1309,11 +1316,11 @@ const ClientLoginsSync = {
                     phone: client.phone || '', phone2: client.phone2 || '',
                     email: client.email || '', address: client.address || '',
                     taxId: client.taxId || '', openingBalance: client.openingBalance || 0,
-                    specialPrices: client.specialPrices || []
+                    specialPrices: cleanSpecialPrices
                 },
                 updatedAt: new Date().toISOString()
             }, { merge: true });
-            console.log(`✅ Login "${client.login}" synchronisé`);
+            console.log(`✅ Login "${client.login}" synchronisé avec ${cleanSpecialPrices.length} prix spécial(aux)`);
             return true;
         } catch(e) { console.warn(`⚠️ Sync login "${client.login}" échoué:`, e.message); return false; }
     },
@@ -2185,22 +2192,55 @@ function createTransactionModule(cfg) {
             }
             this.updateAccountSummary(); this.refreshArticleOptions();
         },
-        fillArticle() {
+                fillArticle() {
             const a = State.articles.find(x => x.id == $(cfg.articleSelect).value);
-            if (!a) { $(cfg.priceInput).value = ''; if (cfg.stockHint) $(cfg.stockHint).textContent = 'Stock: -'; this.calcLine(); return; }
+            if (!a) { 
+                $(cfg.priceInput).value = ''; 
+                if (cfg.stockHint) $(cfg.stockHint).textContent = 'Stock: -'; 
+                this.calcLine(); 
+                return; 
+            }
+            
             let price = cfg.isPurchase ? (a.costPrice || a.price) : a.price;
             let hint = '';
+            let isSpecialPrice = false;
+            
             if (!cfg.isPurchase) {
-                hint = 'Stock: ' + (a.stock || 0);
-                if (this.originalPartyId && this.partySpecialPrices) {
-                    const sp = this.partySpecialPrices.find(s => s.name === a.name);
-                    if (sp) { price = sp.price; hint = `⭐ Spécial: ${sp.price.toFixed(3)} (Stock: ${a.stock || 0})`; }
+                let sp = null;
+                if ($(cfg.partySelect).value) {
+                    const currentParty = cfg.partyList().find(p => p.id == $(cfg.partySelect).value);
+                    if (currentParty && currentParty.specialPrices && currentParty.specialPrices.length > 0) {
+                        sp = currentParty.specialPrices.find(s => s.name === a.name);
+                    }
+                }
+                if (!sp && this.partySpecialPrices && this.partySpecialPrices.length > 0) {
+                    sp = this.partySpecialPrices.find(s => s.name === a.name);
+                }
+                if (sp) {
+                    price = sp.price;
+                    isSpecialPrice = true;
+                    hint = `⭐ Prix spécial: ${sp.price.toFixed(3)} TND (Stock: ${a.stock || 0})`;
+                } else {
+                    hint = 'Stock: ' + (a.stock || 0);
                 }
                 if (a.stock <= 5 && a.stock > 0) hint += ' ⚠️';
                 else if (a.stock <= 0) hint += ' ❌';
-            } else hint = `Stock: ${a.stock || 0} (sera ajouté)`;
+            } else {
+                hint = `Stock: ${a.stock || 0} (sera ajouté)`;
+            }
+            
             if (cfg.stockHint) $(cfg.stockHint).textContent = hint;
             $(cfg.priceInput).value = price.toFixed(3);
+            
+            if (isSpecialPrice && $(cfg.priceInput)) {
+                $(cfg.priceInput).style.borderColor = '#f39c12';
+                $(cfg.priceInput).style.background = '#fff8e1';
+                Toast.show(`⭐ Prix spécial appliqué: ${price.toFixed(3)} TND`, 'success');
+            } else if ($(cfg.priceInput)) {
+                $(cfg.priceInput).style.borderColor = '';
+                $(cfg.priceInput).style.background = '';
+            }
+            
             this.calcLine();
         },
         calcLine() {
@@ -2737,8 +2777,23 @@ const ClientsModule = createEntityModule({
     },
     async onSave(data) {
         BalanceCalculator.recalculateClient(data.name);
-        const client = State.clients.find(c => c.login === data.login);
-        if (client && client.passwordHash) await ClientLoginsSync.syncOne(client);
+        
+        // ✅ التأكد من حفظ الأسعار الخاصة في بيانات العميل
+        const client = State.clients.find(c => c.name === data.name);
+        if (client) {
+            client.specialPrices = Array.isArray(this._specialPrices) 
+                ? this._specialPrices.map(sp => ({ name: sp.name, price: Number(sp.price) }))
+                : [];
+            
+            console.log(`💾 Client "${client.name}" sauvegardé avec ${client.specialPrices.length} prix spécial(aux)`);
+            
+            if (client.passwordHash) {
+                await ClientLoginsSync.syncOne(client);
+                if (client.specialPrices.length > 0) {
+                    Toast.show(`⭐ ${client.specialPrices.length} prix spécial(aux) sauvegardé(s)`, 'success');
+                }
+            }
+        }
     },
     async onDelete(item) { if (item.login) await ClientLoginsSync.deleteOne(item.login); }
 });
