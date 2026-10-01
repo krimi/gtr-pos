@@ -997,6 +997,27 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 </div>
 </div>
 
+<!-- ✅ حوار 3 أزرار مخصص (Always / This Invoice / Cancel) -->
+<div class="modal-overlay" id="customConfirm3Modal">
+    <div class="modal-box" style="max-width: 420px;">
+        <h3 id="customConfirm3Title" style="color: var(--secondary); font-size: 16px; font-weight: 800; text-align: center; margin-bottom: 16px;">💾 Enregistrer le prix</h3>
+        <div id="customConfirm3Message" style="font-size: 13px; line-height: 1.7; color: var(--text); background: var(--bg); padding: 14px 16px; border-radius: 12px; margin-bottom: 18px; border: 1px solid var(--border); text-align: left;"></div>
+        <div style="display: flex; gap: 8px; flex-direction: column;">
+            <button class="btn save" id="customConfirm3Always" style="padding: 12px; font-size: 13px; font-weight: 700; border-radius: 10px; background: linear-gradient(135deg, #2ecc71, #27ae60); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                ⭐ Toujours (Permanent)
+            </button>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn del" id="customConfirm3Cancel" style="flex: 1; padding: 10px; font-size: 12px; font-weight: 700; border-radius: 10px; background: linear-gradient(135deg, #e74c5e, #c0392b); color: #fff; border: none; cursor: pointer;">
+                    ❌ Annuler
+                </button>
+                <button class="btn print" id="customConfirm3Ok" style="flex: 1; padding: 10px; font-size: 12px; font-weight: 700; border-radius: 10px; background: linear-gradient(135deg, #4a6cf7, #2a4ac7); color: #fff; border: none; cursor: pointer;">
+                    ✅ Cette facture
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="client-portal" id="clientPortal">
 <div class="cp-header">
 <div class="cp-logo">GTR<span>POS</span></div>
@@ -1727,6 +1748,36 @@ const CustomConfirm = {
     }
 };
 
+// ✅ حوار 3 أزرار مخصص (Always / This Invoice / Cancel)
+const CustomConfirm3 = {
+    resolvePromise: null,
+    init() {
+        const modal = $('customConfirm3Modal');
+        if (!modal) return;
+        $('customConfirm3Always').onclick = () => this.handle('always');
+        $('customConfirm3Ok').onclick = () => this.handle('ok');
+        $('customConfirm3Cancel').onclick = () => this.handle('cancel');
+        modal.addEventListener('click', (e) => { if (e.target === modal) this.handle('cancel'); });
+    },
+    show(message, title = 'Confirmation', options = {}) {
+        return new Promise((resolve) => {
+            this.resolvePromise = resolve;
+            $('customConfirm3Title').textContent = String(title);
+            $('customConfirm3Message').innerHTML = String(message);
+            if (options.alwaysText) $('customConfirm3Always').textContent = options.alwaysText;
+            if (options.okText) $('customConfirm3Ok').textContent = options.okText;
+            if (options.cancelText) $('customConfirm3Cancel').textContent = options.cancelText;
+            if (options.hideAlways) $('customConfirm3Always').style.display = 'none';
+            else $('customConfirm3Always').style.display = 'flex';
+            $('customConfirm3Modal').classList.add('show');
+        });
+    },
+    handle(value) {
+        $('customConfirm3Modal').classList.remove('show');
+        if (this.resolvePromise) { this.resolvePromise(value); this.resolvePromise = null; }
+    }
+};
+
 const Bluetooth = {
     SERVICE_UUID: '000018f0-0000-1000-8000-00805f9b34fb',
     CHAR_UUID: '00002af1-0000-1000-8000-00805f9b34fb',
@@ -2248,7 +2299,7 @@ function createTransactionModule(cfg) {
             const q = parseFloat($(cfg.qtyInput).value) || 0;
             $(cfg.totalInput).value = (p * q).toFixed(3);
         },
-        addLine() {
+                async addLine() {
             const sel = $(cfg.articleSelect);
             const name = sel.value ? sel.options[sel.selectedIndex].textContent : '';
             const price = parseFloat($(cfg.priceInput).value) || 0;
@@ -2276,14 +2327,24 @@ function createTransactionModule(cfg) {
             }
         }
         
-        // ✅ إذا كان السعر معدَّلاً يدوياً، اسأل عن الحفظ الدائم
+                // ✅ إذا كان السعر معدَّلاً يدوياً، اعرض حواراً جميلاً
         if (priceSource === 'manual' && !cfg.isPurchase) {
             const currentParty = $(cfg.partySelect).value ? cfg.partyList().find(p => p.id == $(cfg.partySelect).value) : null;
             if (currentParty) {
-                const savePermanently = confirm(`💾 Enregistrer ce prix (${price.toFixed(3)} TND) comme PRIX SPÉCIAL PERMANENT pour "${currentParty.name}" ?\n\n✅ OK = Pour toutes les prochaines factures\n❌ Annuler = Uniquement cette facture`);
+                const choice = await CustomConfirm3.show(
+                    `💰 <strong>Nouveau prix:</strong> ${price.toFixed(3)} TND<br><br>` +
+                    `👤 <strong>Client:</strong> ${currentParty.name}<br>` +
+                    `📦 <strong>Article:</strong> ${name}<br><br>` +
+                    `Voulez-vous enregistrer ce prix comme <strong>PRIX SPÉCIAL PERMANENT</strong> ?`,
+                    '💾 Enregistrer le prix spécial',
+                    {
+                        alwaysText: '⭐ Toujours (Permanent)',
+                        okText: '✅ Cette facture',
+                        cancelText: '❌ Annuler'
+                    }
+                );
                 
-                if (savePermanently) {
-                    // حفظ السعر الخاص في بيانات العميل
+                if (choice === 'always') {
                     if (!currentParty.specialPrices) currentParty.specialPrices = [];
                     const existingIdx = currentParty.specialPrices.findIndex(sp => sp.name === name);
                     if (existingIdx !== -1) {
@@ -2291,11 +2352,8 @@ function createTransactionModule(cfg) {
                     } else {
                         currentParty.specialPrices.push({ name: name, price: price });
                     }
-                    
-                    // حفظ في localStorage
                     Persistence.save();
                     
-                    // مزامنة مع Firebase
                     if (currentParty.passwordHash && typeof ClientLoginsSync !== 'undefined') {
                         ClientLoginsSync.syncOne(currentParty).then(ok => {
                             if (ok) {
@@ -2306,9 +2364,11 @@ function createTransactionModule(cfg) {
                         Toast.show(`⭐ Prix spécial enregistré: ${name} → ${price.toFixed(3)} TND`, 'success');
                     }
                     
-                    priceSource = 'special'; // أصبح السعر خاصاً دائماً
-                } else {
+                    priceSource = 'special';
+                } else if (choice === 'ok') {
                     Toast.show(`✏️ Prix modifié pour cette facture uniquement`, 'info');
+                } else {
+                    return;
                 }
             }
         }
@@ -5034,6 +5094,7 @@ async function bootstrap() {
     Dashboard.load();
     Fullscreen.init();
     CustomConfirm.init();
+	    CustomConfirm3.init();
     bindEvents();
     Auth.init();
     Persistence.load();
