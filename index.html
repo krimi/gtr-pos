@@ -19,22 +19,26 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
-html,body{height:100%;font-family:'Cairo',sans-serif;background:#0e142e;font-size:14px;overflow:hidden}
-:root{--primary:#4a6cf7;--secondary:#1a2a5c;--success:#2ecc71;--danger:#e74c5e;--warning:#f1c40f;--bg:#f0f2f8;--panel:#fff;--text:#1a1f2e;--muted:#7a8499;--border:#e2e6f0;--card-radius:16px;--transition:all .3s ease;--shadow:0 4px 20px rgba(26,42,92,.08)}
-body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--border:#2a3a5c;--shadow:0 4px 20px rgba(0,0,0,.3)}
+html,body{height:100%;font-family:'Cairo',sans-serif;background:#0e142e;font-size:16px;overflow:hidden}
+:root{
+    --primary:#4a6cf7;--secondary:#1a2a5c;--success:#2ecc71;--danger:#e74c5e;--warning:#f1c40f;
+    --bg:#f0f2f8;--panel:#fff;--text:#111827;--muted:#6b7280;--border:#d1d5db;
+    --card-radius:16px;--transition:all .3s ease;--shadow:0 4px 20px rgba(26,42,92,.08)
+}
+body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--border:#374151;--shadow:0 4px 20px rgba(0,0,0,.3)}
 .phone{width:100%;height:100vh;height:100dvh;background:var(--bg);display:flex;flex-direction:column;position:relative;overflow:hidden;max-width:100%;margin:0 auto;color:var(--text)}
 @media(min-width:768px){.phone{max-width:420px;height:95dvh;margin:20px auto;border-radius:36px;box-shadow:0 20px 60px rgba(0,0,0,.3)}}
-.appbar{background:linear-gradient(135deg,var(--secondary),#2a3f7a);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;min-height:56px;z-index:5;box-shadow:0 2px 20px rgba(26,42,92,.3)}
-.appbar .logo-icon{width:40px;height:40px;border-radius:12px;background:linear-gradient(145deg,#6b8aff,#3a56d4);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;margin-right:10px;flex-shrink:0;box-shadow:0 4px 16px rgba(74,108,247,.45);position:relative}
+.appbar{background:linear-gradient(135deg,var(--secondary),#2a3f7a);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;min-height:60px;z-index:5;box-shadow:0 2px 20px rgba(26,42,92,.3)}
+.appbar .logo-icon{width:42px;height:42px;border-radius:12px;background:linear-gradient(145deg,#6b8aff,#3a56d4);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#fff;margin-right:10px;flex-shrink:0;box-shadow:0 4px 16px rgba(74,108,247,.45);position:relative}
 .appbar .logo-icon .logo-text{position:relative;z-index:1;display:flex;align-items:center;gap:0}
 .appbar .logo-icon .logo-text .gtr{font-size:18px;font-weight:900}
 .appbar .logo-icon .logo-text .pos{font-size:10px;font-weight:700;background:rgba(255,255,255,.2);padding:1px 4px;border-radius:4px;margin-left:1px;letter-spacing:.5px}
 .appbar .logo-icon .badge-dot{position:absolute;bottom:-2px;right:-2px;width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,var(--success),#27ae60);border:2px solid var(--secondary);z-index:2;display:flex;align-items:center;justify-content:center;font-size:6px;color:#fff;font-weight:700}
-.appbar .title{font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
-.appbar .sub{font-size:10px;color:rgba(255,255,255,.7);cursor:pointer}
+.appbar .title{font-size:19px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.appbar .sub{font-size:11px;color:rgba(255,255,255,.8);cursor:pointer}
 .appbar-left{display:flex;align-items:center}
-.appbar .menu-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.12);border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:var(--transition);position:relative;z-index:10}
-.appbar .menu-btn .badge{position:absolute;top:-2px;right:-2px;background:var(--danger);color:#fff;border-radius:50%;font-size:8px;padding:1px 5px;display:none}
+.appbar .menu-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.12);border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:var(--transition);position:relative;z-index:10}
+.appbar .menu-btn .badge{position:absolute;top:-2px;right:-2px;background:var(--danger);color:#fff;border-radius:50%;font-size:9px;padding:1px 5px;display:none}
 .appbar .menu-btn .badge.show{display:block}
 #backBtn{background:rgba(255,255,255,.08);font-size:18px}
 .login-logo-icon{width:80px;height:80px;border-radius:22px;background:linear-gradient(145deg,#6b8aff,#2a4ac7);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 8px 40px rgba(74,108,247,.4);position:relative}
@@ -50,32 +54,32 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 .dashboard-grid.cols-2{grid-template-columns:repeat(2,1fr)}
 .dashboard-grid.cols-3{grid-template-columns:repeat(3,1fr)}
 .dashboard-grid.cols-4{grid-template-columns:repeat(4,1fr)}
-.dash-item{background:var(--panel);border-radius:var(--card-radius);padding:14px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:var(--shadow);border:none;transition:var(--transition);cursor:pointer;min-height:76px;position:relative;overflow:hidden;color:var(--text)}
-.dash-icon{font-size:32px;margin-bottom:4px}
-.dash-label{font-size:11px;font-weight:700;color:var(--text);text-align:center}
-.fab-top{position:absolute;top:12px;right:16px;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#6b8aff,var(--primary));color:#fff;font-size:24px;border:none;box-shadow:0 4px 16px rgba(74,108,247,.4);z-index:15;cursor:pointer;display:none;align-items:center;justify-content:center}
+.dash-item{background:var(--panel);border-radius:var(--card-radius);padding:14px 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:var(--shadow);border:none;transition:var(--transition);cursor:pointer;min-height:80px;position:relative;overflow:hidden;color:var(--text)}
+.dash-icon{font-size:32px;margin-bottom:6px}
+.dash-label{font-size:13px;font-weight:700;color:var(--text);text-align:center}
+.fab-top{position:absolute;top:12px;right:16px;width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#6b8aff,var(--primary));color:#fff;font-size:26px;border:none;box-shadow:0 4px 16px rgba(74,108,247,.4);z-index:15;cursor:pointer;display:none;align-items:center;justify-content:center}
 .fab-top.show{display:flex}
-.search-box{width:100%;padding:8px 14px;border:2px solid var(--border);border-radius:12px;font-family:'Cairo',sans-serif;font-size:12px;margin-bottom:8px;background:var(--panel);color:var(--text);height:36px}
-.row-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:8px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:44px;color:var(--text)}
-.row-card .name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
-.row-card .meta{font-size:9px;color:var(--muted)}
-.row-card .amount{font-size:12px;font-weight:800;color:var(--secondary)}
-.empty-msg{text-align:center;color:var(--muted);font-size:12px;padding:16px 0}
-.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:8px;margin-bottom:12px}
-.kpi-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 6px;text-align:center}
-.kpi-card .val{font-size:15px;font-weight:800;color:var(--secondary)}
-.kpi-card .lbl{font-size:8px;color:var(--muted);margin-top:2px;font-weight:600;text-transform:uppercase}
-.section-title{font-size:13px;font-weight:800;color:var(--secondary);margin:10px 0 6px;display:flex;align-items:center;gap:6px}
-.section-title::before{content:'';width:3px;height:16px;background:var(--primary);border-radius:2px}
-.badge{padding:3px 8px;border-radius:20px;font-size:8px;font-weight:700;color:#fff}
+.search-box{width:100%;padding:10px 16px;border:2px solid var(--border);border-radius:12px;font-family:'Cairo',sans-serif;font-size:14px;margin-bottom:10px;background:var(--panel);color:var(--text);height:44px}
+.row-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;min-height:56px;color:var(--text);transition:var(--transition)}
+.row-card .name{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.row-card .meta{font-size:11px;color:var(--muted);margin-top:2px}
+.row-card .amount{font-size:15px;font-weight:800;color:var(--secondary)}
+.empty-msg{text-align:center;color:var(--muted);font-size:14px;padding:20px 0}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;margin-bottom:12px}
+.kpi-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center}
+.kpi-card .val{font-size:18px;font-weight:800;color:var(--secondary)}
+.kpi-card .lbl{font-size:10px;color:var(--muted);margin-top:4px;font-weight:600;text-transform:uppercase}
+.section-title{font-size:16px;font-weight:800;color:var(--secondary);margin:14px 0 8px;display:flex;align-items:center;gap:8px}
+.section-title::before{content:'';width:4px;height:18px;background:var(--primary);border-radius:2px}
+.badge{padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700;color:#fff}
 .badge.paid{background:linear-gradient(135deg,var(--success),#27ae60)}
 .badge.pending{background:linear-gradient(135deg,var(--warning),#f39c12)}
 .badge.low{background:linear-gradient(135deg,var(--danger),#c0392b)}
 .badge.high{background:linear-gradient(135deg,var(--success),#27ae60)}
 .badge.medium{background:linear-gradient(135deg,var(--warning),#f39c12)}
 .badge.payment-only{background:linear-gradient(135deg,#3498db,#2980b9)}
-.btn{width:100%;padding:8px;border:none;border-radius:10px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer;margin-bottom:4px;background:linear-gradient(135deg,#6b8aff,var(--primary))}
-.btn.small{padding:4px 10px;font-size:10px;margin-bottom:2px;border-radius:8px;width:auto}
+.btn{width:100%;padding:12px;border:none;border-radius:10px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;color:#fff;cursor:pointer;margin-bottom:6px;background:linear-gradient(135deg,#6b8aff,var(--primary))}
+.btn.small{padding:6px 12px;font-size:12px;margin-bottom:2px;border-radius:8px;width:auto}
 .btn.save{background:linear-gradient(135deg,var(--success),#27ae60)}
 .btn.edit{background:linear-gradient(135deg,var(--warning),#f39c12)}
 .btn.del{background:linear-gradient(135deg,var(--danger),#c0392b)}
@@ -90,85 +94,84 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 .sheet.show{transform:translateY(0)}
 .sheet-handle{width:40px;height:4px;background:#dde1ec;border-radius:4px;margin:8px auto 4px}
 .sheet-header{display:flex;justify-content:space-between;align-items:center;padding:6px 16px 10px;border-bottom:1px solid var(--border)}
-.sheet-header h3{font-size:16px;font-weight:800;color:var(--secondary)}
-.sheet-close{width:30px;height:30px;border-radius:50%;background:var(--bg);border:1px solid var(--border);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text)}
+.sheet-header h3{font-size:18px;font-weight:800;color:var(--secondary)}
+.sheet-close{width:32px;height:32px;border-radius:50%;background:var(--bg);border:1px solid var(--border);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text)}
 .sheet-body{padding:12px 16px;overflow-y:auto;flex:1}
 .sheet-footer{padding:10px 16px 14px;background:var(--panel);border-top:1px solid var(--border);display:flex;gap:8px}
-.sheet-footer .btn{flex:1;margin:0;padding:10px 6px;font-size:12px;border-radius:10px}
-.field{margin-bottom:6px}
-.field label{display:block;font-size:10px;font-weight:700;color:var(--text);margin-bottom:2px}
-.field input,.field select,.field textarea{width:100%;padding:6px 10px;border:2px solid var(--border);border-radius:8px;font-family:'Cairo',sans-serif;font-size:12px;background:var(--bg);color:var(--text);height:32px}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.field-row-2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px}
+.sheet-footer .btn{flex:1;margin:0;padding:10px 6px;font-size:13px;border-radius:10px}
+.field{margin-bottom:8px}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px}
+.field input,.field select,.field textarea{width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Cairo',sans-serif;font-size:15px;background:var(--bg);color:var(--text);height:44px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.field-row-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
 .login-overlay{position:fixed;inset:0;background:linear-gradient(160deg,var(--secondary),#2a3f7a);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px}
 .login-overlay.hide{display:none}
 .login-box{background:var(--panel);border-radius:20px;padding:28px 20px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.4);text-align:center;color:var(--text)}
 .login-logo{font-size:22px;font-weight:800;color:var(--secondary);margin-top:2px}
-.login-sub{font-size:12px;color:var(--muted);margin-bottom:14px}
-.login-box input{width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-size:13px;margin-bottom:8px;background:var(--bg);font-family:'Cairo',sans-serif;color:var(--text)}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+.login-box input{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:10px;font-size:15px;margin-bottom:10px;background:var(--bg);font-family:'Cairo',sans-serif;color:var(--text)}
 .password-wrapper{position:relative}
 .password-wrapper input{padding-left:38px}
 .password-toggle{position:absolute;left:10px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:16px;cursor:pointer;color:var(--muted)}
-.login-btn{width:100%;padding:10px;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:4px;background:linear-gradient(135deg,#6b8aff,var(--primary));color:#fff}
+.login-btn{width:100%;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:6px;background:linear-gradient(135deg,#6b8aff,var(--primary));color:#fff}
 .login-btn.secondary{background:var(--panel);color:var(--secondary);border:2px solid var(--secondary)}
 .login-btn.google{background:var(--panel);color:#333;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;gap:6px}
-.login-divider{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:11px;margin:10px 0}
+.login-divider{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;margin:10px 0}
 .login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--border)}
-.login-error{color:var(--danger);font-size:11px;min-height:16px}
-.login-toggle{font-size:12px;color:var(--primary);cursor:pointer;font-weight:700;margin-top:4px}
-.login-loading{font-size:12px;color:var(--muted);margin-top:4px;display:none}
-.cloud-badge{display:inline-block;background:linear-gradient(135deg,#4a6cf7,#2a4ac7);color:#fff;font-size:10px;font-weight:700;padding:4px 12px;border-radius:12px;margin-top:8px}
-.capital-card{background:linear-gradient(135deg,var(--secondary),#2a3f7a);color:#fff;border-radius:var(--card-radius);padding:16px 20px;margin-bottom:12px;text-align:center}
-.capital-card .capital-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;opacity:.7}
-.capital-card .capital-value{font-size:28px;font-weight:800;margin-top:4px}
+.login-error{color:var(--danger);font-size:12px;min-height:18px}
+.login-toggle{font-size:13px;color:var(--primary);cursor:pointer;font-weight:700;margin-top:4px}
+.login-loading{font-size:13px;color:var(--muted);margin-top:4px;display:none}
+.cloud-badge{display:inline-block;background:linear-gradient(135deg,#4a6cf7,#2a4ac7);color:#fff;font-size:11px;font-weight:700;padding:6px 14px;border-radius:12px;margin-top:10px}
+.capital-card{background:linear-gradient(135deg,var(--secondary),#2a3f7a);color:#fff;border-radius:var(--card-radius);padding:18px 22px;margin-bottom:12px;text-align:center}
+.capital-card .capital-label{font-size:12px;text-transform:uppercase;letter-spacing:1px;opacity:.8}
+.capital-card .capital-value{font-size:30px;font-weight:800;margin-top:6px}
 .bi-kpi-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:12px}
 @media(max-width:450px){.bi-kpi-grid{grid-template-columns:1fr 1fr}}
-.bi-kpi{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 6px;text-align:center}
+.bi-kpi{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center}
 .bi-kpi .num{font-size:20px;font-weight:800;color:var(--secondary)}
-.bi-kpi .lbl{font-size:8px;color:var(--muted);text-transform:uppercase;margin-top:2px}
-.report-table-wrapper{overflow-x:auto;border-radius:12px;background:var(--panel);border:1px solid var(--border);margin-top:8px}
-.report-table{width:100%;min-width:600px;border-collapse:collapse;font-size:9px;direction:ltr;background:var(--panel)}
-.report-table th{background:var(--secondary);color:#fff;padding:6px 8px;font-weight:700;white-space:nowrap;text-align:center;font-size:8px}
-.report-table td{padding:5px 8px;border-bottom:1px solid var(--border);text-align:center;font-size:8px}
+.bi-kpi .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;margin-top:4px}.report-table-wrapper{overflow-x:auto;border-radius:12px;background:var(--panel);border:1px solid var(--border);margin-top:8px}
+.report-table{width:100%;min-width:600px;border-collapse:collapse;font-size:12px;direction:ltr;background:var(--panel)}
+.report-table th{background:var(--secondary);color:#fff;padding:10px 8px;font-weight:700;white-space:nowrap;text-align:center;font-size:11px}
+.report-table td{padding:8px;border-bottom:1px solid var(--border);text-align:center;font-size:11px}
 .summary-mini-card{background:var(--bg);border-radius:12px;padding:10px;margin:6px 0;border:1px solid var(--border)}
 .summary-mini-card .grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px}
 @media(max-width:450px){.summary-mini-card .grid-4{grid-template-columns:1fr 1fr}}
-.summary-mini-card .grid-4 .item{text-align:center;font-size:10px}
-.summary-mini-card .grid-4 .item .lbl{display:block;font-size:7px;color:var(--muted);font-weight:600;text-transform:uppercase}
-.summary-mini-card .grid-4 .item .val{font-size:14px;font-weight:800}
+.summary-mini-card .grid-4 .item{text-align:center;font-size:11px}
+.summary-mini-card .grid-4 .item .lbl{display:block;font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase}
+.summary-mini-card .grid-4 .item .val{font-size:15px;font-weight:800}
 .summary-mini-card .grid-4 .item .val.opening{color:var(--primary)}
 .summary-mini-card .grid-4 .item .val.purchases{color:#2980b9}
 .summary-mini-card .grid-4 .item .val.payments{color:var(--success)}
 .summary-mini-card .grid-4 .item .val.balance{color:var(--danger)}
-.client-summary-card{background:linear-gradient(135deg,var(--secondary),#2a3f7a);color:#fff;padding:14px;border-radius:14px;margin-bottom:10px}
-.client-summary-card .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px}
-.client-summary-card .grid .label{opacity:.7}
+.client-summary-card{background:linear-gradient(135deg,var(--secondary),#2a3f7a);color:#fff;padding:16px;border-radius:14px;margin-bottom:10px}
+.client-summary-card .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px}
+.client-summary-card .grid .label{opacity:.75}
 .client-summary-card .grid .value{font-weight:700}
 .client-summary-card .grid .value.positive{color:#4dbf8c}
 .client-summary-card .grid .value.negative{color:#ff6b6b}
-.balance-display{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:4px 0 8px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:8px 12px}
-.balance-display .item{text-align:center;font-size:10px;font-weight:600}
-.balance-display .item .label{color:var(--muted);font-size:8px;display:block}
-.balance-display .item .value{font-size:13px;font-weight:800;color:var(--secondary)}
+.balance-display{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0 10px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 14px}
+.balance-display .item{text-align:center;font-size:11px;font-weight:600}
+.balance-display .item .label{color:var(--muted);font-size:9px;display:block}
+.balance-display .item .value{font-size:15px;font-weight:800;color:var(--secondary)}
 .balance-display .item .value.opening{color:var(--primary)}
 .balance-display .item .value.closing{color:var(--danger)}
-.history-table-wrapper{overflow-x:auto;margin-bottom:6px;border-radius:12px;border:1px solid var(--border);background:var(--panel)}
-.history-table{width:100%;min-width:480px;border-collapse:collapse;font-size:7px;direction:ltr;background:var(--panel)}
-.history-table th{background:var(--secondary);color:#fff;padding:4px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:7px}
-.history-table td{padding:4px 6px;border-bottom:1px solid var(--border);text-align:center;white-space:nowrap;font-size:7px}
+.history-table-wrapper{overflow-x:auto;margin-bottom:8px;border-radius:12px;border:1px solid var(--border);background:var(--panel)}
+.history-table{width:100%;min-width:480px;border-collapse:collapse;font-size:11px;direction:ltr;background:var(--panel)}
+.history-table th{background:var(--secondary);color:#fff;padding:8px 6px;font-weight:700;white-space:nowrap;text-align:center;font-size:11px}
+.history-table td{padding:8px 6px;border-bottom:1px solid var(--border);text-align:center;white-space:nowrap;font-size:11px}
 .print-overlay{position:fixed;inset:0;background:#525659;z-index:200;display:none;overflow-y:auto;padding:10px}
 .print-overlay.show{display:block}
-.invoice-doc{background:#fff;color:#111;border-radius:8px;padding:10px;font-family:'Cairo',sans-serif;direction:ltr;margin:0 auto;font-size:10px;max-width:650px}
-.invoice-doc.paper-80{max-width:80mm;font-size:8px;padding:6px}
-.invoice-doc.paper-56{max-width:56mm;font-size:6px;padding:4px}
-.invoice-doc.paper-a4{max-width:210mm;font-size:11px;padding:14px}
-.print-actions{position:sticky;top:0;display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-bottom:8px;z-index:2;background:#525659;padding:4px 0}
-.print-actions button{flex:1;padding:6px;border:none;border-radius:5px;font-weight:700;font-size:11px;cursor:pointer}
+.invoice-doc{background:#fff;color:#111;border-radius:8px;padding:14px;font-family:'Cairo',sans-serif;direction:ltr;margin:0 auto;font-size:12px;max-width:650px}
+.invoice-doc.paper-80{max-width:80mm;font-size:11px;padding:8px}
+.invoice-doc.paper-56{max-width:56mm;font-size:9px;padding:6px}
+.invoice-doc.paper-a4{max-width:210mm;font-size:13px;padding:16px}
+.print-actions{position:sticky;top:0;display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:8px;z-index:2;background:#525659;padding:4px 0}
+.print-actions button{flex:1;padding:8px;border:none;border-radius:5px;font-weight:700;font-size:12px;cursor:pointer}
 .print-actions .btn-close{background:#fff;color:#333}
 .print-actions .btn-print{background:#25d366;color:#fff}
-.paper-selector{display:flex;align-items:center;gap:3px;color:#fff;font-size:11px;background:rgba(255,255,255,.12);padding:3px 8px;border-radius:5px}
-.paper-selector select{padding:2px 5px;border-radius:3px;border:none;font-size:11px}
+.paper-selector{display:flex;align-items:center;gap:4px;color:#fff;font-size:12px;background:rgba(255,255,255,.12);padding:4px 10px;border-radius:5px}
+.paper-selector select{padding:3px 6px;border-radius:3px;border:none;font-size:12px}
 .notification-panel{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px}
 .notification-panel.show{display:flex}
 .notification-content{background:var(--panel);border-radius:16px;padding:24px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;color:var(--text)}
@@ -177,174 +180,206 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 .modal-box{background:var(--panel);border-radius:20px;padding:24px;width:100%;max-width:340px;color:var(--text)}
 .modal-box h3{font-size:18px;font-weight:800;color:var(--secondary);text-align:center;margin-bottom:14px}
 .modal-actions{display:flex;gap:8px;margin-top:14px}
-.modal-actions .btn{flex:1;padding:8px;font-size:12px;margin:0;border-radius:10px}
-.modal-error{color:var(--danger);font-size:10px;text-align:center;min-height:16px;margin-top:4px}
-.offline-badge{background:var(--warning);color:#fff;font-size:8px;padding:2px 8px;border-radius:12px;margin-right:6px;display:none}
+.modal-actions .btn{flex:1;padding:10px;font-size:13px;margin:0;border-radius:10px}
+.modal-error{color:var(--danger);font-size:11px;text-align:center;min-height:16px;margin-top:4px}
+.offline-badge{background:var(--warning);color:#fff;font-size:9px;padding:2px 8px;border-radius:12px;margin-right:6px;display:none}
 .offline-badge.show{display:inline-block}
 .shortcut-help{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px}
 .shortcut-help.show{display:flex}
 .shortcut-help-content{background:var(--panel);border-radius:16px;padding:24px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;color:var(--text)}
-.shortcut-help-content kbd{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:2px 6px;font-size:11px;font-family:monospace}
+.shortcut-help-content kbd{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:2px 6px;font-size:12px;font-family:monospace}
 .shortcut-help-content table{width:100%;border-collapse:collapse;font-size:13px}
 .shortcut-help-content th{background:var(--secondary);color:#fff;padding:8px 12px;text-align:left}
 .shortcut-help-content td{padding:6px 12px;border-bottom:1px solid var(--border)}
-.invoice-header-modern{background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff;padding:14px 18px;border-radius:var(--card-radius);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-.invoice-header-modern .invoice-title{font-size:17px;font-weight:800}
-.invoice-header-modern .invoice-subtitle{font-size:10px;opacity:.8}
-.invoice-header-modern .invoice-badge{background:rgba(255,255,255,.15);padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;text-align:center}
-.invoice-header-modern .invoice-badge small{display:block;font-size:9px;opacity:.7}
-.party-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:10px}
-.party-info-grid .field-group label{font-size:8px;font-weight:700;color:var(--muted);text-transform:uppercase;display:block}
-.party-info-grid .field-group .value{font-size:12px;font-weight:700;color:var(--text);padding:2px 0}
-.party-info-grid .field-group select,.party-info-grid .field-group input{width:100%;padding:4px 8px;border:2px solid var(--border);border-radius:8px;font-family:'Cairo',sans-serif;font-size:11px;background:var(--bg);color:var(--text);height:32px}
-.account-summary-modern{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
-.account-summary-modern .summary-item{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:8px 4px;text-align:center}
-.account-summary-modern .summary-item .label{font-size:7px;color:var(--muted);text-transform:uppercase;font-weight:700;display:block}
-.account-summary-modern .summary-item .value{font-size:14px;font-weight:800;color:var(--secondary);margin-top:1px}
+.invoice-header-modern{background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff;padding:16px 20px;border-radius:var(--card-radius);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.invoice-header-modern .invoice-title{font-size:18px;font-weight:800}
+.invoice-header-modern .invoice-subtitle{font-size:11px;opacity:.85}
+.invoice-header-modern .invoice-badge{background:rgba(255,255,255,.15);padding:6px 16px;border-radius:20px;font-size:13px;font-weight:700;text-align:center}
+.invoice-header-modern .invoice-badge small{display:block;font-size:10px;opacity:.75}
+.party-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:10px}
+.party-info-grid .field-group label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;display:block}
+.party-info-grid .field-group .value{font-size:13px;font-weight:700;color:var(--text);padding:3px 0}
+.party-info-grid .field-group select,.party-info-grid .field-group input{width:100%;padding:6px 10px;border:2px solid var(--border);border-radius:8px;font-family:'Cairo',sans-serif;font-size:13px;background:var(--bg);color:var(--text);height:38px}
+.account-summary-modern{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.account-summary-modern .summary-item{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center}
+.account-summary-modern .summary-item .label{font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:700;display:block}
+.account-summary-modern .summary-item .value{font-size:16px;font-weight:800;color:var(--secondary);margin-top:2px}
 .account-summary-modern .summary-item .value.positive{color:var(--success)}
 .account-summary-modern .summary-item .value.negative{color:var(--danger)}
 .account-summary-modern .summary-item .value.warning{color:var(--warning)}
-.add-product-section{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:10px}
-.add-product-section .section-label{font-size:10px;font-weight:700;color:var(--secondary);margin-bottom:6px;display:flex;align-items:center;gap:6px}
-.add-product-section .section-label::before{content:'';width:3px;height:14px;background:var(--primary);border-radius:2px}
-.add-product-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:6px;align-items:end}
+.add-product-section{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.add-product-section .section-label{font-size:12px;font-weight:700;color:var(--secondary);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.add-product-section .section-label::before{content:'';width:3px;height:15px;background:var(--primary);border-radius:2px}
+.add-product-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;align-items:end}
 .add-product-row .field{margin-bottom:0}
-.add-product-row .field label{font-size:8px;font-weight:700;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:2px}
-.add-product-row .field select,.add-product-row .field input{width:100%;padding:4px 6px;border:2px solid var(--border);border-radius:8px;font-family:'Cairo',sans-serif;font-size:10px;background:var(--bg);color:var(--text);height:30px}
-.add-product-row .btn-add{padding:4px 14px;border:none;border-radius:8px;background:linear-gradient(135deg,var(--primary),#3a56d4);color:#fff;font-size:14px;font-weight:700;cursor:pointer;height:30px;display:flex;align-items:center;justify-content:center;min-width:40px}
-.stock-hint{font-size:7px;color:var(--muted);margin-top:2px;padding:1px 6px;background:var(--bg);border-radius:4px;display:inline-block}
-.items-table-modern{width:100%;border-collapse:collapse;font-size:10px;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+.add-product-row .field label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px}
+.add-product-row .field select,.add-product-row .field input{width:100%;padding:6px 8px;border:2px solid var(--border);border-radius:8px;font-family:'Cairo',sans-serif;font-size:12px;background:var(--bg);color:var(--text);height:38px}
+.add-product-row .btn-add{padding:6px 16px;border:none;border-radius:8px;background:linear-gradient(135deg,var(--primary),#3a56d4);color:#fff;font-size:16px;font-weight:700;cursor:pointer;height:38px;display:flex;align-items:center;justify-content:center;min-width:44px}
+.stock-hint{font-size:9px;color:var(--muted);margin-top:3px;padding:2px 8px;background:var(--bg);border-radius:4px;display:inline-block}
+.items-table-modern{width:100%;border-collapse:collapse;font-size:13px;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
 .items-table-modern thead{background:var(--secondary);color:#fff}
-.items-table-modern th{padding:6px 4px;text-align:center;font-size:8px;font-weight:700}
-.items-table-modern td{padding:4px 3px;text-align:center;border-bottom:1px solid var(--border);background:var(--panel);color:var(--text);font-size:10px}
+.items-table-modern th{padding:10px 6px;text-align:center;font-size:11px;font-weight:700}
+.items-table-modern td{padding:8px 4px;text-align:center;border-bottom:1px solid var(--border);background:var(--panel);color:var(--text);font-size:13px}
 .items-table-modern .item-name{font-weight:700;text-align:left}
 .items-table-modern .item-total{font-weight:800;color:var(--primary)}
-.items-table-modern .btn-action{padding:1px 6px;border:none;border-radius:4px;font-size:9px;cursor:pointer}
+.items-table-modern .btn-action{padding:2px 8px;border:none;border-radius:4px;font-size:10px;cursor:pointer}
 .items-table-modern .btn-action.edit{background:var(--warning);color:#fff}
 .items-table-modern .btn-action.delete{background:var(--danger);color:#fff}
 .items-table-modern .btn-action.save-edit{background:var(--success);color:#fff}
 .items-table-modern .btn-action.cancel-edit{background:var(--muted);color:#fff}
-.items-table-modern .edit-input{width:50px;padding:1px 3px;border:2px solid var(--primary);border-radius:4px;font-size:10px;font-family:'Cairo',sans-serif;text-align:center;background:#fff;color:var(--text)}
-.invoice-total-modern{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff;border-radius:12px;margin:8px 0 10px}
-.invoice-total-modern .label{font-size:12px;font-weight:600;opacity:.9}
-.invoice-total-modern .amount{font-size:20px;font-weight:800}
-.payments-section{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:10px}
-.payments-section .section-label{font-size:10px;font-weight:700;color:var(--secondary);margin-bottom:6px;display:flex;align-items:center;gap:6px}
-.payments-section .section-label::before{content:'';width:3px;height:14px;background:var(--success);border-radius:2px}
-.payments-grid{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
-.payment-item{background:var(--bg);border-radius:8px;padding:4px 10px;display:flex;align-items:center;gap:6px;font-size:10px;border:1px solid var(--border)}
+.items-table-modern .edit-input{width:60px;padding:2px 4px;border:2px solid var(--primary);border-radius:4px;font-size:12px;font-family:'Cairo',sans-serif;text-align:center;background:#fff;color:var(--text)}
+.invoice-total-modern{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff;border-radius:12px;margin:8px 0 10px}
+.invoice-total-modern .label{font-size:14px;font-weight:600;opacity:.95}
+.invoice-total-modern .amount{font-size:22px;font-weight:800}
+.payments-section{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.payments-section .section-label{font-size:12px;font-weight:700;color:var(--secondary);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.payments-section .section-label::before{content:'';width:3px;height:15px;background:var(--success);border-radius:2px}
+.payments-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.payment-item{background:var(--bg);border-radius:8px;padding:6px 12px;display:flex;align-items:center;gap:8px;font-size:12px;border:1px solid var(--border)}
 .payment-item .method{font-weight:700;color:var(--secondary)}
 .payment-item .amount{font-weight:800;color:var(--success)}
-.payment-item .delete-payment{color:var(--danger);cursor:pointer;font-size:12px;padding:0 2px}
-.add-payment-row{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;align-items:end}
+.payment-item .delete-payment{color:var(--danger);cursor:pointer;font-size:14px;padding:0 4px}
+.add-payment-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}
 .add-payment-row .field{margin-bottom:0}
-.add-payment-row .field label{font-size:8px;font-weight:700;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:2px}
-.add-payment-row .field input,.add-payment-row .field select{width:100%;padding:4px 6px;border:2px solid var(--border);border-radius:8px;font-family:'Cairo',sans-serif;font-size:10px;background:var(--bg);color:var(--text);height:30px}
-.add-payment-row .btn-add-payment{padding:4px 14px;border:none;border-radius:8px;background:linear-gradient(135deg,var(--success),#27ae60);color:#fff;font-size:13px;font-weight:700;cursor:pointer;height:30px}
-.invoice-actions-modern{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0 4px}
-.invoice-actions-modern .btn-action{padding:6px 4px;border:none;border-radius:10px;font-family:'Cairo',sans-serif;font-size:9px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px}
+.add-payment-row .field label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px}
+.add-payment-row .field input,.add-payment-row .field select{width:100%;padding:6px 8px;border:2px solid var(--border);border-radius:8px;font-family:'Cairo',sans-serif;font-size:12px;background:var(--bg);color:var(--text);height:38px}
+.add-payment-row .btn-add-payment{padding:6px 16px;border:none;border-radius:8px;background:linear-gradient(135deg,var(--success),#27ae60);color:#fff;font-size:15px;font-weight:700;cursor:pointer;height:38px}
+.invoice-actions-modern{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0 4px}
+.invoice-actions-modern .btn-action{padding:8px 4px;border:none;border-radius:10px;font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px}
 .invoice-actions-modern .btn-action.whatsapp{background:linear-gradient(135deg,#25d366,#128C7E)}
 .invoice-actions-modern .btn-action.print{background:linear-gradient(135deg,#6c7ae0,#4a56b0)}
 .invoice-actions-modern .btn-action.bluetooth{background:linear-gradient(135deg,#4a6cf7,#2a4ac7)}
-.toast-modern{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--secondary);color:#fff;padding:8px 20px;border-radius:14px;font-size:12px;font-weight:700;opacity:0;pointer-events:none;transition:all .4s ease;z-index:999;max-width:90%;text-align:center}
+.toast-modern{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--secondary);color:#fff;padding:10px 24px;border-radius:14px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:all .4s ease;z-index:999;max-width:90%;text-align:center}
 .toast-modern.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(max-width:550px){.account-summary-modern{grid-template-columns:repeat(2,1fr)}.add-product-row{grid-template-columns:1fr 1fr}.add-product-row .field:first-child{grid-column:1/-1}.invoice-actions-modern{grid-template-columns:repeat(2,1fr)}.party-info-grid{grid-template-columns:1fr}.add-payment-row{grid-template-columns:1fr 1fr}.add-payment-row .field:first-child{grid-column:1/-1}.invoice-header-modern{flex-direction:column;align-items:stretch;text-align:center}.invoice-header-modern .invoice-badge{align-self:center}.items-table-modern{font-size:8px}.invoice-total-modern .amount{font-size:17px}}
-.import-section{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px}
+@media(max-width:550px){.account-summary-modern{grid-template-columns:repeat(2,1fr)}.add-product-row{grid-template-columns:1fr 1fr}.add-product-row .field:first-child{grid-column:1/-1}.invoice-actions-modern{grid-template-columns:repeat(2,1fr)}.party-info-grid{grid-template-columns:1fr}.add-payment-row{grid-template-columns:1fr 1fr}.add-payment-row .field:first-child{grid-column:1/-1}.invoice-header-modern{flex-direction:column;align-items:stretch;text-align:center}.invoice-header-modern .invoice-badge{align-self:center}.items-table-modern{font-size:10px}.invoice-total-modern .amount{font-size:19px}}
+.import-section{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
 .import-section .import-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.import-section .import-header h4{font-size:13px;font-weight:700;color:var(--secondary)}
+.import-section .import-header h4{font-size:14px;font-weight:700;color:var(--secondary)}
 .import-section .import-actions{display:flex;gap:6px;flex-wrap:wrap}
-.import-section .import-actions .btn{flex:1;min-width:70px;padding:4px 10px;font-size:10px;margin:0}
-.file-drop-zone{border:2px dashed var(--border);border-radius:8px;padding:16px;text-align:center;color:var(--muted);cursor:pointer;margin-bottom:6px}
+.import-section .import-actions .btn{flex:1;min-width:70px;padding:6px 12px;font-size:11px;margin:0}
+.file-drop-zone{border:2px dashed var(--border);border-radius:8px;padding:16px;text-align:center;color:var(--muted);cursor:pointer;margin-bottom:6px;font-size:12px}
 .file-drop-zone .icon{font-size:28px;display:block;margin-bottom:4px}
-.special-price-item{display:flex;justify-content:space-between;align-items:center;padding:4px 8px;background:var(--bg);border-radius:6px;margin-bottom:3px;border:1px solid var(--border);font-size:10px}
+.special-price-item{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg);border-radius:6px;margin-bottom:4px;border:1px solid var(--border);font-size:12px}
 .special-price-item .sp-article{font-weight:600;color:var(--text)}
 .special-price-item .sp-price{font-weight:700;color:var(--primary)}
-.special-price-item .sp-del{color:var(--danger);cursor:pointer;font-size:12px;padding:0 4px}
-.add-sp-row{display:flex;gap:4px;margin-top:4px;align-items:center}
-.add-sp-row select,.add-sp-row input{flex:1;padding:4px 6px;border:2px solid var(--border);border-radius:8px;font-family:'Cairo',sans-serif;font-size:10px;background:var(--bg);color:var(--text);height:30px}
-.add-sp-row .btn.save.small{flex:0 0 32px;padding:4px 8px;font-size:14px;height:30px;display:flex;align-items:center;justify-content:center}
+.special-price-item .sp-del{color:var(--danger);cursor:pointer;font-size:14px;padding:0 4px}
+.add-sp-row{display:flex;gap:6px;margin-top:6px;align-items:center}
+.add-sp-row select,.add-sp-row input{flex:1;padding:6px 8px;border:2px solid var(--border);border-radius:8px;font-family:'Cairo',sans-serif;font-size:12px;background:var(--bg);color:var(--text);height:38px}
+.add-sp-row .btn.save.small{flex:0 0 38px;padding:6px 10px;font-size:15px;height:38px;display:flex;align-items:center;justify-content:center}
 .account-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
-.account-stats .stat{background:var(--panel);padding:10px;border-radius:12px;text-align:center;border:1px solid var(--border)}
-.account-stats .stat .num{font-size:20px;font-weight:800;color:var(--secondary)}
-.account-stats .stat .lbl{font-size:9px;color:var(--muted);text-transform:uppercase}
-.account-item{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:8px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
-.account-item .email{font-size:11px;font-weight:600;word-break:break-all}
-.account-item .date{font-size:9px;color:var(--muted)}
-.account-item .status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.account-stats .stat{background:var(--panel);padding:12px;border-radius:12px;text-align:center;border:1px solid var(--border)}
+.account-stats .stat .num{font-size:22px;font-weight:800;color:var(--secondary)}
+.account-stats .stat .lbl{font-size:10px;color:var(--muted);text-transform:uppercase}
+.account-item{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+.account-item .email{font-size:12px;font-weight:600;word-break:break-all}
+.account-item .date{font-size:10px;color:var(--muted)}
+.account-item .status{font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px}
 .account-item .status.approved{background:#d4f4dd;color:#27ae60}
 .account-item .status.pending{background:#fff3cd;color:#856404}
 .account-item .actions{display:flex;gap:4px;grid-column:1/-1}
-.payment-only-notice{background:linear-gradient(135deg,#e3f2fd,#bbdefb);border:2px dashed #3498db;border-radius:10px;padding:10px 12px;margin:8px 0;text-align:center;color:#1565c0}
-.payment-only-notice .title{font-weight:800;font-size:12px;margin-bottom:2px}
-.payment-only-notice .subtitle{font-size:9px;opacity:.8}
+
+/* ✨ Mode Règlement - 6 lignes compactes */
+.payment-only-notice {
+    background: transparent;
+    border: none;
+    border-top: 1px dashed var(--border);
+    border-bottom: 1px dashed var(--border);
+    border-radius: 0;
+    padding: 4px 0;
+    margin: 4px 0;
+    text-align: left;
+    color: var(--muted);
+    font-size: 8px;
+    line-height: 1.4;
+}
+.payment-only-notice .title {
+    font-weight: 700;
+    font-size: 8px;
+    margin-bottom: 2px;
+    color: var(--secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.payment-only-notice .subtitle {
+    font-size: 8px;
+    opacity: 0.8;
+    display: block;
+    padding: 1px 0;
+    border-bottom: 1px dotted rgba(0,0,0,0.05);
+}
+.payment-only-notice .subtitle:last-child {
+    border-bottom: none;
+}
+
 .preview-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9998;display:none;align-items:center;justify-content:center;padding:12px}
 .preview-modal.show{display:flex}
 .preview-modal-content{background:#fff;border-radius:16px;width:100%;max-width:720px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
 .preview-modal-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:linear-gradient(135deg,var(--secondary),#2a3f7a);color:#fff;flex-shrink:0}
-.preview-modal-header h3{font-size:14px;font-weight:800;margin:0}
-.preview-close-btn{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.preview-modal-header h3{font-size:15px;font-weight:800;margin:0}
+.preview-close-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .preview-modal-body{flex:1;overflow-y:auto;padding:14px;background:#f5f5f5}
-.preview-modal-body .preview-doc{background:#fff;color:#111;border-radius:8px;padding:16px;font-family:'Cairo',sans-serif;direction:ltr;font-size:11px;overflow-x:auto}
-.preview-modal-body .preview-doc table{width:100%;border-collapse:collapse;font-size:10px}
-.preview-modal-body .preview-doc th{background:#1e2f66;color:#fff;padding:6px 8px;text-align:center;font-weight:700;font-size:9px}
-.preview-modal-body .preview-doc td{padding:5px 8px;border-bottom:1px solid #ddd;text-align:center}
+.preview-modal-body .preview-doc{background:#fff;color:#111;border-radius:8px;padding:16px;font-family:'Cairo',sans-serif;direction:ltr;font-size:12px;overflow-x:auto}
+.preview-modal-body .preview-doc table{width:100%;border-collapse:collapse;font-size:11px}
+.preview-modal-body .preview-doc th{background:#1e2f66;color:#fff;padding:8px;text-align:center;font-weight:700;font-size:10px}
+.preview-modal-body .preview-doc td{padding:6px 8px;border-bottom:1px solid #ddd;text-align:center}
 .preview-modal-body .preview-doc tfoot td{font-weight:700;background:#e8ecf4;border-top:2px solid #999}
 .preview-modal-footer{display:flex;gap:8px;padding:12px 16px;background:#fff;border-top:1px solid #e2e6f0;flex-shrink:0}
-.preview-modal-footer .btn{flex:1;padding:10px;font-size:12px;margin:0;border-radius:10px}
+.preview-modal-footer .btn{flex:1;padding:10px;font-size:13px;margin:0;border-radius:10px}
 :fullscreen .phone,:-webkit-full-screen .phone,:-moz-full-screen .phone,:-ms-fullscreen .phone{max-width:100%!important;width:100%!important;height:100dvh!important;border-radius:0!important;margin:0!important;box-shadow:none!important}
 #fullscreenBtn.active{background:rgba(255,255,255,.3)!important}
 .client-portal{position:fixed;inset:0;z-index:250;display:none;flex-direction:column;background:var(--bg);color:var(--text);overflow:hidden}
 .client-portal.show{display:flex}
 .cp-header{background:linear-gradient(135deg,var(--secondary),#2a3f7a);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 20px rgba(26,42,92,.3);flex-shrink:0}
-.cp-logo{font-size:20px;font-weight:900;letter-spacing:-.5px;display:flex;align-items:center;gap:3px}
-.cp-logo span{font-size:11px;background:rgba(255,255,255,.2);padding:2px 6px;border-radius:5px}
-.cp-user{display:flex;align-items:center;gap:8px;font-size:12px}
-.cp-user button{background:rgba(255,255,255,.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:14px}
+.cp-logo{font-size:22px;font-weight:900;letter-spacing:-.5px;display:flex;align-items:center;gap:4px}
+.cp-logo span{font-size:12px;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:5px}
+.cp-user{display:flex;align-items:center;gap:8px;font-size:13px}
+.cp-user button{background:rgba(255,255,255,.15);border:none;color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:15px}
 .cp-content{flex:1;overflow-y:auto;padding:14px;padding-bottom:30px}
-.cp-balance-card{background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff;border-radius:16px;padding:22px;text-align:center;margin-bottom:14px;box-shadow:0 4px 20px rgba(74,108,247,.3)}
-.cp-balance-card .cp-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;opacity:.8}
-.cp-balance-card .cp-balance{font-size:32px;font-weight:800;margin-top:6px}
-.cp-balance-card .cp-balance-note{font-size:10px;margin-top:6px;display:inline-block;padding:3px 12px;border-radius:12px;background:rgba(255,255,255,.15)}
+.cp-balance-card{background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff;border-radius:16px;padding:24px;text-align:center;margin-bottom:14px;box-shadow:0 4px 20px rgba(74,108,247,.3)}
+.cp-balance-card .cp-label{font-size:12px;text-transform:uppercase;letter-spacing:1px;opacity:.8}
+.cp-balance-card .cp-balance{font-size:36px;font-weight:800;margin-top:6px}
+.cp-balance-card .cp-balance-note{font-size:11px;margin-top:8px;display:inline-block;padding:4px 14px;border-radius:12px;background:rgba(255,255,255,.15)}
 .cp-balance-card .cp-balance-note.positive{background:rgba(46,204,113,.3)}
 .cp-balance-card .cp-balance-note.negative{background:rgba(231,76,94,.3)}
 .cp-kpis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
-.cp-kpi{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 6px;text-align:center}
-.cp-kpi .num{font-size:15px;font-weight:800;color:var(--secondary);white-space:nowrap}
+.cp-kpi{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center}
+.cp-kpi .num{font-size:16px;font-weight:800;color:var(--secondary);white-space:nowrap}
 .cp-kpi .num.positive{color:var(--success)}
 .cp-kpi .num.negative{color:var(--danger)}
-.cp-kpi .lbl{font-size:8px;color:var(--muted);text-transform:uppercase;margin-top:3px;font-weight:600}
-.cp-section-title{font-size:13px;font-weight:800;color:var(--secondary);margin:14px 0 8px;display:flex;align-items:center;gap:6px}
-.cp-section-title::before{content:'';width:3px;height:16px;background:var(--primary);border-radius:2px}
-.cp-row{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
-.cp-row .cp-row-info .name{font-size:12px;font-weight:700;color:var(--text)}
-.cp-row .cp-row-info .meta{font-size:9px;color:var(--muted);margin-top:2px}
-.cp-row .cp-row-amount{font-size:13px;font-weight:800;text-align:right}
+.cp-kpi .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;margin-top:4px;font-weight:600}
+.cp-section-title{font-size:15px;font-weight:800;color:var(--secondary);margin:16px 0 10px;display:flex;align-items:center;gap:8px}
+.cp-section-title::before{content:'';width:4px;height:18px;background:var(--primary);border-radius:2px}
+.cp-row{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.cp-row .cp-row-info .name{font-size:13px;font-weight:700;color:var(--text)}
+.cp-row .cp-row-info .meta{font-size:10px;color:var(--muted);margin-top:3px}
+.cp-row .cp-row-amount{font-size:14px;font-weight:800;text-align:right}
 .cp-row .cp-row-amount .paid{color:var(--success)}
-.cp-row .cp-row-amount small{display:block;font-size:8px;font-weight:400;color:var(--muted);margin-top:2px}
-.cp-badge{padding:2px 8px;border-radius:10px;font-size:8px;font-weight:700;color:#fff;margin-left:6px}
+.cp-row .cp-row-amount small{display:block;font-size:9px;font-weight:400;color:var(--muted);margin-top:3px}
+.cp-badge{padding:3px 10px;border-radius:10px;font-size:9px;font-weight:700;color:#fff;margin-left:6px}
 .cp-badge.paid{background:linear-gradient(135deg,#2ecc71,#27ae60)}
 .cp-badge.pending{background:linear-gradient(135deg,#f39c12,#e67e22)}
 .cp-badge.partial{background:linear-gradient(135deg,#f1c40f,#f39c12)}
 .cp-badge.payment{background:linear-gradient(135deg,#3498db,#2980b9)}
 .cp-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}
-.cp-btn{padding:12px;border:none;border-radius:12px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer}
+.cp-btn{padding:14px;border:none;border-radius:12px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer}
 .cp-btn.print{background:linear-gradient(135deg,#6c7ae0,#4a56b0)}
 .cp-btn.whatsapp{background:linear-gradient(135deg,#25d366,#128C7E)}
-.cp-empty{text-align:center;color:var(--muted);font-size:11px;padding:20px 0}
-.admin-badge{display:inline-block;background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;font-size:8px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:6px}
-.login-hint{font-size:10px;color:var(--muted);background:rgba(241,196,15,.15);border:1px dashed var(--warning);border-radius:8px;padding:6px 10px;margin-bottom:10px;text-align:left;line-height:1.5}
+.cp-empty{text-align:center;color:var(--muted);font-size:12px;padding:20px 0}
+.admin-badge{display:inline-block;background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;font-size:9px;font-weight:700;padding:3px 10px;border-radius:10px;margin-left:6px}
+.login-hint{font-size:11px;color:var(--muted);background:rgba(241,196,15,.15);border:1px dashed var(--warning);border-radius:8px;padding:8px 12px;margin-bottom:10px;text-align:left;line-height:1.6}
 .login-hint strong{color:var(--warning)}
-.approval-notice{background:linear-gradient(135deg,#fff3cd,#ffe8a3);border:2px dashed #f39c12;border-radius:10px;padding:12px;margin-bottom:10px;text-align:left;font-size:10px;color:#856404;line-height:1.6}
-.approval-notice .icon{font-size:16px;margin-right:4px}
+.approval-notice{background:linear-gradient(135deg,#fff3cd,#ffe8a3);border:2px dashed #f39c12;border-radius:10px;padding:14px;margin-bottom:10px;text-align:left;font-size:11px;color:#856404;line-height:1.7}
+.approval-notice .icon{font-size:18px;margin-right:4px}
 .approval-notice strong{color:#e67e22}
-.security-info{font-size:9px;color:var(--muted);text-align:center;margin-top:8px;padding:6px;background:rgba(46,204,113,.08);border-radius:8px;border:1px dashed var(--success)}
+.security-info{font-size:10px;color:var(--muted);text-align:center;margin-top:10px;padding:8px;background:rgba(46,204,113,.08);border-radius:8px;border:1px dashed var(--success)}
 .security-info strong{color:var(--success)}
-.login-credentials-box{background:linear-gradient(135deg,#e3f2fd,#bbdefb);border:2px dashed #1976d2;border-radius:10px;padding:10px 12px;margin-top:8px;font-size:10px;color:#0d47a1;text-align:left}
+.login-credentials-box{background:linear-gradient(135deg,#e3f2fd,#bbdefb);border:2px dashed #1976d2;border-radius:10px;padding:12px 14px;margin-top:10px;font-size:11px;color:#0d47a1;text-align:left}
 .login-credentials-box strong{color:#1565c0}
-.toast{position:absolute;top:64px;left:50%;transform:translateX(-50%) translateY(-10px);background:var(--secondary);color:#fff;padding:6px 18px;border-radius:14px;font-size:12px;font-weight:700;opacity:0;pointer-events:none;transition:all .3s ease;z-index:250;white-space:nowrap}
+.toast{position:absolute;top:64px;left:50%;transform:translateX(-50%) translateY(-10px);background:var(--secondary);color:#fff;padding:8px 20px;border-radius:14px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:all .3s ease;z-index:250;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
-</head><body><!-- LOGIN -->
+</head>
+<body><!-- LOGIN -->
 <div class="login-overlay" id="loginOverlay">
 <div class="login-box">
 <div class="login-logo-icon"><div class="logo-content"><span class="gtr-big">GTR</span><span class="pos-badge">POS</span></div><span class="version-tag">V 0.8.9</span></div>
@@ -505,16 +540,16 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 <div class="section-title">⏳ En attente</div><div id="pendingAccountsList"></div>
 <div class="section-title">✅ Approuvés</div><div id="approvedAccountsList"></div>
 <div style="margin-top:12px;padding:12px;background:var(--bg);border-radius:12px;border:1px solid var(--border);">
-<div style="font-size:12px;font-weight:700;color:var(--secondary);margin-bottom:4px;">🔐 Sécurité</div>
-<button class="btn save small" style="width:auto;padding:4px 14px;font-size:10px;" onclick="openChangePasswordModal()">🔑 Changer mot de passe</button>
-<button class="btn edit small" style="width:auto;padding:4px 14px;font-size:10px;margin-left:4px;" onclick="openStaffPasswordModal()">🔑 Changer (Admin/Staff)</button>
-<div id="accountEmailDisplay2" style="font-size:10px;color:var(--muted);margin-top:4px;"></div>
+<div style="font-size:13px;font-weight:700;color:var(--secondary);margin-bottom:6px;">🔐 Sécurité</div>
+<button class="btn save small" style="width:auto;padding:6px 16px;font-size:11px;" onclick="openChangePasswordModal()">🔑 Changer mot de passe</button>
+<button class="btn edit small" style="width:auto;padding:6px 16px;font-size:11px;margin-left:4px;" onclick="openStaffPasswordModal()">🔑 Changer (Admin/Staff)</button>
+<div id="accountEmailDisplay2" style="font-size:11px;color:var(--muted);margin-top:6px;"></div>
 </div>
 </div>
 
 <div class="section" id="sec-clients-logins">
 <div class="section-title">🔑 Liste des Logins clients</div>
-<div style="font-size:10px;color:var(--muted);margin-bottom:8px;">📋 Tous les Logins uniques des clients</div>
+<div style="font-size:11px;color:var(--muted);margin-bottom:8px;">📋 Tous les Logins uniques des clients</div>
 <input class="search-box" id="loginsSearch" placeholder="🔍 Rechercher un login..." oninput="ClientLogins.render()">
 <div style="display:flex;gap:6px;margin-bottom:8px;">
 <button class="btn save small" onclick="ClientLogins.syncAll()" style="flex:1;">☁️ Synchroniser tout</button>
@@ -525,7 +560,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 
 <div class="section" id="sec-finance-jour">
 <div class="section-title">📊 Rapport financier du jour</div>
-<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">📅 <span id="financeJourDate">---</span> | ⏰ <span id="financeJourHeure">--:--:--</span></div>
+<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">📅 <span id="financeJourDate">---</span> | ⏰ <span id="financeJourHeure">--:--:--</span></div>
 <div class="bi-kpi-grid" style="grid-template-columns:1fr 1fr 1fr;">
 <div class="bi-kpi"><div class="num" id="fjSoldeClient">0.000</div><div class="lbl">💰 Solde client</div></div>
 <div class="bi-kpi"><div class="num" id="fjValeurStock">0.000</div><div class="lbl">📦 Stock</div></div>
@@ -536,7 +571,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 </div>
 <div class="capital-card" style="margin-top:10px;"><div class="capital-label">💰 Capital fixe</div><div class="capital-value" id="fjCapitalFixe">0.000 TND</div></div>
 <div class="section-title" style="margin-top:10px;">📋 Mouvements du jour</div>
-<div class="history-table-wrapper"><table class="history-table" style="min-width:650px;font-size:8px;">
+<div class="history-table-wrapper"><table class="history-table" style="min-width:650px;font-size:11px;">
 <thead><tr><th>Type</th><th>Partie</th><th>Facture</th><th>Description</th><th>Montant</th><th>Direction</th></tr></thead>
 <tbody id="fjMouvementsBody"></tbody></table></div>
 <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
@@ -586,7 +621,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 <div class="kpi-card"><div class="val" id="margeTotalMarge">0.000</div><div class="lbl">Marge</div></div>
 <div class="kpi-card"><div class="val" id="margeTauxMoyen">0.0%</div><div class="lbl">Taux</div></div>
 </div>
-<div class="history-table-wrapper"><table class="history-table" style="min-width:550px;font-size:8px;">
+<div class="history-table-wrapper"><table class="history-table" style="min-width:550px;font-size:11px;">
 <thead><tr><th>Client</th><th>Date</th><th>N° facture</th><th>Bénéfice</th></tr></thead>
 <tbody id="margeTableBody"></tbody></table></div>
 <div style="margin-top:8px;display:flex;gap:6px;">
@@ -600,19 +635,21 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 <div id="monthlyProfitContent"></div>
 </div>
 
-</div>
-<div class="sheet-overlay" id="overlay"></div><div class="sheet" id="sheet-clients">
+</div><div class="sheet-overlay" id="overlay"></div>
+
+<!-- SHEET CLIENTS -->
+<div class="sheet" id="sheet-clients">
 <div class="sheet-handle"></div>
 <div class="sheet-header"><h3>Données client</h3><button class="sheet-close" onclick="App.closeSheet()">✕</button></div>
 <div class="sheet-body">
 <div class="field"><label>Code client</label><input id="cCode" readonly></div>
-<div class="field"><label>🔑 Login (unique)</label><input id="cLogin" placeholder="Ex: Amine_2026" style="direction:ltr;text-align:left;font-family:monospace;letter-spacing:1px;" autocomplete="off"><div id="cLoginError" style="font-size:8px;color:var(--danger);min-height:12px;"></div></div>
+<div class="field"><label>🔑 Login (unique)</label><input id="cLogin" placeholder="Ex: Amine_2026" style="direction:ltr;text-align:left;font-family:monospace;letter-spacing:1px;" autocomplete="off"><div id="cLoginError" style="font-size:9px;color:var(--danger);min-height:12px;"></div></div>
 <div class="field"><label>Nom client</label><input id="cName" autocomplete="off"></div>
 <div class="field-row"><div class="field"><label>Téléphone 1</label><input id="cPhone" autocomplete="off"></div><div class="field"><label>Téléphone 2</label><input id="cPhone2" autocomplete="off"></div></div>
-<div class="field"><label>📧 Email (optionnel)</label><input id="cEmail" type="email" placeholder="exemple@email.com" style="direction:ltr;text-align:left;" autocomplete="off"><div id="cEmailError" style="font-size:8px;color:var(--danger);min-height:12px;"></div></div>
+<div class="field"><label>📧 Email (optionnel)</label><input id="cEmail" type="email" placeholder="exemple@email.com" style="direction:ltr;text-align:left;" autocomplete="off"><div id="cEmailError" style="font-size:9px;color:var(--danger);min-height:12px;"></div></div>
 <div class="field-row-2">
-<div class="field"><label>🔐 Mot de passe client</label><div class="password-wrapper"><input type="text" id="cPassword" placeholder="Mot de passe" style="direction:ltr;text-align:left;font-family:monospace;" autocomplete="new-password"><button class="password-toggle" type="button" onclick="ClientsModule.togglePwd()" id="cPwdToggle">👁️</button></div><div id="cPasswordError" style="font-size:8px;color:var(--danger);min-height:12px;"></div></div>
-<div class="field"><label>🎲 Générer auto</label><button class="btn edit small" onclick="ClientsModule.generatePassword()" style="width:100%;height:32px;font-size:10px;">🎲 Générer</button></div>
+<div class="field"><label>🔐 Mot de passe client</label><div class="password-wrapper"><input type="text" id="cPassword" placeholder="Mot de passe" style="direction:ltr;text-align:left;font-family:monospace;" autocomplete="new-password"><button class="password-toggle" type="button" onclick="ClientsModule.togglePwd()" id="cPwdToggle">👁️</button></div><div id="cPasswordError" style="font-size:9px;color:var(--danger);min-height:12px;"></div></div>
+<div class="field"><label>🎲 Générer auto</label><button class="btn edit small" onclick="ClientsModule.generatePassword()" style="width:100%;height:38px;font-size:12px;">🎲 Générer</button></div>
 </div>
 <div class="login-credentials-box">💡 <strong>Le client se connecte avec:</strong><br>🔑 Login: <span id="cDisplayLogin">-</span><br>🔐 Mot de passe: celui que vous définissez</div>
 <div class="field"><label>Adresse</label><input id="cAddress" autocomplete="off"></div>
@@ -636,15 +673,16 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 </div>
 </div>
 <div class="sheet-footer" style="flex-wrap: wrap; gap: 6px;">
-    <button class="btn save" onclick="ClientsModule.save()" style="flex: 1; min-width: 80px; padding: 10px 6px; font-size: 11px;">💾 Enregistrer</button>
-    <button class="btn edit" onclick="ClientsModule.edit()" style="flex: 1; min-width: 80px; padding: 10px 6px; font-size: 11px;">✏️ Modifier</button>
-    <button class="btn del" onclick="ClientsModule.remove()" style="flex: 1; min-width: 80px; padding: 10px 6px; font-size: 11px;">🗑 Supprimer</button>
-    <button onclick="ClientsModule.loginAsClient()" style="flex: 1 0 100%; margin-top: 4px; padding: 12px; font-size: 12px; font-weight: 700; color: #fff; border: none; border-radius: 10px; cursor: pointer; background: linear-gradient(135deg, #8e44ad, #6c3483); display: flex; align-items: center; justify-content: center; gap: 6px;">
+    <button class="btn save" onclick="ClientsModule.save()" style="flex: 1; min-width: 80px; padding: 10px 6px; font-size: 12px;">💾 Enregistrer</button>
+    <button class="btn edit" onclick="ClientsModule.edit()" style="flex: 1; min-width: 80px; padding: 10px 6px; font-size: 12px;">✏️ Modifier</button>
+    <button class="btn del" onclick="ClientsModule.remove()" style="flex: 1; min-width: 80px; padding: 10px 6px; font-size: 12px;">🗑 Supprimer</button>
+    <button onclick="ClientsModule.loginAsClient()" style="flex: 1 0 100%; margin-top: 4px; padding: 12px; font-size: 13px; font-weight: 700; color: #fff; border: none; border-radius: 10px; cursor: pointer; background: linear-gradient(135deg, #8e44ad, #6c3483); display: flex; align-items: center; justify-content: center; gap: 6px;">
         🔓 Login as Client
     </button>
 </div>
 </div>
 
+<!-- SHEET FOURNISSEURS -->
 <div class="sheet" id="sheet-fournisseurs">
 <div class="sheet-handle"></div>
 <div class="sheet-header"><h3>Fournisseur</h3><button class="sheet-close" onclick="App.closeSheet()">✕</button></div>
@@ -673,6 +711,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 </div>
 </div>
 
+<!-- SHEET ARTICLES -->
 <div class="sheet" id="sheet-articles">
 <div class="sheet-handle"></div>
 <div class="sheet-header"><h3>Article</h3><button class="sheet-close" onclick="App.closeSheet()">✕</button></div>
@@ -697,6 +736,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 </div>
 </div>
 
+<!-- SHEET VENTES (مع Mode Règlement 6 أسطر) -->
 <div class="sheet" id="sheet-ventes">
 <div class="sheet-handle"></div>
 <div class="sheet-header"><h3>📄 Facture de vente</h3><button class="sheet-close" onclick="App.closeSheet()">✕</button></div>
@@ -717,7 +757,18 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 <div class="summary-item"><span class="label">💳 Payé</span><span class="value positive" id="vPaidAmount">0.000</span></div>
 <div class="summary-item"><span class="label">📊 Solde</span><span class="value negative" id="vCurrentBalance">0.000</span></div>
 </div>
-<div class="payment-only-notice" id="vPaymentOnlyNotice" style="display:none;"><div class="title">💰 Mode Règlement</div><div class="subtitle">Aucun produit</div></div>
+
+<!-- ✨ MODE RÈGLEMENT — 6 LIGNES COMPACTES -->
+<div class="payment-only-notice" id="vPaymentOnlyNotice" style="display:none;">
+    <div class="title">💰 Mode Règlement</div>
+    <div class="subtitle">• Aucun produit ajouté</div>
+    <div class="subtitle">• Facture de paiement uniquement</div>
+    <div class="subtitle">• Le solde sera mis à jour</div>
+    <div class="subtitle">• Aucun mouvement de stock</div>
+    <div class="subtitle">• Enregistrement direct possible</div>
+    <div class="subtitle">• Vérifiez le montant avant validation</div>
+</div>
+
 <div class="add-product-section">
 <div class="section-label">➕ Ajouter un produit</div>
 <div class="add-product-row">
@@ -755,6 +806,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 </div>
 </div>
 
+<!-- SHEET ACHATS (مع Mode Règlement 6 أسطر) -->
 <div class="sheet" id="sheet-achats">
 <div class="sheet-handle"></div>
 <div class="sheet-header"><h3>📄 Facture d'achat</h3><button class="sheet-close" onclick="App.closeSheet()">✕</button></div>
@@ -775,7 +827,18 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 <div class="summary-item"><span class="label">💳 Payé</span><span class="value positive" id="pPaidAmount">0.000</span></div>
 <div class="summary-item"><span class="label">📊 Solde</span><span class="value negative" id="pCurrentBalance">0.000</span></div>
 </div>
-<div class="payment-only-notice" id="pPaymentOnlyNotice" style="display:none;"><div class="title">💸 Mode Règlement</div><div class="subtitle">Aucun produit</div></div>
+
+<!-- ✨ MODE RÈGLEMENT — 6 LIGNES COMPACTES -->
+<div class="payment-only-notice" id="pPaymentOnlyNotice" style="display:none;">
+    <div class="title">💸 Mode Règlement</div>
+    <div class="subtitle">• Aucun produit ajouté</div>
+    <div class="subtitle">• Facture de paiement uniquement</div>
+    <div class="subtitle">• Le solde sera mis à jour</div>
+    <div class="subtitle">• Aucun mouvement de stock</div>
+    <div class="subtitle">• Enregistrement direct possible</div>
+    <div class="subtitle">• Vérifiez le montant avant validation</div>
+</div>
+
 <div class="add-product-section">
 <div class="section-label">➕ Ajouter un produit</div>
 <div class="add-product-row">
@@ -813,6 +876,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 </div>
 </div>
 
+<!-- SHEET EXPENSES -->
 <div class="sheet" id="sheet-expenses">
 <div class="sheet-handle"></div>
 <div class="sheet-header"><h3>Dépense</h3><button class="sheet-close" onclick="App.closeSheet()">✕</button></div>
@@ -834,7 +898,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 </div>
 </div>
 
-<!-- ⚙️ PARAMÈTRES AVEC FORMAT D'IMPRESSION A4/80/56 -->
+<!-- SHEET COMPANY (PARAMÈTRES) -->
 <div class="sheet" id="sheet-company">
 <div class="sheet-handle"></div>
 <div class="sheet-header"><h3>⚙️ Paramètres</h3><button class="sheet-close" onclick="App.closeSheet()">✕</button></div>
@@ -864,7 +928,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 <input type="file" id="importFileInputBackup" accept=".json" style="display:none;" onchange="Persistence.import(this.files[0]);this.value='';">
 <button class="btn outline small" onclick="document.getElementById('importFileInputBackup').click()">⬆️ Importer</button>
 
-<!-- ✅ SECTION IMPRESSION A4 / 80mm / 56mm -->
 <div class="section-title">🖨️ Impression</div>
 <div class="field">
     <label>📄 Format de papier par défaut</label>
@@ -887,15 +950,18 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 <div class="section-title">🖥️ Affichage</div>
 <button class="btn outline small" onclick="Fullscreen.toggle()" style="width:100%;">⛶ Plein écran</button>
 <div class="section-title">👤 Compte</div>
-<div id="accountEmailDisplay" style="font-size:11px;color:var(--muted);margin-bottom:3px;"></div>
-<button class="btn save small" style="width:auto;padding:6px 14px;font-size:11px;margin-bottom:4px;" onclick="App.closeSheet();openStaffPasswordModal();">🔑 Changer mot de passe</button>
+<div id="accountEmailDisplay" style="font-size:12px;color:var(--muted);margin-bottom:4px;"></div>
+<button class="btn save small" style="width:auto;padding:8px 16px;font-size:12px;margin-bottom:4px;" onclick="App.closeSheet();openStaffPasswordModal();">🔑 Changer mot de passe</button>
 <button class="btn del" onclick="Auth.logout()">🚪 Se déconnecter</button>
 </div>
 </div>
 
 <div class="toast" id="toast"></div>
 <div class="toast-modern" id="toastModern"></div>
-</div><div class="modal-overlay" id="passwordModal">
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="passwordModal">
 <div class="modal-box">
 <h3>🔑 Changer mot de passe</h3>
 <div class="field"><label>Mot de passe actuel</label><div class="password-wrapper"><input type="password" id="currentPassword"><button class="password-toggle" type="button" onclick="Auth.togglePassword('currentPassword')">👁️</button></div></div>
@@ -934,7 +1000,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 <button class="btn save small" style="width:100%;margin-bottom:8px;" onclick="ClientOrder.addLine()">➕ Ajouter au panier</button>
 <div class="section-title" style="margin-top:8px;">🛒 Panier</div>
 <div id="coLinesList" style="max-height:180px;overflow-y:auto;margin-bottom:8px;"></div>
-<div class="invoice-total-modern" style="margin:8px 0;"><span class="label">💰 Total</span><span class="amount" id="coTotal" style="font-size:16px;">0.000 TND</span></div>
+<div class="invoice-total-modern" style="margin:8px 0;"><span class="label">💰 Total</span><span class="amount" id="coTotal" style="font-size:18px;">0.000 TND</span></div>
 <div class="field"><label>📝 Note (optionnel)</label><input type="text" id="coNote" placeholder="Ex: livraison demain..."></div>
 <div class="modal-error" id="coError"></div>
 <div class="modal-actions">
@@ -949,8 +1015,8 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 <h3>🖨️ Impression</h3>
 <div class="field"><label>🖼️ Logo</label>
 <input type="file" id="logoUpload" accept="image/*" onchange="PrintSystem.handleLogoUpload(event)">
-<div id="logoPreview" style="margin-top:4px;text-align:center;font-size:9px;color:var(--muted);"><span id="logoFileName">Aucun logo</span><br><img id="logoPreviewImg" style="max-width:100px;max-height:60px;display:none;margin-top:4px;border:1px solid var(--border);border-radius:4px;padding:2px;"></div>
-<button class="btn outline small" onclick="PrintSystem.loadDefaultLogo()" style="margin-top:2px;font-size:9px;padding:2px 8px;">⬇️ Logo par défaut</button>
+<div id="logoPreview" style="margin-top:4px;text-align:center;font-size:10px;color:var(--muted);"><span id="logoFileName">Aucun logo</span><br><img id="logoPreviewImg" style="max-width:100px;max-height:60px;display:none;margin-top:4px;border:1px solid var(--border);border-radius:4px;padding:2px;"></div>
+<button class="btn outline small" onclick="PrintSystem.loadDefaultLogo()" style="margin-top:2px;font-size:10px;padding:4px 10px;">⬇️ Logo par défaut</button>
 </div>
 <div class="field"><label>📝 Pied de page</label><input type="text" id="customFooter"></div>
 <div class="field"><label>📐 Taille de police</label><select id="fontSizeSelect"><option value="small">Petite</option><option value="medium" selected>Moyenne</option><option value="large">Grande</option></select></div>
@@ -965,11 +1031,11 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 <div class="notification-panel" id="notificationPanel">
 <div class="notification-content">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:6px;">
-<h2 style="color:var(--secondary);font-size:16px;margin:0;">🔔 Notifications</h2>
+<h2 style="color:var(--secondary);font-size:18px;margin:0;">🔔 Notifications</h2>
 <div style="display:flex;gap:4px;flex-wrap:wrap;">
-<button onclick="NotificationSystem.markAllAsRead();NotificationSystem.renderPanel();" style="padding:5px 12px;border:none;border-radius:6px;background:var(--primary);color:#fff;font-size:11px;cursor:pointer;">✓ Tout marquer</button>
-<button onclick="NotificationSystem.clearAll();" style="padding:5px 12px;border:none;border-radius:6px;background:var(--warning);color:#fff;font-size:11px;cursor:pointer;font-weight:700;">🗑️ Effacer tout</button>
-<button onclick="closeNotificationPanel()" style="padding:5px 12px;border:none;border-radius:6px;background:var(--danger);color:#fff;font-size:11px;cursor:pointer;">✕ Fermer</button>
+<button onclick="NotificationSystem.markAllAsRead();NotificationSystem.renderPanel();" style="padding:6px 14px;border:none;border-radius:6px;background:var(--primary);color:#fff;font-size:12px;cursor:pointer;">✓ Tout marquer</button>
+<button onclick="NotificationSystem.clearAll();" style="padding:6px 14px;border:none;border-radius:6px;background:var(--warning);color:#fff;font-size:12px;cursor:pointer;font-weight:700;">🗑️ Effacer tout</button>
+<button onclick="closeNotificationPanel()" style="padding:6px 14px;border:none;border-radius:6px;background:var(--danger);color:#fff;font-size:12px;cursor:pointer;">✕ Fermer</button>
 </div>
 </div>
 <div id="notificationList"></div>
@@ -980,7 +1046,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 <div class="shortcut-help-content">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
 <h2 style="color:var(--secondary);">⌨️ Raccourcis</h2>
-<button onclick="closeShortcutHelp()" style="padding:4px 12px;border:none;border-radius:4px;background:var(--danger);color:#fff;font-size:11px;cursor:pointer;">Fermer</button>
+<button onclick="closeShortcutHelp()" style="padding:6px 14px;border:none;border-radius:4px;background:var(--danger);color:#fff;font-size:12px;cursor:pointer;">Fermer</button>
 </div>
 <table><thead><tr><th>Raccourci</th><th>Fonction</th></tr></thead><tbody id="shortcutList"></tbody></table>
 </div>
@@ -1000,7 +1066,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 <div class="modal-overlay" id="customConfirmModal">
 <div class="modal-box">
 <h3 id="customConfirmTitle">Confirmation</h3>
-<div id="customConfirmMessage" style="font-size:13px;line-height:1.6;white-space:pre-wrap;margin-bottom:15px;color:var(--text);"></div>
+<div id="customConfirmMessage" style="font-size:14px;line-height:1.7;white-space:pre-wrap;margin-bottom:15px;color:var(--text);"></div>
 <div class="modal-actions">
 <button class="btn del" id="customConfirmCancel">Annuler</button>
 <button class="btn save" id="customConfirmOk">OK</button>
@@ -1008,20 +1074,19 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 </div>
 </div>
 
-<!-- ✅ حوار 3 أزرار مخصص (Always / This Invoice / Cancel) -->
 <div class="modal-overlay" id="customConfirm3Modal">
     <div class="modal-box" style="max-width: 420px;">
-        <h3 id="customConfirm3Title" style="color: var(--secondary); font-size: 16px; font-weight: 800; text-align: center; margin-bottom: 16px;">💾 Enregistrer le prix</h3>
-        <div id="customConfirm3Message" style="font-size: 13px; line-height: 1.7; color: var(--text); background: var(--bg); padding: 14px 16px; border-radius: 12px; margin-bottom: 18px; border: 1px solid var(--border); text-align: left;"></div>
+        <h3 id="customConfirm3Title" style="color: var(--secondary); font-size: 17px; font-weight: 800; text-align: center; margin-bottom: 16px;">💾 Enregistrer le prix</h3>
+        <div id="customConfirm3Message" style="font-size: 14px; line-height: 1.8; color: var(--text); background: var(--bg); padding: 14px 16px; border-radius: 12px; margin-bottom: 18px; border: 1px solid var(--border); text-align: left;"></div>
         <div style="display: flex; gap: 8px; flex-direction: column;">
-            <button class="btn save" id="customConfirm3Always" style="padding: 12px; font-size: 13px; font-weight: 700; border-radius: 10px; background: linear-gradient(135deg, #2ecc71, #27ae60); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <button class="btn save" id="customConfirm3Always" style="padding: 14px; font-size: 14px; font-weight: 700; border-radius: 10px; background: linear-gradient(135deg, #2ecc71, #27ae60); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
                 ⭐ Toujours (Permanent)
             </button>
             <div style="display: flex; gap: 8px;">
-                <button class="btn del" id="customConfirm3Cancel" style="flex: 1; padding: 10px; font-size: 12px; font-weight: 700; border-radius: 10px; background: linear-gradient(135deg, #e74c5e, #c0392b); color: #fff; border: none; cursor: pointer;">
+                <button class="btn del" id="customConfirm3Cancel" style="flex: 1; padding: 12px; font-size: 13px; font-weight: 700; border-radius: 10px; background: linear-gradient(135deg, #e74c5e, #c0392b); color: #fff; border: none; cursor: pointer;">
                     ❌ Annuler
                 </button>
-                <button class="btn print" id="customConfirm3Ok" style="flex: 1; padding: 10px; font-size: 12px; font-weight: 700; border-radius: 10px; background: linear-gradient(135deg, #4a6cf7, #2a4ac7); color: #fff; border: none; cursor: pointer;">
+                <button class="btn print" id="customConfirm3Ok" style="flex: 1; padding: 12px; font-size: 13px; font-weight: 700; border-radius: 10px; background: linear-gradient(135deg, #4a6cf7, #2a4ac7); color: #fff; border: none; cursor: pointer;">
                     ✅ Cette facture
                 </button>
             </div>
@@ -1034,7 +1099,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 <div class="cp-logo">GTR<span>POS</span></div>
 <div class="cp-user">
     <span id="cpClientName">Client</span>
-    <span id="cpStaffBadge" style="display: none; background: #8e44ad; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 9px; font-weight: 700;">👨‍💼 Vue Staff</span>
+    <span id="cpStaffBadge" style="display: none; background: #8e44ad; color: #fff; padding: 3px 10px; border-radius: 10px; font-size: 10px; font-weight: 700;">👨‍💼 Vue Staff</span>
     <button id="cpExitBtn" onclick="ClientsModule.exitClientView()" title="Retour au mode Staff" style="display: none; background: linear-gradient(135deg, #8e44ad, #6c3483);">🔓</button>
     <button onclick="Auth.logout()" title="Déconnexion">🚪</button>
 </div>
@@ -1068,11 +1133,9 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#e8ecf4;--muted:#8892b0;--bor
 <button class="btn-close" onclick="PrintSystem.close()">✕ Fermer</button>
 <button class="btn-print" onclick="window.print()">🖨️ Imprimer</button>
 </div>
-<div style="text-align:center;color:#aaa;font-size:10px;margin-bottom:3px;">💡 Choisissez l'imprimante et le format</div>
+<div style="text-align:center;color:#aaa;font-size:11px;margin-bottom:3px;">💡 Choisissez l'imprimante et le format</div>
 <div class="invoice-doc paper-80" id="printDoc"></div>
-</div>
-
-<script>
+</div><script>
 (function() {
 'use strict';
 
@@ -1099,8 +1162,8 @@ const FIREBASE_CONFIG = {
 };
 
 const THEMES = {
-    light: { primary:'#4a6cf7', secondary:'#1a2a5c', success:'#2ecc71', danger:'#e74c5e', warning:'#f1c40f', bg:'#f0f2f8', panel:'#ffffff', text:'#1a1f2e', muted:'#7a8499', border:'#e2e6f0' },
-    dark:  { primary:'#6b8aff', secondary:'#2a3f7a', success:'#2ecc71', danger:'#e74c5e', warning:'#f1c40f', bg:'#0a0e1a', panel:'#141b2d', text:'#e8ecf4', muted:'#8892b0', border:'#2a3a5c' },
+    light: { primary:'#4a6cf7', secondary:'#1a2a5c', success:'#2ecc71', danger:'#e74c5e', warning:'#f1c40f', bg:'#f0f2f8', panel:'#ffffff', text:'#111827', muted:'#6b7280', border:'#d1d5db' },
+    dark:  { primary:'#6b8aff', secondary:'#2a3f7a', success:'#2ecc71', danger:'#e74c5e', warning:'#f1c40f', bg:'#0a0e1a', panel:'#141b2d', text:'#f3f4f6', muted:'#9ca3af', border:'#374151' },
     blue:  { primary:'#1a4fd6', secondary:'#0a2a7a', success:'#27ae60', danger:'#e74c5e', warning:'#f1c40f', bg:'#e8eef8', panel:'#ffffff', text:'#0a1a3a', muted:'#6a7a9a', border:'#d0d8e8' },
     green: { primary:'#27ae60', secondary:'#1a7a40', success:'#2ecc71', danger:'#e74c5e', warning:'#f1c40f', bg:'#e8f5ee', panel:'#ffffff', text:'#0a2a1a', muted:'#5a8a6a', border:'#c8e0d0' }
 };
@@ -1254,12 +1317,12 @@ const NotificationSystem = {
         else {
             list.innerHTML = State.notifications.slice(0, 20).map(n => {
                 const t = this.TYPES[n.type] || this.TYPES.INFO;
-                return `<div style="padding:12px;margin-bottom:8px;border-radius:8px;background:${n.read?'var(--bg)':'var(--panel)'};border:1px solid ${n.read?'var(--border)':t.color};border-right:3px solid ${t.color};">
+                return `<div style="padding:14px;margin-bottom:8px;border-radius:8px;background:${n.read?'var(--bg)':'var(--panel)'};border:1px solid ${n.read?'var(--border)':t.color};border-right:3px solid ${t.color};">
                     <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <span style="font-weight:700;font-size:13px;">${t.icon} ${esc(n.title)}</span>
-                        <span style="font-size:10px;color:var(--muted);">${new Date(n.timestamp).toLocaleDateString('fr')} ${new Date(n.timestamp).toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'})}</span>
+                        <span style="font-weight:700;font-size:14px;">${t.icon} ${esc(n.title)}</span>
+                        <span style="font-size:11px;color:var(--muted);">${new Date(n.timestamp).toLocaleDateString('fr')} ${new Date(n.timestamp).toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'})}</span>
                     </div>
-                    <div style="font-size:12px;color:var(--muted);margin-top:4px;">${esc(n.message)}</div>
+                    <div style="font-size:13px;color:var(--muted);margin-top:4px;">${esc(n.message)}</div>
                 </div>`;
             }).join('');
         }
@@ -1356,7 +1419,7 @@ const ClientLoginsSync = {
                 },
                 updatedAt: new Date().toISOString()
             }, { merge: true });
-            console.log(`✅ Login "${client.login}" synchronisé avec ${cleanSpecialPrices.length} prix spécial(aux)`);
+            console.log(`✅ Login "${client.login}" synchronisé`);
             return true;
         } catch(e) { console.warn(`⚠️ Sync login "${client.login}" échoué:`, e.message); return false; }
     },
@@ -1426,34 +1489,20 @@ const Persistence = {
                 && !String(State.currentUser.uid).startsWith('client_')) {
                 const data = this.serialize();
                 window.db.collection('users').doc(State.currentUser.uid).set(data)
-                    .then(() => {
-                        console.log('☁️ Firestore sauvegardé');
-                        this._retryPendingSyncs();
-                    })
-                    .catch(e => {
-                        console.warn('⚠️ Firestore offline, mis en queue:', e.message);
-                        this._queueSync(State.currentUser.uid, data);
-                    });
+                    .then(() => { this._retryPendingSyncs(); })
+                    .catch(e => { this._queueSync(State.currentUser.uid, data); });
             }
             this.syncVentesToShared();
             return true;
         } catch(e) { console.error('❌ Erreur save:', e); return false; }
     },
-    _queueSync(uid, data) {
-        this._pendingSyncs.push({ uid, data, at: Date.now() });
-        if (this._pendingSyncs.length > 10) this._pendingSyncs.shift();
-    },
+    _queueSync(uid, data) { this._pendingSyncs.push({ uid, data, at: Date.now() }); if (this._pendingSyncs.length > 10) this._pendingSyncs.shift(); },
     async _retryPendingSyncs() {
         if (!this._pendingSyncs.length) return;
-        const queue = [...this._pendingSyncs];
-        this._pendingSyncs = [];
+        const queue = [...this._pendingSyncs]; this._pendingSyncs = [];
         for (const item of queue) {
-            try {
-                await window.db.collection('users').doc(item.uid).set(item.data);
-                console.log('✅ Sync rattrapé pour', item.uid);
-            } catch(e) {
-                this._pendingSyncs.push(item);
-            }
+            try { await window.db.collection('users').doc(item.uid).set(item.data); }
+            catch(e) { this._pendingSyncs.push(item); }
         }
     },
     async syncVentesToShared() {
@@ -1473,7 +1522,6 @@ const Persistence = {
                 batch.set(ref, { ...v, clientEmail: client.email || '', clientLogin: client.login || '', clientId: client.id, clientUid: 'client_' + client.id, syncedAt: new Date().toISOString() }, { merge: true });
             });
             await batch.commit();
-            console.log(`✅ ${toSync.length} ventes synchronisées`);
         } catch(e) { console.warn('⚠️ syncVentesToShared:', e.message); }
     },
     load() {
@@ -1500,10 +1548,7 @@ const Persistence = {
                 this.load();
                 try { await window.db.collection('users').doc(uid).set(this.serialize()); } catch(e) {}
             }
-        } catch(e) {
-            console.warn('⚠️ Cloud load failed:', e.message);
-            this.load();
-        }
+        } catch(e) { this.load(); }
     },
     export() {
         const data = { ...this.serialize(), exportedAt: new Date().toISOString() };
@@ -1515,34 +1560,24 @@ const Persistence = {
         URL.revokeObjectURL(url);
         Toast.show('✅ Exporté');
     },
-           import(file) {                              
-        if (!file || !file.name.endsWith('.json')) { 
-            Toast.show('⚠️ Fichier JSON requis'); 
-            return; 
-        }                                        
+    import(file) {
+        if (!file || !file.name.endsWith('.json')) { Toast.show('⚠️ Fichier JSON requis'); return; }
         const reader = new FileReader();
-        reader.onload = e => {                  
+        reader.onload = e => {
             try {
                 const data = JSON.parse(e.target.result);
-                this.deserialize(data); 
-                this.save(); 
+                this.deserialize(data);
+                this.save();
                 App.reloadAll();
                 Toast.show(`✅ Importé`);
-            } catch(err) { 
-                Toast.show('❌ Erreur'); 
-            }                                   
-        };                                       
-                reader.readAsText(file);
+            } catch(err) { Toast.show('❌ Erreur'); }
+        };
+        reader.readAsText(file);
     }
-};                                     
+};
 
 const PrintSystem = {
-    settings: {
-        logo: null,
-        footer: 'Merci de votre visite',
-        fontSize: 'medium',
-        defaultPaperSize: '80'
-    },
+    settings: { logo: null, footer: 'Merci de votre visite', fontSize: 'medium', defaultPaperSize: '80' },
     _currentData: null,
     load() {
         try {
@@ -1573,19 +1608,14 @@ const PrintSystem = {
     },
     setDefaultFontSize(value) {
         this.settings.fontSize = value;
-        try {
-            localStorage.setItem(APP_CONFIG.printKey, JSON.stringify(this.settings));
-            const labels = { small:'Petite', medium:'Moyenne', large:'Grande' };
-            Toast.show('✅ Police: ' + (labels[value] || value), 'success');
-        } catch(e) {}
+        try { localStorage.setItem(APP_CONFIG.printKey, JSON.stringify(this.settings)); Toast.show('✅ Police: ' + value, 'success'); } catch(e) {}
     },
     async reset() {
         const ok = await CustomConfirm.show('⚠️ Restaurer ?');
         if (!ok) return;
         this.settings = { logo:null, footer:'Merci de votre visite', fontSize:'medium', defaultPaperSize:'80' };
         localStorage.removeItem(APP_CONFIG.printKey);
-        this.updateCustomizerUI();
-        this.syncSettingsUI();
+        this.updateCustomizerUI(); this.syncSettingsUI();
     },
     openCustomizer() { this.load(); this.updateCustomizerUI(); $('printCustomizerModal').classList.add('show'); },
     closeCustomizer() { $('printCustomizerModal').classList.remove('show'); },
@@ -1624,36 +1654,36 @@ const PrintSystem = {
         this.updateCustomizerUI();
         Toast.show('✅ Logo par défaut', 'success');
     },
-    getFontSize() { return { small:'7px', medium:'10px', large:'14px' }[this.settings.fontSize] || '10px'; },
+    getFontSize() { return { small:'9px', medium:'12px', large:'16px' }[this.settings.fontSize] || '12px'; },
     buildInvoiceHTML(data) {
         const fs = this.getFontSize();
-        const logo = this.settings.logo ? `<div style="text-align:center;margin-bottom:4px;"><img src="${esc(this.settings.logo)}" style="max-width:120px;max-height:50px;"></div>` : '';
-        const footer = this.settings.footer ? `<div style="text-align:center;font-size:${fs};color:#666;margin-top:8px;border-top:1px dashed #ddd;padding-top:6px;">${esc(this.settings.footer)}</div>` : '';
-        let lines = (data.lines || []).map((l, i) => `<tr><td style="border:1px solid #999;padding:2px 4px;text-align:center;">${i+1}</td><td style="border:1px solid #999;padding:2px 4px;">${esc(l.name)}</td><td style="border:1px solid #999;padding:2px 4px;text-align:center;">${Number(l.price).toFixed(3)}</td><td style="border:1px solid #999;padding:2px 4px;text-align:center;">${Number(l.qty)}</td><td style="border:1px solid #999;padding:2px 4px;text-align:right;font-weight:700;">${Number(l.total).toFixed(3)}</td></tr>`).join('');
+        const logo = this.settings.logo ? `<div style="text-align:center;margin-bottom:6px;"><img src="${esc(this.settings.logo)}" style="max-width:120px;max-height:50px;"></div>` : '';
+        const footer = this.settings.footer ? `<div style="text-align:center;font-size:${fs};color:#666;margin-top:10px;border-top:1px dashed #ddd;padding-top:8px;">${esc(this.settings.footer)}</div>` : '';
+        let lines = (data.lines || []).map((l, i) => `<tr><td style="border:1px solid #999;padding:4px 6px;text-align:center;">${i+1}</td><td style="border:1px solid #999;padding:4px 6px;">${esc(l.name)}</td><td style="border:1px solid #999;padding:4px 6px;text-align:center;">${Number(l.price).toFixed(3)}</td><td style="border:1px solid #999;padding:4px 6px;text-align:center;">${Number(l.qty)}</td><td style="border:1px solid #999;padding:4px 6px;text-align:right;font-weight:700;">${Number(l.total).toFixed(3)}</td></tr>`).join('');
         if (!lines) lines = `<tr><td colspan="5" style="border:1px solid #999;padding:10px;text-align:center;color:#2980b9;font-style:italic;background:#e3f2fd;">💰 Règlement de compte</td></tr>`;
         return `${logo}
-            <div style="text-align:center;border-bottom:2px solid #1e2f66;padding-bottom:4px;margin-bottom:4px;">
+            <div style="text-align:center;border-bottom:2px solid #1e2f66;padding-bottom:6px;margin-bottom:6px;">
                 <div style="font-size:${fs};font-weight:800;">${esc(data.title)}</div>
                 <div style="font-size:${fs};color:#666;">${new Date().toLocaleDateString('fr-FR')} - ${esc(State.companyInfo.name)}</div>
             </div>
-            <div style="font-size:${fs};text-align:center;margin:2px 0;">${esc(data.date)}</div>
-            <div style="display:flex;justify-content:space-between;font-size:${fs};border:1px solid #999;padding:3px;margin:3px 0;flex-wrap:wrap;">
+            <div style="font-size:${fs};text-align:center;margin:4px 0;">${esc(data.date)}</div>
+            <div style="display:flex;justify-content:space-between;font-size:${fs};border:1px solid #999;padding:5px;margin:5px 0;flex-wrap:wrap;">
                 <span><strong>${esc(data.partyLabel)}:</strong> ${esc(data.partyName)}</span>
                 <span><strong>Tél:</strong> ${esc(data.partyPhone || '-')}</span>
                 <span><strong>MF:</strong> ${esc(data.partyTaxId || '-')}</span>
             </div>
             <table style="width:100%;border-collapse:collapse;font-size:${fs};"><thead><tr style="background:#1e2f66;color:#fff;">
-                <th style="border:1px solid #999;padding:2px 4px;">#</th><th style="border:1px solid #999;padding:2px 4px;">Produit</th>
-                <th style="border:1px solid #999;padding:2px 4px;">Prix</th><th style="border:1px solid #999;padding:2px 4px;">Qté</th>
-                <th style="border:1px solid #999;padding:2px 4px;">Total</th>
+                <th style="border:1px solid #999;padding:4px 6px;">#</th><th style="border:1px solid #999;padding:4px 6px;">Produit</th>
+                <th style="border:1px solid #999;padding:4px 6px;">Prix</th><th style="border:1px solid #999;padding:4px 6px;">Qté</th>
+                <th style="border:1px solid #999;padding:4px 6px;">Total</th>
             </tr></thead><tbody>${lines}</tbody></table>
-            <table style="width:100%;border-collapse:collapse;font-size:${fs};margin:4px 0;">
-                <tr><td style="border:1px solid #999;padding:2px 4px;">Solde préc.</td><td style="border:1px solid #999;padding:2px 4px;text-align:right;">${Number(data.prevBalance).toFixed(3)}</td></tr>
-                <tr style="background:#d9ede2;font-weight:700;"><td style="border:1px solid #999;padding:2px 4px;">Total facture</td><td style="border:1px solid #999;padding:2px 4px;text-align:right;">${Number(data.total).toFixed(3)}</td></tr>
-                <tr><td style="border:1px solid #999;padding:2px 4px;">Payé</td><td style="border:1px solid #999;padding:2px 4px;text-align:right;">${Number(data.paid).toFixed(3)}</td></tr>
-                <tr style="background:#fbdcc9;font-weight:700;"><td style="border:1px solid #999;padding:2px 4px;">Solde actuel</td><td style="border:1px solid #999;padding:2px 4px;text-align:right;color:#c0392b;">${Number(data.currentBalance).toFixed(3)}</td></tr>
+            <table style="width:100%;border-collapse:collapse;font-size:${fs};margin:6px 0;">
+                <tr><td style="border:1px solid #999;padding:4px 6px;">Solde préc.</td><td style="border:1px solid #999;padding:4px 6px;text-align:right;">${Number(data.prevBalance).toFixed(3)}</td></tr>
+                <tr style="background:#d9ede2;font-weight:700;"><td style="border:1px solid #999;padding:4px 6px;">Total facture</td><td style="border:1px solid #999;padding:4px 6px;text-align:right;">${Number(data.total).toFixed(3)}</td></tr>
+                <tr><td style="border:1px solid #999;padding:4px 6px;">Payé</td><td style="border:1px solid #999;padding:4px 6px;text-align:right;">${Number(data.paid).toFixed(3)}</td></tr>
+                <tr style="background:#fbdcc9;font-weight:700;"><td style="border:1px solid #999;padding:4px 6px;">Solde actuel</td><td style="border:1px solid #999;padding:4px 6px;text-align:right;color:#c0392b;">${Number(data.currentBalance).toFixed(3)}</td></tr>
             </table>
-            <div style="text-align:center;font-size:${fs};font-weight:700;margin:4px 0;">${esc(data.num)}</div>
+            <div style="text-align:center;font-size:${fs};font-weight:700;margin:6px 0;">${esc(data.num)}</div>
             ${footer}`;
     },
     showInvoice(data) {
@@ -1670,53 +1700,35 @@ const PrintSystem = {
         const safeTitle = esc(title);
         const paperSize = this.settings.defaultPaperSize || '80';
         let pageCSS = '';
-        if (paperSize === 'a4') {
-            pageCSS = '@page { size: A4; margin: 10mm; }';
-        } else if (paperSize === '80') {
-            pageCSS = '@page { size: 80mm auto; margin: 2mm; }';
-        } else if (paperSize === '56') {
-            pageCSS = '@page { size: 56mm auto; margin: 1mm; }';
-        }
+        if (paperSize === 'a4') pageCSS = '@page { size: A4; margin: 10mm; }';
+        else if (paperSize === '80') pageCSS = '@page { size: 80mm auto; margin: 2mm; }';
+        else if (paperSize === '56') pageCSS = '@page { size: 56mm auto; margin: 1mm; }';
         const iframe = document.createElement('iframe');
-        iframe.style.position = 'fixed';
-        iframe.style.right = '0';
-        iframe.style.bottom = '0';
-        iframe.style.width = '0';
-        iframe.style.height = '0';
-        iframe.style.border = '0';
-        iframe.style.visibility = 'hidden';
+        iframe.style.position = 'fixed'; iframe.style.right = '0'; iframe.style.bottom = '0';
+        iframe.style.width = '0'; iframe.style.height = '0'; iframe.style.border = '0'; iframe.style.visibility = 'hidden';
         document.body.appendChild(iframe);
-        
         const doc = iframe.contentWindow.document;
         doc.open();
         doc.write('<!DOCTYPE html><html dir="ltr"><head><title>' + safeTitle + '</title><style>' +
             pageCSS +
             'body{font-family:Cairo,Arial,sans-serif;padding:' + (paperSize === 'a4' ? '20px' : '5px') + ';direction:ltr;background:#fff;' + (paperSize === 'a4' ? '' : 'max-width:' + paperSize + 'mm;margin:0 auto;') + '}' +
             'table{width:100%;border-collapse:collapse}' +
-            'th,td{padding:' + (paperSize === 'a4' ? '6px' : '3px') + ';text-align:center;border:1px solid #ddd;font-size:' + (paperSize === 'a4' ? '12px' : '9px') + '}' +
+            'th,td{padding:' + (paperSize === 'a4' ? '6px' : '3px') + ';text-align:center;border:1px solid #ddd;font-size:' + (paperSize === 'a4' ? '12px' : '10px') + '}' +
             'th{background:#1e2f66;color:#fff}' +
             '.header{text-align:center;border-bottom:3px double #1e2f66;padding-bottom:10px;margin-bottom:15px}' +
             '.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin:10px 0}' +
             '.kpi-card{background:#f0f4ff;padding:10px;border-radius:8px;text-align:center}' +
             '.kpi-card .val{font-size:16px;font-weight:800;color:#1e2f66}' +
-            '.kpi-card .lbl{font-size:10px;color:#666}' +
+            '.kpi-card .lbl{font-size:11px;color:#666}' +
             '</style></head><body>' +
             '<div class="header"><h1>' + safeTitle + '</h1><p>' + esc(State.companyInfo.name) + ' - ' + new Date().toLocaleDateString('fr-FR') + '</p></div>' +
             content +
             '</body></html>');
         doc.close();
-        
         setTimeout(() => {
-            try {
-                iframe.contentWindow.focus();
-                iframe.contentWindow.print();
-            } catch(e) {
-                console.error('Erreur impression:', e);
-                Toast.show('❌ Erreur d\'impression', 'error');
-            }
-            setTimeout(() => {
-                if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-            }, 1500);
+            try { iframe.contentWindow.focus(); iframe.contentWindow.print(); }
+            catch(e) { Toast.show('❌ Erreur d\'impression', 'error'); }
+            setTimeout(() => { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 1500);
         }, 500);
     }
 };
@@ -1739,15 +1751,15 @@ const PreviewModal = {
             const statusLbl = { pending:'⏳ En attente', approved:'✅ Acceptée' };
             const pRows = pendingOrders.map(o => `<tr style="background:#fff8e1;"><td>${esc(o.date)}</td><td style="font-weight:700;">${esc(o.num)}</td><td style="text-align:left;">🛒 ${o.lines.length} article(s) — ${statusLbl[o.status] || esc(o.status)}</td><td style="text-align:right;font-weight:700;color:#e67e22;">${Number(o.total).toFixed(3)}</td><td colspan="2"></td></tr>`).join('');
             const totalPending = pendingOrders.reduce((s, o) => s + o.total, 0);
-            pendingHTML = `<div style="margin-top:16px;border-top:3px dashed #f39c12;padding-top:10px;"><div style="font-size:12px;font-weight:800;color:#e67e22;margin-bottom:6px;">🛒 Commandes en cours</div><table><thead><tr style="background:#e67e22;"><th>Date</th><th>N°</th><th>Statut</th><th>Montant</th><th colspan="2"></th></tr></thead><tbody>${pRows}</tbody><tfoot><tr><td colspan="3" style="text-align:right;font-weight:700;">Total :</td><td style="text-align:right;font-weight:700;color:#e67e22;">${totalPending.toFixed(3)} TND</td><td colspan="2"></td></tr></tfoot></table></div>`;
+            pendingHTML = `<div style="margin-top:16px;border-top:3px dashed #f39c12;padding-top:10px;"><div style="font-size:13px;font-weight:800;color:#e67e22;margin-bottom:6px;">🛒 Commandes en cours</div><table><thead><tr style="background:#e67e22;"><th>Date</th><th>N°</th><th>Statut</th><th>Montant</th><th colspan="2"></th></tr></thead><tbody>${pRows}</tbody><tfoot><tr><td colspan="3" style="text-align:right;font-weight:700;">Total :</td><td style="text-align:right;font-weight:700;color:#e67e22;">${totalPending.toFixed(3)} TND</td><td colspan="2"></td></tr></tfoot></table></div>`;
         }
-        return `<div style="text-align:center;border-bottom:2px solid #1e2f66;padding-bottom:6px;margin-bottom:8px;"><div style="font-size:14px;font-weight:800;">${esc(data.title)}</div><div style="font-size:10px;color:#666;">${esc(State.companyInfo.name)} - ${new Date().toLocaleDateString('fr-FR')}</div></div>
-        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;font-size:10px;border:1px solid #999;padding:6px 8px;margin-bottom:8px;"><span><strong>${esc(partyLabel)}:</strong> ${esc(entity.name)}</span><span><strong>Tél:</strong> ${esc(entity.phone || '-')}</span><span><strong>Solde:</strong> <span style="color:${finalBalance >= 0 ? '#27ae60' : '#c0392b'};font-weight:700;">${finalBalance.toFixed(3)} TND</span></span></div>
+        return `<div style="text-align:center;border-bottom:2px solid #1e2f66;padding-bottom:6px;margin-bottom:8px;"><div style="font-size:15px;font-weight:800;">${esc(data.title)}</div><div style="font-size:11px;color:#666;">${esc(State.companyInfo.name)} - ${new Date().toLocaleDateString('fr-FR')}</div></div>
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;font-size:11px;border:1px solid #999;padding:6px 8px;margin-bottom:8px;"><span><strong>${esc(partyLabel)}:</strong> ${esc(entity.name)}</span><span><strong>Tél:</strong> ${esc(entity.phone || '-')}</span><span><strong>Solde:</strong> <span style="color:${finalBalance >= 0 ? '#27ae60' : '#c0392b'};font-weight:700;">${finalBalance.toFixed(3)} TND</span></span></div>
         <table><thead><tr><th>Date</th><th>N°</th><th>Libellé</th><th>Débit</th><th>Crédit</th><th>Solde</th></tr></thead><tbody>${rows}</tbody><tfoot><tr><td colspan="3" style="text-align:left;">Totaux</td><td style="text-align:right;">${totals.debit.toFixed(3)}</td><td style="text-align:right;">${totals.credit.toFixed(3)}</td><td style="text-align:right;color:#c0392b;">${finalBalance.toFixed(3)}</td></tr></tfoot></table>
         ${pendingHTML}`;
     },
     buildArticleHTML(data) {
-        return `<div style="text-align:center;border-bottom:2px solid #1e2f66;padding-bottom:6px;margin-bottom:8px;"><div style="font-size:14px;font-weight:800;">Historique Article</div></div>
+        return `<div style="text-align:center;border-bottom:2px solid #1e2f66;padding-bottom:6px;margin-bottom:8px;"><div style="font-size:15px;font-weight:800;">Historique Article</div></div>
         <table><thead><tr><th>Date</th><th>Document</th><th>Type</th><th>Tiers</th><th>Quantité</th><th>Prix</th><th>Total</th><th>Solde</th></tr></thead><tbody>${data.rows}</tbody></table>`;
     },
     showInvoice(data) {
@@ -1760,10 +1772,7 @@ const PreviewModal = {
     },
     close() { $('previewModal').classList.remove('show'); this._currentContent = null; },
     confirmPrint() {
-        if (!this._currentContent) {
-            Toast.show('⚠️ Aucun contenu à imprimer', 'warning');
-            return;
-        }
+        if (!this._currentContent) { Toast.show('⚠️ Aucun contenu', 'warning'); return; }
         const title = this._currentTitle || 'Aperçu';
         const content = this._currentContent;
         this.close();
@@ -1788,10 +1797,7 @@ const CustomConfirm = {
             $('customConfirmModal').classList.add('show');
         });
     },
-    handle(value) {
-        $('customConfirmModal').classList.remove('show');
-        if (this.resolvePromise) { this.resolvePromise(value); this.resolvePromise = null; }
-    }
+    handle(value) { $('customConfirmModal').classList.remove('show'); if (this.resolvePromise) { this.resolvePromise(value); this.resolvePromise = null; } }
 };
 
 const CustomConfirm3 = {
@@ -1817,10 +1823,7 @@ const CustomConfirm3 = {
             $('customConfirm3Modal').classList.add('show');
         });
     },
-    handle(value) {
-        $('customConfirm3Modal').classList.remove('show');
-        if (this.resolvePromise) { this.resolvePromise(value); this.resolvePromise = null; }
-    }
+    handle(value) { $('customConfirm3Modal').classList.remove('show'); if (this.resolvePromise) { this.resolvePromise(value); this.resolvePromise = null; } }
 };
 
 const Bluetooth = {
@@ -1938,37 +1941,19 @@ const ClientOrder = {
             try {
                 const client = State.currentClient;
                 await firebase.firestore().collection('orders').doc('order_' + order.id + '_' + Date.now()).set({
-                    ...order,
-                    clientLogin: client?.login || '',
-                    clientEmail: client?.email || '',
-                    clientUid: currentUser.uid,
-                    syncedAt: new Date().toISOString(),
-                    source: 'client-portal'
+                    ...order, clientLogin: client?.login || '', clientEmail: client?.email || '',
+                    clientUid: currentUser.uid, syncedAt: new Date().toISOString(), source: 'client-portal'
                 });
-                console.log('✅ Commande envoyée au cloud via Firebase Auth');
                 return true;
-            } catch(e) {
-                console.warn('⚠️ Firebase Auth sync failed:', e.message);
-            }
+            } catch(e) {}
         }
         try {
             const pending = JSON.parse(localStorage.getItem('gtrpos_pending_orders') || '[]');
-            pending.push({
-                ...order,
-                clientId: State.currentClient?.id,
-                clientLogin: State.currentClient?.login || '',
-                clientEmail: State.currentClient?.email || '',
-                source: 'client-portal-local',
-                pendingSince: new Date().toISOString()
-            });
+            pending.push({ ...order, clientId: State.currentClient?.id, clientLogin: State.currentClient?.login || '', clientEmail: State.currentClient?.email || '', source: 'client-portal-local', pendingSince: new Date().toISOString() });
             localStorage.setItem('gtrpos_pending_orders', JSON.stringify(pending));
-            console.log('📦 Commande stockée localement, sera synchronisée par le staff');
             updatePendingCount();
             return true;
-        } catch(e) {
-            console.error('❌ Erreur storage local:', e.message);
-            return false;
-        }
+        } catch(e) { return false; }
     },
     async syncPendingOrders() {
         if (typeof firebase === 'undefined' || !window.db) return;
@@ -1977,27 +1962,18 @@ const ClientOrder = {
         try {
             const pending = JSON.parse(localStorage.getItem('gtrpos_pending_orders') || '[]');
             if (!pending.length) return;
-            console.log(`📤 Synchronisation de ${pending.length} commande(s) en attente...`);
             const batch = window.db.batch();
             pending.forEach(order => {
                 const docId = 'order_' + order.id + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
                 const ref = window.db.collection('orders').doc(docId);
-                batch.set(ref, {
-                    ...order,
-                    syncedAt: new Date().toISOString(),
-                    syncedByStaff: true,
-                    source: 'staff-sync'
-                });
+                batch.set(ref, { ...order, syncedAt: new Date().toISOString(), syncedByStaff: true, source: 'staff-sync' });
             });
             await batch.commit();
             localStorage.removeItem('gtrpos_pending_orders');
-            console.log(`✅ ${pending.length} commande(s) synchronisée(s)`);
             Toast.show(`✅ ${pending.length} commande(s) synchronisée(s)`, 'success');
             NotificationSystem.add('📦 Sync Staff', `${pending.length} commande(s) synchronisée(s)`, 'SUCCESS');
             updatePendingCount();
-        } catch(e) {
-            console.error('❌ Erreur sync pending orders:', e.message);
-        }
+        } catch(e) {}
     }
 };
 
@@ -2049,7 +2025,7 @@ const ClientPortal = {
                 });
                 if (changed) { Persistence.save(); this.renderOrders(); this.render(); }
             }, err => console.warn('⚠️ orders listener:', err.message));
-        } catch(e) { console.error(e); }
+        } catch(e) {}
     },
     stopClientOrderListener() { if (this._ordersUnsub) { this._ordersUnsub(); this._ordersUnsub = null; } },
     startClientVentesListener() {
@@ -2076,7 +2052,7 @@ const ClientPortal = {
                 });
                 if (changed) { Persistence.save(); BalanceCalculator.recalculateClient(client.name); this.render(); }
             }, err => console.warn('⚠️ ventes listener:', err.message));
-        } catch(e) { console.error(e); }
+        } catch(e) {}
     },
     render() {
         const client = State.currentClient;
@@ -2294,12 +2270,7 @@ function createTransactionModule(cfg) {
         },
         fillArticle() {
             const a = State.articles.find(x => x.id == $(cfg.articleSelect).value);
-            if (!a) { 
-                $(cfg.priceInput).value = ''; 
-                if (cfg.stockHint) $(cfg.stockHint).textContent = 'Stock: -'; 
-                this.calcLine(); 
-                return; 
-            }
+            if (!a) { $(cfg.priceInput).value = ''; if (cfg.stockHint) $(cfg.stockHint).textContent = 'Stock: -'; this.calcLine(); return; }
             let price = cfg.isPurchase ? (a.costPrice || a.price) : a.price;
             let hint = '';
             let isSpecialPrice = false;
@@ -2318,14 +2289,10 @@ function createTransactionModule(cfg) {
                     price = sp.price;
                     isSpecialPrice = true;
                     hint = `⭐ Prix spécial: ${sp.price.toFixed(3)} TND (Stock: ${a.stock || 0})`;
-                } else {
-                    hint = 'Stock: ' + (a.stock || 0);
-                }
+                } else { hint = 'Stock: ' + (a.stock || 0); }
                 if (a.stock <= 5 && a.stock > 0) hint += ' ⚠️';
                 else if (a.stock <= 0) hint += ' ❌';
-            } else {
-                hint = `Stock: ${a.stock || 0} (sera ajouté)`;
-            }
+            } else { hint = `Stock: ${a.stock || 0} (sera ajouté)`; }
             if (cfg.stockHint) $(cfg.stockHint).textContent = hint;
             $(cfg.priceInput).value = price.toFixed(3);
             if (isSpecialPrice && $(cfg.priceInput)) {
@@ -2357,81 +2324,51 @@ function createTransactionModule(cfg) {
             const article = State.articles.find(a => a.name === name);
             let priceSource = 'normal';
             if (article && Math.abs(price - article.price) > 0.001) {
-                const currentParty = $(cfg.partySelect).value 
-                    ? cfg.partyList().find(p => p.id == $(cfg.partySelect).value) 
-                    : null;
+                const currentParty = $(cfg.partySelect).value ? cfg.partyList().find(p => p.id == $(cfg.partySelect).value) : null;
                 if (currentParty && currentParty.specialPrices) {
                     const sp = currentParty.specialPrices.find(s => s.name === name);
-                    if (sp && Math.abs(sp.price - price) < 0.001) {
-                        priceSource = 'special';
-                    } else {
-                        priceSource = 'manual';
-                    }
-                } else {
-                    priceSource = 'manual';
-                }
+                    if (sp && Math.abs(sp.price - price) < 0.001) priceSource = 'special';
+                    else priceSource = 'manual';
+                } else priceSource = 'manual';
             }
             if (priceSource === 'manual' && !cfg.isPurchase) {
                 const currentParty = $(cfg.partySelect).value ? cfg.partyList().find(p => p.id == $(cfg.partySelect).value) : null;
                 if (currentParty) {
                     const choice = await CustomConfirm3.show(
-                        `💰 <strong>Nouveau prix:</strong> ${price.toFixed(3)} TND<br><br>` +
-                        `👤 <strong>Client:</strong> ${currentParty.name}<br>` +
-                        `📦 <strong>Article:</strong> ${name}<br><br>` +
-                        `Voulez-vous enregistrer ce prix comme <strong>PRIX SPÉCIAL PERMANENT</strong> ?`,
+                        `💰 <strong>Nouveau prix:</strong> ${price.toFixed(3)} TND<br><br>👤 <strong>Client:</strong> ${currentParty.name}<br>📦 <strong>Article:</strong> ${name}<br><br>Voulez-vous enregistrer ce prix comme <strong>PRIX SPÉCIAL PERMANENT</strong> ?`,
                         '💾 Enregistrer le prix spécial',
                         { alwaysText: '⭐ Toujours (Permanent)', okText: '✅ Cette facture', cancelText: '❌ Annuler' }
                     );
                     if (choice === 'always') {
                         if (!currentParty.specialPrices) currentParty.specialPrices = [];
                         const existingIdx = currentParty.specialPrices.findIndex(sp => sp.name === name);
-                        if (existingIdx !== -1) {
-                            currentParty.specialPrices[existingIdx].price = price;
-                        } else {
-                            currentParty.specialPrices.push({ name: name, price: price });
-                        }
+                        if (existingIdx !== -1) currentParty.specialPrices[existingIdx].price = price;
+                        else currentParty.specialPrices.push({ name: name, price: price });
                         Persistence.save();
                         if (currentParty.passwordHash && typeof ClientLoginsSync !== 'undefined') {
                             ClientLoginsSync.syncOne(currentParty).then(ok => {
                                 if (ok) Toast.show(`⭐ Prix spécial enregistré: ${name} → ${price.toFixed(3)} TND`, 'success');
                             });
-                        } else {
-                            Toast.show(`⭐ Prix spécial enregistré: ${name} → ${price.toFixed(3)} TND`, 'success');
-                        }
+                        } else Toast.show(`⭐ Prix spécial enregistré: ${name} → ${price.toFixed(3)} TND`, 'success');
                         priceSource = 'special';
-                    } else if (choice === 'ok') {
-                        Toast.show(`✏️ Prix modifié pour cette facture uniquement`, 'info');
-                    } else {
-                        return;
-                    }
+                    } else if (choice === 'ok') { Toast.show(`✏️ Prix modifié pour cette facture uniquement`, 'info'); }
+                    else return;
                 }
             }
             const existing = this.lines.find(l => l.name === name);
-            if (existing) { 
-                existing.qty += qty; 
-                existing.total = existing.price * existing.qty;
-                existing.priceSource = priceSource;
-            } else {
-                this.lines.push({ name, price, qty, total: price * qty, priceSource });
-            }
-            $(cfg.articleSelect).value = ''; 
-            $(cfg.priceInput).value = ''; 
-            $(cfg.qtyInput).value = 1; 
-            $(cfg.totalInput).value = '';
+            if (existing) { existing.qty += qty; existing.total = existing.price * existing.qty; existing.priceSource = priceSource; }
+            else this.lines.push({ name, price, qty, total: price * qty, priceSource });
+            $(cfg.articleSelect).value = ''; $(cfg.priceInput).value = ''; $(cfg.qtyInput).value = 1; $(cfg.totalInput).value = '';
             if (cfg.stockHint) $(cfg.stockHint).textContent = 'Stock: -';
-            $(cfg.priceInput).style.borderColor = '';
-            $(cfg.priceInput).style.background = '';
-            this.renderLines(); 
-            this.refreshArticleOptions();
-            this.updateAccountSummary();
+            $(cfg.priceInput).style.borderColor = ''; $(cfg.priceInput).style.background = '';
+            this.renderLines(); this.refreshArticleOptions(); this.updateAccountSummary();
             if (cfg.paymentOnlyNotice && $(cfg.paymentOnlyNotice)) $(cfg.paymentOnlyNotice).style.display = 'none';
             Toast.show('✅ Ajouté', 'success');
         },
         removeLine(idx) {
             this.lines.splice(idx, 1);
             if (this.editingRowIndex === idx) this.editingRowIndex = null;
-            this.renderLines(); this.refreshArticleOptions();
-            this.updateAccountSummary();
+            this.renderLines(); this.refreshArticleOptions(); this.updateAccountSummary();
         },
         editLine(idx) { this.editingRowIndex = idx; this.renderLines(); },
         saveEditLine(idx) {
@@ -2456,7 +2393,7 @@ function createTransactionModule(cfg) {
             if (!b) return;
             let sum = 0;
             if (!this.lines.length) {
-                b.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:16px;color:#2980b9;font-size:11px;background:#e3f2fd;">💰 <b>Facture de règlement</b><br><span style="font-size:9px;opacity:0.8;">Aucun produit</span></td></tr>`;
+                b.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:16px;color:#2980b9;font-size:12px;background:#e3f2fd;">💰 <b>Facture de règlement</b><br><span style="font-size:10px;opacity:0.8;">Aucun produit</span></td></tr>`;
                 $(cfg.grandTotal).textContent = '0.000 TND';
                 if (cfg.paymentOnlyNotice && $(cfg.paymentOnlyNotice)) $(cfg.paymentOnlyNotice).style.display = 'block';
                 return;
@@ -2474,7 +2411,7 @@ function createTransactionModule(cfg) {
         renderReglements() {
             const c = $(cfg.reglementsList);
             if (!c) return;
-            if (!this.reglements.length) { c.innerHTML = '<span style="font-size:10px;color:var(--muted);">Aucun paiement</span>'; return; }
+            if (!this.reglements.length) { c.innerHTML = '<span style="font-size:11px;color:var(--muted);">Aucun paiement</span>'; return; }
             c.innerHTML = this.reglements.map((r, i) => `<div class="payment-item"><span class="method">${esc(r.method || 'Espèces')}</span><span class="amount">${r.amount.toFixed(3)} TND</span><span class="delete-payment" onclick="${cfg.name}.deleteReglement(${i})">✕</span></div>`).join('');
             this.updateAccountSummary();
         },
@@ -2666,20 +2603,14 @@ function createTransactionModule(cfg) {
             Toast.show('✅ WhatsApp ouvert', 'success');
         }
     };
-}const ClientsRenderer = {
+}
+
+const ClientsRenderer = {
     getVisibleClients() {
         const user = State.currentUser;
         if (!user) return [];
-        if (user.isLocalAdmin || user.email === APP_CONFIG.adminEmail || user.loginName === APP_CONFIG.adminLogin) {
-            return State.clients;
-        }
-        if (user.uid) {
-            return State.clients.filter(c => 
-                c.staffOwner === user.uid || 
-                c.staffOwner === 'admin' || 
-                !c.staffOwner
-            );
-        }
+        if (user.isLocalAdmin || user.email === APP_CONFIG.adminEmail || user.loginName === APP_CONFIG.adminLogin) return State.clients;
+        if (user.uid) return State.clients.filter(c => c.staffOwner === user.uid || c.staffOwner === 'admin' || !c.staffOwner);
         return State.clients;
     },
     render() {
@@ -2768,7 +2699,7 @@ const VentesRenderer = {
             const d = document.createElement('div');
             d.className = 'row-card';
             d.onclick = () => { VentesModule.load(v.id); };
-            d.innerHTML = `<div style="flex:1;"><div class="name">${isPaymentOnly ? '💰 ' : ''}${esc(v.num)}</div><div class="meta">${esc(v.client)} - ${esc(v.date)} | ${badge}</div></div><div style="display:flex;gap:4px;align-items:center;"><span class="amount">${amountDisplay} TND</span><button class="btn print" style="padding:2px 8px;font-size:14px;border-radius:6px;margin:0;width:auto;" title="Imprimer" onclick="event.stopPropagation();VentesModule.load(${v.id});setTimeout(()=>VentesModule.printInvoice(),400);">🖨️</button></div>`;
+            d.innerHTML = `<div style="flex:1;"><div class="name">${isPaymentOnly ? '💰 ' : ''}${esc(v.num)}</div><div class="meta">${esc(v.client)} - ${esc(v.date)} | ${badge}</div></div><div style="display:flex;gap:4px;align-items:center;"><span class="amount">${amountDisplay} TND</span><button class="btn print" style="padding:3px 10px;font-size:15px;border-radius:6px;margin:0;width:auto;" title="Imprimer" onclick="event.stopPropagation();VentesModule.load(${v.id});setTimeout(()=>VentesModule.printInvoice(),400);">🖨️</button></div>`;
             list.appendChild(d);
         });
     }
@@ -2805,13 +2736,13 @@ const ClientLogins = {
             const safeLogin = Utils.escapeAttr(c.login);
             return `<div class="row-card" style="flex-direction:column;align-items:stretch;cursor:default;">
                 <div style="display:flex;justify-content:space-between;align-items:center;">
-                    <div style="flex:1;"><div class="name" style="font-family:monospace;font-size:13px;color:var(--primary);">🔑 ${esc(c.login)}</div><div class="meta">👤 ${esc(c.name)} • 📞 ${esc(c.phone || '-')}</div></div>
-                    <div style="text-align:right;"><div style="font-size:10px;color:var(--muted);">Mot de passe: ${hasPwd}</div><div style="font-size:9px;color:var(--muted);">${c.email ? '📧 ' + esc(c.email) : ''}</div></div>
+                    <div style="flex:1;"><div class="name" style="font-family:monospace;font-size:14px;color:var(--primary);">🔑 ${esc(c.login)}</div><div class="meta">👤 ${esc(c.name)} • 📞 ${esc(c.phone || '-')}</div></div>
+                    <div style="text-align:right;"><div style="font-size:11px;color:var(--muted);">Mot de passe: ${hasPwd}</div><div style="font-size:10px;color:var(--muted);">${c.email ? '📧 ' + esc(c.email) : ''}</div></div>
                 </div>
                 <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">
-                    <button class="btn save small" style="flex:1;padding:4px;font-size:9px;" onclick="ClientLogins.syncOne(${c.id})">☁️ Sync</button>
-                    <button class="btn edit small" style="flex:1;padding:4px;font-size:9px;" onclick="ClientLogins.copyCredentials('${safeLogin}',${c.id})">📋 Copier</button>
-                    <button class="btn outline small" style="flex:1;padding:4px;font-size:9px;" onclick="ClientLogins.showQR('${safeLogin}',${c.id})">📱 QR</button>
+                    <button class="btn save small" style="flex:1;padding:5px;font-size:10px;" onclick="ClientLogins.syncOne(${c.id})">☁️ Sync</button>
+                    <button class="btn edit small" style="flex:1;padding:5px;font-size:10px;" onclick="ClientLogins.copyCredentials('${safeLogin}',${c.id})">📋 Copier</button>
+                    <button class="btn outline small" style="flex:1;padding:5px;font-size:10px;" onclick="ClientLogins.showQR('${safeLogin}',${c.id})">📱 QR</button>
                 </div>
             </div>`;
         }).join('');
@@ -2851,7 +2782,7 @@ const ClientLogins = {
         w.document.write(`<html><head><title>QR - ${esc(c.login)}</title><style>
             body{font-family:Cairo,sans-serif;text-align:center;padding:20px;background:#f0f2f8}
             h2{color:#1a2a5c} img{border:4px solid #4a6cf7;border-radius:12px;padding:10px;background:#fff}
-            .info{background:#fff;padding:10px;border-radius:8px;margin-top:10px;font-size:12px;text-align:left}
+            .info{background:#fff;padding:10px;border-radius:8px;margin-top:10px;font-size:13px;text-align:left}
         </style></head><body>
             <h2>🔑 ${esc(c.login)}</h2>
             <img src="${qrUrl}" alt="QR">
@@ -2916,22 +2847,14 @@ const ClientsModule = createEntityModule({
         let staffOwner = null;
         let staffName = 'Admin';
         if (currentUser && !currentUser.isClient) {
-            if (currentUser.isLocalAdmin || currentUser.email === APP_CONFIG.adminEmail) {
-                staffOwner = 'admin';
-                staffName = 'Admin';
-            } else if (currentUser.uid) {
-                staffOwner = currentUser.uid;
-                staffName = currentUser.email || currentUser.login || 'Staff';
-            }
+            if (currentUser.isLocalAdmin || currentUser.email === APP_CONFIG.adminEmail) { staffOwner = 'admin'; staffName = 'Admin'; }
+            else if (currentUser.uid) { staffOwner = currentUser.uid; staffName = currentUser.email || currentUser.login || 'Staff'; }
         }
         let finalStaffOwner = staffOwner;
         let finalStaffName = staffName;
         if (this.editingId) {
             const existing = State.clients.find(c => c.id === this.editingId);
-            if (existing && existing.staffOwner) {
-                finalStaffOwner = existing.staffOwner;
-                finalStaffName = existing.staffName || 'Staff';
-            }
+            if (existing && existing.staffOwner) { finalStaffOwner = existing.staffOwner; finalStaffName = existing.staffName || 'Staff'; }
         }
         return {
             login: $('cLogin').value.trim(), name: $('cName').value.trim(),
@@ -2942,8 +2865,7 @@ const ClientsModule = createEntityModule({
             balance: parseFloat($('cBalance').value) || 0,
             passwordHash, passwordSalt: salt,
             specialPrices: [...this._specialPrices],
-            staffOwner: finalStaffOwner,
-            staffName: finalStaffName
+            staffOwner: finalStaffOwner, staffName: finalStaffName
         };
     },
     canDelete(c) {
@@ -2975,15 +2897,10 @@ const ClientsModule = createEntityModule({
         BalanceCalculator.recalculateClient(data.name);
         const client = State.clients.find(c => c.name === data.name);
         if (client) {
-            client.specialPrices = Array.isArray(this._specialPrices) 
-                ? this._specialPrices.map(sp => ({ name: sp.name, price: Number(sp.price) }))
-                : [];
-            console.log(`💾 Client "${client.name}" sauvegardé avec ${client.specialPrices.length} prix spécial(aux)`);
+            client.specialPrices = Array.isArray(this._specialPrices) ? this._specialPrices.map(sp => ({ name: sp.name, price: Number(sp.price) })) : [];
             if (client.passwordHash) {
                 await ClientLoginsSync.syncOne(client);
-                if (client.specialPrices.length > 0) {
-                    Toast.show(`⭐ ${client.specialPrices.length} prix spécial(aux) sauvegardé(s)`, 'success');
-                }
+                if (client.specialPrices.length > 0) Toast.show(`⭐ ${client.specialPrices.length} prix spécial(aux) sauvegardé(s)`, 'success');
             }
         }
     },
@@ -2992,63 +2909,34 @@ const ClientsModule = createEntityModule({
 
 Object.assign(ClientsModule, {
     loginAsClient() {
-        if (this.editingId == null) {
-            Toast.show('⚠️ Sélectionnez un client', 'warning');
-            return;
-        }
+        if (this.editingId == null) { Toast.show('⚠️ Sélectionnez un client', 'warning'); return; }
         const client = State.clients.find(c => c.id === this.editingId);
-        if (!client) {
-            Toast.show('❌ Client introuvable', 'error');
-            return;
-        }
-        if (!client.login) {
-            Toast.show('⚠️ Ce client n\'a pas de Login', 'warning');
-            return;
-        }
-        if (State.currentUser && !State.currentUser.isClient) {
-            State._previousUser = { ...State.currentUser };
-        }
+        if (!client) { Toast.show('❌ Client introuvable', 'error'); return; }
+        if (!client.login) { Toast.show('⚠️ Ce client n\'a pas de Login', 'warning'); return; }
+        if (State.currentUser && !State.currentUser.isClient) State._previousUser = { ...State.currentUser };
         State.currentClient = client;
-        State.currentUser = { 
-            login: client.login, 
-            uid: 'client_' + client.id, 
-            isClient: true,
-            viewedByStaff: true
-        };
+        State.currentUser = { login: client.login, uid: 'client_' + client.id, isClient: true, viewedByStaff: true };
         App.closeSheet();
         setTimeout(() => {
             try {
                 ClientPortal.show();
                 setTimeout(() => {
-                    const exitBtn = $('cpExitBtn');
-                    const staffBadge = $('cpStaffBadge');
+                    const exitBtn = $('cpExitBtn'); const staffBadge = $('cpStaffBadge');
                     if (exitBtn) exitBtn.style.display = 'flex';
                     if (staffBadge) staffBadge.style.display = 'inline-block';
                 }, 200);
-            } catch(e) {
-                console.error('❌ Erreur ClientPortal.show():', e.message);
-                Toast.show('❌ Erreur: ' + e.message, 'error');
-            }
+            } catch(e) { Toast.show('❌ Erreur: ' + e.message, 'error'); }
         }, 50);
         Toast.show(`🔓 Portail client: ${client.name}`, 'success');
     },
     exitClientView() {
-        if (!State.currentUser || !State.currentUser.viewedByStaff) {
-            Toast.show('⚠️ Vous n\'êtes pas en mode client', 'warning');
-            return;
-        }
+        if (!State.currentUser || !State.currentUser.viewedByStaff) { Toast.show('⚠️ Vous n\'êtes pas en mode client', 'warning'); return; }
         ClientPortal.stopClientOrderListener();
-        if (ClientPortal._ventesUnsub) {
-            ClientPortal._ventesUnsub();
-            ClientPortal._ventesUnsub = null;
-        }
+        if (ClientPortal._ventesUnsub) { ClientPortal._ventesUnsub(); ClientPortal._ventesUnsub = null; }
         $('clientPortal').classList.remove('show');
         document.querySelector('.phone').style.display = 'flex';
         State.currentClient = null;
-        if (State._previousUser) {
-            State.currentUser = State._previousUser;
-            State._previousUser = null;
-        }
+        if (State._previousUser) { State.currentUser = State._previousUser; State._previousUser = null; }
         App.showSection('clients');
         Toast.show('👨‍💼 Retour au mode Staff/Admin', 'success');
     },
@@ -3071,7 +2959,7 @@ Object.assign(ClientsModule, {
     renderSpecialPrices() {
         const c = $('specialPricesList');
         if (!c) return;
-        if (!this._specialPrices.length) { c.innerHTML = '<div class="empty-msg" style="font-size:9px;padding:4px 0;">Aucun prix spécial</div>'; return; }
+        if (!this._specialPrices.length) { c.innerHTML = '<div class="empty-msg" style="font-size:10px;padding:4px 0;">Aucun prix spécial</div>'; return; }
         c.innerHTML = this._specialPrices.map((sp, i) => `<div class="special-price-item"><span class="sp-article">${esc(sp.name)}</span><span class="sp-price">${sp.price.toFixed(3)} TND</span><span class="sp-del" onclick="ClientsModule.removeSpecialPrice(${i})">✕</span></div>`).join('');
     },
     refreshSpArticleOptions() {
@@ -3101,25 +2989,16 @@ Object.assign(ClientsModule, {
         }
         this.renderSpecialPrices();
         priceInput.value = '';
-        console.log('💰 Special prices actuels:', this._specialPrices);
     },
     async saveSpecialPricesNow() {
-        if (this.editingId == null) {
-            Toast.show('⚠️ Enregistrez d\'abord le client', 'warning');
-            return;
-        }
+        if (this.editingId == null) { Toast.show('⚠️ Enregistrez d\'abord le client', 'warning'); return; }
         const client = State.clients.find(c => c.id === this.editingId);
         if (!client) return;
-        client.specialPrices = Array.isArray(this._specialPrices) 
-            ? this._specialPrices.map(sp => ({ name: sp.name, price: Number(sp.price) }))
-            : [];
+        client.specialPrices = Array.isArray(this._specialPrices) ? this._specialPrices.map(sp => ({ name: sp.name, price: Number(sp.price) })) : [];
         Persistence.save();
         if (client.passwordHash) {
             const ok = await ClientLoginsSync.syncOne(client);
-            if (ok) {
-                Toast.show(`☁️ ${client.specialPrices.length} prix spécial(aux) synchronisé(s)`, 'success');
-                console.log(`✅ Client "${client.name}" synchronisé avec ${client.specialPrices.length} prix`);
-            }
+            if (ok) Toast.show(`☁️ ${client.specialPrices.length} prix spécial(aux) synchronisé(s)`, 'success');
         }
     },
     removeSpecialPrice(i) { this._specialPrices.splice(i, 1); this.renderSpecialPrices(); this.refreshSpArticleOptions(); },
@@ -3218,14 +3097,8 @@ Object.assign(ArticlesModule, {
         const article = State.articles.find(a => a.name === articleName);
         if (!article) return null;
         let stock = article.stockDepart !== undefined ? article.stockDepart : 0;
-        State.ventes.forEach(v => {
-            if (!v.lines) return;
-            v.lines.forEach(l => { if (l.name === articleName) stock -= l.qty; });
-        });
-        State.achats.forEach(a => {
-            if (!a.lines) return;
-            a.lines.forEach(l => { if (l.name === articleName) stock += l.qty; });
-        });
+        State.ventes.forEach(v => { if (!v.lines) return; v.lines.forEach(l => { if (l.name === articleName) stock -= l.qty; }); });
+        State.achats.forEach(a => { if (!a.lines) return; a.lines.forEach(l => { if (l.name === articleName) stock += l.qty; }); });
         article.stock = Math.max(0, stock);
         return article.stock;
     },
@@ -3234,19 +3107,12 @@ Object.assign(ArticlesModule, {
         State.articles.forEach(a => {
             const oldStock = a.stock || 0;
             const newStock = this.recalculateStock(a.name);
-            if (oldStock !== newStock) {
-                corrections.push({ name: a.name, old: oldStock, new: newStock });
-            }
+            if (oldStock !== newStock) corrections.push({ name: a.name, old: oldStock, new: newStock });
         });
         Persistence.save();
         ArticlesRenderer.render();
-        if (corrections.length) {
-            const msg = corrections.map(c => `${c.name}: ${c.old} → ${c.new}`).join('\n');
-            console.log('🔧 Corrections appliquées:\n' + msg);
-            Toast.show(`✅ ${corrections.length} stock(s) corrigé(s)`, 'success');
-        } else {
-            Toast.show('✅ Tous les stocks sont corrects');
-        }
+        if (corrections.length) Toast.show(`✅ ${corrections.length} stock(s) corrigé(s)`, 'success');
+        else Toast.show('✅ Tous les stocks sont corrects');
     }
 });
 
@@ -3303,22 +3169,17 @@ const Orders = {
                     } else if (change.type === 'removed' && existingIdx !== -1) { State.orders.splice(existingIdx, 1); changed = true; }
                 });
                 if (changed) { Persistence.save(); if (State.currentSection === 'orders') this.render(); }
-                console.log(`📦 ${snapshot.size} commande(s) chargée(s) depuis Firestore`);
             }, err => {
                 console.warn('⚠️ Firestore listener:', err.message);
-                Toast.show('⚠️ Impossible de charger les commandes: ' + err.code, 'warning');
+                Toast.show('⚠️ Impossible de charger les commandes', 'warning');
             });
-        } catch(e) {
-            console.warn('⚠️ Cannot start listener:', e.message);
-            Toast.show('❌ Erreur connexion Firestore', 'error');
-        }
+        } catch(e) { Toast.show('❌ Erreur connexion Firestore', 'error'); }
     },
     stopRealtimeListener() { if (this._unsubscribe) { this._unsubscribe(); this._unsubscribe = null; } },
     async updateCloudStatus(order, newStatus) {
         if (typeof firebase === 'undefined' || !order.cloudId) return;
-        try {
-            await firebase.firestore().collection('orders').doc(order.cloudId).update({ status: newStatus, updatedAt: new Date().toISOString(), updatedByStaff: true });
-        } catch(e) { console.warn('⚠️ Update cloud:', e.message); }
+        try { await firebase.firestore().collection('orders').doc(order.cloudId).update({ status: newStatus, updatedAt: new Date().toISOString(), updatedByStaff: true }); }
+        catch(e) { console.warn('⚠️ Update cloud:', e.message); }
     },
     get(id) { return State.orders.find(o => o.id === id || o.cloudId === id); },
     render() {
@@ -3334,21 +3195,21 @@ const Orders = {
             const s = statusMap[o.status] || statusMap.pending;
             const orderKey = o.cloudId || o.id;
             const keyStr = Utils.escapeAttr(orderKey);
-            const linesPreview = o.lines.slice(0, 3).map(l => `<div style="font-size:9px;color:var(--muted);">• ${esc(l.name)} × ${Number(l.qty)||0} = ${(Number(l.total)||0).toFixed(3)} TND</div>`).join('');
-            const more = o.lines.length > 3 ? `<div style="font-size:8px;color:var(--muted);">... +${o.lines.length - 3}</div>` : '';
-            const stockBadge = o.stockDecremented ? '<span style="font-size:8px;background:#d4f4dd;color:#27ae60;padding:1px 6px;border-radius:8px;margin-left:4px;">📦 Stock -</span>' : '';
+            const linesPreview = o.lines.slice(0, 3).map(l => `<div style="font-size:10px;color:var(--muted);">• ${esc(l.name)} × ${Number(l.qty)||0} = ${(Number(l.total)||0).toFixed(3)} TND</div>`).join('');
+            const more = o.lines.length > 3 ? `<div style="font-size:9px;color:var(--muted);">... +${o.lines.length - 3}</div>` : '';
+            const stockBadge = o.stockDecremented ? '<span style="font-size:9px;background:#d4f4dd;color:#27ae60;padding:1px 6px;border-radius:8px;margin-left:4px;">📦 Stock -</span>' : '';
             return `<div class="row-card" style="flex-direction:column;align-items:stretch;cursor:default;">
                 <div style="display:flex;justify-content:space-between;align-items:center;">
                     <div><div class="name">${esc(o.num)} <span class="cp-badge ${s.cls}" style="margin-left:4px;">${s.lbl}</span>${stockBadge}</div><div class="meta">👤 ${esc(o.clientName)} • 📅 ${esc(Utils.formatDate(o.date))} ${esc(o.time || '')}</div></div>
-                    <div class="amount" style="font-size:13px;">${(Number(o.total)||0).toFixed(3)} TND</div>
+                    <div class="amount" style="font-size:14px;">${(Number(o.total)||0).toFixed(3)} TND</div>
                 </div>
                 <div style="margin-top:6px;padding:6px;background:var(--bg);border-radius:8px;">${linesPreview}${more}</div>
-                ${o.note ? `<div style="font-size:9px;color:var(--muted);margin-top:4px;">📝 ${esc(o.note)}</div>` : ''}
+                ${o.note ? `<div style="font-size:10px;color:var(--muted);margin-top:4px;">📝 ${esc(o.note)}</div>` : ''}
                 <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">
-                    ${o.status === 'pending' ? `<button class="btn save small" style="flex:1;padding:4px;font-size:9px;" onclick="Orders.approve('${keyStr}')">✅ Accepter</button><button class="btn del small" style="flex:1;padding:4px;font-size:9px;" onclick="Orders.reject('${keyStr}')">❌ Refuser</button>` : ''}
-                    ${o.status === 'approved' ? `<button class="btn save small" style="flex:1;padding:4px;font-size:9px;" onclick="Orders.convertToSale('${keyStr}')">📄 → Facture</button>` : ''}
-                    <button class="btn outline small" style="flex:1;padding:4px;font-size:9px;" onclick="Orders.callClient('${keyStr}')">📞 Appeler</button>
-                    <button class="btn del small" style="padding:4px;font-size:9px;" onclick="Orders.remove('${keyStr}')">🗑️</button>
+                    ${o.status === 'pending' ? `<button class="btn save small" style="flex:1;padding:5px;font-size:10px;" onclick="Orders.approve('${keyStr}')">✅ Accepter</button><button class="btn del small" style="flex:1;padding:5px;font-size:10px;" onclick="Orders.reject('${keyStr}')">❌ Refuser</button>` : ''}
+                    ${o.status === 'approved' ? `<button class="btn save small" style="flex:1;padding:5px;font-size:10px;" onclick="Orders.convertToSale('${keyStr}')">📄 → Facture</button>` : ''}
+                    <button class="btn outline small" style="flex:1;padding:5px;font-size:10px;" onclick="Orders.callClient('${keyStr}')">📞 Appeler</button>
+                    <button class="btn del small" style="padding:5px;font-size:10px;" onclick="Orders.remove('${keyStr}')">🗑️</button>
                 </div>
             </div>`;
         }).join('');
@@ -3361,7 +3222,7 @@ const Orders = {
             o.lines.forEach(line => {
                 const article = State.articles.find(a => a.name === line.name);
                 if (!article) { warnings.push(`"${line.name}" introuvable`); return; }
-                if ((article.stock || 0) < line.qty) warnings.push(`"${line.name}": stock ${article.stock || 0} < ${line.qty}`);
+                if ((article.stock || 0) < line.qty) warnings.push(`"${line.name}": stock insuffisant`);
                 Stock.adjust(line.name, -line.qty, { silent: true, allowNegative: true });
             });
             o.stockDecremented = true;
@@ -3379,10 +3240,7 @@ const Orders = {
     reject(id) {
         const o = this.get(id);
         if (!o) return;
-        if (o.stockDecremented) {
-            o.lines.forEach(line => Stock.adjust(line.name, line.qty, { silent: true, allowNegative: true }));
-            o.stockDecremented = false;
-        }
+        if (o.stockDecremented) { o.lines.forEach(line => Stock.adjust(line.name, line.qty, { silent: true, allowNegative: true })); o.stockDecremented = false; }
         o.status = 'rejected';
         o.rejectedAt = new Date().toISOString();
         Persistence.save();
@@ -3457,11 +3315,9 @@ const Expenses = {
         if (amount <= 0) { Toast.show('Montant invalide'); return; }
         const rec = {
             id: this.editingId || State.nextId.expenses++,
-            code: $('exCode').value.trim(),
-            date: $('exDate').value,
+            code: $('exCode').value.trim(), date: $('exDate').value,
             category: $('exCategory').options[$('exCategory').selectedIndex].textContent,
-            amount,
-            description: $('exDesc').value.trim() || '-'
+            amount, description: $('exDesc').value.trim() || '-'
         };
         if (this.editingId) {
             const i = State.expenses.findIndex(e => e.id === this.editingId);
@@ -3595,8 +3451,8 @@ function createHistoryModule(cfg) {
         buildActions(e) {
             const safeName = Utils.escapeAttr(e.name);
             return `<div style="display:flex;gap:6px;margin:6px 0;flex-wrap:wrap;">
-                <button class="btn print small" onclick="printStatement('${cfg.statementType}', ${e.id})" style="flex:1;padding:6px;font-size:10px;">🖨️ Imprimer</button>
-                <button class="btn save small" onclick="BalanceCalculator.recalculate('${cfg.balanceType}', '${safeName}');${cfg.name}.show();" style="flex:1;padding:6px;font-size:10px;">🔄 Actualiser</button>
+                <button class="btn print small" onclick="printStatement('${cfg.statementType}', ${e.id})" style="flex:1;padding:8px;font-size:12px;">🖨️ Imprimer</button>
+                <button class="btn save small" onclick="BalanceCalculator.recalculate('${cfg.balanceType}', '${safeName}');${cfg.name}.show();" style="flex:1;padding:8px;font-size:12px;">🔄 Actualiser</button>
             </div>`;
         },
         buildInvoicesTable(docs, payments) {
@@ -3621,7 +3477,7 @@ function createHistoryModule(cfg) {
                         <td style="color:var(--success);">${Utils.formatNum(paid)}</td>
                         <td style="color:${rem > 0.001 ? 'var(--danger)' : 'var(--success)'};">${Utils.formatNum(rem)}</td>
                         <td style="color:${sc};font-weight:700;">${st}</td>
-                        <td><button class="btn edit small" onclick="${cfg.name}.editInvoice('${d.id}')" style="padding:1px 6px;font-size:7px;margin:0 1px;">✏️</button><button class="btn save small" onclick="${cfg.name}.payInvoice('${d.id}')" style="padding:1px 6px;font-size:7px;margin:0 1px;">💰</button></td>
+                        <td><button class="btn edit small" onclick="${cfg.name}.editInvoice('${d.id}')" style="padding:2px 8px;font-size:9px;margin:0 2px;">✏️</button><button class="btn save small" onclick="${cfg.name}.payInvoice('${d.id}')" style="padding:2px 8px;font-size:9px;margin:0 2px;">💰</button></td>
                     </tr>`;
                 });
             }
@@ -3704,7 +3560,7 @@ const ArticleHistory = {
         movements.sort((a, b) => a.date < b.date ? -1 : 1);
         const stockDepart = article.stockDepart !== undefined ? article.stockDepart : (article.stock || 0);
         let html = `<div class="client-summary-card"><div class="grid"><div><span class="label">📦 Article:</span><span class="value">${esc(article.name)}</span></div><div><span class="label">📊 Stock:</span><span class="value">${article.stock || 0}</span></div></div></div>
-            <div style="display:flex;gap:6px;margin:6px 0;"><button class="btn print small" onclick="printStatement('article', ${article.id})" style="flex:1;padding:6px;font-size:10px;">🖨️ Imprimer</button></div>
+            <div style="display:flex;gap:6px;margin:6px 0;"><button class="btn print small" onclick="printStatement('article', ${article.id})" style="flex:1;padding:8px;font-size:12px;">🖨️ Imprimer</button></div>
             <div class="history-table-wrapper"><table class="history-table" style="min-width:650px;"><thead><tr><th>Date</th><th>Doc</th><th>Type</th><th>Tiers</th><th>Qté</th><th>Prix</th><th>Total</th><th>Solde</th></tr></thead><tbody>`;
         if (!movements.length) html += `<tr><td colspan="8" style="text-align:center;padding:12px;color:var(--muted);">📭 Aucun mouvement</td></tr>`;
         else {
@@ -3738,13 +3594,7 @@ const CaisseHistory = {
     renderSolde() {
         const container = $('caisseSoldeContent');
         if (!container) return;
-        const soldes = {
-            'Espèces':  { in: 0, out: 0 },
-            'Chèque':   { in: 0, out: 0 },
-            'Virement': { in: 0, out: 0 },
-            'Mobile':   { in: 0, out: 0 },
-            'Carte':    { in: 0, out: 0 }
-        };
+        const soldes = { 'Espèces':{in:0,out:0}, 'Chèque':{in:0,out:0}, 'Virement':{in:0,out:0}, 'Mobile':{in:0,out:0}, 'Carte':{in:0,out:0} };
         State.caisseClients.forEach(c => {
             const method = c.regType || 'Espèces';
             if (!soldes[method]) soldes[method] = { in: 0, out: 0 };
@@ -3766,20 +3616,20 @@ const CaisseHistory = {
             const icon = methodIcons[method] || '💳';
             const color = methodColors[method] || '#4a6cf7';
             const soldeColor = solde >= 0 ? 'var(--success)' : 'var(--danger)';
-            html += '<div style="background:var(--panel);border:2px solid ' + color + ';border-radius:12px;padding:10px;">';
+            html += '<div style="background:var(--panel);border:2px solid ' + color + ';border-radius:12px;padding:12px;">';
             html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">';
-            html += '<span style="font-weight:700;color:' + color + ';font-size:13px;">' + icon + ' ' + esc(method) + '</span>';
+            html += '<span style="font-weight:700;color:' + color + ';font-size:14px;">' + icon + ' ' + esc(method) + '</span>';
             html += '</div>';
             html += '<div style="text-align:center;">';
-            html += '<span style="font-size:18px;font-weight:800;color:' + soldeColor + ';">' + solde.toFixed(3) + '</span>';
-            html += '<span style="font-size:10px;color:var(--muted);margin-left:4px;">TND</span>';
+            html += '<span style="font-size:20px;font-weight:800;color:' + soldeColor + ';">' + solde.toFixed(3) + '</span>';
+            html += '<span style="font-size:11px;color:var(--muted);margin-left:4px;">TND</span>';
             html += '</div></div>';
         });
         html += '</div>';
         const totalColor = totalSolde >= 0 ? 'var(--success)' : 'var(--danger)';
-        html += '<div style="background:linear-gradient(135deg,#1a2a5c,#2a3f7a);color:#fff;border-radius:16px;padding:18px;text-align:center;margin-bottom:12px;">';
-        html += '<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;opacity:.8;">💰 Total en Caisse</div>';
-        html += '<div style="font-size:32px;font-weight:800;margin-top:6px;color:' + totalColor + ';">' + totalSolde.toFixed(3) + ' TND</div>';
+        html += '<div style="background:linear-gradient(135deg,#1a2a5c,#2a3f7a);color:#fff;border-radius:16px;padding:20px;text-align:center;margin-bottom:12px;">';
+        html += '<div style="font-size:12px;text-transform:uppercase;letter-spacing:1px;opacity:.85;">💰 Total en Caisse</div>';
+        html += '<div style="font-size:36px;font-weight:800;margin-top:8px;color:' + totalColor + ';">' + totalSolde.toFixed(3) + ' TND</div>';
         html += '</div>';
         container.innerHTML = html;
     },
@@ -3795,10 +3645,10 @@ const CaisseHistory = {
             '<div class="field-row-2">' +
             '<div class="field"><label>👥 Type</label><select id="caisseType" onchange="CaisseHistory.show()">' +
             '<option value="all">Tous</option><option value="client">Clients</option><option value="fournisseur">Fournisseurs</option></select></div>' +
-            '<div class="field"><label>💳 Mode de paiement</label><select id="caisseMethod" onchange="CaisseHistory.show()">' +
+            '<div class="field"><label>💳 Mode</label><select id="caisseMethod" onchange="CaisseHistory.show()">' +
             '<option value="all">Tous</option><option value="Espèces">💵 Espèces</option><option value="Chèque">🧾 Chèque</option><option value="Virement">🏦 Virement</option><option value="Carte">💳 Carte</option><option value="Mobile">📱 Mobile</option></select></div>' +
             '</div>' +
-            '<div class="field"><label>🔍 Rechercher</label><input type="text" id="caisseSearch" placeholder="N° facture, client, description..." oninput="CaisseHistory.show()" style="width:100%;padding:6px 10px;border:2px solid var(--border);border-radius:8px;font-family:Cairo,sans-serif;font-size:12px;background:var(--bg);color:var(--text);height:32px;"></div>' +
+            '<div class="field"><label>🔍 Rechercher</label><input type="text" id="caisseSearch" placeholder="N° facture, client, description..." oninput="CaisseHistory.show()" style="width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:Cairo,sans-serif;font-size:14px;background:var(--bg);color:var(--text);height:44px;"></div>' +
             '<div id="caisseHistoryResult"></div>';
         setTimeout(() => this.show(), 100);
     },
@@ -3849,7 +3699,7 @@ const CaisseHistory = {
         const totalIn = movements.filter(m => m.direction === 'in').reduce((s, m) => s + m.amount, 0);
         const totalOut = movements.filter(m => m.direction === 'out').reduce((s, m) => s + m.amount, 0);
         const balance = totalIn - totalOut;
-        const byMethod = { 'Espèces': { count: 0, in: 0, out: 0, total: 0 }, 'Chèque': { count: 0, in: 0, out: 0, total: 0 }, 'Virement': { count: 0, in: 0, out: 0, total: 0 }, 'Carte': { count: 0, in: 0, out: 0, total: 0 }, 'Mobile': { count: 0, in: 0, out: 0, total: 0 } };
+        const byMethod = { 'Espèces':{count:0,in:0,out:0,total:0}, 'Chèque':{count:0,in:0,out:0,total:0}, 'Virement':{count:0,in:0,out:0,total:0}, 'Carte':{count:0,in:0,out:0,total:0}, 'Mobile':{count:0,in:0,out:0,total:0} };
         movements.forEach(m => {
             const method = m.method || 'Espèces';
             if (!byMethod[method]) byMethod[method] = { count: 0, in: 0, out: 0, total: 0 };
@@ -3865,7 +3715,7 @@ const CaisseHistory = {
             <div><span class="label">📊 Solde</span><span class="value">${balance.toFixed(3)} TND</span></div>
         </div></div>`;
         if (grandTotal > 0) {
-            html += `<div class="section-title" style="margin-top:10px;">💳 Répartition par mode de paiement</div>`;
+            html += `<div class="section-title" style="margin-top:10px;">💳 Répartition par mode</div>`;
             html += `<div class="history-table-wrapper" style="margin-bottom:10px;"><table class="history-table" style="min-width:500px;">
                 <thead><tr><th>💳 Méthode</th><th>🔢 Nb</th><th>⬆️ Entrées</th><th>⬇️ Sorties</th><th>💰 Total</th><th>📊 %</th></tr></thead><tbody>`;
             const methodIcons = { 'Espèces': '💵', 'Chèque': '🧾', 'Virement': '🏦', 'Carte': '💳', 'Mobile': '📱' };
@@ -3908,11 +3758,8 @@ const CaisseHistory = {
         const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url;
-        a.download = `caisse_${Utils.today()}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        a.href = url; a.download = `caisse_${Utils.today()}.csv`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
         URL.revokeObjectURL(url);
         Toast.show('✅ Exporté', 'success');
     },
@@ -3973,15 +3820,9 @@ const FinanceJour = {
             const isPaymentOnly = !a.lines.length;
             movements.push({ type: isPaymentOnly ? '💰 Règl. fourn.' : '📥 Achat', party:a.supplier, invoice:a.num, description: isPaymentOnly ? 'Règlement' : `${q} unités`, amount:a.total, direction:'in' });
         });
-        State.caisseClients.filter(c => c.date === today).forEach(c => {
-            movements.push({ type:'💳 Paiement client', party:c.clientName, invoice:c.invoiceNum || '-', description:c.description || 'Règlement', amount:c.amount, direction:'in' });
-        });
-        State.caisseFournisseurs.filter(c => c.date === today).forEach(c => {
-            movements.push({ type:'💳 Paiement fourn.', party:c.fournisseurName, invoice:c.invoiceNum || '-', description:c.description || 'Règlement', amount:c.amount, direction:'out' });
-        });
-        State.expenses.filter(e => e.date === today).forEach(e => {
-            movements.push({ type:'💸 Dépense', party:'-', invoice:e.code || '-', description:e.category, amount:e.amount, direction:'out' });
-        });
+        State.caisseClients.filter(c => c.date === today).forEach(c => { movements.push({ type:'💳 Paiement client', party:c.clientName, invoice:c.invoiceNum || '-', description:c.description || 'Règlement', amount:c.amount, direction:'in' }); });
+        State.caisseFournisseurs.filter(c => c.date === today).forEach(c => { movements.push({ type:'💳 Paiement fourn.', party:c.fournisseurName, invoice:c.invoiceNum || '-', description:c.description || 'Règlement', amount:c.amount, direction:'out' }); });
+        State.expenses.filter(e => e.date === today).forEach(e => { movements.push({ type:'💸 Dépense', party:'-', invoice:e.code || '-', description:e.category, amount:e.amount, direction:'out' }); });
         this.data = { soldeClient, valeurStock, caisse, soldeFournisseur, total, capitalFixe, benefice, movements };
         this.render();
     },
@@ -4289,15 +4130,9 @@ const AdvancedReports = {
     }
 };
 
-// ═══════════════════════════════════════════════════════════
-// 📄 PDF EXPORTER
-// ═══════════════════════════════════════════════════════════
 const PDFExporter = {
     async exportInvoice(type, invoiceId) {
-        if (typeof window.jspdf === 'undefined') {
-            Toast.show('❌ jsPDF non chargé', 'error');
-            return;
-        }
+        if (typeof window.jspdf === 'undefined') { Toast.show('❌ jsPDF non chargé', 'error'); return; }
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
         const list = type === 'vente' ? State.ventes : State.achats;
@@ -4307,7 +4142,6 @@ const PDFExporter = {
         const party = partyList.find(p => p.name === (rec.client || rec.supplier));
         const partyKey = type === 'vente' ? 'Client' : 'Fournisseur';
         const partyName = rec.client || rec.supplier;
-        
         doc.setFillColor(30, 47, 102);
         doc.rect(0, 0, 210, 25, 'F');
         doc.setTextColor(255, 255, 255);
@@ -4318,18 +4152,15 @@ const PDFExporter = {
         doc.setFont('helvetica', 'normal');
         doc.text(State.companyInfo.address || '', 105, 18, { align: 'center' });
         doc.text(`Tel: ${State.companyInfo.phone1 || '-'} | MF: ${State.companyInfo.taxId || '-'}`, 105, 22, { align: 'center' });
-        
         doc.setTextColor(0, 0, 0);
         doc.setFontSize(16);
         doc.setFont('helvetica', 'bold');
         const title = type === 'vente' ? 'FACTURE DE VENTE' : "FACTURE D'ACHAT";
         doc.text(title, 105, 38, { align: 'center' });
-        
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
         doc.text(`N°: ${rec.num}`, 15, 48);
         doc.text(`Date: ${Utils.formatDate(rec.date)}`, 150, 48);
-        
         doc.setFillColor(240, 242, 248);
         doc.rect(15, 55, 180, 20, 'F');
         doc.setFont('helvetica', 'bold');
@@ -4344,7 +4175,6 @@ const PDFExporter = {
         doc.text('MF:', 110, 69);
         doc.setFont('helvetica', 'normal');
         doc.text(party?.taxId || '-', 130, 69);
-        
         const startY = 82;
         doc.setFillColor(30, 47, 102);
         doc.rect(15, startY, 180, 8, 'F');
@@ -4356,11 +4186,9 @@ const PDFExporter = {
         doc.text('Prix', 110, startY + 5.5);
         doc.text('Qte', 135, startY + 5.5);
         doc.text('Total', 170, startY + 5.5);
-        
         doc.setTextColor(0, 0, 0);
         doc.setFont('helvetica', 'normal');
         let y = startY + 8;
-        
         if (!rec.lines || !rec.lines.length) {
             doc.setFont('helvetica', 'italic');
             doc.setTextColor(41, 128, 185);
@@ -4369,10 +4197,7 @@ const PDFExporter = {
         } else {
             rec.lines.forEach((line, i) => {
                 if (y > 260) { doc.addPage(); y = 20; }
-                if (i % 2 === 0) {
-                    doc.setFillColor(248, 249, 252);
-                    doc.rect(15, y, 180, 7, 'F');
-                }
+                if (i % 2 === 0) { doc.setFillColor(248, 249, 252); doc.rect(15, y, 180, 7, 'F'); }
                 doc.setFontSize(9);
                 doc.text(String(i + 1), 18, y + 5);
                 doc.text(String(line.name).substring(0, 40), 28, y + 5);
@@ -4384,12 +4209,10 @@ const PDFExporter = {
                 y += 7;
             });
         }
-        
         y += 5;
         const paid = (rec.reglements || []).reduce((s, r) => s + r.amount, 0);
         const prevBalance = rec.prevBalance || 0;
         const currentBalance = prevBalance + rec.total - paid;
-        
         doc.setFillColor(240, 242, 248);
         doc.rect(110, y, 85, 30, 'F');
         doc.setFontSize(10);
@@ -4398,7 +4221,6 @@ const PDFExporter = {
         doc.text('Total facture:', 115, y + 13);
         doc.text('Paye:', 115, y + 20);
         doc.text('Solde actuel:', 115, y + 27);
-        
         doc.setFont('helvetica', 'normal');
         doc.text(prevBalance.toFixed(3) + ' TND', 190, y + 6, { align: 'right' });
         doc.setFont('helvetica', 'bold');
@@ -4408,19 +4230,15 @@ const PDFExporter = {
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(192, 57, 43);
         doc.text(currentBalance.toFixed(3) + ' TND', 190, y + 27, { align: 'right' });
-        
         doc.setTextColor(120, 120, 120);
         doc.setFontSize(8);
         doc.setFont('helvetica', 'italic');
         doc.text('Merci de votre visite', 105, 285, { align: 'center' });
         doc.text(`Genere le ${new Date().toLocaleString('fr-FR')}`, 105, 290, { align: 'center' });
-        
         const filename = `${rec.num}_${String(partyName).replace(/\s+/g, '_')}.pdf`;
         doc.save(filename);
         Toast.show(`✅ PDF exporté: ${filename}`, 'success');
-        if (typeof NotificationSystem !== 'undefined') {
-            NotificationSystem.add('📄 Export PDF', filename, 'SUCCESS');
-        }
+        if (typeof NotificationSystem !== 'undefined') NotificationSystem.add('📄 Export PDF', filename, 'SUCCESS');
     },
     async exportStatement(type, entityId) {
         if (typeof window.jspdf === 'undefined') { Toast.show('❌ jsPDF non chargé', 'error'); return; }
@@ -4429,14 +4247,12 @@ const PDFExporter = {
         const list = type === 'client' ? State.clients : State.fournisseurs;
         const entity = list.find(x => x.id === entityId);
         if (!entity) { Toast.show('❌ Introuvable', 'error'); return; }
-        
         doc.setFillColor(30, 47, 102);
         doc.rect(0, 0, 210, 20, 'F');
         doc.setTextColor(255, 255, 255);
         doc.setFontSize(16);
         doc.setFont('helvetica', 'bold');
         doc.text(`RELEVE DE COMPTE - ${type === 'client' ? 'CLIENT' : 'FOURNISSEUR'}`, 105, 13, { align: 'center' });
-        
         doc.setTextColor(0, 0, 0);
         doc.setFontSize(11);
         doc.setFont('helvetica', 'normal');
@@ -4444,144 +4260,65 @@ const PDFExporter = {
         doc.text(`Tel: ${entity.phone || '-'}`, 15, 37);
         doc.text(`MF: ${entity.taxId || '-'}`, 15, 44);
         doc.text(`Solde: ${(entity.balance || 0).toFixed(3)} TND`, 150, 30);
-        
         doc.save(`Releve_${entity.name.replace(/\s+/g, '_')}_${Utils.today()}.pdf`);
         Toast.show('✅ Relevé PDF exporté', 'success');
     }
 };
-// ═══════════════════════════════════════════════════════════
-// 📸 IMAGE EXPORTER - تصدير الفواتير كصورة JPEG
-// ═══════════════════════════════════════════════════════════
+
 const ImageExporter = {
     async exportInvoice(type, invoiceId, options = {}) {
-        if (typeof html2canvas === 'undefined') {
-            Toast.show('❌ html2canvas non chargé', 'error');
-            return;
-        }
-        
-        // 1. جمع البيانات
+        if (typeof html2canvas === 'undefined') { Toast.show('❌ html2canvas non chargé', 'error'); return; }
         const list = type === 'vente' ? State.ventes : State.achats;
         const rec = list.find(x => x.id === invoiceId);
-        if (!rec) { 
-            Toast.show('❌ Facture introuvable', 'error'); 
-            return; 
-        }
-        
+        if (!rec) { Toast.show('❌ Facture introuvable', 'error'); return; }
         const partyList = type === 'vente' ? State.clients : State.fournisseurs;
         const party = partyList.find(p => p.name === (rec.client || rec.supplier));
         const paid = (rec.reglements || []).reduce((a, r) => a + r.amount, 0);
         const prevBalance = rec.prevBalance || 0;
-        
-        // 2. بناء HTML للفاتورة
         const html = PrintSystem.buildInvoiceHTML({
             title: type === 'vente' ? 'Facture de vente' : "Facture d'achat",
-            num: rec.num,
-            date: Utils.formatDate(rec.date),
+            num: rec.num, date: Utils.formatDate(rec.date),
             partyLabel: type === 'vente' ? 'Client' : 'Fournisseur',
             partyName: rec.client || rec.supplier,
-            partyPhone: party?.phone || '',
-            partyTaxId: party?.taxId || '',
-            lines: rec.lines || [],
-            total: rec.total,
-            paid,
-            prevBalance,
+            partyPhone: party?.phone || '', partyTaxId: party?.taxId || '',
+            lines: rec.lines || [], total: rec.total, paid, prevBalance,
             currentBalance: prevBalance + rec.total - paid
         });
-        
-        // 3. إنشاء حاوية مؤقتة للتصوير
         const container = document.createElement('div');
-        container.style.position = 'fixed';
-        container.style.left = '-9999px';
-        container.style.top = '0';
-        container.style.width = '800px';  // عرض ثابت للجودة
-        container.style.background = '#ffffff';
-        container.style.padding = '20px';
-        container.style.fontFamily = 'Cairo, Arial, sans-serif';
-        container.style.direction = 'ltr';
-        container.style.color = '#111';
-        container.style.fontSize = '12px';
+        container.style.position = 'fixed'; container.style.left = '-9999px'; container.style.top = '0';
+        container.style.width = '800px'; container.style.background = '#ffffff'; container.style.padding = '20px';
+        container.style.fontFamily = 'Cairo, Arial, sans-serif'; container.style.direction = 'ltr';
+        container.style.color = '#111'; container.style.fontSize = '12px';
         container.innerHTML = html;
         document.body.appendChild(container);
-        
-        // إظهار Loading
         Toast.show('📸 Génération de l\'image...', 'info');
-        
         try {
-            // 4. التقاط الصورة
-            const canvas = await html2canvas(container, {
-                scale: options.scale || 2,       // جودة عالية (2x)
-                useCORS: true,
-                backgroundColor: '#ffffff',
-                logging: false,
-                width: container.scrollWidth,
-                height: container.scrollHeight
-            });
-            
-            // 5. تحويل إلى JPEG
-            const quality = options.quality || 0.92;  // جودة 92%
+            const canvas = await html2canvas(container, { scale: options.scale || 2, useCORS: true, backgroundColor: '#ffffff', logging: false, width: container.scrollWidth, height: container.scrollHeight });
+            const quality = options.quality || 0.92;
             const dataURL = canvas.toDataURL('image/jpeg', quality);
-            
-            // 6. التنزيل
             const filename = `${rec.num}_${String(rec.client || rec.supplier).replace(/\s+/g, '_')}_${Utils.today()}.jpg`;
             const link = document.createElement('a');
-            link.download = filename;
-            link.href = dataURL;
-            link.click();
-            
+            link.download = filename; link.href = dataURL; link.click();
             Toast.show(`✅ Image exportée: ${filename}`, 'success');
-            if (typeof NotificationSystem !== 'undefined') {
-                NotificationSystem.add('📸 Export Image', filename, 'SUCCESS');
-            }
-        } catch (err) {
-            console.error('❌ Erreur export image:', err);
-            Toast.show('❌ Erreur: ' + err.message, 'error');
-        } finally {
-            // 7. تنظيف
-            setTimeout(() => {
-                if (container.parentNode) container.parentNode.removeChild(container);
-            }, 500);
-        }
+            if (typeof NotificationSystem !== 'undefined') NotificationSystem.add('📸 Export Image', filename, 'SUCCESS');
+        } catch (err) { Toast.show('❌ Erreur: ' + err.message, 'error'); }
+        finally { setTimeout(() => { if (container.parentNode) container.parentNode.removeChild(container); }, 500); }
     },
-    
-    // تصدير بيان حساب كصورة
     async exportStatement(type, entityId) {
-        if (typeof html2canvas === 'undefined') {
-            Toast.show('❌ html2canvas non chargé', 'error');
-            return;
-        }
+        if (typeof html2canvas === 'undefined') { Toast.show('❌ html2canvas non chargé', 'error'); return; }
         const list = type === 'client' ? State.clients : State.fournisseurs;
         const entity = list.find(x => x.id === entityId);
         if (!entity) { Toast.show('❌ Introuvable', 'error'); return; }
-        
-        // بناء الحاوية
         const container = document.createElement('div');
-        container.style.position = 'fixed';
-        container.style.left = '-9999px';
-        container.style.width = '900px';
-        container.style.background = '#fff';
-        container.style.padding = '24px';
-        container.style.fontFamily = 'Cairo, Arial, sans-serif';
-        container.style.direction = 'ltr';
-        container.style.color = '#111';
-        
-        const docs = type === 'client' 
-            ? State.ventes.filter(v => v.client === entity.name)
-            : State.achats.filter(a => a.supplier === entity.name);
-        const payments = type === 'client'
-            ? State.caisseClients.filter(c => c.clientName === entity.name)
-            : State.caisseFournisseurs.filter(c => c.fournisseurName === entity.name);
-        
+        container.style.position = 'fixed'; container.style.left = '-9999px'; container.style.width = '900px';
+        container.style.background = '#fff'; container.style.padding = '24px';
+        container.style.fontFamily = 'Cairo, Arial, sans-serif'; container.style.direction = 'ltr'; container.style.color = '#111';
+        const docs = type === 'client' ? State.ventes.filter(v => v.client === entity.name) : State.achats.filter(a => a.supplier === entity.name);
+        const payments = type === 'client' ? State.caisseClients.filter(c => c.clientName === entity.name) : State.caisseFournisseurs.filter(c => c.fournisseurName === entity.name);
         const rows = docs.map(d => {
             const paid = payments.filter(p => p.invoiceNum === d.num).reduce((s, p) => s + p.amount, 0);
-            return `<tr>
-                <td style="border:1px solid #999;padding:4px 6px;">${esc(Utils.formatDate(d.date))}</td>
-                <td style="border:1px solid #999;padding:4px 6px;font-weight:700;">${esc(d.num)}</td>
-                <td style="border:1px solid #999;padding:4px 6px;text-align:right;">${d.total.toFixed(3)}</td>
-                <td style="border:1px solid #999;padding:4px 6px;text-align:right;color:#27ae60;">${paid.toFixed(3)}</td>
-                <td style="border:1px solid #999;padding:4px 6px;text-align:right;color:#c0392b;">${(d.total - paid).toFixed(3)}</td>
-            </tr>`;
+            return `<tr><td style="border:1px solid #999;padding:4px 6px;">${esc(Utils.formatDate(d.date))}</td><td style="border:1px solid #999;padding:4px 6px;font-weight:700;">${esc(d.num)}</td><td style="border:1px solid #999;padding:4px 6px;text-align:right;">${d.total.toFixed(3)}</td><td style="border:1px solid #999;padding:4px 6px;text-align:right;color:#27ae60;">${paid.toFixed(3)}</td><td style="border:1px solid #999;padding:4px 6px;text-align:right;color:#c0392b;">${(d.total - paid).toFixed(3)}</td></tr>`;
         }).join('');
-        
         container.innerHTML = `
             <div style="text-align:center;border-bottom:3px double #1e2f66;padding-bottom:12px;margin-bottom:16px;">
                 <div style="font-size:22px;font-weight:800;color:#1e2f66;">RELEVÉ DE COMPTE</div>
@@ -4604,32 +4341,20 @@ const ImageExporter = {
             </table>
             <div style="text-align:center;color:#999;font-size:10px;margin-top:16px;">Généré le ${new Date().toLocaleString('fr-FR')}</div>
         `;
-        
         document.body.appendChild(container);
         Toast.show('📸 Génération...', 'info');
-        
         try {
             const canvas = await html2canvas(container, { scale: 2, useCORS: true, backgroundColor: '#fff', logging: false });
             const dataURL = canvas.toDataURL('image/jpeg', 0.92);
             const filename = `Releve_${entity.name.replace(/\s+/g, '_')}_${Utils.today()}.jpg`;
             const link = document.createElement('a');
-            link.download = filename;
-            link.href = dataURL;
-            link.click();
+            link.download = filename; link.href = dataURL; link.click();
             Toast.show(`✅ ${filename}`, 'success');
-        } catch (err) {
-            Toast.show('❌ ' + err.message, 'error');
-        } finally {
-            setTimeout(() => container.parentNode?.removeChild(container), 500);
-        }
+        } catch (err) { Toast.show('❌ ' + err.message, 'error'); }
+        finally { setTimeout(() => container.parentNode?.removeChild(container), 500); }
     },
-    
-    // تصدير أي عنصر HTML معين
     async exportElement(elementId, filename = 'export.jpg') {
-        if (typeof html2canvas === 'undefined') {
-            Toast.show('❌ html2canvas non chargé', 'error');
-            return;
-        }
+        if (typeof html2canvas === 'undefined') { Toast.show('❌ html2canvas non chargé', 'error'); return; }
         const el = document.getElementById(elementId);
         if (!el) { Toast.show('❌ Élément introuvable', 'error'); return; }
         Toast.show('📸 Génération...', 'info');
@@ -4637,19 +4362,13 @@ const ImageExporter = {
             const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#fff', logging: false });
             const dataURL = canvas.toDataURL('image/jpeg', 0.92);
             const link = document.createElement('a');
-            link.download = filename;
-            link.href = dataURL;
-            link.click();
+            link.download = filename; link.href = dataURL; link.click();
             Toast.show('✅ Image exportée', 'success');
-        } catch (err) {
-            Toast.show('❌ ' + err.message, 'error');
-        }
+        } catch (err) { Toast.show('❌ ' + err.message, 'error'); }
     }
 };
 window.ImageExporter = ImageExporter;
-// ═══════════════════════════════════════════════════════════
-// 📈 MONTHLY PROFIT REPORT
-// ═══════════════════════════════════════════════════════════
+
 const MonthlyProfitReport = {
     _getMonthData(monthsBack) {
         const now = new Date();
@@ -4669,11 +4388,7 @@ const MonthlyProfitReport = {
         const revenue = ventes.reduce((s, v) => s + v.total, 0);
         const expenseTotal = expenses.reduce((s, e) => s + e.amount, 0);
         const profit = revenue - cogs - expenseTotal;
-        return {
-            label: d.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' }),
-            from, to, revenue, cogs, expenses: expenseTotal, profit,
-            invoiceCount: ventes.length
-        };
+        return { label: d.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' }), from, to, revenue, cogs, expenses: expenseTotal, profit, invoiceCount: ventes.length };
     },
     render() {
         const container = $('monthlyProfitContent');
@@ -4684,7 +4399,6 @@ const MonthlyProfitReport = {
         const totalProfit = months.reduce((s, m) => s + m.profit, 0);
         const avgProfit = totalProfit / 12;
         const maxVal = Math.max(...months.map(m => Math.max(m.revenue, Math.abs(m.profit))), 1);
-        
         let html = `
             <div class="kpi-row" style="grid-template-columns:1fr 1fr 1fr;">
                 <div class="kpi-card"><div class="val">${totalRevenue.toFixed(3)}</div><div class="lbl">Revenus 12 mois</div></div>
@@ -4698,7 +4412,7 @@ const MonthlyProfitReport = {
                     const profH = (Math.abs(m.profit) / maxVal * 100);
                     return `
                         <div style="margin-bottom:8px;">
-                            <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;margin-bottom:2px;">
+                            <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;margin-bottom:2px;">
                                 <span>${m.label}</span>
                                 <span style="color:var(--muted);">${m.invoiceCount} factures</span>
                             </div>
@@ -4706,7 +4420,7 @@ const MonthlyProfitReport = {
                                 <div style="position:absolute;top:0;left:0;height:50%;width:${revH}%;background:linear-gradient(90deg,#4a6cf7,#6b8aff);"></div>
                                 <div style="position:absolute;bottom:0;left:0;height:50%;width:${profH}%;background:linear-gradient(90deg,${m.profit >= 0 ? '#2ecc71,#27ae60' : '#e74c5e,#c0392b'});"></div>
                             </div>
-                            <div style="display:flex;justify-content:space-between;font-size:9px;margin-top:2px;">
+                            <div style="display:flex;justify-content:space-between;font-size:10px;margin-top:2px;">
                                 <span style="color:#4a6cf7;">💰 ${m.revenue.toFixed(3)}</span>
                                 <span style="color:${m.profit >= 0 ? 'var(--success)' : 'var(--danger)'};font-weight:700;">📈 ${m.profit.toFixed(3)}</span>
                             </div>
@@ -4717,13 +4431,10 @@ const MonthlyProfitReport = {
             <div class="section-title">📋 Détails</div>
             <div class="history-table-wrapper">
                 <table class="history-table" style="min-width:600px;">
-                    <thead><tr>
-                        <th>Mois</th><th>Factures</th><th>Revenus</th><th>Coût</th><th>Dépenses</th><th>Bénéfice</th>
-                    </tr></thead>
+                    <thead><tr><th>Mois</th><th>Factures</th><th>Revenus</th><th>Coût</th><th>Dépenses</th><th>Bénéfice</th></tr></thead>
                     <tbody>
                         ${[...months].reverse().map(m => `<tr>
-                            <td>${m.label}</td>
-                            <td>${m.invoiceCount}</td>
+                            <td>${m.label}</td><td>${m.invoiceCount}</td>
                             <td style="color:#4a6cf7;">${m.revenue.toFixed(3)}</td>
                             <td>${m.cogs.toFixed(3)}</td>
                             <td style="color:var(--danger);">${m.expenses.toFixed(3)}</td>
@@ -4739,10 +4450,7 @@ const MonthlyProfitReport = {
         `;
         container.innerHTML = html;
     },
-    print() {
-        const content = $('monthlyProfitContent')?.innerHTML || '';
-        PrintSystem.openPrintWindow('Rapport de bénéfices 12 mois', content);
-    },
+    print() { const content = $('monthlyProfitContent')?.innerHTML || ''; PrintSystem.openPrintWindow('Rapport de bénéfices 12 mois', content); },
     exportCSV() {
         let csv = 'Mois,Factures,Revenus,Coût,Dépenses,Bénéfice\n';
         for (let i = 11; i >= 0; i--) {
@@ -4758,20 +4466,10 @@ const MonthlyProfitReport = {
     }
 };
 
-// ═══════════════════════════════════════════════════════════
-// 🔄 AUTO SYNC
-// ═══════════════════════════════════════════════════════════
 const AutoSync = {
-    _timer: null,
-    _lastHash: null,
-    start() {
-        if (this._timer) return;
-        this._timer = setInterval(() => this._check(), 30000);
-        console.log('🔄 Auto-sync activé (30s)');
-    },
-    stop() {
-        if (this._timer) { clearInterval(this._timer); this._timer = null; }
-    },
+    _timer: null, _lastHash: null,
+    start() { if (this._timer) return; this._timer = setInterval(() => this._check(), 30000); },
+    stop() { if (this._timer) { clearInterval(this._timer); this._timer = null; } },
     async _check() {
         if (!window.db || !State.currentUser) return;
         if (State.currentUser.isClient || State.currentUser.isLocalAdmin) return;
@@ -4779,12 +4477,8 @@ const AutoSync = {
         const hash = await Utils.hashPassword(currentData, 'sync-check');
         if (hash !== this._lastHash) {
             this._lastHash = hash;
-            try {
-                await window.db.collection('users').doc(State.currentUser.uid).set(Persistence.serialize());
-                console.log('☁️ Auto-sync:', new Date().toLocaleTimeString('fr-FR'));
-            } catch(e) {
-                console.warn('⚠️ Auto-sync échoué:', e.message);
-            }
+            try { await window.db.collection('users').doc(State.currentUser.uid).set(Persistence.serialize()); }
+            catch(e) { console.warn('⚠️ Auto-sync échoué:', e.message); }
         }
     }
 };
@@ -4974,10 +4668,7 @@ const App = {
             setTimeout(() => { const body = s.querySelector('.sheet-body'); if (body) body.scrollTop = 0; }, 50);
             setTimeout(() => { const body = s.querySelector('.sheet-body'); if (body) body.scrollTop = 0; }, 400);
         }
-        if (name === 'company') {
-            CompanyInfo.load();
-            PrintSystem.syncSettingsUI();
-        }
+        if (name === 'company') { CompanyInfo.load(); PrintSystem.syncSettingsUI(); }
     },
     closeSheet() {
         document.querySelectorAll('.sheet').forEach(s => s.classList.remove('show'));
@@ -4997,12 +4688,8 @@ const App = {
     },
     reloadAll() {
         BalanceCalculator.recalculateAll();
-        ClientsRenderer.render();
-        FournisseursRenderer.render();
-        ArticlesRenderer.render();
-        VentesRenderer.render();
-        AchatsRenderer.render();
-        Expenses.render();
+        ClientsRenderer.render(); FournisseursRenderer.render(); ArticlesRenderer.render();
+        VentesRenderer.render(); AchatsRenderer.render(); Expenses.render();
         VentesModule.refreshPartyOptions(); VentesModule.refreshArticleOptions();
         AchatsModule.refreshPartyOptions(); AchatsModule.refreshArticleOptions();
         FinanceJour.init(); Marges.init(); Marges.render();
@@ -5052,7 +4739,7 @@ const Auth = {
                         try { localStorage.setItem(APP_CONFIG.storageKey, JSON.stringify(Persistence.serialize())); } catch(e) {}
                     }
                 }
-            } catch(e) { console.warn('⚠️ Cloud lookup failed:', e.message); }
+            } catch(e) {}
         }
         if (!client || !client.passwordHash || !client.passwordSalt) return false;
         const hash = await Utils.hashPassword(p, client.passwordSalt);
@@ -5173,11 +4860,7 @@ const Auth = {
             try {
                 if (window.db) await window.db.collection('approvals').doc(uid).set({ email: e, requestedAt: new Date().toISOString(), approved: false, role: 'staff' });
                 Toast.show('✅ Demande envoyée à l\'admin', 'success');
-            } catch (dbErr) {
-                console.warn('⚠️ Firestore:', dbErr.message);
-                Toast.show('⚠️ Compte créé mais approval échoué', 'warning');
-                this._showPending();
-            }
+            } catch (dbErr) { Toast.show('⚠️ Compte créé mais approval échoué', 'warning'); this._showPending(); }
         }).catch(err => {
             $('loginError').textContent = '❌ ' + (err.message || 'Erreur');
             $('loginLoading').style.display = 'none';
@@ -5306,11 +4989,7 @@ const Auth = {
         App.showSection('dashboard');
         Dashboard.load();
         if (typeof AutoSync !== 'undefined') AutoSync.start();
-        setTimeout(() => {
-            if (typeof ClientOrder !== 'undefined' && ClientOrder.syncPendingOrders) {
-                ClientOrder.syncPendingOrders();
-            }
-        }, 1500);
+        setTimeout(() => { if (typeof ClientOrder !== 'undefined' && ClientOrder.syncPendingOrders) ClientOrder.syncPendingOrders(); }, 1500);
         Toast.show(`☁️ Connecté (Cloud sécurisé)`, 'success');
         setTimeout(() => { AdvancedReports.generateReport(); Marges.init(); Marges.render(); FinanceJour.init(); Dashboard.load(); }, 800);
     },
@@ -5367,16 +5046,16 @@ function showImportPreview(data) {
     const headers = Object.keys(data[0]);
     const rows = data.slice(0, 20).map(r => {
         const isDup = r.Login && existing.includes(String(r.Login).toLowerCase());
-        return `<tr style="${isDup ? 'background:#ffe8e8;' : ''}">${headers.map(h => `<td style="padding:3px 5px;border:1px solid #ddd;font-size:9px;">${esc(r[h] || '')}</td>`).join('')}</tr>`;
+        return `<tr style="${isDup ? 'background:#ffe8e8;' : ''}">${headers.map(h => `<td style="padding:4px 6px;border:1px solid #ddd;font-size:10px;">${esc(r[h] || '')}</td>`).join('')}</tr>`;
     }).join('');
     preview.innerHTML = `
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:10px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px;">
             <span>📊 ${data.length} clients</span>
-            <span style="color:${dups.length ? 'var(--danger)' : 'var(--success)'};">${dups.length ? `⚠️ ${dups.length} doublon(s) Login` : '✅ OK'}</span>
+            <span style="color:${dups.length ? 'var(--danger)' : 'var(--success)'};">${dups.length ? `⚠️ ${dups.length} doublon(s)` : '✅ OK'}</span>
         </div>
         <div style="max-height:200px;overflow:auto;border:1px solid var(--border);border-radius:6px;">
-            <table style="width:100%;border-collapse:collapse;font-size:9px;">
-                <thead><tr style="background:var(--secondary);color:#fff;position:sticky;top:0;">${headers.map(h => `<th style="padding:3px 5px;font-size:8px;">${esc(h)}</th>`).join('')}</tr></thead>
+            <table style="width:100%;border-collapse:collapse;font-size:10px;">
+                <thead><tr style="background:var(--secondary);color:#fff;position:sticky;top:0;">${headers.map(h => `<th style="padding:4px 6px;font-size:9px;">${esc(h)}</th>`).join('')}</tr></thead>
                 <tbody>${rows}</tbody>
             </table>
         </div>`;
@@ -5431,11 +5110,7 @@ async function confirmImport() {
         ClientsRenderer.render();
         if (window.db && createdClients.length) {
             st.textContent = `☁️ Synchronisation...`;
-            for (const c of createdClients) {
-                if (c.passwordHash) {
-                    try { await ClientLoginsSync.syncOne(c); } catch(e) { console.warn('Sync failed:', c.login); }
-                }
-            }
+            for (const c of createdClients) { if (c.passwordHash) { try { await ClientLoginsSync.syncOne(c); } catch(e) {} } }
         }
         pf.style.width = '100%';
         st.textContent = `✅ ${imported} importés, ${errors} erreurs`;
@@ -5475,9 +5150,7 @@ function closeShortcutHelp() { $('shortcutHelp').classList.remove('show'); }
 function showPendingOrders() {
     const pending = JSON.parse(localStorage.getItem('gtrpos_pending_orders') || '[]');
     if (!pending.length) { Toast.show('✅ Aucune commande en attente'); return; }
-    console.log(`📦 ${pending.length} commande(s) en attente:`);
-    pending.forEach(o => console.log(` - ${o.num} | ${o.clientName} | ${o.total.toFixed(3)} TND`));
-    Toast.show(`📦 ${pending.length} commande(s) en attente — voir console`);
+    Toast.show(`📦 ${pending.length} commande(s) en attente`);
 }
 
 function updatePendingCount() {
@@ -5494,8 +5167,7 @@ function printStatement(type, id) {
         const c = State.clients.find(x => x.id === numericId);
         if (!c) return;
         BalanceCalculator.recalculateClient(c.name);
-        const fromEl = $('clientHistoryFrom');
-        const toEl = $('clientHistoryTo');
+        const fromEl = $('clientHistoryFrom'); const toEl = $('clientHistoryTo');
         const from = fromEl ? new Date(fromEl.value) : new Date(0);
         const to = toEl ? new Date(toEl.value) : new Date();
         to.setHours(23, 59, 59);
@@ -5507,8 +5179,7 @@ function printStatement(type, id) {
         const f = State.fournisseurs.find(x => x.id === numericId);
         if (!f) return;
         BalanceCalculator.recalculateSupplier(f.name);
-        const fromEl = $('fournisseurHistoryFrom');
-        const toEl = $('fournisseurHistoryTo');
+        const fromEl = $('fournisseurHistoryFrom'); const toEl = $('fournisseurHistoryTo');
         const from = fromEl ? new Date(fromEl.value) : new Date(0);
         const to = toEl ? new Date(toEl.value) : new Date();
         to.setHours(23, 59, 59);
@@ -5549,8 +5220,7 @@ function showPreviewReleve(type, entity, docs, payments, pendingOrders) {
 }
 
 function showPreviewArticle(article) {
-    const fromEl = $('articleHistoryFrom');
-    const toEl = $('articleHistoryTo');
+    const fromEl = $('articleHistoryFrom'); const toEl = $('articleHistoryTo');
     const from = fromEl ? new Date(fromEl.value) : new Date(0);
     const to = toEl ? new Date(toEl.value) : new Date();
     to.setHours(23, 59, 59);
@@ -5593,17 +5263,9 @@ function bindEvents() {
         });
     });
     const cPasswordInput = $('cPassword');
-    if (cPasswordInput) {
-        cPasswordInput.addEventListener('input', function() {
-            PasswordCache.value = this.value;
-        });
-    }
+    if (cPasswordInput) cPasswordInput.addEventListener('input', function() { PasswordCache.value = this.value; });
     const cLoginInput = $('cLogin');
-    if (cLoginInput) {
-        cLoginInput.addEventListener('input', function() {
-            if ($('cDisplayLogin')) $('cDisplayLogin').textContent = this.value.trim() || '-';
-        });
-    }
+    if (cLoginInput) cLoginInput.addEventListener('input', function() { if ($('cDisplayLogin')) $('cDisplayLogin').textContent = this.value.trim() || '-'; });
     document.addEventListener('keydown', e => {
         if (e.key === 'F1') { e.preventDefault(); showShortcutHelp(); }
         if (e.ctrlKey && e.key === 'p') {
@@ -5641,7 +5303,7 @@ Object.assign(window, {
     Dashboard, Fullscreen, Persistence, BalanceCalculator, ClientLogins, ClientLoginsSync,
     ClientsRenderer, FournisseursRenderer, ArticlesRenderer, VentesRenderer, AchatsRenderer,
     RoleManager, ClientPortal, Toast, Utils, State,
-   PDFExporter, MonthlyProfitReport, AutoSync, ImageExporter,
+    PDFExporter, MonthlyProfitReport, AutoSync, ImageExporter,
     downloadTemplate, handleImportFile, confirmImport, cancelImport,
     showNotificationPanel, closeNotificationPanel,
     openChangePasswordModal, closeChangePasswordModal,
@@ -5661,7 +5323,7 @@ async function migratePasswords() {
         }
         if (c.passwordHash && c.password) delete c.password;
     }
-    if (migrated > 0) { Persistence.save(); console.log(`🔐 ${migrated} mot(s) migré(s)`); Toast.show(`🔐 ${migrated} mot(s) migré(s)`, 'success'); }
+    if (migrated > 0) { Persistence.save(); Toast.show(`🔐 ${migrated} mot(s) migré(s)`, 'success'); }
 }
 
 async function migrateClientLogins() {
@@ -5676,7 +5338,7 @@ async function migrateClientLogins() {
             migrated++;
         }
     }
-    if (migrated > 0) { Persistence.save(); console.log(`🔑 ${migrated} client(s) migré(s)`); Toast.show(`🔑 ${migrated} client(s) ont reçu un Login auto`, 'success'); }
+    if (migrated > 0) { Persistence.save(); Toast.show(`🔑 ${migrated} client(s) ont reçu un Login auto`, 'success'); }
 }
 
 async function repairOldOrders() {
@@ -5716,9 +5378,9 @@ async function bootstrap() {
     Persistence.load();
 
     setTimeout(async () => {
-        try { await migratePasswords(); } catch(e) { console.warn('Migrate PW:', e.message); }
-        try { await migrateClientLogins(); } catch(e) { console.warn('Migrate Login:', e.message); }
-        try { const repaired = await repairOldOrders(); if (repaired > 0) Toast.show(`🔧 ${repaired} commande(s) réparée(s)`, 'success'); } catch(e) { console.warn('Repair:', e.message); }
+        try { await migratePasswords(); } catch(e) {}
+        try { await migrateClientLogins(); } catch(e) {}
+        try { const repaired = await repairOldOrders(); if (repaired > 0) Toast.show(`🔧 ${repaired} commande(s) réparée(s)`, 'success'); } catch(e) {}
     }, 800);
 
     setTimeout(() => Dashboard.load(), 500);
@@ -5736,7 +5398,6 @@ async function bootstrap() {
                 State.currentUser = { login: session.login || client.login, uid: 'client_' + client.id, isClient: true };
                 $('loginOverlay').classList.add('hide');
                 ClientPortal.show();
-                console.log('✅ Session client restaurée');
             }
         } catch(e) {}
     }, 400);
@@ -5744,12 +5405,7 @@ async function bootstrap() {
     setInterval(updatePendingCount, 5000);
     updatePendingCount();
 
-    setTimeout(() => {
-        if (ArticlesModule.recalculateAllStocks) {
-            console.log('🔧 Vérification automatique des stocks...');
-            ArticlesModule.recalculateAllStocks();
-        }
-    }, 3000);
+    setTimeout(() => { if (ArticlesModule.recalculateAllStocks) ArticlesModule.recalculateAllStocks(); }, 3000);
 
     console.log(`✅ GTR POS ${APP_CONFIG.version} ready`);
 }
