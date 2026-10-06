@@ -191,15 +191,77 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .shortcut-help-content table{width:100%;border-collapse:collapse;font-size:13px}
 .shortcut-help-content th{background:var(--secondary);color:#fff;padding:8px 12px;text-align:left}
 .shortcut-help-content td{padding:6px 12px;border-bottom:1px solid var(--border)}
-.invoice-header-modern{background:linear-gradient(135deg,var(--secondary),var(--primary));color:#fff;padding:16px 20px;border-radius:var(--card-radius);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-.invoice-header-modern .invoice-title{font-size:18px;font-weight:800}
-.invoice-header-modern .invoice-subtitle{font-size:11px;opacity:.85}
-.invoice-header-modern .invoice-badge{background:rgba(255,255,255,.15);padding:6px 16px;border-radius:20px;font-size:13px;font-weight:700;text-align:center}
-.invoice-header-modern .invoice-badge small{display:block;font-size:10px;opacity:.75}
-.party-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:10px}
-.party-info-grid .field-group label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;display:block}
-.party-info-grid .field-group .value{font-size:13px;font-weight:700;color:var(--text);padding:3px 0}
-.party-info-grid .field-group select,.party-info-grid .field-group input{width:100%;padding:6px 10px;border:2px solid var(--border);border-radius:8px;font-family:'Cairo',sans-serif;font-size:13px;background:var(--bg);color:var(--text);height:38px}
+
+/* ═══════════════════════════════════════════════════════
+   🎨 رأس الفاتورة - 3 ألوان حسب الحالة
+   ═══════════════════════════════════════════════════════ */
+
+/* 🆕 فاتورة جديدة - أزرق */
+.invoice-header-modern,
+.invoice-header-modern.state-new {
+    background: linear-gradient(135deg, #1a2a5c, #4a6cf7) !important;
+    background-image: linear-gradient(135deg, #1a2a5c, #4a6cf7) !important;
+    background-color: #1a2a5c !important;
+    color: #fff !important;
+    padding: 16px 20px;
+    border-radius: var(--card-radius);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    box-shadow: 0 4px 16px rgba(26,42,92,.25);
+    transition: all 0.4s ease;
+}
+
+/* ✅ فاتورة محفوظة - أخضر */
+.invoice-header-modern.state-saved {
+    background: linear-gradient(135deg, #1a7a40, #2ecc71) !important;
+    background-image: linear-gradient(135deg, #1a7a40, #2ecc71) !important;
+    background-color: #1a7a40 !important;
+    box-shadow: 0 4px 16px rgba(46,204,113,.4) !important;
+}
+
+/* ✏️ فاتورة معدّلة - برتقالي */
+.invoice-header-modern.state-modified {
+    background: linear-gradient(135deg, #d35400, #f39c12) !important;
+    background-image: linear-gradient(135deg, #d35400, #f39c12) !important;
+    background-color: #d35400 !important;
+    box-shadow: 0 4px 16px rgba(243,156,18,.4) !important;
+}
+
+/* النصوص الداخلية لرأس الفاتورة */
+.invoice-header-modern .invoice-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #ffffff !important;
+}
+.invoice-header-modern .invoice-subtitle {
+    font-size: 11px;
+    color: rgba(255,255,255,0.9) !important;
+}
+.invoice-header-modern .invoice-badge {
+    background: rgba(255,255,255,.2) !important;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    color: #ffffff !important;
+    border: 1px solid rgba(255,255,255,.25);
+}
+.invoice-header-modern .invoice-badge span,
+.invoice-header-modern .invoice-badge small {
+    color: #ffffff !important;
+}
+.invoice-header-modern .invoice-badge span { font-weight: 800; }
+.invoice-header-modern .invoice-badge small { display: block; font-size: 10px; opacity: 0.9; }
+
+.party-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:10px;color:var(--text)}
+.party-info-grid .field-group label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;display:block}
+.party-info-grid .field-group .value{font-size:14px;font-weight:700;color:var(--text);padding:3px 0;word-break:break-word}
+.party-info-grid .field-group select,.party-info-grid .field-group input{width:100%;padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-family:'Cairo',sans-serif;font-size:14px;background:var(--bg);color:var(--text);height:42px}
 .account-summary-modern{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
 .account-summary-modern .summary-item{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center}
 .account-summary-modern .summary-item .label{font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:700;display:block}
@@ -736,12 +798,12 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 </div>
 </div>
 
-<!-- SHEET VENTES (مع Mode Règlement 6 أسطر) -->
+<!-- SHEET VENTES -->
 <div class="sheet" id="sheet-ventes">
 <div class="sheet-handle"></div>
 <div class="sheet-header"><h3>📄 Facture de vente</h3><button class="sheet-close" onclick="App.closeSheet()">✕</button></div>
 <div class="sheet-body">
-<div class="invoice-header-modern">
+<div class="invoice-header-modern state-new">
 <div><div class="invoice-title">📄 Facture de vente</div><div class="invoice-subtitle">GTR POS</div></div>
 <div class="invoice-badge"><span id="vNumDisplay">#VTE-0001</span><small id="vDateDisplay">--/--/----</small></div>
 </div>
@@ -757,8 +819,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 <div class="summary-item"><span class="label">💳 Payé</span><span class="value positive" id="vPaidAmount">0.000</span></div>
 <div class="summary-item"><span class="label">📊 Solde</span><span class="value negative" id="vCurrentBalance">0.000</span></div>
 </div>
-
-<!-- ✨ MODE RÈGLEMENT — 6 LIGNES COMPACTES -->
 <div class="payment-only-notice" id="vPaymentOnlyNotice" style="display:none;">
     <div class="title">💰 Mode Règlement</div>
     <div class="subtitle">• Aucun produit ajouté</div>
@@ -768,7 +828,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
     <div class="subtitle">• Enregistrement direct possible</div>
     <div class="subtitle">• Vérifiez le montant avant validation</div>
 </div>
-
 <div class="add-product-section">
 <div class="section-label">➕ Ajouter un produit</div>
 <div class="add-product-row">
@@ -806,12 +865,12 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 </div>
 </div>
 
-<!-- SHEET ACHATS (مع Mode Règlement 6 أسطر) -->
+<!-- SHEET ACHATS -->
 <div class="sheet" id="sheet-achats">
 <div class="sheet-handle"></div>
 <div class="sheet-header"><h3>📄 Facture d'achat</h3><button class="sheet-close" onclick="App.closeSheet()">✕</button></div>
 <div class="sheet-body">
-<div class="invoice-header-modern">
+<div class="invoice-header-modern state-new">
 <div><div class="invoice-title">📄 Facture d'achat</div><div class="invoice-subtitle">GTR POS</div></div>
 <div class="invoice-badge"><span id="pNumDisplay">#ACH-0001</span><small id="pDateDisplay">--/--/----</small></div>
 </div>
@@ -827,8 +886,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 <div class="summary-item"><span class="label">💳 Payé</span><span class="value positive" id="pPaidAmount">0.000</span></div>
 <div class="summary-item"><span class="label">📊 Solde</span><span class="value negative" id="pCurrentBalance">0.000</span></div>
 </div>
-
-<!-- ✨ MODE RÈGLEMENT — 6 LIGNES COMPACTES -->
 <div class="payment-only-notice" id="pPaymentOnlyNotice" style="display:none;">
     <div class="title">💸 Mode Règlement</div>
     <div class="subtitle">• Aucun produit ajouté</div>
@@ -838,7 +895,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
     <div class="subtitle">• Enregistrement direct possible</div>
     <div class="subtitle">• Vérifiez le montant avant validation</div>
 </div>
-
 <div class="add-product-section">
 <div class="section-label">➕ Ajouter un produit</div>
 <div class="add-product-row">
@@ -898,7 +954,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 </div>
 </div>
 
-<!-- SHEET COMPANY (PARAMÈTRES) -->
+<!-- SHEET COMPANY -->
 <div class="sheet" id="sheet-company">
 <div class="sheet-handle"></div>
 <div class="sheet-header"><h3>⚙️ Paramètres</h3><button class="sheet-close" onclick="App.closeSheet()">✕</button></div>
@@ -927,7 +983,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 <button class="btn outline small" onclick="Persistence.export()">⬇️ Exporter</button>
 <input type="file" id="importFileInputBackup" accept=".json" style="display:none;" onchange="Persistence.import(this.files[0]);this.value='';">
 <button class="btn outline small" onclick="document.getElementById('importFileInputBackup').click()">⬆️ Importer</button>
-
 <div class="section-title">🖨️ Impression</div>
 <div class="field">
     <label>📄 Format de papier par défaut</label>
@@ -946,7 +1001,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
     </select>
 </div>
 <button class="btn outline small" onclick="PrintSystem.openCustomizer()" style="width:100%;">🖨️ Personnaliser (Logo / Pied de page)</button>
-
 <div class="section-title">🖥️ Affichage</div>
 <button class="btn outline small" onclick="Fullscreen.toggle()" style="width:100%;">⛶ Plein écran</button>
 <div class="section-title">👤 Compte</div>
@@ -1419,17 +1473,14 @@ const ClientLoginsSync = {
                 },
                 updatedAt: new Date().toISOString()
             }, { merge: true });
-            console.log(`✅ Login "${client.login}" synchronisé`);
             return true;
-        } catch(e) { console.warn(`⚠️ Sync login "${client.login}" échoué:`, e.message); return false; }
+        } catch(e) { return false; }
     },
     async deleteOne(login) {
         if (typeof firebase === 'undefined' || !window.db) return false;
         if (!login) return false;
-        try {
-            await window.db.collection(this.COLLECTION).doc('login_' + login.toLowerCase()).delete();
-            return true;
-        } catch(e) { console.warn('⚠️ Delete login failed:', e.message); return false; }
+        try { await window.db.collection(this.COLLECTION).doc('login_' + login.toLowerCase()).delete(); return true; }
+        catch(e) { return false; }
     },
     async lookup(login) {
         if (typeof firebase === 'undefined' || !window.db) return null;
@@ -1437,7 +1488,7 @@ const ClientLoginsSync = {
         try {
             const doc = await window.db.collection(this.COLLECTION).doc('login_' + login.toLowerCase()).get();
             if (doc.exists) return doc.data().clientData || null;
-        } catch(e) { console.warn('⚠️ Lookup failed:', e.message); }
+        } catch(e) {}
         return null;
     },
     async syncAll() {
@@ -1494,7 +1545,7 @@ const Persistence = {
             }
             this.syncVentesToShared();
             return true;
-        } catch(e) { console.error('❌ Erreur save:', e); return false; }
+        } catch(e) { return false; }
     },
     _queueSync(uid, data) { this._pendingSyncs.push({ uid, data, at: Date.now() }); if (this._pendingSyncs.length > 10) this._pendingSyncs.shift(); },
     async _retryPendingSyncs() {
@@ -1522,7 +1573,7 @@ const Persistence = {
                 batch.set(ref, { ...v, clientEmail: client.email || '', clientLogin: client.login || '', clientId: client.id, clientUid: 'client_' + client.id, syncedAt: new Date().toISOString() }, { merge: true });
             });
             await batch.commit();
-        } catch(e) { console.warn('⚠️ syncVentesToShared:', e.message); }
+        } catch(e) {}
     },
     load() {
         try {
@@ -1579,32 +1630,17 @@ const Persistence = {
 const PrintSystem = {
     settings: { logo: null, footer: 'Merci de votre visite', fontSize: 'medium', defaultPaperSize: '80' },
     _currentData: null,
-    load() {
-        try {
-            const saved = localStorage.getItem(APP_CONFIG.printKey);
-            if (saved) Object.assign(this.settings, JSON.parse(saved));
-        } catch(e) {}
-    },
+    load() { try { const saved = localStorage.getItem(APP_CONFIG.printKey); if (saved) Object.assign(this.settings, JSON.parse(saved)); } catch(e) {} },
     save() {
         this.settings.footer = $('customFooter')?.value.trim() || this.settings.footer || 'Merci de votre visite';
         this.settings.fontSize = $('fontSizeSelect')?.value || this.settings.fontSize || 'medium';
-        try {
-            localStorage.setItem(APP_CONFIG.printKey, JSON.stringify(this.settings));
-            Toast.show('✅ Enregistré', 'success');
-            this.closeCustomizer();
-        } catch(e) {}
+        try { localStorage.setItem(APP_CONFIG.printKey, JSON.stringify(this.settings)); Toast.show('✅ Enregistré', 'success'); this.closeCustomizer(); } catch(e) {}
     },
     setDefaultPaperSize(value) {
         this.settings.defaultPaperSize = value;
-        try {
-            localStorage.setItem(APP_CONFIG.printKey, JSON.stringify(this.settings));
-            const labels = { a4:'A4 (Normal)', '80':'Ticket 80mm', '56':'Ticket 56mm' };
-            Toast.show('✅ Format: ' + (labels[value] || value), 'success');
-        } catch(e) {}
-        const paperSel = $('paperSizeSelect');
-        if (paperSel) paperSel.value = value;
-        const doc = $('printDoc');
-        if (doc) doc.className = 'invoice-doc paper-' + value;
+        try { localStorage.setItem(APP_CONFIG.printKey, JSON.stringify(this.settings)); const labels = { a4:'A4 (Normal)', '80':'Ticket 80mm', '56':'Ticket 56mm' }; Toast.show('✅ Format: ' + (labels[value] || value), 'success'); } catch(e) {}
+        const paperSel = $('paperSizeSelect'); if (paperSel) paperSel.value = value;
+        const doc = $('printDoc'); if (doc) doc.className = 'invoice-doc paper-' + value;
     },
     setDefaultFontSize(value) {
         this.settings.fontSize = value;
@@ -2200,6 +2236,38 @@ function createEntityModule(cfg) {
             App.openSheet(cfg.sheet);
         }
     };
+}/* ✅✅✅ دوال تلوين رأس الفاتورة حسب الحالة ✅✅✅ */
+function forceInvoiceHeaderColor() {
+    setTimeout(() => {
+        // Ventes
+        const vHeader = document.querySelector('#sheet-ventes .invoice-header-modern');
+        if (vHeader) {
+            vHeader.classList.remove('state-new', 'state-saved', 'state-modified');
+            if (VentesModule.editingId) {
+                vHeader.classList.add('state-saved');
+            } else {
+                vHeader.classList.add('state-new');
+            }
+        }
+        // Achats
+        const pHeader = document.querySelector('#sheet-achats .invoice-header-modern');
+        if (pHeader) {
+            pHeader.classList.remove('state-new', 'state-saved', 'state-modified');
+            if (AchatsModule.editingId) {
+                pHeader.classList.add('state-saved');
+            } else {
+                pHeader.classList.add('state-new');
+            }
+        }
+    }, 50);
+}
+
+/* 🎨 تغيير اللون إلى "معدّلة" عند أي تعديل على فاتورة محفوظة */
+function setInvoiceModified(type) {
+    const header = document.querySelector(type === 'vente' ? '#sheet-ventes .invoice-header-modern' : '#sheet-achats .invoice-header-modern');
+    if (!header) return;
+    header.classList.remove('state-new', 'state-saved');
+    header.classList.add('state-modified');
 }
 
 function createTransactionModule(cfg) {
@@ -2235,6 +2303,8 @@ function createTransactionModule(cfg) {
             this.renderLines(); this.renderReglements();
             this.refreshArticleOptions(); this.refreshPartyOptions();
             this.updateAccountSummary();
+            // 🆕 Nouveau → Bleu
+            setTimeout(() => forceInvoiceHeaderColor(), 50);
         },
         refreshPartyOptions() {
             const s = $(cfg.partySelect);
@@ -2363,12 +2433,15 @@ function createTransactionModule(cfg) {
             $(cfg.priceInput).style.borderColor = ''; $(cfg.priceInput).style.background = '';
             this.renderLines(); this.refreshArticleOptions(); this.updateAccountSummary();
             if (cfg.paymentOnlyNotice && $(cfg.paymentOnlyNotice)) $(cfg.paymentOnlyNotice).style.display = 'none';
+            // 🎨 Si on modifie une facture déjà sauvegardée → orange
+            if (this.editingId) setInvoiceModified(cfg.isPurchase ? 'achat' : 'vente');
             Toast.show('✅ Ajouté', 'success');
         },
         removeLine(idx) {
             this.lines.splice(idx, 1);
             if (this.editingRowIndex === idx) this.editingRowIndex = null;
             this.renderLines(); this.refreshArticleOptions(); this.updateAccountSummary();
+            if (this.editingId) setInvoiceModified(cfg.isPurchase ? 'achat' : 'vente');
         },
         editLine(idx) { this.editingRowIndex = idx; this.renderLines(); },
         saveEditLine(idx) {
@@ -2386,6 +2459,7 @@ function createTransactionModule(cfg) {
             this.lines[idx] = { ...old, price, qty, total: price * qty };
             this.editingRowIndex = null;
             this.renderLines(); this.updateAccountSummary();
+            if (this.editingId) setInvoiceModified(cfg.isPurchase ? 'achat' : 'vente');
         },
         cancelEdit() { this.editingRowIndex = null; this.renderLines(); },
         renderLines() {
@@ -2436,6 +2510,7 @@ function createTransactionModule(cfg) {
             if (party) BalanceCalculator.recalculate(cfg.balanceType, partyName);
             this.renderReglements(); this.updateAccountSummary();
             $(cfg.regAmount).value = '';
+            if (this.editingId) setInvoiceModified(cfg.isPurchase ? 'achat' : 'vente');
             Toast.show('✅ Paiement ajouté');
         },
         deleteReglement(idx) {
@@ -2447,6 +2522,7 @@ function createTransactionModule(cfg) {
             const pn = $(cfg.partySelect).options[$(cfg.partySelect).selectedIndex]?.textContent || '';
             if (pn) BalanceCalculator.recalculate(cfg.balanceType, pn);
             this.renderReglements(); this.updateAccountSummary();
+            if (this.editingId) setInvoiceModified(cfg.isPurchase ? 'achat' : 'vente');
         },
         updateAccountSummary() {
             const total = this.lines.reduce((a, l) => a + l.total, 0);
@@ -2509,7 +2585,13 @@ function createTransactionModule(cfg) {
                 this.originalBalance = party.balance;
                 this.updateAccountSummary();
                 this.isSaved = true;
-                Toast.show(isNew ? '✅ Enregistré' : '✅ Modifié', 'success');
+                // ✅✅✅ Après sauvegarde → Vert ✅✅✅
+                const header = document.querySelector(cfg.isPurchase ? '#sheet-achats .invoice-header-modern' : '#sheet-ventes .invoice-header-modern');
+                if (header) {
+                    header.classList.remove('state-new', 'state-modified');
+                    header.classList.add('state-saved');
+                }
+                Toast.show(isNew ? '✅ Enregistré (Vert)' : '✅ Modifié (Vert)', 'success');
             } catch(e) {
                 deltasApplied.forEach(([name, delta]) => Stock.adjust(name, -delta, { silent: true, allowNegative: true }));
                 Toast.show('❌ Erreur — stock restauré', 'error');
@@ -2561,6 +2643,14 @@ function createTransactionModule(cfg) {
             this.renderLines(); this.refreshArticleOptions();
             this.renderReglements(); this.updateAccountSummary();
             App.openSheet(cfg.sheet);
+            // ✅ Après chargement → Vert
+            setTimeout(() => {
+                const header = document.querySelector(cfg.isPurchase ? '#sheet-achats .invoice-header-modern' : '#sheet-ventes .invoice-header-modern');
+                if (header) {
+                    header.classList.remove('state-new', 'state-modified');
+                    header.classList.add('state-saved');
+                }
+            }, 100);
         },
         printInvoice() {
             if (this.editingId == null) { Toast.show('⚠️ Enregistrez'); return; }
@@ -3169,17 +3259,14 @@ const Orders = {
                     } else if (change.type === 'removed' && existingIdx !== -1) { State.orders.splice(existingIdx, 1); changed = true; }
                 });
                 if (changed) { Persistence.save(); if (State.currentSection === 'orders') this.render(); }
-            }, err => {
-                console.warn('⚠️ Firestore listener:', err.message);
-                Toast.show('⚠️ Impossible de charger les commandes', 'warning');
-            });
+            }, err => { Toast.show('⚠️ Impossible de charger les commandes', 'warning'); });
         } catch(e) { Toast.show('❌ Erreur connexion Firestore', 'error'); }
     },
     stopRealtimeListener() { if (this._unsubscribe) { this._unsubscribe(); this._unsubscribe = null; } },
     async updateCloudStatus(order, newStatus) {
         if (typeof firebase === 'undefined' || !order.cloudId) return;
         try { await firebase.firestore().collection('orders').doc(order.cloudId).update({ status: newStatus, updatedAt: new Date().toISOString(), updatedByStaff: true }); }
-        catch(e) { console.warn('⚠️ Update cloud:', e.message); }
+        catch(e) {}
     },
     get(id) { return State.orders.find(o => o.id === id || o.cloudId === id); },
     render() {
@@ -4478,7 +4565,7 @@ const AutoSync = {
         if (hash !== this._lastHash) {
             this._lastHash = hash;
             try { await window.db.collection('users').doc(State.currentUser.uid).set(Persistence.serialize()); }
-            catch(e) { console.warn('⚠️ Auto-sync échoué:', e.message); }
+            catch(e) {}
         }
     }
 };
@@ -4491,7 +4578,7 @@ const CompanyInfo = {
             $('cpyPhone1').value = State.companyInfo.phone1 || '';
             $('cpyTaxId').value = State.companyInfo.taxId || '';
             $('cpyCashOpening').value = State.companyInfo.cashOpening || 0;
-        } catch(e) { console.error(e); }
+        } catch(e) {}
     },
     save() {
         try {
@@ -4707,7 +4794,7 @@ const Auth = {
             window.db = firebase.firestore();
             window.storage = firebase.storage();
             State.storageMode = 'cloud';
-        } catch(e) { console.warn('⚠️ Firebase init:', e.message); }
+        } catch(e) {}
     },
     toggleMode() {
         this.isSignup = !this.isSignup;
@@ -4782,7 +4869,7 @@ const Auth = {
             this._showApp();
             Toast.show('👑 Bienvenue', 'success');
             return true;
-        } catch(e) { console.warn('⚠️ Admin login:', e.message); return false; }
+        } catch(e) { return false; }
     },
     async changeAdminPassword() {
         const c = $('staffCurrentPassword').value;
@@ -5304,6 +5391,7 @@ Object.assign(window, {
     ClientsRenderer, FournisseursRenderer, ArticlesRenderer, VentesRenderer, AchatsRenderer,
     RoleManager, ClientPortal, Toast, Utils, State,
     PDFExporter, MonthlyProfitReport, AutoSync, ImageExporter,
+    forceInvoiceHeaderColor, setInvoiceModified,
     downloadTemplate, handleImportFile, confirmImport, cancelImport,
     showNotificationPanel, closeNotificationPanel,
     openChangePasswordModal, closeChangePasswordModal,
