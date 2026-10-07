@@ -336,6 +336,10 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .preview-modal-footer .btn{flex:1;padding:10px;font-size:13px;margin:0;border-radius:10px}
 :fullscreen .phone,:-webkit-full-screen .phone,:-moz-full-screen .phone,:-ms-fullscreen .phone{max-width:100%!important;width:100%!important;height:100dvh!important;border-radius:0!important;margin:0!important;box-shadow:none!important}
 #fullscreenBtn.active{background:rgba(255,255,255,.3)!important}
+
+/* ═══════════════════════════════════════════════════════
+   👤 CLIENT PORTAL
+   ═══════════════════════════════════════════════════════ */
 .client-portal{position:fixed;inset:0;z-index:250;display:none;flex-direction:column;background:var(--bg);color:var(--text);overflow:hidden}
 .client-portal.show{display:flex}
 .cp-header{background:linear-gradient(135deg,var(--secondary),#2a3f7a);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 20px rgba(26,42,92,.3);flex-shrink:0}
@@ -343,7 +347,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .cp-logo span{font-size:12px;background:rgba(255,255,255,.2);padding:2px 8px;border-radius:5px}
 .cp-user{display:flex;align-items:center;gap:8px;font-size:13px}
 .cp-user button{background:rgba(255,255,255,.15);border:none;color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:15px}
-.cp-content{flex:1;overflow-y:auto;padding:14px;padding-bottom:80px}
+.cp-content{flex:1;overflow-y:auto;padding:14px;padding-bottom:100px}
 .cp-balance-card{background:linear-gradient(135deg,#1a2a5c 0%,#4a6cf7 100%);color:#fff;border-radius:18px;padding:22px 20px;text-align:center;margin-bottom:14px;box-shadow:0 8px 28px rgba(74,108,247,.35);position:relative;overflow:hidden}
 .cp-balance-card::before{content:'';position:absolute;top:-50%;right:-20%;width:200px;height:200px;background:radial-gradient(circle,rgba(255,255,255,0.1) 0%,transparent 70%);border-radius:50%}
 .cp-balance-card .cp-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;opacity:.85;position:relative;z-index:1}
@@ -361,7 +365,8 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .cp-kpi .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;margin-top:4px;font-weight:600}
 .cp-section-title{font-size:15px;font-weight:800;color:var(--secondary);margin:16px 0 10px;display:flex;align-items:center;gap:8px}
 .cp-section-title::before{content:'';width:4px;height:18px;background:var(--primary);border-radius:2px}
-.cp-row{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.cp-row{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;transition:all .2s ease}
+.cp-row:hover{transform:translateX(2px);box-shadow:0 2px 8px rgba(0,0,0,.06)}
 .cp-row .cp-row-info .name{font-size:13px;font-weight:700;color:var(--text)}
 .cp-row .cp-row-info .meta{font-size:10px;color:var(--muted);margin-top:3px}
 .cp-row .cp-row-amount{font-size:14px;font-weight:800;text-align:right}
@@ -378,194 +383,63 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .cp-btn.whatsapp{background:linear-gradient(135deg,#25d366,#128C7E)}
 .cp-empty{text-align:center;color:var(--muted);font-size:13px;padding:30px 20px}
 .cp-empty .icon{font-size:48px;display:block;margin-bottom:8px;opacity:.6}
-.admin-badge{display:inline-block;background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;font-size:9px;font-weight:700;padding:3px 10px;border-radius:10px;margin-left:6px}
-.login-hint{font-size:11px;color:var(--muted);background:rgba(241,196,15,.15);border:1px dashed var(--warning);border-radius:8px;padding:8px 12px;margin-bottom:10px;text-align:left;line-height:1.6}
-.login-hint strong{color:var(--warning)}
-.approval-notice{background:linear-gradient(135deg,#fff3cd,#ffe8a3);border:2px dashed #f39c12;border-radius:10px;padding:14px;margin-bottom:10px;text-align:left;font-size:11px;color:#856404;line-height:1.7}
-.approval-notice .icon{font-size:18px;margin-right:4px}
-.approval-notice strong{color:#e67e22}
-.security-info{font-size:10px;color:var(--muted);text-align:center;margin-top:10px;padding:8px;background:rgba(46,204,113,.08);border-radius:8px;border:1px dashed var(--success)}
-.security-info strong{color:var(--success)}
-.login-credentials-box{background:linear-gradient(135deg,#e3f2fd,#bbdefb);border:2px dashed #1976d2;border-radius:10px;padding:12px 14px;margin-top:10px;font-size:11px;color:#0d47a1;text-align:left}
-.login-credentials-box strong{color:#1565c0}
-.toast{position:absolute;top:64px;left:50%;transform:translateX(-50%) translateY(-10px);background:var(--secondary);color:#fff;padding:8px 20px;border-radius:14px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:all .3s ease;z-index:250;white-space:nowrap}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* ═══════════════════════════════════════════════════════
-   📦 ArticlePicker - قائمة المنتجات الذكية
+   💬 زر الدردشة العائم - مُصلَح ✅
    ═══════════════════════════════════════════════════════ */
-.article-picker {
-    position: relative;
-    width: 100%;
-}
-.article-picker-input {
-    width: 100%;
-    padding: 8px 12px;
-    border: 2px solid var(--border);
-    border-radius: 8px;
-    font-family: 'Cairo', sans-serif;
-    font-size: 12px;
-    background: var(--bg);
-    color: var(--text);
-    height: 38px;
-    cursor: pointer;
-}
-.article-picker-input:focus {
-    border-color: var(--primary);
-    outline: none;
-}
-.article-picker-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    max-height: 280px;
-    overflow-y: auto;
-    background: var(--panel);
-    border: 2px solid var(--primary);
-    border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-    z-index: 999;
-    display: none;
-    margin-top: 4px;
-}
-.article-picker-dropdown.show {
-    display: block;
-}
-.article-picker-dropdown::-webkit-scrollbar {
-    width: 8px;
-}
-.article-picker-dropdown::-webkit-scrollbar-track {
-    background: var(--bg);
-}
-.article-picker-dropdown::-webkit-scrollbar-thumb {
-    background: var(--primary);
-    border-radius: 4px;
-}
-.article-option {
-    padding: 10px 12px;
-    cursor: pointer;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: background 0.15s;
-}
-.article-option:last-child { border-bottom: none; }
-.article-option:hover {
-    background: rgba(74,108,247,0.1);
-}
-.article-option.selected {
-    background: rgba(74,108,247,0.15);
-}
-.article-option .info {
-    flex: 1;
-    min-width: 0;
-}
-.article-option .info .name {
-    font-weight: 700;
-    font-size: 12px;
-    color: var(--text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.article-option .info .meta {
-    font-size: 9px;
-    color: var(--muted);
-    margin-top: 2px;
-}
-.article-option .price {
-    font-weight: 800;
-    font-size: 12px;
-    color: var(--primary);
-    margin-left: 8px;
-    white-space: nowrap;
-}
-.article-option .stock-badge {
-    display: inline-block;
-    padding: 1px 6px;
-    border-radius: 8px;
-    font-size: 9px;
-    font-weight: 700;
-    margin-left: 4px;
-}
-.article-option .stock-badge.ok { background: #d4f4dd; color: #27ae60; }
-.article-option .stock-badge.low { background: #ffe8cc; color: #e67e22; }
-.article-option .stock-badge.out { background: #ffd6d6; color: #c0392b; }
-.article-picker-empty {
-    padding: 20px;
-    text-align: center;
-    color: var(--muted);
-    font-size: 12px;
-}
-.article-picker-search {
-    padding: 10px;
-    border-bottom: 2px solid var(--border);
-    background: var(--bg);
-    position: sticky;
-    top: 0;
-    z-index: 1;
-}
-.article-picker-search input {
-    width: 100%;
-    padding: 8px 12px;
-    border: 2px solid var(--border);
-    border-radius: 6px;
-    font-family: 'Cairo', sans-serif;
-    font-size: 12px;
-    background: var(--panel);
-    color: var(--text);
-    height: 36px;
-}
-.article-picker-search input:focus {
-    border-color: var(--primary);
-    outline: none;
-}
-.article-count-badge {
-    font-size: 9px;
-    background: var(--primary);
+.cp-chat-fab {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #25d366, #128C7E);
     color: #fff;
-    padding: 2px 8px;
-    border-radius: 10px;
-    margin-left: 6px;
-    font-weight: 700;
+    border: none;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(37,211,102,.45);
+    z-index: 500;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all .3s ease;
+    padding: 0;
+    font-family: 'Cairo', sans-serif;
+}
+.cp-chat-fab.show { display: flex; }
+.cp-chat-fab:hover { transform: scale(1.1); box-shadow: 0 12px 32px rgba(37,211,102,.6); }
+.cp-chat-fab:active { transform: scale(0.95); }
+.cp-chat-fab .badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #e74c5e;
+    color: #fff;
+    border-radius: 50%;
+    min-width: 20px;
+    height: 20px;
+    font-size: 11px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    border: 2px solid #fff;
+    animation: pulse 1.5s infinite;
+}
+.cp-chat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 28px;
+    line-height: 1;
 }
 
-/* ═══════════════════════════════════════════════════════
-   🔔 إشعارات فورية
-   ═══════════════════════════════════════════════════════ */
-.cp-notification-banner{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-120%);background:linear-gradient(135deg,#1a2a5c,#4a6cf7);color:#fff;padding:12px 20px;border-radius:14px;box-shadow:0 8px 28px rgba(74,108,247,.4);font-size:13px;font-weight:700;z-index:9999;max-width:90%;transition:transform .4s ease;display:flex;align-items:center;gap:10px;cursor:pointer}
-.cp-notification-banner.show{transform:translateX(-50%) translateY(0)}
-.cp-notification-banner.success{background:linear-gradient(135deg,#1a7a40,#2ecc71)}
-.cp-notification-banner.warning{background:linear-gradient(135deg,#d35400,#f39c12)}
-.cp-notification-banner.error{background:linear-gradient(135deg,#c0392b,#e74c5e)}
-
-/* 📊 إحصائيات متقدمة */
-.cp-stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
-.cp-stat-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px;position:relative;overflow:hidden;transition:all .25s ease}
-.cp-stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
-.cp-stat-card .icon-bg{position:absolute;top:-10px;right:-10px;width:70px;height:70px;border-radius:50%;opacity:.1;display:flex;align-items:center;justify-content:center;font-size:40px}
-.cp-stat-card .label{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:700;display:block;letter-spacing:.5px}
-.cp-stat-card .value{font-size:22px;font-weight:800;color:var(--secondary);margin-top:4px;display:block}
-.cp-stat-card .value.positive{color:var(--success)}
-.cp-stat-card .value.negative{color:var(--danger)}
-.cp-stat-card .value.warning{color:var(--warning)}
-.cp-stat-card .sub{font-size:10px;color:var(--muted);margin-top:2px}
-.cp-stat-card.color-blue{border-left:4px solid #4a6cf7}
-.cp-stat-card.color-green{border-left:4px solid #2ecc71}
-.cp-stat-card.color-orange{border-left:4px solid #f39c12}
-.cp-stat-card.color-red{border-left:4px solid #e74c5e}
-.cp-stat-card.color-purple{border-left:4px solid #9b59b6}
-.cp-mini-chart{display:flex;align-items:flex-end;gap:4px;height:60px;margin-top:8px}
-.cp-mini-chart .bar{flex:1;background:linear-gradient(180deg,#4a6cf7,#6b8aff);border-radius:4px 4px 0 0;min-height:4px;transition:all .3s ease}
-.cp-mini-chart .bar:hover{opacity:0.8}
-.cp-mini-chart .bar-label{font-size:8px;color:var(--muted);text-align:center;margin-top:2px}
-
-/* 💬 دردشة مباشرة */
-.cp-chat-fab{position:fixed;bottom:20px;right:20px;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128C7E);color:#fff;border:none;font-size:26px;cursor:pointer;box-shadow:0 8px 24px rgba(37,211,102,.45);z-index:500;display:none;align-items:center;justify-content:center;transition:all .3s ease}
-.cp-chat-fab:hover{transform:scale(1.1);box-shadow:0 12px 32px rgba(37,211,102,.6)}
-.cp-chat-fab .badge{position:absolute;top:-4px;right:-4px;background:#e74c5e;color:#fff;border-radius:50%;min-width:20px;height:20px;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 5px;border:2px solid #fff;animation:pulse 1.5s infinite}
 .cp-chat-panel{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:501;display:none;align-items:flex-end;justify-content:center}
 .cp-chat-panel.show{display:flex}
 .cp-chat-box{background:var(--panel);border-radius:20px 20px 0 0;width:100%;max-width:480px;height:85vh;display:flex;flex-direction:column;color:var(--text);animation:slideUp .3s ease}
@@ -602,7 +476,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .cp-order-modal-header h3{font-size:16px;font-weight:800;margin:0}
 .cp-order-modal-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:15px}
 .cp-order-modal-body{padding:16px 20px}
-
 .cp-order-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:all .25s ease;position:relative;overflow:hidden}
 .cp-order-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
 .cp-order-card.status-pending{border-right:4px solid #f39c12}
@@ -624,7 +497,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .cp-order-actions .btn-reorder{background:linear-gradient(135deg,#9b59b6,#8e44ad)}
 .cp-order-actions .btn-details{background:linear-gradient(135deg,#4a6cf7,#2a4ac7)}
 .cp-order-actions .btn-whatsapp{background:linear-gradient(135deg,#25d366,#128C7E)}
-
 .cp-timeline{position:relative;padding:8px 0;margin:10px 0}
 .cp-timeline-step{display:flex;align-items:flex-start;gap:10px;padding:6px 0;position:relative}
 .cp-timeline-step .dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;background:var(--bg);color:var(--muted);border:2px solid var(--border);z-index:1}
@@ -633,7 +505,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .cp-timeline-step .step-info{flex:1;padding-top:2px}
 .cp-timeline-step .step-info .step-title{font-size:12px;font-weight:700;color:var(--text)}
 .cp-timeline-step .step-info .step-time{font-size:10px;color:var(--muted);margin-top:1px}
-
 .cp-search-box{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:12px;font-family:'Cairo',sans-serif;font-size:14px;margin-bottom:12px;background:var(--panel);color:var(--text);height:46px}
 .cp-filters{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
 .cp-filters::-webkit-scrollbar{height:0}
@@ -641,6 +512,79 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .cp-filter-btn.active{background:linear-gradient(135deg,#4a6cf7,#2a4ac7);color:#fff;border-color:#4a6cf7;box-shadow:0 4px 12px rgba(74,108,247,.3)}
 .cp-filter-btn .count{background:rgba(255,255,255,.25);padding:1px 7px;border-radius:10px;font-size:10px}
 .cp-filter-btn.active .count{background:rgba(255,255,255,.35)}
+
+/* 📊 إحصائيات متقدمة */
+.cp-stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.cp-stat-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px;position:relative;overflow:hidden;transition:all .25s ease}
+.cp-stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.cp-stat-card .icon-bg{position:absolute;top:-10px;right:-10px;width:70px;height:70px;border-radius:50%;opacity:.1;display:flex;align-items:center;justify-content:center;font-size:40px}
+.cp-stat-card .label{font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:700;display:block;letter-spacing:.5px}
+.cp-stat-card .value{font-size:22px;font-weight:800;color:var(--secondary);margin-top:4px;display:block}
+.cp-stat-card .value.positive{color:var(--success)}
+.cp-stat-card .value.negative{color:var(--danger)}
+.cp-stat-card .value.warning{color:var(--warning)}
+.cp-stat-card .sub{font-size:10px;color:var(--muted);margin-top:2px}
+.cp-stat-card.color-blue{border-left:4px solid #4a6cf7}
+.cp-stat-card.color-green{border-left:4px solid #2ecc71}
+.cp-stat-card.color-orange{border-left:4px solid #f39c12}
+.cp-stat-card.color-red{border-left:4px solid #e74c5e}
+.cp-stat-card.color-purple{border-left:4px solid #9b59b6}
+.cp-mini-chart{display:flex;align-items:flex-end;gap:4px;height:60px;margin-top:8px}
+.cp-mini-chart .bar{flex:1;background:linear-gradient(180deg,#4a6cf7,#6b8aff);border-radius:4px 4px 0 0;min-height:4px;transition:all .3s ease}
+.cp-mini-chart .bar:hover{opacity:0.8}
+.cp-mini-chart .bar-label{font-size:8px;color:var(--muted);text-align:center;margin-top:2px}
+
+/* ═══════════════════════════════════════════════════════
+   🔔 إشعارات فورية
+   ═══════════════════════════════════════════════════════ */
+.cp-notification-banner{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-120%);background:linear-gradient(135deg,#1a2a5c,#4a6cf7);color:#fff;padding:12px 20px;border-radius:14px;box-shadow:0 8px 28px rgba(74,108,247,.4);font-size:13px;font-weight:700;z-index:9999;max-width:90%;transition:transform .4s ease;display:flex;align-items:center;gap:10px;cursor:pointer}
+.cp-notification-banner.show{transform:translateX(-50%) translateY(0)}
+.cp-notification-banner.success{background:linear-gradient(135deg,#1a7a40,#2ecc71)}
+.cp-notification-banner.warning{background:linear-gradient(135deg,#d35400,#f39c12)}
+.cp-notification-banner.error{background:linear-gradient(135deg,#c0392b,#e74c5e)}
+
+/* 🎨 Badges supplémentaires */
+.admin-badge{display:inline-block;background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;font-size:9px;font-weight:700;padding:3px 10px;border-radius:10px;margin-left:6px}
+.login-hint{font-size:11px;color:var(--muted);background:rgba(241,196,15,.15);border:1px dashed var(--warning);border-radius:8px;padding:8px 12px;margin-bottom:10px;text-align:left;line-height:1.6}
+.login-hint strong{color:var(--warning)}
+.approval-notice{background:linear-gradient(135deg,#fff3cd,#ffe8a3);border:2px dashed #f39c12;border-radius:10px;padding:14px;margin-bottom:10px;text-align:left;font-size:11px;color:#856404;line-height:1.7}
+.approval-notice .icon{font-size:18px;margin-right:4px}
+.approval-notice strong{color:#e67e22}
+.security-info{font-size:10px;color:var(--muted);text-align:center;margin-top:10px;padding:8px;background:rgba(46,204,113,.08);border-radius:8px;border:1px dashed var(--success)}
+.security-info strong{color:var(--success)}
+.login-credentials-box{background:linear-gradient(135deg,#e3f2fd,#bbdefb);border:2px dashed #1976d2;border-radius:10px;padding:12px 14px;margin-top:10px;font-size:11px;color:#0d47a1;text-align:left}
+.login-credentials-box strong{color:#1565c0}
+.toast{position:absolute;top:64px;left:50%;transform:translateX(-50%) translateY(-10px);background:var(--secondary);color:#fff;padding:8px 20px;border-radius:14px;font-size:13px;font-weight:700;opacity:0;pointer-events:none;transition:all .3s ease;z-index:250;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ═══════════════════════════════════════════════════════
+   📦 ArticlePicker - قائمة المنتجات الذكية
+   ═══════════════════════════════════════════════════════ */
+.article-picker{position:relative;width:100%}
+.article-picker-input{width:100%;padding:8px 12px;border:2px solid var(--border);border-radius:8px;font-family:'Cairo',sans-serif;font-size:12px;background:var(--bg);color:var(--text);height:38px;cursor:pointer}
+.article-picker-input:focus{border-color:var(--primary);outline:none}
+.article-picker-dropdown{position:absolute;top:100%;left:0;right:0;max-height:280px;overflow-y:auto;background:var(--panel);border:2px solid var(--primary);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.15);z-index:9999;display:none;margin-top:4px}
+.article-picker-dropdown.show{display:block}
+.article-picker-dropdown::-webkit-scrollbar{width:8px}
+.article-picker-dropdown::-webkit-scrollbar-track{background:var(--bg)}
+.article-picker-dropdown::-webkit-scrollbar-thumb{background:var(--primary);border-radius:4px}
+.article-option{padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;transition:background 0.15s}
+.article-option:last-child{border-bottom:none}
+.article-option:hover{background:rgba(74,108,247,0.1)}
+.article-option.selected{background:rgba(74,108,247,0.15)}
+.article-option .info{flex:1;min-width:0}
+.article-option .info .name{font-weight:700;font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.article-option .info .meta{font-size:9px;color:var(--muted);margin-top:2px}
+.article-option .price{font-weight:800;font-size:12px;color:var(--primary);margin-left:8px;white-space:nowrap}
+.article-option .stock-badge{display:inline-block;padding:1px 6px;border-radius:8px;font-size:9px;font-weight:700;margin-left:4px}
+.article-option .stock-badge.ok{background:#d4f4dd;color:#27ae60}
+.article-option .stock-badge.low{background:#ffe8cc;color:#e67e22}
+.article-option .stock-badge.out{background:#ffd6d6;color:#c0392b}
+.article-picker-empty{padding:20px;text-align:center;color:var(--muted);font-size:12px}
+.article-picker-search{padding:10px;border-bottom:2px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:1}
+.article-picker-search input{width:100%;padding:8px 12px;border:2px solid var(--border);border-radius:6px;font-family:'Cairo',sans-serif;font-size:12px;background:var(--panel);color:var(--text);height:36px}
+.article-picker-search input:focus{border-color:var(--primary);outline:none}
+.article-count-badge{font-size:9px;background:var(--primary);color:#fff;padding:2px 8px;border-radius:10px;margin-left:6px;font-weight:700}
 </style>
 </head>
 <body><!-- LOGIN -->
@@ -1276,7 +1220,20 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 <div class="modal-overlay" id="clientOrderModal">
 <div class="modal-box" style="max-width:420px;">
 <h3>🛒 Nouvelle commande</h3>
-<div class="field"><label>📦 Produit</label><select id="coArticle" onchange="ClientOrder.fillPrice()"><option value="">-- Choisir --</option></select><span class="stock-hint" id="coStockHint">Stock: -</span></div>
+<div class="field">
+    <label>📦 Produit <span class="article-count-badge" id="coArticleCount">0</span></label>
+    <div class="article-picker" id="coArticlePicker">
+        <input type="text" class="article-picker-input" id="coArticleInput" placeholder="🔍 Cliquez pour choisir un produit..." readonly onclick="ArticlePicker.open('co')">
+        <div class="article-picker-dropdown" id="coArticleDropdown">
+            <div class="article-picker-search">
+                <input type="text" id="coArticleSearch" placeholder="🔍 Rechercher..." oninput="ArticlePicker.filter('co')" onclick="event.stopPropagation()">
+            </div>
+            <div id="coArticleOptions"></div>
+        </div>
+        <select id="coArticle" style="display:none;"><option value="">-- Choisir --</option></select>
+    </div>
+    <span class="stock-hint" id="coStockHint">Stock: -</span>
+</div>
 <div class="field-row-2">
 <div class="field"><label>Prix (TND)</label><input type="number" step="0.001" id="coPrice" readonly style="background:#eef0f6;"></div>
 <div class="field"><label>Quantité</label><input type="number" min="1" value="1" id="coQty"></div>
@@ -1451,8 +1408,9 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
     <span id="cpNotifText">Notification</span>
 </div>
 
+<!-- ✅ زر الدردشة العائم - مُصلَح -->
 <button class="cp-chat-fab" id="cpChatFab" onclick="ClientChat.open()">
-    💬
+    <span class="cp-chat-icon">💬</span>
     <span class="badge" id="cpChatBadge" style="display:none;">0</span>
 </button>
 
@@ -1598,7 +1556,7 @@ const $ = Utils.$;
 const esc = Utils.escapeHTML.bind(Utils);
 
 // ═══════════════════════════════════════════════════════
-// 🔊 SoundSystem - أصوات Web Audio API
+// 🔊 SoundSystem
 // ═══════════════════════════════════════════════════════
 const SoundSystem = {
     _ctx: null,
@@ -2277,7 +2235,7 @@ const RoleManager = {
 };
 
 // ═══════════════════════════════════════════════════════
-// 📦 ArticlePicker - قائمة المنتجات الذكية الكاملة
+// 📦 ArticlePicker (vi, pi, co)
 // ═══════════════════════════════════════════════════════
 const ArticlePicker = {
     _currentPrefix: null,
@@ -2290,7 +2248,6 @@ const ArticlePicker = {
         const search = $(prefix + 'ArticleSearch');
         if (!dropdown) return;
 
-        // إغلاق القوائم الأخرى
         document.querySelectorAll('.article-picker-dropdown').forEach(d => {
             if (d.id !== prefix + 'ArticleDropdown') d.classList.remove('show');
         });
@@ -2302,7 +2259,6 @@ const ArticlePicker = {
         }
         this.render(prefix);
 
-        // إغلاق عند النقر خارجاً
         if (this._handler) document.removeEventListener('click', this._handler);
         this._handler = (e) => {
             if (!e.target.closest('.article-picker')) {
@@ -2394,6 +2350,7 @@ const ArticlePicker = {
 
         if (prefix === 'vi') VentesModule.fillArticle();
         else if (prefix === 'pi') AchatsModule.fillArticle();
+        else if (prefix === 'co') ClientOrder.fillPrice();
 
         this.close(prefix);
     },
@@ -2402,6 +2359,7 @@ const ArticlePicker = {
         let lines = [];
         if (prefix === 'vi') lines = VentesModule.lines || [];
         else if (prefix === 'pi') lines = AchatsModule.lines || [];
+        else if (prefix === 'co') lines = ClientOrder.lines || [];
         return lines.map(l => {
             const a = State.articles.find(x => x.name === l.name);
             return a ? a.id : null;
@@ -2419,7 +2377,7 @@ const ArticlePicker = {
 };
 
 // ═══════════════════════════════════════════════════════
-// 📄 تلوين رأس الفاتورة حسب الحالة
+// 📄 تلوين رأس الفاتورة
 // ═══════════════════════════════════════════════════════
 function forceInvoiceHeaderColor() {
     setTimeout(() => {
@@ -2540,7 +2498,6 @@ function createTransactionModule(cfg) {
             $(cfg.qtyInput).value = 1;
             $(cfg.totalInput).value = '';
             if (cfg.stockHint) $(cfg.stockHint).textContent = 'Stock: -';
-            // reset ArticlePicker
             const prefix = cfg.prefix === 'VTE' ? 'vi' : 'pi';
             ArticlePicker.reset(prefix);
             this.renderLines(); this.renderReglements();
@@ -3493,31 +3450,45 @@ const AchatsModule = createTransactionModule({
     paymentOnlyNotice:'pPaymentOnlyNotice', renderer: AchatsRenderer
 });
 
+// ═══════════════════════════════════════════════════════
+// 📦 ClientOrder (مع ArticlePicker)
+// ═══════════════════════════════════════════════════════
 const ClientOrder = {
     lines: [],
     open() {
-        this.lines = []; this.renderArticles(); this.renderLines();
-        $('coQty').value = 1; $('coPrice').value = ''; $('coNote').value = ''; $('coError').textContent = '';
+        this.lines = []; 
+        if ($('coArticleSearch')) $('coArticleSearch').value = '';
+        if ($('coArticle')) $('coArticle').value = '';
+        if ($('coArticleInput')) $('coArticleInput').value = '';
+        if ($('coPrice')) $('coPrice').value = '';
+        if ($('coStockHint')) $('coStockHint').textContent = 'Stock: -';
+        ArticlePicker.reset('co');
+        this.renderArticles(); 
+        this.renderLines();
+        $('coQty').value = 1; 
+        $('coNote').value = ''; 
+        $('coError').textContent = '';
         $('clientOrderModal').classList.add('show');
     },
     close() { $('clientOrderModal').classList.remove('show'); },
-    renderArticles() {
-        const sel = $('coArticle');
-        if (!sel) return;
-        sel.innerHTML = '<option value="">-- Choisir --</option>' + State.articles.filter(a => (a.stock || 0) > 0).map(a => `<option value="${esc(a.id)}">${esc(a.name)}</option>`).join('');
-    },
+    renderArticles() { ArticlePicker.render('co'); },
     fillPrice() {
         const a = State.articles.find(x => x.id == $('coArticle').value);
         const hint = $('coStockHint');
         if (!a) { $('coPrice').value = ''; hint.textContent = 'Stock: -'; return; }
         let price = a.price;
         const client = State.currentClient;
+        let isSpecial = false;
         if (client && client.specialPrices) {
             const sp = client.specialPrices.find(s => s.name === a.name);
-            if (sp) { price = sp.price; hint.textContent = `⭐ Prix spécial (Stock: ${a.stock})`; }
-            else hint.textContent = `Stock: ${a.stock}`;
-        } else hint.textContent = `Stock: ${a.stock}`;
+            if (sp) { price = sp.price; isSpecial = true; }
+        }
         $('coPrice').value = price.toFixed(3);
+        const stock = a.stock || 0;
+        let stockMsg = '';
+        if (stock <= 0) stockMsg = ' • ⚠️ <b style="color:#e74c5e;">Épuisé (commande possible)</b>';
+        else if (stock <= 5) stockMsg = ' • <b style="color:#f39c12;">Stock faible</b>';
+        hint.innerHTML = `📦 Stock: <b>${stock}</b>${stockMsg}${isSpecial ? ' • ⭐ <b style="color:#f39c12;">Prix spécial</b>' : ''}`;
     },
     addLine() {
         const a = State.articles.find(x => x.id == $('coArticle').value);
@@ -3525,15 +3496,22 @@ const ClientOrder = {
         const price = parseFloat($('coPrice').value) || 0;
         const qty = parseFloat($('coQty').value) || 0;
         if (price <= 0 || qty <= 0) { $('coError').textContent = '⚠️ Prix/Qté invalides'; return; }
-        if (qty > (a.stock || 0)) { $('coError').textContent = `⚠️ Stock insuffisant: ${a.stock}`; return; }
+        // ✅ السماح بالطلب حتى مع stock = 0 (البائع يقرر لاحقاً)
         const existing = this.lines.find(l => l.name === a.name);
         if (existing) { existing.qty += qty; existing.total = existing.price * existing.qty; }
         else this.lines.push({ name: a.name, articleId: a.id, price, qty, total: price * qty });
-        $('coError').textContent = ''; $('coArticle').value = ''; $('coPrice').value = ''; $('coQty').value = 1; $('coStockHint').textContent = 'Stock: -';
+        $('coError').textContent = '';
+        $('coArticle').value = '';
+        $('coArticleInput').value = '';
+        $('coPrice').value = '';
+        $('coQty').value = 1;
+        $('coStockHint').textContent = 'Stock: -';
+        ArticlePicker.reset('co');
+        this.renderArticles();
         this.renderLines();
         Toast.show('✅ Ajouté', 'success');
     },
-    removeLine(i) { this.lines.splice(i, 1); this.renderLines(); },
+    removeLine(i) { this.lines.splice(i, 1); this.renderLines(); this.renderArticles(); },
     renderLines() {
         const c = $('coLinesList');
         if (!c) return;
@@ -3610,6 +3588,9 @@ const ClientOrder = {
     }
 };
 
+// ═══════════════════════════════════════════════════════
+// 👤 ClientPortal - مع تفاصيل الفاتورة عند النقر ✅
+// ═══════════════════════════════════════════════════════
 const ClientPortal = {
     _ordersUnsub: null, _ventesUnsub: null,
     _orderFilter: 'all',
@@ -3634,6 +3615,9 @@ const ClientPortal = {
             ClientNotifications.init();
             ClientNotifications.startWatching();
             ClientChat.init();
+            // ✅ إظهار زر الدردشة العائم
+            const fab = $('cpChatFab');
+            if (fab) fab.classList.add('show');
         }, 500);
     },
     hide() {
@@ -3644,6 +3628,8 @@ const ClientPortal = {
         State.currentClient = null;
         ClientNotifications.stopWatching();
         ClientChat.stopRealtimeListener();
+        const fab = $('cpChatFab');
+        if (fab) fab.classList.remove('show');
     },
     toggleSound() {
         const enabled = SoundSystem.toggle();
@@ -3755,7 +3741,14 @@ const ClientPortal = {
             else if (rem >= v.total - 0.001) { badge = '⏳ Non payée'; badgeClass = 'pending'; }
             else { badge = '🔄 Partielle'; badgeClass = 'partial'; }
             const amountDisplay = isPaymentOnly ? paid : (v.total || 0);
-            return `<div class="cp-row"><div class="cp-row-info"><div class="name">${esc(v.num)}<span class="cp-badge ${badgeClass}">${badge}</span></div><div class="meta">${esc(Utils.formatDate(v.date))}</div></div><div class="cp-row-amount">${amountDisplay.toFixed(3)} TND${!isPaymentOnly && rem > 0.001 ? `<small style="color:var(--danger);">Reste: ${rem.toFixed(3)}</small>` : ''}</div></div>`;
+            // ✅ الفاتورة قابلة للنقر لعرض التفاصيل
+            return `<div class="cp-row" style="cursor:pointer;" onclick="ClientPortal.showInvoiceDetail('${esc(v.num)}')">
+                <div class="cp-row-info">
+                    <div class="name">📄 ${esc(v.num)}<span class="cp-badge ${badgeClass}">${badge}</span></div>
+                    <div class="meta">${esc(Utils.formatDate(v.date))}</div>
+                </div>
+                <div class="cp-row-amount">${amountDisplay.toFixed(3)} TND${!isPaymentOnly && rem > 0.001 ? `<small style="color:var(--danger);">Reste: ${rem.toFixed(3)}</small>` : ''}</div>
+            </div>`;
         }).join('');
     },
     renderPayments(payments) {
@@ -3831,6 +3824,121 @@ const ClientPortal = {
                 <div class="cp-order-actions">${actionBtns}</div>
             </div>`;
         }).join('');
+    },
+    // ✅ دالة عرض تفاصيل الفاتورة (Modal جميل)
+    showInvoiceDetail(invoiceNum) {
+        if (!invoiceNum) return;
+        const inv = State.ventes.find(v => v.num === invoiceNum);
+        if (!inv) { Toast.show('❌ Facture introuvable', 'error'); return; }
+        
+        const payments = State.caisseClients.filter(p => p.invoiceNum === invoiceNum);
+        const totalPaid = payments.reduce((s, p) => s + p.amount, 0);
+        const remaining = inv.total - totalPaid;
+        const isPaymentOnly = !inv.lines || !inv.lines.length;
+        
+        let status, statusColor, statusIcon;
+        if (isPaymentOnly) { status = 'Règlement'; statusColor = '#3498db'; statusIcon = '💰'; }
+        else if (remaining <= 0.001) { status = 'Payée'; statusColor = '#2ecc71'; statusIcon = '✅'; }
+        else if (remaining >= inv.total - 0.001) { status = 'Non payée'; statusColor = '#e74c5e'; statusIcon = '⏳'; }
+        else { status = 'Partielle'; statusColor = '#f39c12'; statusIcon = '🔄'; }
+        
+        const itemsHTML = (inv.lines || []).map(l => `
+            <div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--bg);border-radius:8px;margin-bottom:4px;">
+                <div style="flex:1;">
+                    <div style="font-weight:600;font-size:12px;">${esc(l.name)}</div>
+                    <div style="font-size:10px;color:var(--muted);margin-top:2px;">${Number(l.price).toFixed(3)} × ${Number(l.qty)}</div>
+                </div>
+                <div style="font-weight:800;color:var(--primary);font-size:13px;">${Number(l.total).toFixed(3)} TND</div>
+            </div>
+        `).join('');
+        
+        const paymentsHTML = payments.map(p => `
+            <div style="display:flex;justify-content:space-between;padding:6px 10px;background:#e8f5ee;border-radius:6px;margin-bottom:3px;font-size:11px;">
+                <span>💳 ${esc(p.regType || 'Espèces')} — ${esc(Utils.formatDate(p.date))}</span>
+                <span style="font-weight:700;color:#27ae60;">${p.amount.toFixed(3)} TND</span>
+            </div>
+        `).join('');
+        
+        const existing = document.getElementById('cpInvoiceDetailModal');
+        if (existing) existing.remove();
+        
+        const modalHTML = `
+            <div id="cpInvoiceDetailModal" class="cp-order-modal show" style="display:flex;">
+                <div class="cp-order-modal-box" style="max-width:440px;">
+                    <div class="cp-order-modal-header" style="background:linear-gradient(135deg,${statusColor},${statusColor}dd);">
+                        <h3>${statusIcon} Facture ${esc(inv.num)}</h3>
+                        <button class="cp-order-modal-close" onclick="document.getElementById('cpInvoiceDetailModal').remove()">✕</button>
+                    </div>
+                    <div class="cp-order-modal-body">
+                        <div style="text-align:center;padding:12px;background:${statusColor}15;border-radius:12px;margin-bottom:14px;border:2px solid ${statusColor};">
+                            <div style="font-size:24px;margin-bottom:2px;">${statusIcon}</div>
+                            <div style="font-size:14px;font-weight:800;color:${statusColor};">${status.toUpperCase()}</div>
+                            <div style="font-size:11px;color:var(--muted);margin-top:2px;">📅 ${esc(Utils.formatDate(inv.date))}</div>
+                        </div>
+                        
+                        ${isPaymentOnly ? `
+                            <div style="text-align:center;padding:14px;background:#e3f2fd;border-radius:10px;color:#1976d2;font-size:12px;margin-bottom:10px;">
+                                💰 <strong>Règlement de compte</strong>
+                            </div>
+                        ` : `
+                            <div class="section-title" style="font-size:12px;margin:10px 0 8px;">📦 Produits</div>
+                            ${itemsHTML}
+                        `}
+                        
+                        ${payments.length > 0 ? `
+                            <div class="section-title" style="font-size:12px;margin:14px 0 8px;">💳 Paiements (${payments.length})</div>
+                            ${paymentsHTML}
+                        ` : ''}
+                        
+                        <div style="margin-top:14px;background:linear-gradient(135deg,#1a2a5c,#4a6cf7);color:#fff;border-radius:10px;padding:12px;">
+                            <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;">
+                                <span>💰 Total facture:</span>
+                                <span style="font-weight:700;">${inv.total.toFixed(3)} TND</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12px;">
+                                <span>💳 Payé:</span>
+                                <span style="font-weight:700;color:#a8ffcb;">${totalPaid.toFixed(3)} TND</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-top:1px solid rgba(255,255,255,.2);margin-top:6px;padding-top:8px;">
+                                <span>📊 Reste:</span>
+                                <span style="font-weight:800;color:${remaining > 0.001 ? '#ffb3b3' : '#a8ffcb'};">${remaining.toFixed(3)} TND</span>
+                            </div>
+                        </div>
+                        
+                        <div style="display:flex;gap:8px;margin-top:14px;">
+                            <button onclick="document.getElementById('cpInvoiceDetailModal').remove()" 
+                                style="flex:1;padding:10px;background:var(--bg);color:var(--text);border:2px solid var(--border);border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;">
+                                ✕ Fermer
+                            </button>
+                            <button onclick="ClientPortal.shareInvoiceWhatsapp('${esc(inv.num)}')" 
+                                style="flex:1;padding:10px;background:linear-gradient(135deg,#25d366,#128C7E);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;">
+                                📱 WhatsApp
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        SoundSystem.notification();
+    },
+    shareInvoiceWhatsapp(invoiceNum) {
+        const inv = State.ventes.find(v => v.num === invoiceNum);
+        if (!inv) return;
+        const paid = (inv.reglements || []).reduce((s, r) => s + r.amount, 0);
+        const remaining = inv.total - paid;
+        let text = `📄 *Facture ${inv.num}*\n📅 ${Utils.formatDate(inv.date)}\n🏢 ${State.companyInfo.name}\n\n`;
+        if (inv.lines && inv.lines.length) {
+            text += `📦 *Produits:*\n`;
+            inv.lines.forEach(l => { text += `• ${l.name} × ${l.qty} = ${l.total.toFixed(3)} TND\n`; });
+            text += `\n`;
+        }
+        text += `💰 Total: ${inv.total.toFixed(3)} TND\n💳 Payé: ${paid.toFixed(3)} TND\n📊 Reste: ${remaining.toFixed(3)} TND`;
+        const phone = (State.companyInfo.phone1 || '').replace(/\D/g, '');
+        const url = phone ? `https://wa.me/216${phone}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
+        window.open(url, '_blank');
+        Toast.show('✅ WhatsApp ouvert', 'success');
     },
     showOrderDetail(id) {
         const o = State.orders.find(x => x.id === id || x.cloudId === id);
@@ -4297,18 +4405,11 @@ const ClientPortal = {
 // 🔔 ClientNotifications
 // ═══════════════════════════════════════════════════════
 const ClientNotifications = {
-    _banner: null,
-    _timer: null,
-    _watcher: null,
-    _lastOrdersState: {},
-
+    _banner: null, _timer: null, _watcher: null, _lastOrdersState: {},
     init() {
         this._banner = $('cpNotificationBanner');
-        State.orders.forEach(o => {
-            this._lastOrdersState[o.id || o.cloudId] = o.status;
-        });
+        State.orders.forEach(o => { this._lastOrdersState[o.id || o.cloudId] = o.status; });
     },
-
     show(text, type = 'info', duration = 4000) {
         if (!this._banner) return;
         const icons = { info: '🔔', success: '✅', warning: '⚠️', error: '❌' };
@@ -4320,11 +4421,8 @@ const ClientNotifications = {
         else if (type === 'warning') SoundSystem.warning();
         else SoundSystem.notification();
         clearTimeout(this._timer);
-        this._timer = setTimeout(() => {
-            this._banner.classList.remove('show');
-        }, duration);
+        this._timer = setTimeout(() => { this._banner.classList.remove('show'); }, duration);
     },
-
     checkForChanges() {
         State.orders.forEach(o => {
             const key = o.id || o.cloudId;
@@ -4335,55 +4433,35 @@ const ClientNotifications = {
                 SoundSystem.order();
             }
             if (oldStatus && oldStatus !== newStatus) {
-                let msg = '';
-                let type = 'info';
+                let msg = ''; let type = 'info';
                 switch (newStatus) {
-                    case 'approved':
-                        msg = `✅ Votre commande ${o.num} a été acceptée!`;
-                        type = 'success';
-                        break;
-                    case 'rejected':
-                        msg = `❌ Votre commande ${o.num} a été refusée`;
-                        type = 'error';
-                        break;
-                    case 'delivered':
-                        msg = `🚚 Votre commande ${o.num} est livrée!`;
-                        type = 'success';
-                        break;
+                    case 'approved': msg = `✅ Votre commande ${o.num} a été acceptée!`; type = 'success'; break;
+                    case 'rejected': msg = `❌ Votre commande ${o.num} a été refusée`; type = 'error'; break;
+                    case 'delivered': msg = `🚚 Votre commande ${o.num} est livrée!`; type = 'success'; break;
                 }
-                if (msg) {
-                    this.show(msg, type, 5000);
-                    NotificationSystem.add('Mise à jour commande', msg, type.toUpperCase());
-                }
+                if (msg) { this.show(msg, type, 5000); NotificationSystem.add('Mise à jour commande', msg, type.toUpperCase()); }
             }
             this._lastOrdersState[key] = newStatus;
         });
     },
-
     startWatching() {
         if (this._watcher) clearInterval(this._watcher);
         this._watcher = setInterval(() => this.checkForChanges(), 3000);
     },
-
-    stopWatching() {
-        if (this._watcher) { clearInterval(this._watcher); this._watcher = null; }
-    }
+    stopWatching() { if (this._watcher) { clearInterval(this._watcher); this._watcher = null; } }
 };
 
 // ═══════════════════════════════════════════════════════
-// 💬 ClientChat - بدون رد تلقائي
+// 💬 ClientChat (بدون رد تلقائي)
 // ═══════════════════════════════════════════════════════
 const ClientChat = {
-    _unsubscribe: null,
-    _messages: [],
-
+    _unsubscribe: null, _messages: [],
     init() {
         const fab = $('cpChatFab');
-        if (fab) fab.style.display = 'flex';
+        if (fab) fab.classList.add('show');
         this.loadMessages();
         this.startRealtimeListener();
     },
-
     open() {
         const panel = $('cpChatPanel');
         if (!panel) return;
@@ -4392,24 +4470,12 @@ const ClientChat = {
         const badge = $('cpChatBadge');
         if (badge) badge.style.display = 'none';
         setTimeout(() => {
-            const input = $('cpChatInput');
-            if (input) input.focus();
-            const body = $('cpChatBody');
-            if (body) body.scrollTop = body.scrollHeight;
+            const input = $('cpChatInput'); if (input) input.focus();
+            const body = $('cpChatBody'); if (body) body.scrollTop = body.scrollHeight;
         }, 100);
     },
-
-    close() {
-        const panel = $('cpChatPanel');
-        if (panel) panel.classList.remove('show');
-    },
-
-    getChatId() {
-        const client = State.currentClient;
-        if (!client) return null;
-        return 'chat_client_' + client.id;
-    },
-
+    close() { const panel = $('cpChatPanel'); if (panel) panel.classList.remove('show'); },
+    getChatId() { const client = State.currentClient; if (!client) return null; return 'chat_client_' + client.id; },
     loadMessages() {
         const chatId = this.getChatId();
         if (!chatId) return;
@@ -4417,43 +4483,27 @@ const ClientChat = {
             const saved = localStorage.getItem('gtrpos_' + chatId);
             this._messages = saved ? JSON.parse(saved) : [];
             if (!this._messages.length) {
-                this._messages.push({
-                    id: 'welcome',
-                    from: 'vendor',
-                    text: `👋 Bonjour ${State.currentClient.name}, comment pouvons-nous vous aider ?`,
-                    timestamp: new Date().toISOString()
-                });
+                this._messages.push({ id: 'welcome', from: 'vendor', text: `👋 Bonjour ${State.currentClient.name}, comment pouvons-nous vous aider ?`, timestamp: new Date().toISOString() });
                 this.saveMessages();
             }
         } catch(e) { this._messages = []; }
     },
-
     saveMessages() {
         const chatId = this.getChatId();
         if (!chatId) return;
         try { localStorage.setItem('gtrpos_' + chatId, JSON.stringify(this._messages.slice(-200))); } catch(e) {}
     },
-
     renderMessages() {
         const body = $('cpChatBody');
         if (!body) return;
-        if (!this._messages.length) {
-            body.innerHTML = '<div class="cp-empty">💬 Démarrez la conversation</div>';
-            return;
-        }
+        if (!this._messages.length) { body.innerHTML = '<div class="cp-empty">💬 Démarrez la conversation</div>'; return; }
         body.innerHTML = this._messages.map(m => {
             const time = new Date(m.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-            if (m.from === 'system') {
-                return `<div class="cp-chat-msg system">${esc(m.text)}</div>`;
-            }
-            return `<div class="cp-chat-msg ${m.from === 'client' ? 'client' : 'vendor'}">
-                ${esc(m.text)}
-                <span class="time">${time}</span>
-            </div>`;
+            if (m.from === 'system') return `<div class="cp-chat-msg system">${esc(m.text)}</div>`;
+            return `<div class="cp-chat-msg ${m.from === 'client' ? 'client' : 'vendor'}">${esc(m.text)}<span class="time">${time}</span></div>`;
         }).join('');
         setTimeout(() => { body.scrollTop = body.scrollHeight; }, 50);
     },
-
     async send() {
         const input = $('cpChatInput');
         if (!input) return;
@@ -4463,12 +4513,8 @@ const ClientChat = {
         if (!client) return;
         const msg = {
             id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-            from: 'client',
-            text: text,
-            timestamp: new Date().toISOString(),
-            clientId: client.id,
-            clientName: client.name,
-            read: false
+            from: 'client', text: text, timestamp: new Date().toISOString(),
+            clientId: client.id, clientName: client.name, read: false
         };
         this._messages.push(msg);
         this.saveMessages();
@@ -4478,19 +4524,13 @@ const ClientChat = {
         if (typeof firebase !== 'undefined' && window.db) {
             try {
                 await window.db.collection('client_chats').doc(this.getChatId()).set({
-                    clientId: client.id,
-                    clientName: client.name,
-                    clientLogin: client.login || '',
-                    lastMessage: text,
-                    lastMessageAt: msg.timestamp,
-                    messages: this._messages.slice(-100),
-                    unreadByVendor: true
+                    clientId: client.id, clientName: client.name, clientLogin: client.login || '',
+                    lastMessage: text, lastMessageAt: msg.timestamp,
+                    messages: this._messages.slice(-100), unreadByVendor: true
                 }, { merge: true });
-            } catch(e) { console.warn('⚠️ Chat sync failed:', e.message); }
+            } catch(e) {}
         }
-        // ✅ الرد التلقائي أُزيل — البائع فقط يمكنه الرد
     },
-
     startRealtimeListener() {
         if (typeof firebase === 'undefined' || !window.db) return;
         const client = State.currentClient;
@@ -4531,12 +4571,12 @@ const ClientChat = {
             }, err => console.warn('⚠️ Chat listener:', err.message));
         } catch(e) {}
     },
-
-    stopRealtimeListener() {
-        if (this._unsubscribe) { this._unsubscribe(); this._unsubscribe = null; }
-    }
+    stopRealtimeListener() { if (this._unsubscribe) { this._unsubscribe(); this._unsubscribe = null; } }
 };
 
+// ═══════════════════════════════════════════════════════
+// 📋 Orders (Staff)
+// ═══════════════════════════════════════════════════════
 const Orders = {
     filter: 'pending', _unsubscribe: null,
     startRealtimeListener() {
@@ -4603,20 +4643,32 @@ const Orders = {
             </div>`;
         }).join('');
     },
-    approve(id) {
+    async approve(id) {
         const o = this.get(id);
         if (!o) { Toast.show('❌ Commande introuvable', 'error'); return; }
         if (!o.stockDecremented) {
             const warnings = [];
+            let hasOutOfStock = false;
             o.lines.forEach(line => {
                 const article = State.articles.find(a => a.name === line.name);
-                if (!article) { warnings.push(`"${line.name}" introuvable`); return; }
-                if ((article.stock || 0) < line.qty) warnings.push(`"${line.name}": stock insuffisant`);
+                if (!article) { warnings.push(`❌ "${line.name}" introuvable`); return; }
+                if ((article.stock || 0) <= 0) { hasOutOfStock = true; warnings.push(`⚠️ "${line.name}" épuisé (0)`); }
+                else if ((article.stock || 0) < line.qty) warnings.push(`⚠️ "${line.name}": stock ${article.stock} < ${line.qty}`);
+            });
+            if (hasOutOfStock) {
+                const ok = await CustomConfirm.show(
+                    `⚠️ Certains produits sont épuisés:\n\n${warnings.join('\n')}\n\nContinuer et accepter ?\n\n(Stock deviendra négatif)`,
+                    '⚠️ Stock insuffisant'
+                );
+                if (!ok) return;
+            }
+            o.lines.forEach(line => {
+                const article = State.articles.find(a => a.name === line.name);
+                if (!article) return;
                 Stock.adjust(line.name, -line.qty, { silent: true, allowNegative: true });
             });
             o.stockDecremented = true;
             o.stockDecrementedAt = new Date().toISOString();
-            if (warnings.length) Toast.show(`⚠️ Stock: ${warnings.length} article(s)`, 'warning');
         }
         o.status = 'approved';
         o.approvedAt = new Date().toISOString();
@@ -4823,9 +4875,17 @@ function createHistoryModule(cfg) {
             if (!num) return;
             const inv = cfg.docs().find(d => d.num === num);
             if (!inv) { Toast.show('❌ Facture introuvable', 'error'); return; }
-            const module = cfg.invoiceModule();
-            if (!module || !module.load) return;
-            module.load(inv.id);
+            // ✅ للعملاء: عرض تفاصيل. للـ Staff: تأكيد
+            if (State.currentUser && State.currentUser.isClient && ClientPortal.showInvoiceDetail) {
+                ClientPortal.showInvoiceDetail(num);
+                return;
+            }
+            CustomConfirm.show(`Ouvrir la facture ${num} pour modification ?`, '📄 Ouvrir').then(ok => {
+                if (ok) {
+                    const module = cfg.invoiceModule();
+                    if (module && module.load) module.load(inv.id);
+                }
+            });
         },
         buildSummaryCard(e, ti, tp, tpay, cb) {
             const loginLine = e.login ? `<div><span class="label">🔑 Login:</span><span class="value" style="font-family:monospace;">${esc(e.login)}</span></div>` : '';
