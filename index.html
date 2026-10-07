@@ -243,11 +243,11 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .account-summary-modern .summary-item .value.positive{color:var(--success)}
 .account-summary-modern .summary-item .value.negative{color:var(--danger)}
 .account-summary-modern .summary-item .value.warning{color:var(--warning)}
-.add-product-section{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.add-product-section{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;overflow:visible}
 .add-product-section .section-label{font-size:12px;font-weight:700;color:var(--secondary);margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .add-product-section .section-label::before{content:'';width:3px;height:15px;background:var(--primary);border-radius:2px}
 .add-product-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;align-items:end}
-.add-product-row .field{margin-bottom:0}
+.add-product-row .field{margin-bottom:0;position:relative}
 .add-product-row .field label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:3px}
 .add-product-row .field select,.add-product-row .field input{width:100%;padding:6px 8px;border:2px solid var(--border);border-radius:8px;font-family:'Cairo',sans-serif;font-size:12px;background:var(--bg);color:var(--text);height:38px}
 .add-product-row .btn-add{padding:6px 16px;border:none;border-radius:8px;background:linear-gradient(135deg,var(--primary),#3a56d4);color:#fff;font-size:16px;font-weight:700;cursor:pointer;height:38px;display:flex;align-items:center;justify-content:center;min-width:44px}
@@ -315,35 +315,10 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .account-item .actions{display:flex;gap:4px;grid-column:1/-1}
 
 /* ✨ Mode Règlement - 6 lignes compactes */
-.payment-only-notice {
-    background: transparent;
-    border: none;
-    border-top: 1px dashed var(--border);
-    border-bottom: 1px dashed var(--border);
-    border-radius: 0;
-    padding: 4px 0;
-    margin: 4px 0;
-    text-align: left;
-    color: var(--muted);
-    font-size: 8px;
-    line-height: 1.4;
-}
-.payment-only-notice .title {
-    font-weight: 700;
-    font-size: 8px;
-    margin-bottom: 2px;
-    color: var(--secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-.payment-only-notice .subtitle {
-    font-size: 8px;
-    opacity: 0.8;
-    display: block;
-    padding: 1px 0;
-    border-bottom: 1px dotted rgba(0,0,0,0.05);
-}
-.payment-only-notice .subtitle:last-child { border-bottom: none; }
+.payment-only-notice{background:transparent;border:none;border-top:1px dashed var(--border);border-bottom:1px dashed var(--border);border-radius:0;padding:4px 0;margin:4px 0;text-align:left;color:var(--muted);font-size:8px;line-height:1.4}
+.payment-only-notice .title{font-weight:700;font-size:8px;margin-bottom:2px;color:var(--secondary);text-transform:uppercase;letter-spacing:0.5px}
+.payment-only-notice .subtitle{font-size:8px;opacity:0.8;display:block;padding:1px 0;border-bottom:1px dotted rgba(0,0,0,0.05)}
+.payment-only-notice .subtitle:last-child{border-bottom:none}
 
 .preview-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9998;display:none;align-items:center;justify-content:center;padding:12px}
 .preview-modal.show{display:flex}
@@ -417,6 +392,147 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* ═══════════════════════════════════════════════════════
+   📦 ArticlePicker - قائمة المنتجات الذكية
+   ═══════════════════════════════════════════════════════ */
+.article-picker {
+    position: relative;
+    width: 100%;
+}
+.article-picker-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 12px;
+    background: var(--bg);
+    color: var(--text);
+    height: 38px;
+    cursor: pointer;
+}
+.article-picker-input:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+.article-picker-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 280px;
+    overflow-y: auto;
+    background: var(--panel);
+    border: 2px solid var(--primary);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    z-index: 999;
+    display: none;
+    margin-top: 4px;
+}
+.article-picker-dropdown.show {
+    display: block;
+}
+.article-picker-dropdown::-webkit-scrollbar {
+    width: 8px;
+}
+.article-picker-dropdown::-webkit-scrollbar-track {
+    background: var(--bg);
+}
+.article-picker-dropdown::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 4px;
+}
+.article-option {
+    padding: 10px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.15s;
+}
+.article-option:last-child { border-bottom: none; }
+.article-option:hover {
+    background: rgba(74,108,247,0.1);
+}
+.article-option.selected {
+    background: rgba(74,108,247,0.15);
+}
+.article-option .info {
+    flex: 1;
+    min-width: 0;
+}
+.article-option .info .name {
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.article-option .info .meta {
+    font-size: 9px;
+    color: var(--muted);
+    margin-top: 2px;
+}
+.article-option .price {
+    font-weight: 800;
+    font-size: 12px;
+    color: var(--primary);
+    margin-left: 8px;
+    white-space: nowrap;
+}
+.article-option .stock-badge {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-size: 9px;
+    font-weight: 700;
+    margin-left: 4px;
+}
+.article-option .stock-badge.ok { background: #d4f4dd; color: #27ae60; }
+.article-option .stock-badge.low { background: #ffe8cc; color: #e67e22; }
+.article-option .stock-badge.out { background: #ffd6d6; color: #c0392b; }
+.article-picker-empty {
+    padding: 20px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+}
+.article-picker-search {
+    padding: 10px;
+    border-bottom: 2px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+.article-picker-search input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 12px;
+    background: var(--panel);
+    color: var(--text);
+    height: 36px;
+}
+.article-picker-search input:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+.article-count-badge {
+    font-size: 9px;
+    background: var(--primary);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 6px;
+    font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════════════════
    🔔 إشعارات فورية
    ═══════════════════════════════════════════════════════ */
 .cp-notification-banner{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-120%);background:linear-gradient(135deg,#1a2a5c,#4a6cf7);color:#fff;padding:12px 20px;border-radius:14px;box-shadow:0 8px 28px rgba(74,108,247,.4);font-size:13px;font-weight:700;z-index:9999;max-width:90%;transition:transform .4s ease;display:flex;align-items:center;gap:10px;cursor:pointer}
@@ -442,11 +558,11 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .cp-stat-card.color-red{border-left:4px solid #e74c5e}
 .cp-stat-card.color-purple{border-left:4px solid #9b59b6}
 .cp-mini-chart{display:flex;align-items:flex-end;gap:4px;height:60px;margin-top:8px}
-.cp-mini-chart .bar{flex:1;background:linear-gradient(180deg,#4a6cf7,#6b8aff);border-radius:4px 4px 0 0;min-height:4px;transition:all .3s ease;position:relative}
+.cp-mini-chart .bar{flex:1;background:linear-gradient(180deg,#4a6cf7,#6b8aff);border-radius:4px 4px 0 0;min-height:4px;transition:all .3s ease}
 .cp-mini-chart .bar:hover{opacity:0.8}
 .cp-mini-chart .bar-label{font-size:8px;color:var(--muted);text-align:center;margin-top:2px}
 
-/* 💬 درادشة مباشرة */
+/* 💬 دردشة مباشرة */
 .cp-chat-fab{position:fixed;bottom:20px;right:20px;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128C7E);color:#fff;border:none;font-size:26px;cursor:pointer;box-shadow:0 8px 24px rgba(37,211,102,.45);z-index:500;display:none;align-items:center;justify-content:center;transition:all .3s ease}
 .cp-chat-fab:hover{transform:scale(1.1);box-shadow:0 12px 32px rgba(37,211,102,.6)}
 .cp-chat-fab .badge{position:absolute;top:-4px;right:-4px;background:#e74c5e;color:#fff;border-radius:50%;min-width:20px;height:20px;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 5px;border:2px solid #fff;animation:pulse 1.5s infinite}
@@ -454,6 +570,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .cp-chat-panel.show{display:flex}
 .cp-chat-box{background:var(--panel);border-radius:20px 20px 0 0;width:100%;max-width:480px;height:85vh;display:flex;flex-direction:column;color:var(--text);animation:slideUp .3s ease}
 @keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
 .cp-chat-header{background:linear-gradient(135deg,#1a2a5c,#4a6cf7);color:#fff;padding:14px 18px;border-radius:20px 20px 0 0;display:flex;justify-content:space-between;align-items:center}
 .cp-chat-header .info{display:flex;align-items:center;gap:10px}
 .cp-chat-header .avatar{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:20px}
@@ -477,7 +594,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .cp-export-btn{padding:10px 16px;background:linear-gradient(135deg,#e74c5e,#c0392b);color:#fff;border:none;border-radius:10px;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .2s}
 .cp-export-btn:active{transform:scale(.97)}
 
-/* 📋 تفاصيل الطلب - Modal */
+/* 📋 تفاصيل الطلب */
 .cp-order-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400;display:none;align-items:center;justify-content:center;padding:16px}
 .cp-order-modal.show{display:flex}
 .cp-order-modal-box{background:var(--panel);border-radius:20px;width:100%;max-width:420px;max-height:88vh;overflow-y:auto;color:var(--text);animation:slideUp .3s ease}
@@ -486,7 +603,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .cp-order-modal-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:15px}
 .cp-order-modal-body{padding:16px 20px}
 
-/* بطاقة الطلب */
 .cp-order-card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:all .25s ease;position:relative;overflow:hidden}
 .cp-order-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
 .cp-order-card.status-pending{border-right:4px solid #f39c12}
@@ -509,21 +625,16 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .cp-order-actions .btn-details{background:linear-gradient(135deg,#4a6cf7,#2a4ac7)}
 .cp-order-actions .btn-whatsapp{background:linear-gradient(135deg,#25d366,#128C7E)}
 
-/* Timeline */
 .cp-timeline{position:relative;padding:8px 0;margin:10px 0}
 .cp-timeline-step{display:flex;align-items:flex-start;gap:10px;padding:6px 0;position:relative}
 .cp-timeline-step .dot{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;background:var(--bg);color:var(--muted);border:2px solid var(--border);z-index:1}
 .cp-timeline-step.done .dot{background:linear-gradient(135deg,#2ecc71,#27ae60);color:#fff;border-color:#27ae60}
 .cp-timeline-step.active .dot{background:linear-gradient(135deg,#f39c12,#e67e22);color:#fff;border-color:#e67e22;animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
 .cp-timeline-step .step-info{flex:1;padding-top:2px}
 .cp-timeline-step .step-info .step-title{font-size:12px;font-weight:700;color:var(--text)}
 .cp-timeline-step .step-info .step-time{font-size:10px;color:var(--muted);margin-top:1px}
 
-/* شريط البحث في Client Portal */
 .cp-search-box{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:12px;font-family:'Cairo',sans-serif;font-size:14px;margin-bottom:12px;background:var(--panel);color:var(--text);height:46px}
-
-/* أزرار الفلترة */
 .cp-filters{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
 .cp-filters::-webkit-scrollbar{height:0}
 .cp-filter-btn{padding:8px 14px;border:2px solid var(--border);border-radius:20px;background:var(--panel);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .25s ease;display:flex;align-items:center;gap:4px}
@@ -922,7 +1033,20 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 <div class="add-product-section">
 <div class="section-label">➕ Ajouter un produit</div>
 <div class="add-product-row">
-<div class="field"><label>Produit</label><select id="viArticle" onchange="VentesModule.fillArticle()"><option value="">-- Choisir --</option></select><span class="stock-hint" id="viStockHint">Stock: -</span></div>
+<div class="field">
+    <label>Produit <span class="article-count-badge" id="viArticleCount">0</span></label>
+    <div class="article-picker" id="viArticlePicker">
+        <input type="text" class="article-picker-input" id="viArticleInput" placeholder="🔍 Cliquez pour choisir un produit..." readonly onclick="ArticlePicker.open('vi')">
+        <div class="article-picker-dropdown" id="viArticleDropdown">
+            <div class="article-picker-search">
+                <input type="text" id="viArticleSearch" placeholder="🔍 Rechercher..." oninput="ArticlePicker.filter('vi')" onclick="event.stopPropagation()">
+            </div>
+            <div id="viArticleOptions"></div>
+        </div>
+        <select id="viArticle" style="display:none;"><option value="">-- Choisir --</option></select>
+    </div>
+    <span class="stock-hint" id="viStockHint">Stock: -</span>
+</div>
 <div class="field"><label>Prix</label><input type="number" step="0.001" id="viPrice" oninput="VentesModule.calcLine()" placeholder="0.000"></div>
 <div class="field"><label>Qté</label><input type="number" min="1" id="viQty" value="1" oninput="VentesModule.calcLine()"></div>
 <div class="field"><label>Total</label><input type="number" step="0.001" id="viTotal" readonly style="background:#eef0f6;font-weight:700;"></div>
@@ -989,7 +1113,20 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 <div class="add-product-section">
 <div class="section-label">➕ Ajouter un produit</div>
 <div class="add-product-row">
-<div class="field"><label>Produit</label><select id="piArticle" onchange="AchatsModule.fillArticle()"><option value="">-- Choisir --</option></select><span class="stock-hint" id="piStockHint">Stock: -</span></div>
+<div class="field">
+    <label>Produit <span class="article-count-badge" id="piArticleCount">0</span></label>
+    <div class="article-picker" id="piArticlePicker">
+        <input type="text" class="article-picker-input" id="piArticleInput" placeholder="🔍 Cliquez pour choisir un produit..." readonly onclick="ArticlePicker.open('pi')">
+        <div class="article-picker-dropdown" id="piArticleDropdown">
+            <div class="article-picker-search">
+                <input type="text" id="piArticleSearch" placeholder="🔍 Rechercher..." oninput="ArticlePicker.filter('pi')" onclick="event.stopPropagation()">
+            </div>
+            <div id="piArticleOptions"></div>
+        </div>
+        <select id="piArticle" style="display:none;"><option value="">-- Choisir --</option></select>
+    </div>
+    <span class="stock-hint" id="piStockHint">Stock: -</span>
+</div>
 <div class="field"><label>Prix</label><input type="number" step="0.001" id="piPrice" oninput="AchatsModule.calcLine()" placeholder="0.000"></div>
 <div class="field"><label>Qté</label><input type="number" min="1" id="piQty" value="1" oninput="AchatsModule.calcLine()"></div>
 <div class="field"><label>Total</label><input type="number" step="0.001" id="piTotal" readonly style="background:#eef0f6;font-weight:700;"></div>
@@ -1241,7 +1378,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
     </div>
 </div>
 
-<!-- CLIENT PORTAL (مع كل الميزات الجديدة) -->
+<!-- CLIENT PORTAL -->
 <div class="client-portal" id="clientPortal">
 <div class="cp-header">
 <div class="cp-logo">GTR<span>POS</span></div>
@@ -1260,7 +1397,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 <div class="cp-balance-note" id="cpBalanceNote">À jour</div>
 </div>
 
-<!-- 📊 KPIs cliquables -->
 <div class="cp-kpis">
 <div class="cp-kpi" onclick="ClientPortal.scrollToSection('invoices')">
     <div class="num" id="cpInvoiceCount">0</div>
@@ -1276,7 +1412,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 </div>
 </div>
 
-<!-- 📊 إحصائيات متقدمة -->
 <div class="cp-section-title">📊 Mes statistiques</div>
 <div class="cp-stats-grid" id="cpStatsGrid"></div>
 
@@ -1286,7 +1421,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 <div class="cp-section-title">🛒 Passer une commande</div>
 <button class="cp-btn" style="width:100%;background:linear-gradient(135deg,#4a6cf7,#2a4ac7);margin-bottom:8px;" onclick="ClientOrder.open()">➕ Nouvelle commande</button>
 
-<!-- 📋 الطلبات مع الفلاتر -->
 <div class="cp-section-title">📋 Mes commandes <span id="cpOrdersCount" style="font-size:11px;background:var(--primary);color:#fff;padding:2px 10px;border-radius:12px;margin-left:6px;">0</span></div>
 <div class="cp-filters" id="cpOrderFilters">
     <button class="cp-filter-btn active" data-filter="all" onclick="ClientPortal.setOrderFilter('all')">📋 Toutes <span class="count" id="cnt-all">0</span></button>
@@ -1298,7 +1432,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 <input class="cp-search-box" id="cpOrdersSearch" placeholder="🔍 Rechercher un N° de commande..." oninput="ClientPortal.renderOrders()">
 <div id="cpOrdersList"></div>
 
-<!-- 📥 تصدير -->
 <div class="cp-section-title">📥 Exporter mes données</div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
     <button class="cp-export-btn" onclick="ClientPortal.exportOrdersPDF()">📄 Commandes PDF</button>
@@ -1313,19 +1446,16 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 </div>
 </div>
 
-<!-- 🔔 شريط إشعار عائم -->
 <div class="cp-notification-banner" id="cpNotificationBanner">
     <span id="cpNotifIcon">🔔</span>
     <span id="cpNotifText">Notification</span>
 </div>
 
-<!-- 💬 زر الدردشة العائم -->
 <button class="cp-chat-fab" id="cpChatFab" onclick="ClientChat.open()">
     💬
     <span class="badge" id="cpChatBadge" style="display:none;">0</span>
 </button>
 
-<!-- 💬 نافذة الدردشة -->
 <div class="cp-chat-panel" id="cpChatPanel">
     <div class="cp-chat-box">
         <div class="cp-chat-header">
@@ -1346,7 +1476,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
     </div>
 </div>
 
-<!-- 📋 Modal تفاصيل الطلب -->
 <div class="cp-order-modal" id="cpOrderDetailModal">
     <div class="cp-order-modal-box">
         <div class="cp-order-modal-header">
@@ -1469,12 +1598,11 @@ const $ = Utils.$;
 const esc = Utils.escapeHTML.bind(Utils);
 
 // ═══════════════════════════════════════════════════════
-// 🔊 نظام الأصوات (Web Audio API)
+// 🔊 SoundSystem - أصوات Web Audio API
 // ═══════════════════════════════════════════════════════
 const SoundSystem = {
     _ctx: null,
     enabled: true,
-    
     init() {
         try {
             const saved = localStorage.getItem('gtrpos_sound_enabled');
@@ -1482,20 +1610,16 @@ const SoundSystem = {
         } catch(e) {}
         document.addEventListener('click', () => {
             if (!this._ctx) {
-                try {
-                    this._ctx = new (window.AudioContext || window.webkitAudioContext)();
-                } catch(e) {}
+                try { this._ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
             }
         }, { once: true });
     },
-    
     toggle() {
         this.enabled = !this.enabled;
         try { localStorage.setItem('gtrpos_sound_enabled', String(this.enabled)); } catch(e) {}
         Toast.show(this.enabled ? '🔊 Sons activés' : '🔇 Sons désactivés');
         return this.enabled;
     },
-    
     _playTone(frequency, duration, type = 'sine', volume = 0.15) {
         if (!this.enabled) return;
         if (!this._ctx) {
@@ -1517,7 +1641,6 @@ const SoundSystem = {
             osc.stop(now + duration);
         } catch(e) {}
     },
-    
     notification() {
         this._playTone(800, 0.15, 'sine', 0.15);
         setTimeout(() => this._playTone(1000, 0.15, 'sine', 0.15), 150);
@@ -2153,1069 +2276,151 @@ const RoleManager = {
     isClient() { return this.getRole() === 'client'; }
 };
 
-const ClientOrder = {
-    lines: [],
-    open() {
-        this.lines = []; this.renderArticles(); this.renderLines();
-        $('coQty').value = 1; $('coPrice').value = ''; $('coNote').value = ''; $('coError').textContent = '';
-        $('clientOrderModal').classList.add('show');
-    },
-    close() { $('clientOrderModal').classList.remove('show'); },
-    renderArticles() {
-        const sel = $('coArticle');
-        if (!sel) return;
-        sel.innerHTML = '<option value="">-- Choisir --</option>' + State.articles.filter(a => (a.stock || 0) > 0).map(a => `<option value="${esc(a.id)}">${esc(a.name)}</option>`).join('');
-    },
-    fillPrice() {
-        const a = State.articles.find(x => x.id == $('coArticle').value);
-        const hint = $('coStockHint');
-        if (!a) { $('coPrice').value = ''; hint.textContent = 'Stock: -'; return; }
-        let price = a.price;
-        const client = State.currentClient;
-        if (client && client.specialPrices) {
-            const sp = client.specialPrices.find(s => s.name === a.name);
-            if (sp) { price = sp.price; hint.textContent = `⭐ Prix spécial (Stock: ${a.stock})`; }
-            else hint.textContent = `Stock: ${a.stock}`;
-        } else hint.textContent = `Stock: ${a.stock}`;
-        $('coPrice').value = price.toFixed(3);
-    },
-    addLine() {
-        const a = State.articles.find(x => x.id == $('coArticle').value);
-        if (!a) { $('coError').textContent = '⚠️ Choisissez un produit'; return; }
-        const price = parseFloat($('coPrice').value) || 0;
-        const qty = parseFloat($('coQty').value) || 0;
-        if (price <= 0 || qty <= 0) { $('coError').textContent = '⚠️ Prix/Qté invalides'; return; }
-        if (qty > (a.stock || 0)) { $('coError').textContent = `⚠️ Stock insuffisant: ${a.stock}`; return; }
-        const existing = this.lines.find(l => l.name === a.name);
-        if (existing) { existing.qty += qty; existing.total = existing.price * existing.qty; }
-        else this.lines.push({ name: a.name, articleId: a.id, price, qty, total: price * qty });
-        $('coError').textContent = ''; $('coArticle').value = ''; $('coPrice').value = ''; $('coQty').value = 1; $('coStockHint').textContent = 'Stock: -';
-        this.renderLines();
-        Toast.show('✅ Ajouté', 'success');
-    },
-    removeLine(i) { this.lines.splice(i, 1); this.renderLines(); },
-    renderLines() {
-        const c = $('coLinesList');
-        if (!c) return;
-        if (!this.lines.length) c.innerHTML = '<div class="cp-empty" style="padding:10px;">🛒 Panier vide</div>';
-        else c.innerHTML = this.lines.map((l, i) => `<div class="special-price-item"><span class="sp-article">${esc(l.name)} × ${Number(l.qty)}</span><span class="sp-price">${Number(l.total).toFixed(3)} TND</span><span class="sp-del" onclick="ClientOrder.removeLine(${i})">✕</span></div>`).join('');
-        const total = this.lines.reduce((s, l) => s + l.total, 0);
-        $('coTotal').textContent = total.toFixed(3) + ' TND';
-    },
-    async submit() {
-        if (!this.lines.length) { $('coError').textContent = '⚠️ Panier vide'; return; }
-        $('coError').textContent = '';
-        const client = State.currentClient;
-        if (!client) { $('coError').textContent = '❌ Client introuvable'; return; }
-        const total = this.lines.reduce((s, l) => s + l.total, 0);
-        if (typeof State.nextId.orders !== 'number' || isNaN(State.nextId.orders)) State.nextId.orders = 1;
-        const orderId = State.nextId.orders;
-        const order = {
-            id: orderId, num: 'CMD-' + String(orderId).padStart(4, '0'),
-            date: Utils.today(), time: new Date().toLocaleTimeString('fr-FR'),
-            clientId: client.id, clientName: client.name, clientLogin: client.login || '',
-            phone: client.phone || '', lines: [...this.lines], total,
-            note: $('coNote').value.trim(), status: 'pending', createdAt: new Date().toISOString()
-        };
-        State.nextId.orders = orderId + 1;
-        State.orders.push(order);
-        Persistence.save();
-        const ok = await this.syncToCloud(order);
-        if (ok) {
-            Toast.show('✅ Commande envoyée au vendeur', 'success');
-            this.close();
-            setTimeout(() => ClientPortal.render(), 150);
-        } else $('coError').textContent = '✅ Commande enregistrée (sera synchronisée automatiquement)';
-    },
-    async syncToCloud(order) {
-        if (typeof firebase === 'undefined') return false;
-        const currentUser = firebase.auth().currentUser;
-        if (currentUser) {
-            try {
-                const client = State.currentClient;
-                await firebase.firestore().collection('orders').doc('order_' + order.id + '_' + Date.now()).set({
-                    ...order, clientLogin: client?.login || '', clientEmail: client?.email || '',
-                    clientUid: currentUser.uid, syncedAt: new Date().toISOString(), source: 'client-portal'
-                });
-                return true;
-            } catch(e) {}
-        }
-        try {
-            const pending = JSON.parse(localStorage.getItem('gtrpos_pending_orders') || '[]');
-            pending.push({ ...order, clientId: State.currentClient?.id, clientLogin: State.currentClient?.login || '', clientEmail: State.currentClient?.email || '', source: 'client-portal-local', pendingSince: new Date().toISOString() });
-            localStorage.setItem('gtrpos_pending_orders', JSON.stringify(pending));
-            updatePendingCount();
-            return true;
-        } catch(e) { return false; }
-    },
-    async syncPendingOrders() {
-        if (typeof firebase === 'undefined' || !window.db) return;
-        const fbUser = firebase.auth().currentUser;
-        if (!fbUser) return;
-        try {
-            const pending = JSON.parse(localStorage.getItem('gtrpos_pending_orders') || '[]');
-            if (!pending.length) return;
-            const batch = window.db.batch();
-            pending.forEach(order => {
-                const docId = 'order_' + order.id + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
-                const ref = window.db.collection('orders').doc(docId);
-                batch.set(ref, { ...order, syncedAt: new Date().toISOString(), syncedByStaff: true, source: 'staff-sync' });
-            });
-            await batch.commit();
-            localStorage.removeItem('gtrpos_pending_orders');
-            Toast.show(`✅ ${pending.length} commande(s) synchronisée(s)`, 'success');
-            NotificationSystem.add('📦 Sync Staff', `${pending.length} commande(s) synchronisée(s)`, 'SUCCESS');
-            updatePendingCount();
-        } catch(e) {}
-    }
-};
+// ═══════════════════════════════════════════════════════
+// 📦 ArticlePicker - قائمة المنتجات الذكية الكاملة
+// ═══════════════════════════════════════════════════════
+const ArticlePicker = {
+    _currentPrefix: null,
+    _filtered: [],
+    _handler: null,
 
-const ClientPortal = {
-    _ordersUnsub: null, _ventesUnsub: null,
-    _orderFilter: 'all',
-    show() {
-        const client = State.currentClient;
-        if (!client) { Toast.show('❌ Client introuvable', 'error'); return; }
-        $('clientPortal').classList.add('show');
-        $('loginOverlay').classList.add('hide');
-        $('pendingOverlay').classList.add('hide');
-        document.querySelector('.phone').style.display = 'none';
-        $('cpClientName').textContent = client.name || 'Client';
-        BalanceCalculator.recalculateClient(client.name);
-        this.render();
-        this.startClientOrderListener();
-        this.startClientVentesListener();
-        const isStaffView = State.currentUser && State.currentUser.viewedByStaff;
-        const exitBtn = $('cpExitBtn');
-        const staffBadge = $('cpStaffBadge');
-        if (exitBtn) exitBtn.style.display = isStaffView ? 'flex' : 'none';
-        if (staffBadge) staffBadge.style.display = isStaffView ? 'inline-block' : 'none';
-        
-        // 🔔 تشغيل نظام الإشعارات والأصوات والدردشة
-        setTimeout(() => {
-            ClientNotifications.init();
-            ClientNotifications.startWatching();
-            ClientChat.init();
-        }, 500);
-    },
-    hide() {
-        this.stopClientOrderListener();
-        if (this._ventesUnsub) { this._ventesUnsub(); this._ventesUnsub = null; }
-        $('clientPortal').classList.remove('show');
-        document.querySelector('.phone').style.display = 'flex';
-        State.currentClient = null;
-        // إيقاف المراقبين
-        ClientNotifications.stopWatching();
-        ClientChat.stopRealtimeListener();
-    },
-    toggleSound() {
-        const enabled = SoundSystem.toggle();
-        const btn = $('cpSoundBtn');
-        if (btn) btn.textContent = enabled ? '🔊' : '🔇';
-    },
-    scrollToSection(section) {
-        const map = { invoices: 'cpInvoicesList', orders: 'cpOrdersList', payments: 'cpPaymentsList' };
-        const el = $(map[section]);
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    },
-    setOrderFilter(filter) {
-        this._orderFilter = filter;
-        document.querySelectorAll('#cpOrderFilters .cp-filter-btn').forEach(b => {
-            b.classList.toggle('active', b.dataset.filter === filter);
+    open(prefix) {
+        this._currentPrefix = prefix;
+        const dropdown = $(prefix + 'ArticleDropdown');
+        const search = $(prefix + 'ArticleSearch');
+        if (!dropdown) return;
+
+        // إغلاق القوائم الأخرى
+        document.querySelectorAll('.article-picker-dropdown').forEach(d => {
+            if (d.id !== prefix + 'ArticleDropdown') d.classList.remove('show');
         });
-        this.renderOrders();
-    },
-    startClientOrderListener() {
-        if (typeof firebase === 'undefined' || !window.db) return;
-        if (this._ordersUnsub) this._ordersUnsub();
-        const client = State.currentClient;
-        if (!client) return;
-        const clientUid = 'client_' + client.id;
-        try {
-            this._ordersUnsub = window.db.collection('orders').where('clientUid', '==', clientUid).onSnapshot(snapshot => {
-                let changed = false;
-                snapshot.docChanges().forEach(change => {
-                    const data = change.doc.data();
-                    const cloudId = change.doc.id;
-                    const idx = State.orders.findIndex(o => o.cloudId === cloudId || (o.num === data.num && o.clientName === data.clientName));
-                    if (idx === -1 && change.type !== 'removed') { State.orders.push({ ...data, cloudId }); changed = true; }
-                    else if (idx !== -1) {
-                        if (change.type === 'removed') { State.orders.splice(idx, 1); changed = true; }
-                        else { State.orders[idx] = { ...State.orders[idx], ...data, cloudId }; changed = true; }
-                    }
-                });
-                if (changed) { Persistence.save(); this.renderOrders(); this.render(); }
-            }, err => console.warn('⚠️ orders listener:', err.message));
-        } catch(e) {}
-    },
-    stopClientOrderListener() { if (this._ordersUnsub) { this._ordersUnsub(); this._ordersUnsub = null; } },
-    startClientVentesListener() {
-        if (typeof firebase === 'undefined') return;
-        if (this._ventesUnsub) this._ventesUnsub();
-        const client = State.currentClient;
-        if (!client || !client.login) return;
-        const currentUser = firebase.auth().currentUser;
-        if (!currentUser) return;
-        try {
-            this._ventesUnsub = firebase.firestore().collection('shared_ventes').where('clientLogin', '==', client.login || '').onSnapshot(snapshot => {
-                let changed = false;
-                snapshot.docChanges().forEach(change => {
-                    const data = change.doc.data();
-                    const cloudId = change.doc.id;
-                    const vId = data.id;
-                    const idx = State.ventes.findIndex(v => v.cloudVenteId === cloudId || v.id === vId);
-                    if (change.type === 'added' || change.type === 'modified') {
-                        const merged = { ...data, cloudVenteId: cloudId };
-                        if (idx === -1) State.ventes.push(merged);
-                        else State.ventes[idx] = { ...State.ventes[idx], ...merged };
-                        changed = true;
-                    } else if (change.type === 'removed' && idx !== -1) { State.ventes.splice(idx, 1); changed = true; }
-                });
-                if (changed) { Persistence.save(); BalanceCalculator.recalculateClient(client.name); this.render(); }
-            }, err => console.warn('⚠️ ventes listener:', err.message));
-        } catch(e) {}
-    },
-    render() {
-        const client = State.currentClient;
-        if (!client) return;
-        const name = client.name;
-        const invoices = State.ventes.filter(v => v.client === name);
-        const payments = State.caisseClients.filter(c => c.clientName === name);
-        const totalPurchases = invoices.reduce((s, v) => s + (v.total || 0), 0);
-        const totalPaid = payments.reduce((s, p) => s + (p.amount || 0), 0);
-        const balance = client.balance || 0;
-        $('cpBalance').textContent = balance.toFixed(3) + ' TND';
-        const noteEl = $('cpBalanceNote');
-        if (Math.abs(balance) < 0.001) { noteEl.textContent = '✅ À jour'; noteEl.className = 'cp-balance-note positive'; }
-        else if (balance > 0) { noteEl.textContent = '⚠️ Reste à payer: ' + balance.toFixed(3) + ' TND'; noteEl.className = 'cp-balance-note negative'; }
-        else { noteEl.textContent = '💰 Crédit: ' + Math.abs(balance).toFixed(3) + ' TND'; noteEl.className = 'cp-balance-note positive'; }
-        $('cpInvoiceCount').textContent = invoices.length;
-        $('cpTotalPurchases').textContent = totalPurchases.toFixed(3);
-        $('cpTotalPaid').textContent = totalPaid.toFixed(3);
-        this.renderInvoices(invoices, payments);
-        this.renderPayments(payments);
-        this.renderOrders();
-        this.renderAdvancedStats();
-        
-        // تحديث عدد الطلبات النشطة
-        const activeOrdersEl = $('cpActiveOrders');
-        if (activeOrdersEl) {
-            const activeOrders = State.orders.filter(o => 
-                (o.clientId === client.id || o.clientName === client.name) && 
-                (o.status === 'pending' || o.status === 'approved')
-            ).length;
-            activeOrdersEl.textContent = activeOrders;
+
+        dropdown.classList.add('show');
+        if (search) {
+            search.value = '';
+            setTimeout(() => search.focus(), 100);
         }
-    },
-    renderInvoices(invoices) {
-        const container = $('cpInvoicesList');
-        if (!invoices.length) { container.innerHTML = '<div class="cp-empty"><span class="icon">📭</span>Aucune facture</div>'; return; }
-        const sorted = [...invoices].sort((a, b) => a.date < b.date ? 1 : -1);
-        container.innerHTML = sorted.slice(0, 30).map(v => {
-            const paid = (v.reglements || []).reduce((s, r) => s + r.amount, 0);
-            const rem = (v.total || 0) - paid;
-            const isPaymentOnly = !v.lines || !v.lines.length;
-            let badge, badgeClass;
-            if (isPaymentOnly) { badge = '💰 Règlement'; badgeClass = 'payment'; }
-            else if (rem <= 0.001) { badge = '✅ Payée'; badgeClass = 'paid'; }
-            else if (rem >= v.total - 0.001) { badge = '⏳ Non payée'; badgeClass = 'pending'; }
-            else { badge = '🔄 Partielle'; badgeClass = 'partial'; }
-            const amountDisplay = isPaymentOnly ? paid : (v.total || 0);
-            return `<div class="cp-row"><div class="cp-row-info"><div class="name">${esc(v.num)}<span class="cp-badge ${badgeClass}">${badge}</span></div><div class="meta">${esc(Utils.formatDate(v.date))}</div></div><div class="cp-row-amount">${amountDisplay.toFixed(3)} TND${!isPaymentOnly && rem > 0.001 ? `<small style="color:var(--danger);">Reste: ${rem.toFixed(3)}</small>` : ''}</div></div>`;
-        }).join('');
-    },
-    renderPayments(payments) {
-        const container = $('cpPaymentsList');
-        if (!payments.length) { container.innerHTML = '<div class="cp-empty"><span class="icon">📭</span>Aucun paiement</div>'; return; }
-        const sorted = [...payments].sort((a, b) => a.date < b.date ? 1 : -1);
-        container.innerHTML = sorted.slice(0, 30).map(p => `<div class="cp-row"><div class="cp-row-info"><div class="name">💳 ${esc(p.regType || 'Espèces')}</div><div class="meta">${esc(Utils.formatDate(p.date))} • ${esc(p.invoiceNum || '-')}</div></div><div class="cp-row-amount"><span class="paid">${(p.amount || 0).toFixed(3)} TND</span></div></div>`).join('');
-    },
-    renderOrders() {
-        const c = $('cpOrdersList');
-        if (!c) return;
-        const client = State.currentClient;
-        if (!client) return;
-        let allOrders = State.orders.filter(o => o.clientId === client.id || o.clientName === client.name);
-        const counts = {
-            all: allOrders.length,
-            pending: allOrders.filter(o => o.status === 'pending').length,
-            approved: allOrders.filter(o => o.status === 'approved').length,
-            delivered: allOrders.filter(o => o.status === 'delivered').length,
-            rejected: allOrders.filter(o => o.status === 'rejected').length
+        this.render(prefix);
+
+        // إغلاق عند النقر خارجاً
+        if (this._handler) document.removeEventListener('click', this._handler);
+        this._handler = (e) => {
+            if (!e.target.closest('.article-picker')) {
+                document.querySelectorAll('.article-picker-dropdown').forEach(d => d.classList.remove('show'));
+                document.removeEventListener('click', this._handler);
+                this._handler = null;
+            }
         };
-        ['all','pending','approved','delivered','rejected'].forEach(k => {
-            const el = $('cnt-' + k);
-            if (el) el.textContent = counts[k];
-        });
-        const countEl = $('cpOrdersCount');
-        if (countEl) countEl.textContent = counts.all;
-        allOrders.sort((a, b) => {
-            const dateA = a.createdAt || (a.date + ' ' + (a.time || '00:00:00'));
-            const dateB = b.createdAt || (b.date + ' ' + (b.time || '00:00:00'));
-            return dateA < dateB ? 1 : -1;
-        });
-        let orders = allOrders;
-        if (this._orderFilter !== 'all') orders = orders.filter(o => o.status === this._orderFilter);
-        const q = ($('cpOrdersSearch')?.value || '').trim().toLowerCase();
-        if (q) orders = orders.filter(o => (o.num || '').toLowerCase().includes(q));
-        if (!orders.length) {
-            c.innerHTML = `<div class="cp-empty"><span class="icon">📭</span>Aucune commande ${q ? 'trouvée' : 'dans cette catégorie'}</div>`;
+        setTimeout(() => document.addEventListener('click', this._handler), 150);
+    },
+
+    close(prefix) {
+        const dropdown = $(prefix + 'ArticleDropdown');
+        if (dropdown) dropdown.classList.remove('show');
+        if (this._handler) { document.removeEventListener('click', this._handler); this._handler = null; }
+    },
+
+    render(prefix) {
+        const optionsContainer = $(prefix + 'ArticleOptions');
+        const countBadge = $(prefix + 'ArticleCount');
+        if (!optionsContainer) return;
+
+        const allArticles = State.articles.slice();
+        if (countBadge) countBadge.textContent = allArticles.length;
+
+        const used = this._getUsedArticles(prefix);
+        const searchEl = $(prefix + 'ArticleSearch');
+        const q = (searchEl?.value || '').trim().toLowerCase();
+
+        let articles = allArticles;
+        if (q) {
+            articles = articles.filter(a =>
+                (a.name || '').toLowerCase().includes(q) ||
+                (a.code || '').toLowerCase().includes(q)
+            );
+        }
+        this._filtered = articles;
+
+        if (!articles.length) {
+            optionsContainer.innerHTML = '<div class="article-picker-empty">📭 Aucun produit ' + (q ? 'trouvé' : 'disponible') + '</div>';
             return;
         }
-        const statusMap = {
-            pending: { lbl: '⏳ En attente', cls: 'pending' },
-            approved: { lbl: '✅ Acceptée', cls: 'paid' },
-            rejected: { lbl: '❌ Refusée', cls: 'partial' },
-            delivered: { lbl: '🚚 Livrée', cls: 'paid' }
-        };
-        c.innerHTML = orders.slice(0, 30).map(o => {
-            const s = statusMap[o.status] || statusMap.pending;
-            const itemsPreview = o.lines.slice(0, 3).map(l => 
-                `<div class="cp-order-item-line"><span class="item-name">• ${esc(l.name)} × ${Number(l.qty)}</span><span class="item-total">${Number(l.total).toFixed(3)} TND</span></div>`
-            ).join('');
-            const more = o.lines.length > 3 ? `<div class="cp-order-item-line" style="color:var(--muted);font-size:10px;justify-content:center;">... +${o.lines.length - 3} article(s)</div>` : '';
-            let actionBtns = `<button class="btn-details" onclick="event.stopPropagation();ClientPortal.showOrderDetail(${o.id || `'${o.cloudId}'`})">👁️ Détails</button>`;
-            if (o.status === 'pending') {
-                actionBtns += `<button class="btn-cancel" onclick="event.stopPropagation();ClientPortal.cancelOrder(${o.id || `'${o.cloudId}'`})">❌ Annuler</button>`;
+
+        const client = State.currentClient;
+        optionsContainer.innerHTML = articles.map(a => {
+            let price = a.price || 0;
+            let isSpecial = false;
+            if (client && client.specialPrices) {
+                const sp = client.specialPrices.find(s => s.name === a.name);
+                if (sp) { price = sp.price; isSpecial = true; }
             }
-            if (o.status === 'delivered' || o.status === 'rejected') {
-                actionBtns += `<button class="btn-reorder" onclick="event.stopPropagation();ClientPortal.reorder(${o.id || `'${o.cloudId}'`})">🔄 Commander</button>`;
-            }
-            if (o.status === 'approved') {
-                actionBtns += `<button class="btn-whatsapp" onclick="event.stopPropagation();ClientPortal.contactVendor(${o.id || `'${o.cloudId}'`})">📱 Contact</button>`;
-            }
-            return `<div class="cp-order-card status-${o.status}" onclick="ClientPortal.showOrderDetail(${o.id || `'${o.cloudId}'`})">
-                <div class="cp-order-header">
-                    <div>
-                        <div class="cp-order-num">${esc(o.num)} <span class="cp-badge ${s.cls}" style="margin-left:4px;">${s.lbl}</span></div>
-                        <div class="cp-order-date">📅 ${esc(Utils.formatDate(o.date))} ${esc(o.time || '')}</div>
+
+            const stock = a.stock || 0;
+            let stockClass = 'ok';
+            let stockLabel = `${stock}`;
+            if (stock <= 0) { stockClass = 'out'; stockLabel = 'Épuisé'; }
+            else if (stock <= 5) { stockClass = 'low'; stockLabel = `${stock} ⚠️`; }
+
+            const alreadyUsed = used.includes(a.id);
+
+            return `<div class="article-option ${alreadyUsed ? 'selected' : ''}" onclick="ArticlePicker.select('${prefix}', ${a.id})" style="${alreadyUsed ? 'opacity:0.5;pointer-events:none;' : ''}">
+                <div class="info">
+                    <div class="name">${esc(a.name)} ${isSpecial ? '⭐' : ''} ${alreadyUsed ? '<span style="color:var(--success);font-size:9px;">✓ Ajouté</span>' : ''}</div>
+                    <div class="meta">
+                        ${a.code ? '🏷️ ' + esc(a.code) : ''}
+                        <span class="stock-badge ${stockClass}">📦 ${stockLabel}</span>
                     </div>
-                    <div class="cp-order-total">${o.total.toFixed(3)} TND</div>
                 </div>
-                <div class="cp-order-items">${itemsPreview}${more}</div>
-                ${o.note ? `<div style="font-size:10px;color:var(--muted);margin-bottom:6px;">📝 ${esc(o.note)}</div>` : ''}
-                <div class="cp-order-actions">${actionBtns}</div>
+                <div class="price">${price.toFixed(3)}</div>
             </div>`;
         }).join('');
     },
-    showOrderDetail(id) {
-        const o = State.orders.find(x => x.id === id || x.cloudId === id);
-        if (!o) { Toast.show('❌ Commande introuvable'); return; }
-        const statusMap = {
-            pending: { lbl: '⏳ En attente de validation', icon: '⏳', color: '#f39c12' },
-            approved: { lbl: '✅ Acceptée par le vendeur', icon: '✅', color: '#2ecc71' },
-            rejected: { lbl: '❌ Refusée', icon: '❌', color: '#e74c5e' },
-            delivered: { lbl: '🚚 Livrée', icon: '🚚', color: '#3498db' }
-        };
-        const s = statusMap[o.status] || statusMap.pending;
-        const itemsHTML = o.lines.map(l => 
-            `<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--bg);border-radius:8px;margin-bottom:4px;">
-                <span style="font-weight:600;">${esc(l.name)} × ${Number(l.qty)}</span>
-                <span style="font-weight:800;color:var(--primary);">${Number(l.total).toFixed(3)} TND</span>
-            </div>`
-        ).join('');
-        const steps = [
-            { key: 'created', title: '📤 Commande envoyée', time: o.createdAt || (o.date + ' ' + (o.time || '')), done: true },
-            { key: 'approved', title: '✅ Acceptée par le vendeur', time: o.approvedAt || '', done: !!o.approvedAt || o.status === 'approved' || o.status === 'delivered' },
-            { key: 'delivered', title: '🚚 Livrée', time: o.deliveredAt || '', done: o.status === 'delivered' },
-        ];
-        if (o.status === 'rejected') {
-            steps[1] = { key: 'rejected', title: '❌ Refusée par le vendeur', time: o.rejectedAt || '', done: true };
+
+    filter(prefix) { this.render(prefix); },
+
+    select(prefix, articleId) {
+        const article = State.articles.find(a => a.id === articleId);
+        if (!article) return;
+
+        const sel = $(prefix + 'Article');
+        if (sel) {
+            sel.innerHTML = `<option value="${article.id}" selected>${esc(article.name)}</option>`;
+            sel.value = article.id;
         }
-        const timelineHTML = steps.map(st => {
-            const cls = st.done ? 'done' : (st.key === 'approved' && o.status === 'pending' ? 'active' : '');
-            return `<div class="cp-timeline-step ${cls}">
-                <div class="dot">${st.done ? '✓' : '○'}</div>
-                <div class="step-info">
-                    <div class="step-title">${st.title}</div>
-                    ${st.time ? `<div class="step-time">${esc(st.time)}</div>` : ''}
-                </div>
-            </div>`;
-        }).join('');
-        $('cpOrderDetailTitle').textContent = `📋 Commande ${o.num}`;
-        $('cpOrderDetailBody').innerHTML = `
-            <div style="text-align:center;padding:14px 12px;background:linear-gradient(135deg,${s.color},${s.color}dd);color:#fff;border-radius:14px;margin-bottom:14px;">
-                <div style="font-size:32px;margin-bottom:4px;">${s.icon}</div>
-                <div style="font-size:14px;font-weight:800;">${s.lbl}</div>
-                <div style="font-size:11px;opacity:.9;margin-top:2px;">${esc(o.num)} • ${esc(Utils.formatDate(o.date))}</div>
-            </div>
-            <div class="section-title" style="font-size:13px;margin:14px 0 8px;">📦 Articles commandés</div>
-            ${itemsHTML}
-            <div style="display:flex;justify-content:space-between;padding:10px 12px;background:linear-gradient(135deg,#1a2a5c,#4a6cf7);color:#fff;border-radius:10px;margin-top:8px;">
-                <span style="font-weight:700;">💰 Total</span>
-                <span style="font-weight:800;font-size:16px;">${o.total.toFixed(3)} TND</span>
-            </div>
-            ${o.note ? `<div style="margin-top:12px;padding:10px 12px;background:var(--bg);border-radius:8px;font-size:12px;"><strong>📝 Note:</strong> ${esc(o.note)}</div>` : ''}
-            <div class="section-title" style="font-size:13px;margin:14px 0 8px;">📍 Suivi de la commande</div>
-            <div class="cp-timeline">${timelineHTML}</div>
-            <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
-                ${o.status === 'pending' ? `<button class="cp-order-actions btn-cancel" style="flex:1;padding:10px;background:linear-gradient(135deg,#e74c5e,#c0392b);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;" onclick="ClientPortal.cancelOrder(${o.id || `'${o.cloudId}'`});document.getElementById('cpOrderDetailModal').classList.remove('show')">❌ Annuler</button>` : ''}
-                ${o.status === 'delivered' || o.status === 'rejected' ? `<button style="flex:1;padding:10px;background:linear-gradient(135deg,#9b59b6,#8e44ad);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;" onclick="ClientPortal.reorder(${o.id || `'${o.cloudId}'`});document.getElementById('cpOrderDetailModal').classList.remove('show')">🔄 Commander à nouveau</button>` : ''}
-                <button style="flex:1;padding:10px;background:linear-gradient(135deg,#25d366,#128C7E);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;" onclick="ClientPortal.contactVendor(${o.id || `'${o.cloudId}'`})">📱 WhatsApp</button>
-            </div>
-        `;
-        $('cpOrderDetailModal').classList.add('show');
-    },
-    async cancelOrder(id) {
-        const o = State.orders.find(x => x.id === id || x.cloudId === id);
-        if (!o) return;
-        if (o.status !== 'pending') { Toast.show('⚠️ Seules les commandes en attente peuvent être annulées', 'warning'); return; }
-        const ok = await CustomConfirm.show('Voulez-vous vraiment annuler cette commande ?', '❌ Annuler la commande');
-        if (!ok) return;
-        o.status = 'rejected';
-        o.rejectedAt = new Date().toISOString();
-        o.cancelledBy = 'client';
-        Persistence.save();
-        if (typeof firebase !== 'undefined' && o.cloudId) {
-            try {
-                await firebase.firestore().collection('orders').doc(o.cloudId).update({
-                    status: 'rejected', rejectedAt: o.rejectedAt, cancelledBy: 'client', updatedByStaff: false
-                });
-            } catch(e) {}
+        const input = $(prefix + 'ArticleInput');
+        if (input) {
+            input.value = article.name + (article.stock !== undefined ? ` [${article.stock}]` : '');
         }
-        SoundSystem.error();
-        Toast.show('✅ Commande annulée', 'success');
-        NotificationSystem.add('❌ Commande annulée', `${o.num} par le client`, 'WARNING');
-        this.renderOrders();
-        this.render();
+
+        if (prefix === 'vi') VentesModule.fillArticle();
+        else if (prefix === 'pi') AchatsModule.fillArticle();
+
+        this.close(prefix);
     },
-    reorder(id) {
-        const o = State.orders.find(x => x.id === id || x.cloudId === id);
-        if (!o) return;
-        ClientOrder.lines = o.lines.map(l => ({ ...l }));
-        ClientOrder.renderArticles();
-        ClientOrder.renderLines();
-        $('coQty').value = 1; $('coPrice').value = ''; $('coNote').value = ''; $('coError').textContent = '';
-        $('clientOrderModal').classList.add('show');
-        Toast.show('🔄 Articles pré-remplis', 'info');
+
+    _getUsedArticles(prefix) {
+        let lines = [];
+        if (prefix === 'vi') lines = VentesModule.lines || [];
+        else if (prefix === 'pi') lines = AchatsModule.lines || [];
+        return lines.map(l => {
+            const a = State.articles.find(x => x.name === l.name);
+            return a ? a.id : null;
+        }).filter(Boolean);
     },
-    contactVendor(id) {
-        const o = State.orders.find(x => x.id === id || x.cloudId === id);
-        if (!o) return;
-        const phone = (State.companyInfo.phone1 || '').replace(/\D/g, '');
-        const text = `🏢 Bonjour, je voudrais des informations sur ma commande ${o.num} (${o.total.toFixed(3)} TND).`;
-        const url = phone ? `https://wa.me/216${phone}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
-        window.open(url, '_blank');
-    },
-    renderAdvancedStats() {
-        const client = State.currentClient;
-        if (!client) return;
-        const container = $('cpStatsGrid');
-        if (!container) return;
-        const invoices = State.ventes.filter(v => v.client === client.name);
-        const payments = State.caisseClients.filter(c => c.clientName === client.name);
-        const orders = State.orders.filter(o => o.clientId === client.id || o.clientName === client.name);
-        const totalPurchases = invoices.reduce((s, v) => s + (v.total || 0), 0);
-        const totalPaid = payments.reduce((s, p) => s + (p.amount || 0), 0);
-        const balance = client.balance || 0;
-        const ordersCount = orders.length;
-        const paidOrders = orders.filter(o => o.status === 'delivered' || o.status === 'approved').length;
-        const pendingOrders = orders.filter(o => o.status === 'pending').length;
-        const avgBasket = ordersCount > 0 ? orders.reduce((s, o) => s + o.total, 0) / ordersCount : 0;
-        const maxOrder = orders.length > 0 ? Math.max(...orders.map(o => o.total)) : 0;
-        const monthlyPayments = [];
-        const now = new Date();
-        for (let i = 5; i >= 0; i--) {
-            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-            const monthKey = d.toISOString().slice(0, 7);
-            const monthTotal = payments.filter(p => (p.date || '').startsWith(monthKey)).reduce((s, p) => s + (p.amount || 0), 0);
-            monthlyPayments.push({ label: d.toLocaleDateString('fr-FR', { month: 'short' }), value: monthTotal });
-        }
-        const maxPay = Math.max(...monthlyPayments.map(m => m.value), 1);
-        container.innerHTML = `
-            <div class="cp-stat-card color-blue">
-                <div class="icon-bg">📄</div>
-                <span class="label">Factures</span>
-                <span class="value">${invoices.length}</span>
-                <span class="sub">Total: ${totalPurchases.toFixed(3)} TND</span>
-            </div>
-            <div class="cp-stat-card color-green">
-                <div class="icon-bg">💳</div>
-                <span class="label">Payé</span>
-                <span class="value positive">${totalPaid.toFixed(3)}</span>
-                <span class="sub">TND</span>
-            </div>
-            <div class="cp-stat-card color-orange">
-                <div class="icon-bg">🛒</div>
-                <span class="label">Commandes</span>
-                <span class="value">${ordersCount}</span>
-                <span class="sub">${paidOrders} validées • ${pendingOrders} en attente</span>
-            </div>
-            <div class="cp-stat-card color-red">
-                <div class="icon-bg">💰</div>
-                <span class="label">Solde</span>
-                <span class="value ${balance > 0 ? 'negative' : 'positive'}">${balance.toFixed(3)}</span>
-                <span class="sub">TND ${balance > 0 ? 'à payer' : 'crédit'}</span>
-            </div>
-            <div class="cp-stat-card color-purple" style="grid-column: span 2;">
-                <div class="icon-bg">📈</div>
-                <span class="label">Mes paiements — 6 derniers mois</span>
-                <div class="cp-mini-chart">
-                    ${monthlyPayments.map(m => `
-                        <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
-                            <div class="bar" style="height:${(m.value / maxPay * 50) + 4}px;width:100%;" title="${m.value.toFixed(3)} TND"></div>
-                            <div class="bar-label">${m.label}</div>
-                        </div>
-                    `).join('')}
-                </div>
-                <span class="sub" style="margin-top:6px;display:block;">Total 6 mois: ${monthlyPayments.reduce((s, m) => s + m.value, 0).toFixed(3)} TND</span>
-            </div>
-            <div class="cp-stat-card color-blue">
-                <div class="icon-bg">🎯</div>
-                <span class="label">Panier moyen</span>
-                <span class="value">${avgBasket.toFixed(3)}</span>
-                <span class="sub">TND</span>
-            </div>
-            <div class="cp-stat-card color-green">
-                <div class="icon-bg">🏆</div>
-                <span class="label">Plus grosse commande</span>
-                <span class="value">${maxOrder.toFixed(3)}</span>
-                <span class="sub">TND</span>
-            </div>
-        `;
-    },
-    async exportOrdersPDF() {
-        if (typeof window.jspdf === 'undefined') { Toast.show('❌ jsPDF non chargé', 'error'); return; }
-        const client = State.currentClient;
-        if (!client) return;
-        const orders = State.orders.filter(o => o.clientId === client.id || o.clientName === client.name);
-        if (!orders.length) { Toast.show('⚠️ Aucune commande à exporter', 'warning'); return; }
-        Toast.show('📄 Génération du PDF...', 'info');
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-        doc.setFillColor(30, 47, 102);
-        doc.rect(0, 0, 210, 28, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(20);
-        doc.setFont('helvetica', 'bold');
-        doc.text('GTR POS', 105, 12, { align: 'center' });
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'normal');
-        doc.text('Historique des commandes', 105, 20, { align: 'center' });
-        doc.setFontSize(9);
-        doc.text(`Client: ${client.name}`, 105, 25, { align: 'center' });
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(10);
-        doc.text(`Date d'export: ${new Date().toLocaleString('fr-FR')}`, 15, 38);
-        doc.text(`Total commandes: ${orders.length}`, 15, 44);
-        doc.text(`Montant total: ${orders.reduce((s, o) => s + o.total, 0).toFixed(3)} TND`, 15, 50);
-        let y = 60;
-        doc.setFillColor(30, 47, 102);
-        doc.rect(15, y - 5, 180, 8, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'bold');
-        doc.text('N°', 18, y);
-        doc.text('Date', 45, y);
-        doc.text('Articles', 80, y);
-        doc.text('Statut', 120, y);
-        doc.text('Total', 175, y, { align: 'right' });
-        doc.setTextColor(0, 0, 0);
-        doc.setFont('helvetica', 'normal');
-        y += 8;
-        const statusLabels = { pending: 'En attente', approved: 'Acceptee', rejected: 'Refusee', delivered: 'Livree' };
-        orders.sort((a, b) => (b.createdAt || b.date) < (a.createdAt || a.date) ? -1 : 1);
-        orders.forEach((o, i) => {
-            if (y > 270) { doc.addPage(); y = 20; }
-            if (i % 2 === 0) { doc.setFillColor(248, 249, 252); doc.rect(15, y - 5, 180, 7, 'F'); }
-            doc.text(String(o.num).substring(0, 15), 18, y);
-            doc.text(Utils.formatDate(o.date), 45, y);
-            doc.text(String(o.lines.length) + ' article(s)', 80, y);
-            doc.text(statusLabels[o.status] || o.status, 120, y);
-            doc.setFont('helvetica', 'bold');
-            doc.text(o.total.toFixed(3) + ' TND', 195, y, { align: 'right' });
-            doc.setFont('helvetica', 'normal');
-            y += 7;
-        });
-        doc.setFontSize(8);
-        doc.setTextColor(120, 120, 120);
-        doc.text(`Genere le ${new Date().toLocaleString('fr-FR')} - GTR POS`, 105, 290, { align: 'center' });
-        doc.save(`Commandes_${client.name.replace(/\s+/g, '_')}_${Utils.today()}.pdf`);
-        SoundSystem.cash();
-        Toast.show('✅ PDF des commandes exporté', 'success');
-        NotificationSystem.add('📄 Export PDF', 'Commandes exportées', 'SUCCESS');
-    },
-    async exportInvoicesPDF() {
-        if (typeof window.jspdf === 'undefined') { Toast.show('❌ jsPDF non chargé', 'error'); return; }
-        const client = State.currentClient;
-        if (!client) return;
-        const invoices = State.ventes.filter(v => v.client === client.name);
-        if (!invoices.length) { Toast.show('⚠️ Aucune facture à exporter', 'warning'); return; }
-        Toast.show('📄 Génération...', 'info');
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-        doc.setFillColor(30, 47, 102);
-        doc.rect(0, 0, 210, 28, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(20);
-        doc.setFont('helvetica', 'bold');
-        doc.text('GTR POS', 105, 12, { align: 'center' });
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'normal');
-        doc.text('Historique des factures', 105, 20, { align: 'center' });
-        doc.setFontSize(9);
-        doc.text(`Client: ${client.name}`, 105, 25, { align: 'center' });
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(10);
-        doc.text(`Date d'export: ${new Date().toLocaleString('fr-FR')}`, 15, 38);
-        doc.text(`Total factures: ${invoices.length}`, 15, 44);
-        doc.text(`Montant total: ${invoices.reduce((s, v) => s + v.total, 0).toFixed(3)} TND`, 15, 50);
-        doc.text(`Solde actuel: ${(client.balance || 0).toFixed(3)} TND`, 15, 56);
-        let y = 66;
-        doc.setFillColor(30, 47, 102);
-        doc.rect(15, y - 5, 180, 8, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'bold');
-        doc.text('N°', 18, y);
-        doc.text('Date', 45, y);
-        doc.text('Articles', 80, y);
-        doc.text('Paye', 120, y);
-        doc.text('Reste', 150, y);
-        doc.text('Total', 195, y, { align: 'right' });
-        doc.setTextColor(0, 0, 0);
-        doc.setFont('helvetica', 'normal');
-        y += 8;
-        invoices.sort((a, b) => (b.date < a.date) ? -1 : 1);
-        invoices.forEach((v, i) => {
-            if (y > 270) { doc.addPage(); y = 20; }
-            const paid = (v.reglements || []).reduce((s, r) => s + r.amount, 0);
-            const rem = v.total - paid;
-            if (i % 2 === 0) { doc.setFillColor(248, 249, 252); doc.rect(15, y - 5, 180, 7, 'F'); }
-            doc.text(String(v.num).substring(0, 15), 18, y);
-            doc.text(Utils.formatDate(v.date), 45, y);
-            doc.text(String((v.lines || []).length), 80, y);
-            doc.text(paid.toFixed(3), 135, y);
-            doc.text(rem.toFixed(3), 165, y);
-            doc.setFont('helvetica', 'bold');
-            doc.text(v.total.toFixed(3), 195, y, { align: 'right' });
-            doc.setFont('helvetica', 'normal');
-            y += 7;
-        });
-        doc.setFontSize(8);
-        doc.setTextColor(120, 120, 120);
-        doc.text(`Genere le ${new Date().toLocaleString('fr-FR')} - GTR POS`, 105, 290, { align: 'center' });
-        doc.save(`Factures_${client.name.replace(/\s+/g, '_')}_${Utils.today()}.pdf`);
-        SoundSystem.cash();
-        Toast.show('✅ PDF des factures exporté', 'success');
-        NotificationSystem.add('📄 Export PDF', 'Factures exportées', 'SUCCESS');
-    },
-    async exportStatementPDF() {
-        if (typeof window.jspdf === 'undefined') { Toast.show('❌ jsPDF non chargé', 'error'); return; }
-        const client = State.currentClient;
-        if (!client) return;
-        const invoices = State.ventes.filter(v => v.client === client.name);
-        const payments = State.caisseClients.filter(c => c.clientName === client.name);
-        Toast.show('📄 Génération...', 'info');
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-        doc.setFillColor(30, 47, 102);
-        doc.rect(0, 0, 210, 30, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(18);
-        doc.setFont('helvetica', 'bold');
-        doc.text('RELEVE DE COMPTE', 105, 13, { align: 'center' });
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`${client.name} — ${new Date().toLocaleDateString('fr-FR')}`, 105, 22, { align: 'center' });
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Informations', 15, 42);
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        doc.text(`Nom: ${client.name}`, 15, 50);
-        doc.text(`Telephone: ${client.phone || '-'}`, 15, 56);
-        doc.text(`Login: ${client.login || '-'}`, 15, 62);
-        doc.text(`MF: ${client.taxId || '-'}`, 15, 68);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Solde', 130, 50);
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(14);
-        doc.setTextColor((client.balance || 0) > 0 ? 192 : 39, (client.balance || 0) > 0 ? 57 : 174, (client.balance || 0) > 0 ? 43 : 96);
-        doc.text(`${(client.balance || 0).toFixed(3)} TND`, 130, 58);
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Total achats: ${invoices.reduce((s, v) => s + v.total, 0).toFixed(3)} TND`, 130, 68);
-        doc.text(`Total paye: ${payments.reduce((s, p) => s + p.amount, 0).toFixed(3)} TND`, 130, 74);
-        let y = 86;
-        doc.setFillColor(30, 47, 102);
-        doc.rect(15, y - 5, 180, 8, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Date', 18, y);
-        doc.text('Document', 45, y);
-        doc.text('Debit', 110, y);
-        doc.text('Credit', 140, y);
-        doc.text('Solde', 195, y, { align: 'right' });
-        doc.setTextColor(0, 0, 0);
-        doc.setFont('helvetica', 'normal');
-        y += 8;
-        let cumul = client.openingBalance || 0;
-        doc.text('-', 18, y);
-        doc.text('Solde ouverture', 45, y);
-        doc.text(cumul.toFixed(3), 195, y, { align: 'right' });
-        y += 7;
-        const allMovements = [];
-        invoices.forEach(v => {
-            const paid = (v.reglements || []).reduce((s, r) => s + r.amount, 0);
-            allMovements.push({ date: v.date, doc: v.num, debit: v.total, credit: paid, type: 'invoice' });
-        });
-        payments.forEach(p => {
-            if (!p.invoiceNum || !invoices.find(v => v.num === p.invoiceNum)) {
-                allMovements.push({ date: p.date, doc: 'Paiement', debit: 0, credit: p.amount, type: 'payment' });
-            }
-        });
-        allMovements.sort((a, b) => (a.date < b.date) ? -1 : 1);
-        allMovements.forEach((m, i) => {
-            if (y > 270) { doc.addPage(); y = 20; }
-            if (i % 2 === 0) { doc.setFillColor(248, 249, 252); doc.rect(15, y - 5, 180, 7, 'F'); }
-            cumul += m.debit - m.credit;
-            doc.text(Utils.formatDate(m.date), 18, y);
-            doc.text(m.doc, 45, y);
-            doc.text(m.debit > 0 ? m.debit.toFixed(3) : '-', 110, y);
-            doc.text(m.credit > 0 ? m.credit.toFixed(3) : '-', 140, y);
-            doc.setFont('helvetica', 'bold');
-            doc.text(cumul.toFixed(3), 195, y, { align: 'right' });
-            doc.setFont('helvetica', 'normal');
-            y += 7;
-        });
-        doc.setFillColor(30, 47, 102);
-        doc.rect(15, y, 180, 10, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(11);
-        doc.text('SOLDE FINAL', 20, y + 6);
-        doc.text(`${cumul.toFixed(3)} TND`, 195, y + 6, { align: 'right' });
-        doc.setFontSize(8);
-        doc.setTextColor(120, 120, 120);
-        doc.text(`Genere le ${new Date().toLocaleString('fr-FR')} - GTR POS`, 105, 290, { align: 'center' });
-        doc.save(`Releve_${client.name.replace(/\s+/g, '_')}_${Utils.today()}.pdf`);
-        SoundSystem.cash();
-        Toast.show('✅ Relevé PDF exporté', 'success');
-        NotificationSystem.add('📄 Export PDF', 'Relevé exporté', 'SUCCESS');
-    },
-    exportDataCSV() {
-        const client = State.currentClient;
-        if (!client) return;
-        const invoices = State.ventes.filter(v => v.client === client.name);
-        const payments = State.caisseClients.filter(c => c.clientName === client.name);
-        const orders = State.orders.filter(o => o.clientId === client.id || o.clientName === client.name);
-        let csv = '\uFEFF';
-        csv += '=== FACTURES ===\n';
-        csv += 'N°,Date,Montant,Payé,Reste,Statut\n';
-        invoices.forEach(v => {
-            const paid = (v.reglements || []).reduce((s, r) => s + r.amount, 0);
-            const rem = v.total - paid;
-            csv += `"${v.num}","${v.date}","${v.total.toFixed(3)}","${paid.toFixed(3)}","${rem.toFixed(3)}","${rem <= 0 ? 'Payée' : 'Impayée'}"\n`;
-        });
-        csv += '\n=== PAIEMENTS ===\n';
-        csv += 'Date,Montant,Méthode,Facture\n';
-        payments.forEach(p => {
-            csv += `"${p.date}","${p.amount.toFixed(3)}","${p.regType || 'Espèces'}","${p.invoiceNum || '-'}"\n`;
-        });
-        csv += '\n=== COMMANDES ===\n';
-        csv += 'N°,Date,Articles,Statut,Total\n';
-        orders.forEach(o => {
-            csv += `"${o.num}","${o.date}","${o.lines.length}","${o.status}","${o.total.toFixed(3)}"\n`;
-        });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `Export_${client.name.replace(/\s+/g, '_')}_${Utils.today()}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        SoundSystem.cash();
-        Toast.show('✅ CSV complet exporté', 'success');
-        NotificationSystem.add('📊 Export CSV', 'Données exportées', 'SUCCESS');
-    },
-    printStatement() {
-        const client = State.currentClient;
-        if (!client) return;
-        BalanceCalculator.recalculateClient(client.name);
-        const docs = State.ventes.filter(v => v.client === client.name).sort((a, b) => a.date < b.date ? -1 : 1);
-        const pays = State.caisseClients.filter(p => p.clientName === client.name);
-        const pendingOrders = State.orders.filter(o => (o.clientId === client.id || o.clientName === client.name) && (o.status === 'pending' || o.status === 'approved'));
-        showPreviewReleve('client', client, docs, pays, pendingOrders);
-    },
-    shareWhatsapp() {
-        const client = State.currentClient;
-        if (!client) return;
-        const invoices = State.ventes.filter(v => v.client === client.name);
-        const totalPurchases = invoices.reduce((s, v) => s + (v.total || 0), 0);
-        const payments = State.caisseClients.filter(c => c.clientName === client.name);
-        const totalPaid = payments.reduce((s, p) => s + (p.amount || 0), 0);
-        const balance = client.balance || 0;
-        const text = `🏢 *${State.companyInfo.name}*\n📋 Relevé de compte\n\n👤 ${client.name}\n📊 Solde: *${balance.toFixed(3)} TND*\n\n📄 Factures: ${invoices.length}\n💰 Achats: ${totalPurchases.toFixed(3)} TND\n💳 Payé: ${totalPaid.toFixed(3)} TND\n\n📞 ${State.companyInfo.phone1 || ''}`;
-        const phone = (client.phone || '').replace(/\D/g, '');
-        const url = phone ? `https://wa.me/216${phone}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
-        window.open(url, '_blank');
-        Toast.show('✅ WhatsApp ouvert', 'success');
-    }
-};// ═══════════════════════════════════════════════════════
-// 🔔 نظام الإشعارات الفورية
-// ═══════════════════════════════════════════════════════
-const ClientNotifications = {
-    _banner: null,
-    _timer: null,
-    _watcher: null,
-    _lastOrdersState: {},
-    
-    init() {
-        this._banner = $('cpNotificationBanner');
-        State.orders.forEach(o => {
-            this._lastOrdersState[o.id || o.cloudId] = o.status;
-        });
-    },
-    
-    show(text, type = 'info', duration = 4000) {
-        if (!this._banner) return;
-        const icons = { info: '🔔', success: '✅', warning: '⚠️', error: '❌' };
-        $('cpNotifIcon').textContent = icons[type] || '🔔';
-        $('cpNotifText').textContent = text;
-        this._banner.className = 'cp-notification-banner show ' + type;
-        
-        if (type === 'success') SoundSystem.success();
-        else if (type === 'error') SoundSystem.error();
-        else if (type === 'warning') SoundSystem.warning();
-        else SoundSystem.notification();
-        
-        clearTimeout(this._timer);
-        this._timer = setTimeout(() => {
-            this._banner.classList.remove('show');
-        }, duration);
-    },
-    
-    checkForChanges() {
-        State.orders.forEach(o => {
-            const key = o.id || o.cloudId;
-            const oldStatus = this._lastOrdersState[key];
-            const newStatus = o.status;
-            
-            // كشف الطلبات الجديدة
-            if (!oldStatus && newStatus === 'pending') {
-                this.show(`🛒 Nouvelle commande ${o.num} créée!`, 'info', 4000);
-                SoundSystem.order();
-            }
-            
-            if (oldStatus && oldStatus !== newStatus) {
-                let msg = '';
-                let type = 'info';
-                switch (newStatus) {
-                    case 'approved':
-                        msg = `✅ Votre commande ${o.num} a été acceptée!`;
-                        type = 'success';
-                        break;
-                    case 'rejected':
-                        msg = `❌ Votre commande ${o.num} a été refusée`;
-                        type = 'error';
-                        break;
-                    case 'delivered':
-                        msg = `🚚 Votre commande ${o.num} est livrée!`;
-                        type = 'success';
-                        break;
-                }
-                if (msg) {
-                    this.show(msg, type, 5000);
-                    NotificationSystem.add('Mise à jour commande', msg, type.toUpperCase());
-                }
-            }
-            this._lastOrdersState[key] = newStatus;
-        });
-    },
-    
-    startWatching() {
-        if (this._watcher) clearInterval(this._watcher);
-        this._watcher = setInterval(() => this.checkForChanges(), 3000);
-    },
-    
-    stopWatching() {
-        if (this._watcher) { clearInterval(this._watcher); this._watcher = null; }
+
+    reset(prefix) {
+        const input = $(prefix + 'ArticleInput');
+        if (input) input.value = '';
+        const sel = $(prefix + 'Article');
+        if (sel) sel.innerHTML = '<option value="">-- Choisir --</option>';
+        const search = $(prefix + 'ArticleSearch');
+        if (search) search.value = '';
     }
 };
 
 // ═══════════════════════════════════════════════════════
-// 💬 نظام الدردشة المباشرة (بدون رد تلقائي)
+// 📄 تلوين رأس الفاتورة حسب الحالة
 // ═══════════════════════════════════════════════════════
-const ClientChat = {
-    _unsubscribe: null,
-    _messages: [],
-    
-    init() {
-        const fab = $('cpChatFab');
-        if (fab) fab.style.display = 'flex';
-        this.loadMessages();
-        this.startRealtimeListener();
-    },
-    
-    open() {
-        const panel = $('cpChatPanel');
-        if (!panel) return;
-        panel.classList.add('show');
-        this.renderMessages();
-        const badge = $('cpChatBadge');
-        if (badge) badge.style.display = 'none';
-        setTimeout(() => {
-            const input = $('cpChatInput');
-            if (input) input.focus();
-            const body = $('cpChatBody');
-            if (body) body.scrollTop = body.scrollHeight;
-        }, 100);
-    },
-    
-    close() {
-        const panel = $('cpChatPanel');
-        if (panel) panel.classList.remove('show');
-    },
-    
-    getChatId() {
-        const client = State.currentClient;
-        if (!client) return null;
-        return 'chat_client_' + client.id;
-    },
-    
-    loadMessages() {
-        const chatId = this.getChatId();
-        if (!chatId) return;
-        try {
-            const saved = localStorage.getItem('gtrpos_' + chatId);
-            this._messages = saved ? JSON.parse(saved) : [];
-            if (!this._messages.length) {
-                this._messages.push({
-                    id: 'welcome',
-                    from: 'vendor',
-                    text: `👋 Bonjour ${State.currentClient.name}, comment pouvons-nous vous aider ?`,
-                    timestamp: new Date().toISOString()
-                });
-                this.saveMessages();
-            }
-        } catch(e) { this._messages = []; }
-    },
-    
-    saveMessages() {
-        const chatId = this.getChatId();
-        if (!chatId) return;
-        try { localStorage.setItem('gtrpos_' + chatId, JSON.stringify(this._messages.slice(-200))); } catch(e) {}
-    },
-    
-    renderMessages() {
-        const body = $('cpChatBody');
-        if (!body) return;
-        if (!this._messages.length) {
-            body.innerHTML = '<div class="cp-empty">💬 Démarrez la conversation</div>';
-            return;
-        }
-        body.innerHTML = this._messages.map(m => {
-            const time = new Date(m.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-            if (m.from === 'system') {
-                return `<div class="cp-chat-msg system">${esc(m.text)}</div>`;
-            }
-            return `<div class="cp-chat-msg ${m.from === 'client' ? 'client' : 'vendor'}">
-                ${esc(m.text)}
-                <span class="time">${time}</span>
-            </div>`;
-        }).join('');
-        setTimeout(() => { body.scrollTop = body.scrollHeight; }, 50);
-    },
-    
-    async send() {
-        const input = $('cpChatInput');
-        if (!input) return;
-        const text = input.value.trim();
-        if (!text) return;
-        
-        const client = State.currentClient;
-        if (!client) return;
-        
-        const msg = {
-            id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-            from: 'client',
-            text: text,
-            timestamp: new Date().toISOString(),
-            clientId: client.id,
-            clientName: client.name,
-            read: false
-        };
-        
-        this._messages.push(msg);
-        this.saveMessages();
-        this.renderMessages();
-        input.value = '';
-        
-        // 🔊 صوت الإرسال (bip خفيف)
-        SoundSystem._playTone(900, 0.08, 'sine', 0.1);
-        
-        // مزامنة مع Firestore (للرؤية عند البائع)
-        if (typeof firebase !== 'undefined' && window.db) {
-            try {
-                await window.db.collection('client_chats').doc(this.getChatId()).set({
-                    clientId: client.id,
-                    clientName: client.name,
-                    clientLogin: client.login || '',
-                    lastMessage: text,
-                    lastMessageAt: msg.timestamp,
-                    messages: this._messages.slice(-100),
-                    unreadByVendor: true
-                }, { merge: true });
-            } catch(e) { console.warn('⚠️ Chat sync failed:', e.message); }
-        }
-        
-        // ✅ الرد التلقائي أُزيل — البائع فقط يمكنه الرد
-    },
-    
-    startRealtimeListener() {
-        if (typeof firebase === 'undefined' || !window.db) return;
-        const client = State.currentClient;
-        if (!client) return;
-        const chatId = this.getChatId();
-        if (!chatId) return;
-        
-        try {
-            if (this._unsubscribe) this._unsubscribe();
-            this._unsubscribe = window.db.collection('client_chats').doc(chatId).onSnapshot(doc => {
-                if (!doc.exists) return;
-                const data = doc.data();
-                if (data.messages && Array.isArray(data.messages)) {
-                    const vendorMsgs = data.messages.filter(m => m.from === 'vendor');
-                    const existingIds = new Set(this._messages.map(m => m.id));
-                    let changed = false;
-                    vendorMsgs.forEach(vm => {
-                        if (!existingIds.has(vm.id)) {
-                            this._messages.push(vm);
-                            changed = true;
-                            if (!vm.read) {
-                                ClientNotifications.show(`💬 Nouveau message: ${vm.text.substring(0, 40)}...`, 'info', 5000);
-                                SoundSystem.chat();
-                            }
-                        }
-                    });
-                    if (changed) {
-                        this._messages.sort((a, b) => a.timestamp < b.timestamp ? -1 : 1);
-                        this.saveMessages();
-                        this.renderMessages();
-                        const badge = $('cpChatBadge');
-                        if (badge && !$('cpChatPanel').classList.contains('show')) {
-                            const count = parseInt(badge.textContent) || 0;
-                            badge.textContent = count + 1;
-                            badge.style.display = 'flex';
-                        }
-                    }
-                }
-            }, err => console.warn('⚠️ Chat listener:', err.message));
-        } catch(e) {}
-    },
-    
-    stopRealtimeListener() {
-        if (this._unsubscribe) { this._unsubscribe(); this._unsubscribe = null; }
-    }
-};
-
-/* ✅✅✅ دوال تلوين رأس الفاتورة حسب الحالة ✅✅✅ */
 function forceInvoiceHeaderColor() {
     setTimeout(() => {
         const vHeader = document.querySelector('#sheet-ventes .invoice-header-modern');
@@ -3268,6 +2473,7 @@ function createEntityModule(cfg) {
             Persistence.save();
             cfg.renderer.render();
             App.closeSheet();
+            SoundSystem.success();
             Toast.show(this.editingId ? '✅ Modifié' : '✅ Enregistré');
         },
         edit() { if (this.editingId == null) { Toast.show('⚠️ Choisissez'); return; } this.save(); },
@@ -3284,6 +2490,7 @@ function createEntityModule(cfg) {
             Persistence.save();
             cfg.renderer.render();
             App.closeSheet();
+            SoundSystem.error();
             Toast.show('🗑️ Supprimé');
         },
         load(id) {
@@ -3329,13 +2536,16 @@ function createTransactionModule(cfg) {
             $(cfg.partyPhone).textContent = '-';
             if (cfg.partyEmail) $(cfg.partyEmail).textContent = '-';
             if (cfg.partyTaxId) $(cfg.partyTaxId).textContent = '-';
-            $(cfg.articleSelect).value = '';
             $(cfg.priceInput).value = '';
             $(cfg.qtyInput).value = 1;
             $(cfg.totalInput).value = '';
             if (cfg.stockHint) $(cfg.stockHint).textContent = 'Stock: -';
+            // reset ArticlePicker
+            const prefix = cfg.prefix === 'VTE' ? 'vi' : 'pi';
+            ArticlePicker.reset(prefix);
             this.renderLines(); this.renderReglements();
-            this.refreshArticleOptions(); this.refreshPartyOptions();
+            this.refreshPartyOptions();
+            ArticlePicker.render(prefix);
             this.updateAccountSummary();
             setTimeout(() => forceInvoiceHeaderColor(), 50);
         },
@@ -3344,10 +2554,8 @@ function createTransactionModule(cfg) {
             if (s) s.innerHTML = '<option value="">-- Choisir --</option>' + cfg.partyList().map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
         },
         refreshArticleOptions() {
-            const used = this.lines.map(l => l.name);
-            const avail = State.articles.filter(a => !used.includes(a.name));
-            const s = $(cfg.articleSelect);
-            if (s) s.innerHTML = '<option value="">-- Choisir --</option>' + avail.map(a => `<option value="${esc(a.id)}">${esc(a.name)}</option>`).join('');
+            const prefix = cfg.prefix === 'VTE' ? 'vi' : 'pi';
+            ArticlePicker.render(prefix);
         },
         fillParty() {
             const p = cfg.partyList().find(x => x.id == $(cfg.partySelect).value);
@@ -3369,7 +2577,7 @@ function createTransactionModule(cfg) {
                 this.originalPartyId = null; this.originalBalance = 0;
                 this.partyTaxId = ''; this.partyAddress = ''; this.partyEmail = ''; this.partySpecialPrices = [];
             }
-            this.updateAccountSummary(); this.refreshArticleOptions();
+            this.updateAccountSummary();
         },
         fillArticle() {
             const a = State.articles.find(x => x.id == $(cfg.articleSelect).value);
@@ -3461,18 +2669,31 @@ function createTransactionModule(cfg) {
             const existing = this.lines.find(l => l.name === name);
             if (existing) { existing.qty += qty; existing.total = existing.price * existing.qty; existing.priceSource = priceSource; }
             else this.lines.push({ name, price, qty, total: price * qty, priceSource });
-            $(cfg.articleSelect).value = ''; $(cfg.priceInput).value = ''; $(cfg.qtyInput).value = 1; $(cfg.totalInput).value = '';
+            $(cfg.articleSelect).innerHTML = '<option value="">-- Choisir --</option>';
+            $(cfg.articleSelect).value = '';
+            $(cfg.priceInput).value = '';
+            $(cfg.qtyInput).value = 1;
+            $(cfg.totalInput).value = '';
             if (cfg.stockHint) $(cfg.stockHint).textContent = 'Stock: -';
-            $(cfg.priceInput).style.borderColor = ''; $(cfg.priceInput).style.background = '';
-            this.renderLines(); this.refreshArticleOptions(); this.updateAccountSummary();
+            $(cfg.priceInput).style.borderColor = '';
+            $(cfg.priceInput).style.background = '';
+            const prefix = cfg.prefix === 'VTE' ? 'vi' : 'pi';
+            ArticlePicker.reset(prefix);
+            this.renderLines();
+            ArticlePicker.render(prefix);
+            this.updateAccountSummary();
             if (cfg.paymentOnlyNotice && $(cfg.paymentOnlyNotice)) $(cfg.paymentOnlyNotice).style.display = 'none';
             if (this.editingId) setInvoiceModified(cfg.isPurchase ? 'achat' : 'vente');
+            SoundSystem.notification();
             Toast.show('✅ Ajouté', 'success');
         },
         removeLine(idx) {
             this.lines.splice(idx, 1);
             if (this.editingRowIndex === idx) this.editingRowIndex = null;
-            this.renderLines(); this.refreshArticleOptions(); this.updateAccountSummary();
+            this.renderLines();
+            const prefix = cfg.prefix === 'VTE' ? 'vi' : 'pi';
+            ArticlePicker.render(prefix);
+            this.updateAccountSummary();
             if (this.editingId) setInvoiceModified(cfg.isPurchase ? 'achat' : 'vente');
         },
         editLine(idx) { this.editingRowIndex = idx; this.renderLines(); },
@@ -3674,7 +2895,10 @@ function createTransactionModule(cfg) {
             this.lines = [...r.lines];
             this.reglements = r.reglements ? [...r.reglements] : [];
             this.editingRowIndex = null; this.isSaved = true;
-            this.renderLines(); this.refreshArticleOptions();
+            this.renderLines();
+            const prefix = cfg.prefix === 'VTE' ? 'vi' : 'pi';
+            ArticlePicker.reset(prefix);
+            ArticlePicker.render(prefix);
             this.renderReglements(); this.updateAccountSummary();
             App.openSheet(cfg.sheet);
             setTimeout(() => {
@@ -3726,9 +2950,7 @@ function createTransactionModule(cfg) {
             Toast.show('✅ WhatsApp ouvert', 'success');
         }
     };
-}
-
-const ClientsRenderer = {
+}const ClientsRenderer = {
     getVisibleClients() {
         const user = State.currentUser;
         if (!user) return [];
@@ -4271,6 +3493,1050 @@ const AchatsModule = createTransactionModule({
     paymentOnlyNotice:'pPaymentOnlyNotice', renderer: AchatsRenderer
 });
 
+const ClientOrder = {
+    lines: [],
+    open() {
+        this.lines = []; this.renderArticles(); this.renderLines();
+        $('coQty').value = 1; $('coPrice').value = ''; $('coNote').value = ''; $('coError').textContent = '';
+        $('clientOrderModal').classList.add('show');
+    },
+    close() { $('clientOrderModal').classList.remove('show'); },
+    renderArticles() {
+        const sel = $('coArticle');
+        if (!sel) return;
+        sel.innerHTML = '<option value="">-- Choisir --</option>' + State.articles.filter(a => (a.stock || 0) > 0).map(a => `<option value="${esc(a.id)}">${esc(a.name)}</option>`).join('');
+    },
+    fillPrice() {
+        const a = State.articles.find(x => x.id == $('coArticle').value);
+        const hint = $('coStockHint');
+        if (!a) { $('coPrice').value = ''; hint.textContent = 'Stock: -'; return; }
+        let price = a.price;
+        const client = State.currentClient;
+        if (client && client.specialPrices) {
+            const sp = client.specialPrices.find(s => s.name === a.name);
+            if (sp) { price = sp.price; hint.textContent = `⭐ Prix spécial (Stock: ${a.stock})`; }
+            else hint.textContent = `Stock: ${a.stock}`;
+        } else hint.textContent = `Stock: ${a.stock}`;
+        $('coPrice').value = price.toFixed(3);
+    },
+    addLine() {
+        const a = State.articles.find(x => x.id == $('coArticle').value);
+        if (!a) { $('coError').textContent = '⚠️ Choisissez un produit'; return; }
+        const price = parseFloat($('coPrice').value) || 0;
+        const qty = parseFloat($('coQty').value) || 0;
+        if (price <= 0 || qty <= 0) { $('coError').textContent = '⚠️ Prix/Qté invalides'; return; }
+        if (qty > (a.stock || 0)) { $('coError').textContent = `⚠️ Stock insuffisant: ${a.stock}`; return; }
+        const existing = this.lines.find(l => l.name === a.name);
+        if (existing) { existing.qty += qty; existing.total = existing.price * existing.qty; }
+        else this.lines.push({ name: a.name, articleId: a.id, price, qty, total: price * qty });
+        $('coError').textContent = ''; $('coArticle').value = ''; $('coPrice').value = ''; $('coQty').value = 1; $('coStockHint').textContent = 'Stock: -';
+        this.renderLines();
+        Toast.show('✅ Ajouté', 'success');
+    },
+    removeLine(i) { this.lines.splice(i, 1); this.renderLines(); },
+    renderLines() {
+        const c = $('coLinesList');
+        if (!c) return;
+        if (!this.lines.length) c.innerHTML = '<div class="cp-empty" style="padding:10px;">🛒 Panier vide</div>';
+        else c.innerHTML = this.lines.map((l, i) => `<div class="special-price-item"><span class="sp-article">${esc(l.name)} × ${Number(l.qty)}</span><span class="sp-price">${Number(l.total).toFixed(3)} TND</span><span class="sp-del" onclick="ClientOrder.removeLine(${i})">✕</span></div>`).join('');
+        const total = this.lines.reduce((s, l) => s + l.total, 0);
+        $('coTotal').textContent = total.toFixed(3) + ' TND';
+    },
+    async submit() {
+        if (!this.lines.length) { $('coError').textContent = '⚠️ Panier vide'; return; }
+        $('coError').textContent = '';
+        const client = State.currentClient;
+        if (!client) { $('coError').textContent = '❌ Client introuvable'; return; }
+        const total = this.lines.reduce((s, l) => s + l.total, 0);
+        if (typeof State.nextId.orders !== 'number' || isNaN(State.nextId.orders)) State.nextId.orders = 1;
+        const orderId = State.nextId.orders;
+        const order = {
+            id: orderId, num: 'CMD-' + String(orderId).padStart(4, '0'),
+            date: Utils.today(), time: new Date().toLocaleTimeString('fr-FR'),
+            clientId: client.id, clientName: client.name, clientLogin: client.login || '',
+            phone: client.phone || '', lines: [...this.lines], total,
+            note: $('coNote').value.trim(), status: 'pending', createdAt: new Date().toISOString()
+        };
+        State.nextId.orders = orderId + 1;
+        State.orders.push(order);
+        Persistence.save();
+        const ok = await this.syncToCloud(order);
+        if (ok) {
+            Toast.show('✅ Commande envoyée au vendeur', 'success');
+            this.close();
+            setTimeout(() => ClientPortal.render(), 150);
+        } else $('coError').textContent = '✅ Commande enregistrée (sera synchronisée automatiquement)';
+    },
+    async syncToCloud(order) {
+        if (typeof firebase === 'undefined') return false;
+        const currentUser = firebase.auth().currentUser;
+        if (currentUser) {
+            try {
+                const client = State.currentClient;
+                await firebase.firestore().collection('orders').doc('order_' + order.id + '_' + Date.now()).set({
+                    ...order, clientLogin: client?.login || '', clientEmail: client?.email || '',
+                    clientUid: currentUser.uid, syncedAt: new Date().toISOString(), source: 'client-portal'
+                });
+                return true;
+            } catch(e) {}
+        }
+        try {
+            const pending = JSON.parse(localStorage.getItem('gtrpos_pending_orders') || '[]');
+            pending.push({ ...order, clientId: State.currentClient?.id, clientLogin: State.currentClient?.login || '', clientEmail: State.currentClient?.email || '', source: 'client-portal-local', pendingSince: new Date().toISOString() });
+            localStorage.setItem('gtrpos_pending_orders', JSON.stringify(pending));
+            updatePendingCount();
+            return true;
+        } catch(e) { return false; }
+    },
+    async syncPendingOrders() {
+        if (typeof firebase === 'undefined' || !window.db) return;
+        const fbUser = firebase.auth().currentUser;
+        if (!fbUser) return;
+        try {
+            const pending = JSON.parse(localStorage.getItem('gtrpos_pending_orders') || '[]');
+            if (!pending.length) return;
+            const batch = window.db.batch();
+            pending.forEach(order => {
+                const docId = 'order_' + order.id + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+                const ref = window.db.collection('orders').doc(docId);
+                batch.set(ref, { ...order, syncedAt: new Date().toISOString(), syncedByStaff: true, source: 'staff-sync' });
+            });
+            await batch.commit();
+            localStorage.removeItem('gtrpos_pending_orders');
+            Toast.show(`✅ ${pending.length} commande(s) synchronisée(s)`, 'success');
+            NotificationSystem.add('📦 Sync Staff', `${pending.length} commande(s) synchronisée(s)`, 'SUCCESS');
+            updatePendingCount();
+        } catch(e) {}
+    }
+};
+
+const ClientPortal = {
+    _ordersUnsub: null, _ventesUnsub: null,
+    _orderFilter: 'all',
+    show() {
+        const client = State.currentClient;
+        if (!client) { Toast.show('❌ Client introuvable', 'error'); return; }
+        $('clientPortal').classList.add('show');
+        $('loginOverlay').classList.add('hide');
+        $('pendingOverlay').classList.add('hide');
+        document.querySelector('.phone').style.display = 'none';
+        $('cpClientName').textContent = client.name || 'Client';
+        BalanceCalculator.recalculateClient(client.name);
+        this.render();
+        this.startClientOrderListener();
+        this.startClientVentesListener();
+        const isStaffView = State.currentUser && State.currentUser.viewedByStaff;
+        const exitBtn = $('cpExitBtn');
+        const staffBadge = $('cpStaffBadge');
+        if (exitBtn) exitBtn.style.display = isStaffView ? 'flex' : 'none';
+        if (staffBadge) staffBadge.style.display = isStaffView ? 'inline-block' : 'none';
+        setTimeout(() => {
+            ClientNotifications.init();
+            ClientNotifications.startWatching();
+            ClientChat.init();
+        }, 500);
+    },
+    hide() {
+        this.stopClientOrderListener();
+        if (this._ventesUnsub) { this._ventesUnsub(); this._ventesUnsub = null; }
+        $('clientPortal').classList.remove('show');
+        document.querySelector('.phone').style.display = 'flex';
+        State.currentClient = null;
+        ClientNotifications.stopWatching();
+        ClientChat.stopRealtimeListener();
+    },
+    toggleSound() {
+        const enabled = SoundSystem.toggle();
+        const btn = $('cpSoundBtn');
+        if (btn) btn.textContent = enabled ? '🔊' : '🔇';
+    },
+    scrollToSection(section) {
+        const map = { invoices: 'cpInvoicesList', orders: 'cpOrdersList', payments: 'cpPaymentsList' };
+        const el = $(map[section]);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
+    setOrderFilter(filter) {
+        this._orderFilter = filter;
+        document.querySelectorAll('#cpOrderFilters .cp-filter-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.filter === filter);
+        });
+        this.renderOrders();
+    },
+    startClientOrderListener() {
+        if (typeof firebase === 'undefined' || !window.db) return;
+        if (this._ordersUnsub) this._ordersUnsub();
+        const client = State.currentClient;
+        if (!client) return;
+        const clientUid = 'client_' + client.id;
+        try {
+            this._ordersUnsub = window.db.collection('orders').where('clientUid', '==', clientUid).onSnapshot(snapshot => {
+                let changed = false;
+                snapshot.docChanges().forEach(change => {
+                    const data = change.doc.data();
+                    const cloudId = change.doc.id;
+                    const idx = State.orders.findIndex(o => o.cloudId === cloudId || (o.num === data.num && o.clientName === data.clientName));
+                    if (idx === -1 && change.type !== 'removed') { State.orders.push({ ...data, cloudId }); changed = true; }
+                    else if (idx !== -1) {
+                        if (change.type === 'removed') { State.orders.splice(idx, 1); changed = true; }
+                        else { State.orders[idx] = { ...State.orders[idx], ...data, cloudId }; changed = true; }
+                    }
+                });
+                if (changed) { Persistence.save(); this.renderOrders(); this.render(); }
+            }, err => console.warn('⚠️ orders listener:', err.message));
+        } catch(e) {}
+    },
+    stopClientOrderListener() { if (this._ordersUnsub) { this._ordersUnsub(); this._ordersUnsub = null; } },
+    startClientVentesListener() {
+        if (typeof firebase === 'undefined') return;
+        if (this._ventesUnsub) this._ventesUnsub();
+        const client = State.currentClient;
+        if (!client || !client.login) return;
+        const currentUser = firebase.auth().currentUser;
+        if (!currentUser) return;
+        try {
+            this._ventesUnsub = firebase.firestore().collection('shared_ventes').where('clientLogin', '==', client.login || '').onSnapshot(snapshot => {
+                let changed = false;
+                snapshot.docChanges().forEach(change => {
+                    const data = change.doc.data();
+                    const cloudId = change.doc.id;
+                    const vId = data.id;
+                    const idx = State.ventes.findIndex(v => v.cloudVenteId === cloudId || v.id === vId);
+                    if (change.type === 'added' || change.type === 'modified') {
+                        const merged = { ...data, cloudVenteId: cloudId };
+                        if (idx === -1) State.ventes.push(merged);
+                        else State.ventes[idx] = { ...State.ventes[idx], ...merged };
+                        changed = true;
+                    } else if (change.type === 'removed' && idx !== -1) { State.ventes.splice(idx, 1); changed = true; }
+                });
+                if (changed) { Persistence.save(); BalanceCalculator.recalculateClient(client.name); this.render(); }
+            }, err => console.warn('⚠️ ventes listener:', err.message));
+        } catch(e) {}
+    },
+    render() {
+        const client = State.currentClient;
+        if (!client) return;
+        const name = client.name;
+        const invoices = State.ventes.filter(v => v.client === name);
+        const payments = State.caisseClients.filter(c => c.clientName === name);
+        const totalPurchases = invoices.reduce((s, v) => s + (v.total || 0), 0);
+        const totalPaid = payments.reduce((s, p) => s + (p.amount || 0), 0);
+        const balance = client.balance || 0;
+        $('cpBalance').textContent = balance.toFixed(3) + ' TND';
+        const noteEl = $('cpBalanceNote');
+        if (Math.abs(balance) < 0.001) { noteEl.textContent = '✅ À jour'; noteEl.className = 'cp-balance-note positive'; }
+        else if (balance > 0) { noteEl.textContent = '⚠️ Reste à payer: ' + balance.toFixed(3) + ' TND'; noteEl.className = 'cp-balance-note negative'; }
+        else { noteEl.textContent = '💰 Crédit: ' + Math.abs(balance).toFixed(3) + ' TND'; noteEl.className = 'cp-balance-note positive'; }
+        $('cpInvoiceCount').textContent = invoices.length;
+        $('cpTotalPaid').textContent = totalPaid.toFixed(3);
+        this.renderInvoices(invoices, payments);
+        this.renderPayments(payments);
+        this.renderOrders();
+        this.renderAdvancedStats();
+        const activeOrdersEl = $('cpActiveOrders');
+        if (activeOrdersEl) {
+            const activeOrders = State.orders.filter(o =>
+                (o.clientId === client.id || o.clientName === client.name) &&
+                (o.status === 'pending' || o.status === 'approved')
+            ).length;
+            activeOrdersEl.textContent = activeOrders;
+        }
+    },
+    renderInvoices(invoices) {
+        const container = $('cpInvoicesList');
+        if (!invoices.length) { container.innerHTML = '<div class="cp-empty"><span class="icon">📭</span>Aucune facture</div>'; return; }
+        const sorted = [...invoices].sort((a, b) => a.date < b.date ? 1 : -1);
+        container.innerHTML = sorted.slice(0, 30).map(v => {
+            const paid = (v.reglements || []).reduce((s, r) => s + r.amount, 0);
+            const rem = (v.total || 0) - paid;
+            const isPaymentOnly = !v.lines || !v.lines.length;
+            let badge, badgeClass;
+            if (isPaymentOnly) { badge = '💰 Règlement'; badgeClass = 'payment'; }
+            else if (rem <= 0.001) { badge = '✅ Payée'; badgeClass = 'paid'; }
+            else if (rem >= v.total - 0.001) { badge = '⏳ Non payée'; badgeClass = 'pending'; }
+            else { badge = '🔄 Partielle'; badgeClass = 'partial'; }
+            const amountDisplay = isPaymentOnly ? paid : (v.total || 0);
+            return `<div class="cp-row"><div class="cp-row-info"><div class="name">${esc(v.num)}<span class="cp-badge ${badgeClass}">${badge}</span></div><div class="meta">${esc(Utils.formatDate(v.date))}</div></div><div class="cp-row-amount">${amountDisplay.toFixed(3)} TND${!isPaymentOnly && rem > 0.001 ? `<small style="color:var(--danger);">Reste: ${rem.toFixed(3)}</small>` : ''}</div></div>`;
+        }).join('');
+    },
+    renderPayments(payments) {
+        const container = $('cpPaymentsList');
+        if (!payments.length) { container.innerHTML = '<div class="cp-empty"><span class="icon">📭</span>Aucun paiement</div>'; return; }
+        const sorted = [...payments].sort((a, b) => a.date < b.date ? 1 : -1);
+        container.innerHTML = sorted.slice(0, 30).map(p => `<div class="cp-row"><div class="cp-row-info"><div class="name">💳 ${esc(p.regType || 'Espèces')}</div><div class="meta">${esc(Utils.formatDate(p.date))} • ${esc(p.invoiceNum || '-')}</div></div><div class="cp-row-amount"><span class="paid">${(p.amount || 0).toFixed(3)} TND</span></div></div>`).join('');
+    },
+    renderOrders() {
+        const c = $('cpOrdersList');
+        if (!c) return;
+        const client = State.currentClient;
+        if (!client) return;
+        let allOrders = State.orders.filter(o => o.clientId === client.id || o.clientName === client.name);
+        const counts = {
+            all: allOrders.length,
+            pending: allOrders.filter(o => o.status === 'pending').length,
+            approved: allOrders.filter(o => o.status === 'approved').length,
+            delivered: allOrders.filter(o => o.status === 'delivered').length,
+            rejected: allOrders.filter(o => o.status === 'rejected').length
+        };
+        ['all','pending','approved','delivered','rejected'].forEach(k => {
+            const el = $('cnt-' + k);
+            if (el) el.textContent = counts[k];
+        });
+        const countEl = $('cpOrdersCount');
+        if (countEl) countEl.textContent = counts.all;
+        allOrders.sort((a, b) => {
+            const dateA = a.createdAt || (a.date + ' ' + (a.time || '00:00:00'));
+            const dateB = b.createdAt || (b.date + ' ' + (b.time || '00:00:00'));
+            return dateA < dateB ? 1 : -1;
+        });
+        let orders = allOrders;
+        if (this._orderFilter !== 'all') orders = orders.filter(o => o.status === this._orderFilter);
+        const q = ($('cpOrdersSearch')?.value || '').trim().toLowerCase();
+        if (q) orders = orders.filter(o => (o.num || '').toLowerCase().includes(q));
+        if (!orders.length) {
+            c.innerHTML = `<div class="cp-empty"><span class="icon">📭</span>Aucune commande ${q ? 'trouvée' : 'dans cette catégorie'}</div>`;
+            return;
+        }
+        const statusMap = {
+            pending: { lbl: '⏳ En attente', cls: 'pending' },
+            approved: { lbl: '✅ Acceptée', cls: 'paid' },
+            rejected: { lbl: '❌ Refusée', cls: 'partial' },
+            delivered: { lbl: '🚚 Livrée', cls: 'paid' }
+        };
+        c.innerHTML = orders.slice(0, 30).map(o => {
+            const s = statusMap[o.status] || statusMap.pending;
+            const itemsPreview = o.lines.slice(0, 3).map(l =>
+                `<div class="cp-order-item-line"><span class="item-name">• ${esc(l.name)} × ${Number(l.qty)}</span><span class="item-total">${Number(l.total).toFixed(3)} TND</span></div>`
+            ).join('');
+            const more = o.lines.length > 3 ? `<div class="cp-order-item-line" style="color:var(--muted);font-size:10px;justify-content:center;">... +${o.lines.length - 3} article(s)</div>` : '';
+            let actionBtns = `<button class="btn-details" onclick="event.stopPropagation();ClientPortal.showOrderDetail(${o.id || `'${o.cloudId}'`})">👁️ Détails</button>`;
+            if (o.status === 'pending') {
+                actionBtns += `<button class="btn-cancel" onclick="event.stopPropagation();ClientPortal.cancelOrder(${o.id || `'${o.cloudId}'`})">❌ Annuler</button>`;
+            }
+            if (o.status === 'delivered' || o.status === 'rejected') {
+                actionBtns += `<button class="btn-reorder" onclick="event.stopPropagation();ClientPortal.reorder(${o.id || `'${o.cloudId}'`})">🔄 Commander</button>`;
+            }
+            if (o.status === 'approved') {
+                actionBtns += `<button class="btn-whatsapp" onclick="event.stopPropagation();ClientPortal.contactVendor(${o.id || `'${o.cloudId}'`})">📱 Contact</button>`;
+            }
+            return `<div class="cp-order-card status-${o.status}" onclick="ClientPortal.showOrderDetail(${o.id || `'${o.cloudId}'`})">
+                <div class="cp-order-header">
+                    <div>
+                        <div class="cp-order-num">${esc(o.num)} <span class="cp-badge ${s.cls}" style="margin-left:4px;">${s.lbl}</span></div>
+                        <div class="cp-order-date">📅 ${esc(Utils.formatDate(o.date))} ${esc(o.time || '')}</div>
+                    </div>
+                    <div class="cp-order-total">${o.total.toFixed(3)} TND</div>
+                </div>
+                <div class="cp-order-items">${itemsPreview}${more}</div>
+                ${o.note ? `<div style="font-size:10px;color:var(--muted);margin-bottom:6px;">📝 ${esc(o.note)}</div>` : ''}
+                <div class="cp-order-actions">${actionBtns}</div>
+            </div>`;
+        }).join('');
+    },
+    showOrderDetail(id) {
+        const o = State.orders.find(x => x.id === id || x.cloudId === id);
+        if (!o) { Toast.show('❌ Commande introuvable'); return; }
+        const statusMap = {
+            pending: { lbl: '⏳ En attente de validation', icon: '⏳', color: '#f39c12' },
+            approved: { lbl: '✅ Acceptée par le vendeur', icon: '✅', color: '#2ecc71' },
+            rejected: { lbl: '❌ Refusée', icon: '❌', color: '#e74c5e' },
+            delivered: { lbl: '🚚 Livrée', icon: '🚚', color: '#3498db' }
+        };
+        const s = statusMap[o.status] || statusMap.pending;
+        const itemsHTML = o.lines.map(l =>
+            `<div style="display:flex;justify-content:space-between;padding:8px 12px;background:var(--bg);border-radius:8px;margin-bottom:4px;">
+                <span style="font-weight:600;">${esc(l.name)} × ${Number(l.qty)}</span>
+                <span style="font-weight:800;color:var(--primary);">${Number(l.total).toFixed(3)} TND</span>
+            </div>`
+        ).join('');
+        const steps = [
+            { key: 'created', title: '📤 Commande envoyée', time: o.createdAt || (o.date + ' ' + (o.time || '')), done: true },
+            { key: 'approved', title: '✅ Acceptée par le vendeur', time: o.approvedAt || '', done: !!o.approvedAt || o.status === 'approved' || o.status === 'delivered' },
+            { key: 'delivered', title: '🚚 Livrée', time: o.deliveredAt || '', done: o.status === 'delivered' },
+        ];
+        if (o.status === 'rejected') {
+            steps[1] = { key: 'rejected', title: '❌ Refusée par le vendeur', time: o.rejectedAt || '', done: true };
+        }
+        const timelineHTML = steps.map(st => {
+            const cls = st.done ? 'done' : (st.key === 'approved' && o.status === 'pending' ? 'active' : '');
+            return `<div class="cp-timeline-step ${cls}">
+                <div class="dot">${st.done ? '✓' : '○'}</div>
+                <div class="step-info">
+                    <div class="step-title">${st.title}</div>
+                    ${st.time ? `<div class="step-time">${esc(st.time)}</div>` : ''}
+                </div>
+            </div>`;
+        }).join('');
+        $('cpOrderDetailTitle').textContent = `📋 Commande ${o.num}`;
+        $('cpOrderDetailBody').innerHTML = `
+            <div style="text-align:center;padding:14px 12px;background:linear-gradient(135deg,${s.color},${s.color}dd);color:#fff;border-radius:14px;margin-bottom:14px;">
+                <div style="font-size:32px;margin-bottom:4px;">${s.icon}</div>
+                <div style="font-size:14px;font-weight:800;">${s.lbl}</div>
+                <div style="font-size:11px;opacity:.9;margin-top:2px;">${esc(o.num)} • ${esc(Utils.formatDate(o.date))}</div>
+            </div>
+            <div class="section-title" style="font-size:13px;margin:14px 0 8px;">📦 Articles commandés</div>
+            ${itemsHTML}
+            <div style="display:flex;justify-content:space-between;padding:10px 12px;background:linear-gradient(135deg,#1a2a5c,#4a6cf7);color:#fff;border-radius:10px;margin-top:8px;">
+                <span style="font-weight:700;">💰 Total</span>
+                <span style="font-weight:800;font-size:16px;">${o.total.toFixed(3)} TND</span>
+            </div>
+            ${o.note ? `<div style="margin-top:12px;padding:10px 12px;background:var(--bg);border-radius:8px;font-size:12px;"><strong>📝 Note:</strong> ${esc(o.note)}</div>` : ''}
+            <div class="section-title" style="font-size:13px;margin:14px 0 8px;">📍 Suivi de la commande</div>
+            <div class="cp-timeline">${timelineHTML}</div>
+            <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+                ${o.status === 'pending' ? `<button class="cp-order-actions btn-cancel" style="flex:1;padding:10px;background:linear-gradient(135deg,#e74c5e,#c0392b);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;" onclick="ClientPortal.cancelOrder(${o.id || `'${o.cloudId}'`});document.getElementById('cpOrderDetailModal').classList.remove('show')">❌ Annuler</button>` : ''}
+                ${o.status === 'delivered' || o.status === 'rejected' ? `<button style="flex:1;padding:10px;background:linear-gradient(135deg,#9b59b6,#8e44ad);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;" onclick="ClientPortal.reorder(${o.id || `'${o.cloudId}'`});document.getElementById('cpOrderDetailModal').classList.remove('show')">🔄 Commander à nouveau</button>` : ''}
+                <button style="flex:1;padding:10px;background:linear-gradient(135deg,#25d366,#128C7E);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:12px;cursor:pointer;" onclick="ClientPortal.contactVendor(${o.id || `'${o.cloudId}'`})">📱 WhatsApp</button>
+            </div>
+        `;
+        $('cpOrderDetailModal').classList.add('show');
+    },
+    async cancelOrder(id) {
+        const o = State.orders.find(x => x.id === id || x.cloudId === id);
+        if (!o) return;
+        if (o.status !== 'pending') { Toast.show('⚠️ Seules les commandes en attente peuvent être annulées', 'warning'); return; }
+        const ok = await CustomConfirm.show('Voulez-vous vraiment annuler cette commande ?', '❌ Annuler la commande');
+        if (!ok) return;
+        o.status = 'rejected';
+        o.rejectedAt = new Date().toISOString();
+        o.cancelledBy = 'client';
+        Persistence.save();
+        if (typeof firebase !== 'undefined' && o.cloudId) {
+            try {
+                await firebase.firestore().collection('orders').doc(o.cloudId).update({
+                    status: 'rejected', rejectedAt: o.rejectedAt, cancelledBy: 'client', updatedByStaff: false
+                });
+            } catch(e) {}
+        }
+        SoundSystem.error();
+        Toast.show('✅ Commande annulée', 'success');
+        NotificationSystem.add('❌ Commande annulée', `${o.num} par le client`, 'WARNING');
+        this.renderOrders();
+        this.render();
+    },
+    reorder(id) {
+        const o = State.orders.find(x => x.id === id || x.cloudId === id);
+        if (!o) return;
+        ClientOrder.lines = o.lines.map(l => ({ ...l }));
+        ClientOrder.renderArticles();
+        ClientOrder.renderLines();
+        $('coQty').value = 1; $('coPrice').value = ''; $('coNote').value = ''; $('coError').textContent = '';
+        $('clientOrderModal').classList.add('show');
+        Toast.show('🔄 Articles pré-remplis', 'info');
+    },
+    contactVendor(id) {
+        const o = State.orders.find(x => x.id === id || x.cloudId === id);
+        if (!o) return;
+        const phone = (State.companyInfo.phone1 || '').replace(/\D/g, '');
+        const text = `🏢 Bonjour, je voudrais des informations sur ma commande ${o.num} (${o.total.toFixed(3)} TND).`;
+        const url = phone ? `https://wa.me/216${phone}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
+        window.open(url, '_blank');
+    },
+    renderAdvancedStats() {
+        const client = State.currentClient;
+        if (!client) return;
+        const container = $('cpStatsGrid');
+        if (!container) return;
+        const invoices = State.ventes.filter(v => v.client === client.name);
+        const payments = State.caisseClients.filter(c => c.clientName === client.name);
+        const orders = State.orders.filter(o => o.clientId === client.id || o.clientName === client.name);
+        const totalPurchases = invoices.reduce((s, v) => s + (v.total || 0), 0);
+        const totalPaid = payments.reduce((s, p) => s + (p.amount || 0), 0);
+        const balance = client.balance || 0;
+        const ordersCount = orders.length;
+        const paidOrders = orders.filter(o => o.status === 'delivered' || o.status === 'approved').length;
+        const pendingOrders = orders.filter(o => o.status === 'pending').length;
+        const avgBasket = ordersCount > 0 ? orders.reduce((s, o) => s + o.total, 0) / ordersCount : 0;
+        const maxOrder = orders.length > 0 ? Math.max(...orders.map(o => o.total)) : 0;
+        const monthlyPayments = [];
+        const now = new Date();
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const monthKey = d.toISOString().slice(0, 7);
+            const monthTotal = payments.filter(p => (p.date || '').startsWith(monthKey)).reduce((s, p) => s + (p.amount || 0), 0);
+            monthlyPayments.push({ label: d.toLocaleDateString('fr-FR', { month: 'short' }), value: monthTotal });
+        }
+        const maxPay = Math.max(...monthlyPayments.map(m => m.value), 1);
+        container.innerHTML = `
+            <div class="cp-stat-card color-blue">
+                <div class="icon-bg">📄</div>
+                <span class="label">Factures</span>
+                <span class="value">${invoices.length}</span>
+                <span class="sub">Total: ${totalPurchases.toFixed(3)} TND</span>
+            </div>
+            <div class="cp-stat-card color-green">
+                <div class="icon-bg">💳</div>
+                <span class="label">Payé</span>
+                <span class="value positive">${totalPaid.toFixed(3)}</span>
+                <span class="sub">TND</span>
+            </div>
+            <div class="cp-stat-card color-orange">
+                <div class="icon-bg">🛒</div>
+                <span class="label">Commandes</span>
+                <span class="value">${ordersCount}</span>
+                <span class="sub">${paidOrders} validées • ${pendingOrders} en attente</span>
+            </div>
+            <div class="cp-stat-card color-red">
+                <div class="icon-bg">💰</div>
+                <span class="label">Solde</span>
+                <span class="value ${balance > 0 ? 'negative' : 'positive'}">${balance.toFixed(3)}</span>
+                <span class="sub">TND ${balance > 0 ? 'à payer' : 'crédit'}</span>
+            </div>
+            <div class="cp-stat-card color-purple" style="grid-column: span 2;">
+                <div class="icon-bg">📈</div>
+                <span class="label">Mes paiements — 6 derniers mois</span>
+                <div class="cp-mini-chart">
+                    ${monthlyPayments.map(m => `
+                        <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+                            <div class="bar" style="height:${(m.value / maxPay * 50) + 4}px;width:100%;" title="${m.value.toFixed(3)} TND"></div>
+                            <div class="bar-label">${m.label}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <span class="sub" style="margin-top:6px;display:block;">Total 6 mois: ${monthlyPayments.reduce((s, m) => s + m.value, 0).toFixed(3)} TND</span>
+            </div>
+            <div class="cp-stat-card color-blue">
+                <div class="icon-bg">🎯</div>
+                <span class="label">Panier moyen</span>
+                <span class="value">${avgBasket.toFixed(3)}</span>
+                <span class="sub">TND</span>
+            </div>
+            <div class="cp-stat-card color-green">
+                <div class="icon-bg">🏆</div>
+                <span class="label">Plus grosse commande</span>
+                <span class="value">${maxOrder.toFixed(3)}</span>
+                <span class="sub">TND</span>
+            </div>
+        `;
+    },
+    async exportOrdersPDF() {
+        if (typeof window.jspdf === 'undefined') { Toast.show('❌ jsPDF non chargé', 'error'); return; }
+        const client = State.currentClient;
+        if (!client) return;
+        const orders = State.orders.filter(o => o.clientId === client.id || o.clientName === client.name);
+        if (!orders.length) { Toast.show('⚠️ Aucune commande à exporter', 'warning'); return; }
+        Toast.show('📄 Génération du PDF...', 'info');
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        doc.setFillColor(30, 47, 102);
+        doc.rect(0, 0, 210, 28, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(20);
+        doc.setFont('helvetica', 'bold');
+        doc.text('GTR POS', 105, 12, { align: 'center' });
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Historique des commandes', 105, 20, { align: 'center' });
+        doc.setFontSize(9);
+        doc.text(`Client: ${client.name}`, 105, 25, { align: 'center' });
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(10);
+        doc.text(`Date d'export: ${new Date().toLocaleString('fr-FR')}`, 15, 38);
+        doc.text(`Total commandes: ${orders.length}`, 15, 44);
+        doc.text(`Montant total: ${orders.reduce((s, o) => s + o.total, 0).toFixed(3)} TND`, 15, 50);
+        let y = 60;
+        doc.setFillColor(30, 47, 102);
+        doc.rect(15, y - 5, 180, 8, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.text('N°', 18, y);
+        doc.text('Date', 45, y);
+        doc.text('Articles', 80, y);
+        doc.text('Statut', 120, y);
+        doc.text('Total', 175, y, { align: 'right' });
+        doc.setTextColor(0, 0, 0);
+        doc.setFont('helvetica', 'normal');
+        y += 8;
+        const statusLabels = { pending: 'En attente', approved: 'Acceptee', rejected: 'Refusee', delivered: 'Livree' };
+        orders.sort((a, b) => (b.createdAt || b.date) < (a.createdAt || a.date) ? -1 : 1);
+        orders.forEach((o, i) => {
+            if (y > 270) { doc.addPage(); y = 20; }
+            if (i % 2 === 0) { doc.setFillColor(248, 249, 252); doc.rect(15, y - 5, 180, 7, 'F'); }
+            doc.text(String(o.num).substring(0, 15), 18, y);
+            doc.text(Utils.formatDate(o.date), 45, y);
+            doc.text(String(o.lines.length) + ' article(s)', 80, y);
+            doc.text(statusLabels[o.status] || o.status, 120, y);
+            doc.setFont('helvetica', 'bold');
+            doc.text(o.total.toFixed(3) + ' TND', 195, y, { align: 'right' });
+            doc.setFont('helvetica', 'normal');
+            y += 7;
+        });
+        doc.setFontSize(8);
+        doc.setTextColor(120, 120, 120);
+        doc.text(`Genere le ${new Date().toLocaleString('fr-FR')} - GTR POS`, 105, 290, { align: 'center' });
+        doc.save(`Commandes_${client.name.replace(/\s+/g, '_')}_${Utils.today()}.pdf`);
+        SoundSystem.cash();
+        Toast.show('✅ PDF des commandes exporté', 'success');
+        NotificationSystem.add('📄 Export PDF', 'Commandes exportées', 'SUCCESS');
+    },
+    async exportInvoicesPDF() {
+        if (typeof window.jspdf === 'undefined') { Toast.show('❌ jsPDF non chargé', 'error'); return; }
+        const client = State.currentClient;
+        if (!client) return;
+        const invoices = State.ventes.filter(v => v.client === client.name);
+        if (!invoices.length) { Toast.show('⚠️ Aucune facture à exporter', 'warning'); return; }
+        Toast.show('📄 Génération...', 'info');
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        doc.setFillColor(30, 47, 102);
+        doc.rect(0, 0, 210, 28, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(20);
+        doc.setFont('helvetica', 'bold');
+        doc.text('GTR POS', 105, 12, { align: 'center' });
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Historique des factures', 105, 20, { align: 'center' });
+        doc.setFontSize(9);
+        doc.text(`Client: ${client.name}`, 105, 25, { align: 'center' });
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(10);
+        doc.text(`Date d'export: ${new Date().toLocaleString('fr-FR')}`, 15, 38);
+        doc.text(`Total factures: ${invoices.length}`, 15, 44);
+        doc.text(`Montant total: ${invoices.reduce((s, v) => s + v.total, 0).toFixed(3)} TND`, 15, 50);
+        doc.text(`Solde actuel: ${(client.balance || 0).toFixed(3)} TND`, 15, 56);
+        let y = 66;
+        doc.setFillColor(30, 47, 102);
+        doc.rect(15, y - 5, 180, 8, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.text('N°', 18, y);
+        doc.text('Date', 45, y);
+        doc.text('Articles', 80, y);
+        doc.text('Paye', 120, y);
+        doc.text('Reste', 150, y);
+        doc.text('Total', 195, y, { align: 'right' });
+        doc.setTextColor(0, 0, 0);
+        doc.setFont('helvetica', 'normal');
+        y += 8;
+        invoices.sort((a, b) => (b.date < a.date) ? -1 : 1);
+        invoices.forEach((v, i) => {
+            if (y > 270) { doc.addPage(); y = 20; }
+            const paid = (v.reglements || []).reduce((s, r) => s + r.amount, 0);
+            const rem = v.total - paid;
+            if (i % 2 === 0) { doc.setFillColor(248, 249, 252); doc.rect(15, y - 5, 180, 7, 'F'); }
+            doc.text(String(v.num).substring(0, 15), 18, y);
+            doc.text(Utils.formatDate(v.date), 45, y);
+            doc.text(String((v.lines || []).length), 80, y);
+            doc.text(paid.toFixed(3), 135, y);
+            doc.text(rem.toFixed(3), 165, y);
+            doc.setFont('helvetica', 'bold');
+            doc.text(v.total.toFixed(3), 195, y, { align: 'right' });
+            doc.setFont('helvetica', 'normal');
+            y += 7;
+        });
+        doc.setFontSize(8);
+        doc.setTextColor(120, 120, 120);
+        doc.text(`Genere le ${new Date().toLocaleString('fr-FR')} - GTR POS`, 105, 290, { align: 'center' });
+        doc.save(`Factures_${client.name.replace(/\s+/g, '_')}_${Utils.today()}.pdf`);
+        SoundSystem.cash();
+        Toast.show('✅ PDF des factures exporté', 'success');
+        NotificationSystem.add('📄 Export PDF', 'Factures exportées', 'SUCCESS');
+    },
+    async exportStatementPDF() {
+        if (typeof window.jspdf === 'undefined') { Toast.show('❌ jsPDF non chargé', 'error'); return; }
+        const client = State.currentClient;
+        if (!client) return;
+        const invoices = State.ventes.filter(v => v.client === client.name);
+        const payments = State.caisseClients.filter(c => c.clientName === client.name);
+        Toast.show('📄 Génération...', 'info');
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        doc.setFillColor(30, 47, 102);
+        doc.rect(0, 0, 210, 30, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.text('RELEVE DE COMPTE', 105, 13, { align: 'center' });
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`${client.name} — ${new Date().toLocaleDateString('fr-FR')}`, 105, 22, { align: 'center' });
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Informations', 15, 42);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.text(`Nom: ${client.name}`, 15, 50);
+        doc.text(`Telephone: ${client.phone || '-'}`, 15, 56);
+        doc.text(`Login: ${client.login || '-'}`, 15, 62);
+        doc.text(`MF: ${client.taxId || '-'}`, 15, 68);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Solde', 130, 50);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(14);
+        doc.setTextColor((client.balance || 0) > 0 ? 192 : 39, (client.balance || 0) > 0 ? 57 : 174, (client.balance || 0) > 0 ? 43 : 96);
+        doc.text(`${(client.balance || 0).toFixed(3)} TND`, 130, 58);
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`Total achats: ${invoices.reduce((s, v) => s + v.total, 0).toFixed(3)} TND`, 130, 68);
+        doc.text(`Total paye: ${payments.reduce((s, p) => s + p.amount, 0).toFixed(3)} TND`, 130, 74);
+        let y = 86;
+        doc.setFillColor(30, 47, 102);
+        doc.rect(15, y - 5, 180, 8, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Date', 18, y);
+        doc.text('Document', 45, y);
+        doc.text('Debit', 110, y);
+        doc.text('Credit', 140, y);
+        doc.text('Solde', 195, y, { align: 'right' });
+        doc.setTextColor(0, 0, 0);
+        doc.setFont('helvetica', 'normal');
+        y += 8;
+        let cumul = client.openingBalance || 0;
+        doc.text('-', 18, y);
+        doc.text('Solde ouverture', 45, y);
+        doc.text(cumul.toFixed(3), 195, y, { align: 'right' });
+        y += 7;
+        const allMovements = [];
+        invoices.forEach(v => {
+            const paid = (v.reglements || []).reduce((s, r) => s + r.amount, 0);
+            allMovements.push({ date: v.date, doc: v.num, debit: v.total, credit: paid, type: 'invoice' });
+        });
+        payments.forEach(p => {
+            if (!p.invoiceNum || !invoices.find(v => v.num === p.invoiceNum)) {
+                allMovements.push({ date: p.date, doc: 'Paiement', debit: 0, credit: p.amount, type: 'payment' });
+            }
+        });
+        allMovements.sort((a, b) => (a.date < b.date) ? -1 : 1);
+        allMovements.forEach((m, i) => {
+            if (y > 270) { doc.addPage(); y = 20; }
+            if (i % 2 === 0) { doc.setFillColor(248, 249, 252); doc.rect(15, y - 5, 180, 7, 'F'); }
+            cumul += m.debit - m.credit;
+            doc.text(Utils.formatDate(m.date), 18, y);
+            doc.text(m.doc, 45, y);
+            doc.text(m.debit > 0 ? m.debit.toFixed(3) : '-', 110, y);
+            doc.text(m.credit > 0 ? m.credit.toFixed(3) : '-', 140, y);
+            doc.setFont('helvetica', 'bold');
+            doc.text(cumul.toFixed(3), 195, y, { align: 'right' });
+            doc.setFont('helvetica', 'normal');
+            y += 7;
+        });
+        doc.setFillColor(30, 47, 102);
+        doc.rect(15, y, 180, 10, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.text('SOLDE FINAL', 20, y + 6);
+        doc.text(`${cumul.toFixed(3)} TND`, 195, y + 6, { align: 'right' });
+        doc.setFontSize(8);
+        doc.setTextColor(120, 120, 120);
+        doc.text(`Genere le ${new Date().toLocaleString('fr-FR')} - GTR POS`, 105, 290, { align: 'center' });
+        doc.save(`Releve_${client.name.replace(/\s+/g, '_')}_${Utils.today()}.pdf`);
+        SoundSystem.cash();
+        Toast.show('✅ Relevé PDF exporté', 'success');
+        NotificationSystem.add('📄 Export PDF', 'Relevé exporté', 'SUCCESS');
+    },
+    exportDataCSV() {
+        const client = State.currentClient;
+        if (!client) return;
+        const invoices = State.ventes.filter(v => v.client === client.name);
+        const payments = State.caisseClients.filter(c => c.clientName === client.name);
+        const orders = State.orders.filter(o => o.clientId === client.id || o.clientName === client.name);
+        let csv = '\uFEFF';
+        csv += '=== FACTURES ===\n';
+        csv += 'N°,Date,Montant,Payé,Reste,Statut\n';
+        invoices.forEach(v => {
+            const paid = (v.reglements || []).reduce((s, r) => s + r.amount, 0);
+            const rem = v.total - paid;
+            csv += `"${v.num}","${v.date}","${v.total.toFixed(3)}","${paid.toFixed(3)}","${rem.toFixed(3)}","${rem <= 0 ? 'Payée' : 'Impayée'}"\n`;
+        });
+        csv += '\n=== PAIEMENTS ===\n';
+        csv += 'Date,Montant,Méthode,Facture\n';
+        payments.forEach(p => {
+            csv += `"${p.date}","${p.amount.toFixed(3)}","${p.regType || 'Espèces'}","${p.invoiceNum || '-'}"\n`;
+        });
+        csv += '\n=== COMMANDES ===\n';
+        csv += 'N°,Date,Articles,Statut,Total\n';
+        orders.forEach(o => {
+            csv += `"${o.num}","${o.date}","${o.lines.length}","${o.status}","${o.total.toFixed(3)}"\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Export_${client.name.replace(/\s+/g, '_')}_${Utils.today()}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        SoundSystem.cash();
+        Toast.show('✅ CSV complet exporté', 'success');
+        NotificationSystem.add('📊 Export CSV', 'Données exportées', 'SUCCESS');
+    },
+    printStatement() {
+        const client = State.currentClient;
+        if (!client) return;
+        BalanceCalculator.recalculateClient(client.name);
+        const docs = State.ventes.filter(v => v.client === client.name).sort((a, b) => a.date < b.date ? -1 : 1);
+        const pays = State.caisseClients.filter(p => p.clientName === client.name);
+        const pendingOrders = State.orders.filter(o => (o.clientId === client.id || o.clientName === client.name) && (o.status === 'pending' || o.status === 'approved'));
+        showPreviewReleve('client', client, docs, pays, pendingOrders);
+    },
+    shareWhatsapp() {
+        const client = State.currentClient;
+        if (!client) return;
+        const invoices = State.ventes.filter(v => v.client === client.name);
+        const totalPurchases = invoices.reduce((s, v) => s + (v.total || 0), 0);
+        const payments = State.caisseClients.filter(c => c.clientName === client.name);
+        const totalPaid = payments.reduce((s, p) => s + (p.amount || 0), 0);
+        const balance = client.balance || 0;
+        const text = `🏢 *${State.companyInfo.name}*\n📋 Relevé de compte\n\n👤 ${client.name}\n📊 Solde: *${balance.toFixed(3)} TND*\n\n📄 Factures: ${invoices.length}\n💰 Achats: ${totalPurchases.toFixed(3)} TND\n💳 Payé: ${totalPaid.toFixed(3)} TND\n\n📞 ${State.companyInfo.phone1 || ''}`;
+        const phone = (client.phone || '').replace(/\D/g, '');
+        const url = phone ? `https://wa.me/216${phone}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
+        window.open(url, '_blank');
+        Toast.show('✅ WhatsApp ouvert', 'success');
+    }
+};
+
+// ═══════════════════════════════════════════════════════
+// 🔔 ClientNotifications
+// ═══════════════════════════════════════════════════════
+const ClientNotifications = {
+    _banner: null,
+    _timer: null,
+    _watcher: null,
+    _lastOrdersState: {},
+
+    init() {
+        this._banner = $('cpNotificationBanner');
+        State.orders.forEach(o => {
+            this._lastOrdersState[o.id || o.cloudId] = o.status;
+        });
+    },
+
+    show(text, type = 'info', duration = 4000) {
+        if (!this._banner) return;
+        const icons = { info: '🔔', success: '✅', warning: '⚠️', error: '❌' };
+        $('cpNotifIcon').textContent = icons[type] || '🔔';
+        $('cpNotifText').textContent = text;
+        this._banner.className = 'cp-notification-banner show ' + type;
+        if (type === 'success') SoundSystem.success();
+        else if (type === 'error') SoundSystem.error();
+        else if (type === 'warning') SoundSystem.warning();
+        else SoundSystem.notification();
+        clearTimeout(this._timer);
+        this._timer = setTimeout(() => {
+            this._banner.classList.remove('show');
+        }, duration);
+    },
+
+    checkForChanges() {
+        State.orders.forEach(o => {
+            const key = o.id || o.cloudId;
+            const oldStatus = this._lastOrdersState[key];
+            const newStatus = o.status;
+            if (!oldStatus && newStatus === 'pending') {
+                this.show(`🛒 Nouvelle commande ${o.num} créée!`, 'info', 4000);
+                SoundSystem.order();
+            }
+            if (oldStatus && oldStatus !== newStatus) {
+                let msg = '';
+                let type = 'info';
+                switch (newStatus) {
+                    case 'approved':
+                        msg = `✅ Votre commande ${o.num} a été acceptée!`;
+                        type = 'success';
+                        break;
+                    case 'rejected':
+                        msg = `❌ Votre commande ${o.num} a été refusée`;
+                        type = 'error';
+                        break;
+                    case 'delivered':
+                        msg = `🚚 Votre commande ${o.num} est livrée!`;
+                        type = 'success';
+                        break;
+                }
+                if (msg) {
+                    this.show(msg, type, 5000);
+                    NotificationSystem.add('Mise à jour commande', msg, type.toUpperCase());
+                }
+            }
+            this._lastOrdersState[key] = newStatus;
+        });
+    },
+
+    startWatching() {
+        if (this._watcher) clearInterval(this._watcher);
+        this._watcher = setInterval(() => this.checkForChanges(), 3000);
+    },
+
+    stopWatching() {
+        if (this._watcher) { clearInterval(this._watcher); this._watcher = null; }
+    }
+};
+
+// ═══════════════════════════════════════════════════════
+// 💬 ClientChat - بدون رد تلقائي
+// ═══════════════════════════════════════════════════════
+const ClientChat = {
+    _unsubscribe: null,
+    _messages: [],
+
+    init() {
+        const fab = $('cpChatFab');
+        if (fab) fab.style.display = 'flex';
+        this.loadMessages();
+        this.startRealtimeListener();
+    },
+
+    open() {
+        const panel = $('cpChatPanel');
+        if (!panel) return;
+        panel.classList.add('show');
+        this.renderMessages();
+        const badge = $('cpChatBadge');
+        if (badge) badge.style.display = 'none';
+        setTimeout(() => {
+            const input = $('cpChatInput');
+            if (input) input.focus();
+            const body = $('cpChatBody');
+            if (body) body.scrollTop = body.scrollHeight;
+        }, 100);
+    },
+
+    close() {
+        const panel = $('cpChatPanel');
+        if (panel) panel.classList.remove('show');
+    },
+
+    getChatId() {
+        const client = State.currentClient;
+        if (!client) return null;
+        return 'chat_client_' + client.id;
+    },
+
+    loadMessages() {
+        const chatId = this.getChatId();
+        if (!chatId) return;
+        try {
+            const saved = localStorage.getItem('gtrpos_' + chatId);
+            this._messages = saved ? JSON.parse(saved) : [];
+            if (!this._messages.length) {
+                this._messages.push({
+                    id: 'welcome',
+                    from: 'vendor',
+                    text: `👋 Bonjour ${State.currentClient.name}, comment pouvons-nous vous aider ?`,
+                    timestamp: new Date().toISOString()
+                });
+                this.saveMessages();
+            }
+        } catch(e) { this._messages = []; }
+    },
+
+    saveMessages() {
+        const chatId = this.getChatId();
+        if (!chatId) return;
+        try { localStorage.setItem('gtrpos_' + chatId, JSON.stringify(this._messages.slice(-200))); } catch(e) {}
+    },
+
+    renderMessages() {
+        const body = $('cpChatBody');
+        if (!body) return;
+        if (!this._messages.length) {
+            body.innerHTML = '<div class="cp-empty">💬 Démarrez la conversation</div>';
+            return;
+        }
+        body.innerHTML = this._messages.map(m => {
+            const time = new Date(m.timestamp).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            if (m.from === 'system') {
+                return `<div class="cp-chat-msg system">${esc(m.text)}</div>`;
+            }
+            return `<div class="cp-chat-msg ${m.from === 'client' ? 'client' : 'vendor'}">
+                ${esc(m.text)}
+                <span class="time">${time}</span>
+            </div>`;
+        }).join('');
+        setTimeout(() => { body.scrollTop = body.scrollHeight; }, 50);
+    },
+
+    async send() {
+        const input = $('cpChatInput');
+        if (!input) return;
+        const text = input.value.trim();
+        if (!text) return;
+        const client = State.currentClient;
+        if (!client) return;
+        const msg = {
+            id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+            from: 'client',
+            text: text,
+            timestamp: new Date().toISOString(),
+            clientId: client.id,
+            clientName: client.name,
+            read: false
+        };
+        this._messages.push(msg);
+        this.saveMessages();
+        this.renderMessages();
+        input.value = '';
+        SoundSystem._playTone(900, 0.08, 'sine', 0.1);
+        if (typeof firebase !== 'undefined' && window.db) {
+            try {
+                await window.db.collection('client_chats').doc(this.getChatId()).set({
+                    clientId: client.id,
+                    clientName: client.name,
+                    clientLogin: client.login || '',
+                    lastMessage: text,
+                    lastMessageAt: msg.timestamp,
+                    messages: this._messages.slice(-100),
+                    unreadByVendor: true
+                }, { merge: true });
+            } catch(e) { console.warn('⚠️ Chat sync failed:', e.message); }
+        }
+        // ✅ الرد التلقائي أُزيل — البائع فقط يمكنه الرد
+    },
+
+    startRealtimeListener() {
+        if (typeof firebase === 'undefined' || !window.db) return;
+        const client = State.currentClient;
+        if (!client) return;
+        const chatId = this.getChatId();
+        if (!chatId) return;
+        try {
+            if (this._unsubscribe) this._unsubscribe();
+            this._unsubscribe = window.db.collection('client_chats').doc(chatId).onSnapshot(doc => {
+                if (!doc.exists) return;
+                const data = doc.data();
+                if (data.messages && Array.isArray(data.messages)) {
+                    const vendorMsgs = data.messages.filter(m => m.from === 'vendor');
+                    const existingIds = new Set(this._messages.map(m => m.id));
+                    let changed = false;
+                    vendorMsgs.forEach(vm => {
+                        if (!existingIds.has(vm.id)) {
+                            this._messages.push(vm);
+                            changed = true;
+                            if (!vm.read) {
+                                ClientNotifications.show(`💬 Nouveau message: ${vm.text.substring(0, 40)}...`, 'info', 5000);
+                                SoundSystem.chat();
+                            }
+                        }
+                    });
+                    if (changed) {
+                        this._messages.sort((a, b) => a.timestamp < b.timestamp ? -1 : 1);
+                        this.saveMessages();
+                        this.renderMessages();
+                        const badge = $('cpChatBadge');
+                        if (badge && !$('cpChatPanel').classList.contains('show')) {
+                            const count = parseInt(badge.textContent) || 0;
+                            badge.textContent = count + 1;
+                            badge.style.display = 'flex';
+                        }
+                    }
+                }
+            }, err => console.warn('⚠️ Chat listener:', err.message));
+        } catch(e) {}
+    },
+
+    stopRealtimeListener() {
+        if (this._unsubscribe) { this._unsubscribe(); this._unsubscribe = null; }
+    }
+};
+
 const Orders = {
     filter: 'pending', _unsubscribe: null,
     startRealtimeListener() {
@@ -4415,7 +4681,7 @@ const Orders = {
             if (existing) { existing.qty += l.qty; existing.total = existing.price * existing.qty; }
             else VentesModule.lines.push({ name: l.name, price: l.price, qty: l.qty, total: l.total });
         });
-        VentesModule.renderLines(); VentesModule.refreshArticleOptions(); VentesModule.updateAccountSummary();
+        VentesModule.renderLines(); ArticlePicker.render('vi'); VentesModule.updateAccountSummary();
         VentesModule._skipStockAdjust = true;
         o.status = 'delivered';
         o.deliveredAt = new Date().toISOString();
@@ -4449,6 +4715,7 @@ const Expenses = {
             if (i !== -1) State.expenses[i] = rec;
         } else State.expenses.push(rec);
         Persistence.save(); this.render(); App.closeSheet();
+        SoundSystem.success();
         Toast.show(this.editingId ? '✅ Modifié' : '✅ Enregistré');
     },
     edit() { if (!this.editingId) return; this.save(); },
@@ -4460,6 +4727,7 @@ const Expenses = {
         if (!ok) return;
         State.expenses.splice(i, 1);
         Persistence.save(); this.render(); App.closeSheet();
+        SoundSystem.error();
         Toast.show('🗑️ Supprimé');
     },
     load(id) {
@@ -5820,8 +6088,7 @@ const App = {
         BalanceCalculator.recalculateAll();
         ClientsRenderer.render(); FournisseursRenderer.render(); ArticlesRenderer.render();
         VentesRenderer.render(); AchatsRenderer.render(); Expenses.render();
-        VentesModule.refreshPartyOptions(); VentesModule.refreshArticleOptions();
-        AchatsModule.refreshPartyOptions(); AchatsModule.refreshArticleOptions();
+        VentesModule.refreshPartyOptions(); AchatsModule.refreshPartyOptions();
         FinanceJour.init(); Marges.init(); Marges.render();
     }
 };
@@ -6436,7 +6703,7 @@ Object.assign(window, {
     Dashboard, Fullscreen, Persistence, BalanceCalculator, ClientLogins, ClientLoginsSync,
     ClientsRenderer, FournisseursRenderer, ArticlesRenderer, VentesRenderer, AchatsRenderer,
     RoleManager, ClientPortal, Toast, Utils, State, SoundSystem,
-    ClientNotifications, ClientChat,
+    ClientNotifications, ClientChat, ArticlePicker,
     PDFExporter, MonthlyProfitReport, AutoSync, ImageExporter,
     forceInvoiceHeaderColor, setInvoiceModified,
     downloadTemplate, handleImportFile, confirmImport, cancelImport,
