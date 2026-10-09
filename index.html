@@ -2,13 +2,13 @@
 <html lang="fr" dir="ltr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="GTR POS">
 <meta name="theme-color" content="#1e2f66">
-<title>GTR POS V 0.9.0</title>
+<title>GTR POS V 0.9.1</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -529,6 +529,15 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .empty-text{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
 .empty-hint{font-size:11px;color:var(--muted)}
 @media(max-width:400px){.amount-main{font-size:16px}.icon-btn{width:30px;height:30px;font-size:13px}.invoice-num-text{font-size:12px}.date-filter-btn{padding:6px 10px;font-size:11px}}
+/* ✅ FIX CLAVIER MOBILE */
+.article-picker-dropdown{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.article-picker-dropdown.keyboard-open{position:fixed!important;z-index:99999!important;box-shadow:0 12px 40px rgba(0,0,0,.35)!important}
+.article-picker-dropdown.keyboard-open .article-picker-search{background:var(--panel);border-bottom:2px solid var(--primary);border-radius:8px 8px 0 0;position:sticky;top:0;z-index:2}
+@media(max-width:768px){
+    .article-picker-search input{font-size:16px!important}
+    .article-picker-dropdown.show{max-height:60vh}
+    .article-picker-dropdown.keyboard-open{max-height:calc(100vh - 120px)!important}
+}
 </style>
 </head><body>
 
@@ -537,7 +546,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
      ═══════════════════════════════════════════════════════ -->
 <div class="login-overlay" id="loginOverlay">
 <div class="login-box">
-<div class="login-logo-icon"><div class="logo-content"><span class="gtr-big">GTR</span><span class="pos-badge">POS</span></div><span class="version-tag">V 0.9.0</span></div>
+<div class="login-logo-icon"><div class="logo-content"><span class="gtr-big">GTR</span><span class="pos-badge">POS</span></div><span class="version-tag">V 0.9.1</span></div>
 <div class="login-logo">GTR POS</div>
 <div class="login-sub" id="loginModeLabel">Connexion à votre compte</div>
 <div class="login-hint">👑 <strong>Admin</strong>: Login = <code>admin</code><br>👤 <strong>Staff</strong>: email + mot de passe<br>🧑‍💼 <strong>Client</strong>: Login + mot de passe</div>
@@ -550,7 +559,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 <div class="login-error" id="loginError"></div>
 <div class="login-loading" id="loginLoading">Chargement...</div>
 <div style="text-align:center;"><span class="cloud-badge">☁️ Mode Cloud Sécurisé</span></div>
-<div class="security-info">🔒 <strong>V 0.9.0</strong> — Login client sans email + SHA-256</div>
+<div class="security-info">🔒 <strong>V 0.9.1</strong> — Login client sans email + SHA-256</div>
 </div>
 </div>
 
@@ -573,7 +582,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 <div class="appbar">
 <div class="appbar-left">
 <div class="logo-icon"><span class="logo-text"><span class="gtr">G</span><span class="pos">POS</span></span><span class="badge-dot">✓</span></div>
-<div><div class="title" id="pageTitle">Accueil</div><div class="sub" onclick="App.openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">V 0.9.0</span></div></div>
+<div><div class="title" id="pageTitle">Accueil</div><div class="sub" onclick="App.openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">V 0.9.1</span></div></div>
 </div>
 <div style="display:flex;gap:6px;align-items:center;">
 <span class="offline-badge" id="offlineBadge">📴 Hors ligne</span>
@@ -611,9 +620,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     SECTION CLIENTS
-     ═══════════════════════════════════════════════════════ -->
+<!-- SECTION CLIENTS -->
 <div class="section" id="sec-clients">
 <div class="import-section">
 <div class="import-header"><h4>📥 Importer des clients</h4>
@@ -634,39 +641,32 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 <div id="clientsList"></div>
 </div>
 
-<!-- SECTION CLIENT HISTORY -->
 <div class="section" id="sec-client-history">
 <div class="section-title">📜 Relevé client - Détails</div>
 <div id="clientHistoryContent"></div>
 </div>
 
-<!-- SECTION FOURNISSEURS -->
 <div class="section" id="sec-fournisseurs">
 <input class="search-box" id="fSearch" placeholder="🔍 Rechercher..." oninput="FournisseursRenderer.render()">
 <div id="fournisseursList"></div>
 </div>
 
-<!-- SECTION FOURNISSEUR HISTORY -->
 <div class="section" id="sec-fournisseur-history">
 <div class="section-title">📜 Relevé fournisseur - Détails</div>
 <div id="fournisseurHistoryContent"></div>
 </div>
 
-<!-- SECTION ARTICLES -->
 <div class="section" id="sec-articles">
 <input class="search-box" id="aSearch" placeholder="🔍 Rechercher..." oninput="ArticlesRenderer.render()">
 <div id="articlesList"></div>
 </div>
 
-<!-- SECTION ARTICLE HISTORY -->
 <div class="section" id="sec-article-history">
 <div class="section-title">📜 Historique article</div>
 <div id="articleHistoryContent"></div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     SECTION VENTES (مع البحث الذكي + الفلاتر)
-     ═══════════════════════════════════════════════════════ -->
+<!-- SECTION VENTES -->
 <div class="section" id="sec-ventes">
 <div class="smart-search-bar">
     <div class="smart-search-input-wrap">
@@ -704,9 +704,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 <div id="ventesList"></div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     SECTION ACHATS (مع البحث الذكي + الفلاتر)
-     ═══════════════════════════════════════════════════════ -->
+<!-- SECTION ACHATS -->
 <div class="section" id="sec-achats">
 <div class="smart-search-bar">
     <div class="smart-search-input-wrap">
@@ -744,18 +742,14 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 <div id="achatsList"></div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     SECTION EXPENSES
-     ═══════════════════════════════════════════════════════ -->
+<!-- SECTION EXPENSES -->
 <div class="section" id="sec-expenses">
 <div class="kpi-row" style="grid-template-columns:1fr;"><div class="kpi-card"><div class="val" id="expensesTotal">0.000 TND</div><div class="lbl">Total des dépenses</div></div></div>
 <input class="search-box" id="expSearch" placeholder="🔍 Rechercher..." oninput="Expenses.render()">
 <div id="expensesList"></div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     SECTION CAISSE
-     ═══════════════════════════════════════════════════════ -->
+<!-- SECTION CAISSE -->
 <div class="section" id="sec-caisse">
 <div class="section-title">💰 Solde de la caisse par mode de paiement</div>
 <div id="caisseSoldeContent"></div>
@@ -763,9 +757,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 <div id="caisseHistoryContent"></div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     SECTION ORDERS (Commandes clients)
-     ═══════════════════════════════════════════════════════ -->
+<!-- SECTION ORDERS -->
 <div class="section" id="sec-orders">
 <div class="section-title">🛒 Commandes reçues</div>
 <div style="display:flex;gap:6px;margin-bottom:8px;">
@@ -778,9 +770,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 <div id="ordersList"></div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     SECTION ACCOUNTS (Admin uniquement)
-     ═══════════════════════════════════════════════════════ -->
+<!-- SECTION ACCOUNTS -->
 <div class="section" id="sec-accounts">
 <div class="account-stats">
 <div class="stat"><div class="num" id="statTotal">0</div><div class="lbl">Total</div></div>
@@ -797,9 +787,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     SECTION CLIENTS LOGINS
-     ═══════════════════════════════════════════════════════ -->
+<!-- SECTION CLIENTS LOGINS -->
 <div class="section" id="sec-clients-logins">
 <div class="section-title">🔑 Liste des Logins clients</div>
 <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">📋 Tous les Logins uniques des clients</div>
@@ -811,9 +799,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 <div id="loginsList"></div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     SECTION FINANCE JOUR
-     ═══════════════════════════════════════════════════════ -->
+<!-- SECTION FINANCE JOUR -->
 <div class="section" id="sec-finance-jour">
 <div class="section-title">📊 Rapport financier du jour</div>
 <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">📅 <span id="financeJourDate">---</span> | ⏰ <span id="financeJourHeure">--:--:--</span></div>
@@ -837,9 +823,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     SECTION REPORTS
-     ═══════════════════════════════════════════════════════ -->
+<!-- SECTION REPORTS -->
 <div class="section" id="sec-reports">
 <div class="section-title">📊 Rapports et statistiques</div>
 <div class="field-row-3">
@@ -869,9 +853,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     SECTION MARGES
-     ═══════════════════════════════════════════════════════ -->
+<!-- SECTION MARGES -->
 <div class="section" id="sec-marges">
 <div class="section-title">📈 Marge bénéficiaire</div>
 <div class="field-row-2" style="margin-bottom:8px;">
@@ -892,9 +874,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     SECTION MONTHLY PROFIT
-     ═══════════════════════════════════════════════════════ -->
+<!-- SECTION MONTHLY PROFIT -->
 <div class="section" id="sec-monthly-profit">
 <div class="section-title">📈 Bénéfices — 12 derniers mois</div>
 <div id="monthlyProfitContent"></div>
@@ -1296,7 +1276,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 <div class="toast" id="toast"></div>
 <div class="toast-modern" id="toastModern"></div>
 </div><!-- end .phone --><!-- ═══════════════════════════════════════════════════════
-     MODAL: تغيير كلمة المرور (Client)
+     MODAL: Changer mot de passe (Client)
      ═══════════════════════════════════════════════════════ -->
 <div class="modal-overlay" id="passwordModal">
 <div class="modal-box">
@@ -1312,7 +1292,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 </div>
 </div>
 
-<!-- MODAL: تغيير كلمة المرور (Admin/Staff) -->
+<!-- MODAL: Changer mot de passe (Admin/Staff) -->
 <div class="modal-overlay" id="staffPasswordModal">
 <div class="modal-box">
 <h3>🔑 Changer mot de passe <span class="admin-badge">ADMIN/STAFF</span></h3>
@@ -1431,7 +1411,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 </div>
 </div>
 
-<!-- Custom Confirm 3 (Toujours / Cette facture / Annuler) -->
+<!-- Custom Confirm 3 -->
 <div class="modal-overlay" id="customConfirm3Modal">
     <div class="modal-box" style="max-width: 420px;">
         <h3 id="customConfirm3Title" style="color: var(--secondary); font-size: 17px; font-weight: 800; text-align: center; margin-bottom: 16px;">💾 Enregistrer le prix</h3>
@@ -1580,8 +1560,8 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 'use strict';
 
 const APP_CONFIG = {
-    version: 'V 0.9.0',
-    storageKey: 'gtrpos_data_v38',
+    version: 'V 0.9.1',
+    storageKey: 'gtrpos_data_v39',
     themeKey: 'gtrpos_theme',
     printKey: 'gtrpos_print_settings',
     dashboardKey: 'gtrpos_dashboard_cols',
@@ -1654,7 +1634,7 @@ const Utils = {
     },
     async hashPassword(password, salt) {
         const enc = new TextEncoder();
-        const data = enc.encode(String(salt) + ':' + String(password) + ':gtrpos_v090');
+        const data = enc.encode(String(salt) + ':' + String(password) + ':gtrpos_v091');
         const buf = await crypto.subtle.digest('SHA-256', data);
         return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
     },
@@ -1863,6 +1843,87 @@ const Theme = {
     }
 };
 
+// ═══════════════════════════════════════════════════════
+// 📱 MobileKeyboardHandler - Fix clavier qui couvre les dropdowns
+// ═══════════════════════════════════════════════════════
+const MobileKeyboardHandler = {
+    _activeDropdown: null,
+    _handler: null,
+    _raf: null,
+
+    init() {
+        if (!window.visualViewport) {
+            console.warn('⚠️ visualViewport non supporté');
+            return;
+        }
+        this._handler = () => {
+            if (this._raf) cancelAnimationFrame(this._raf);
+            this._raf = requestAnimationFrame(() => this._adjust());
+        };
+        window.visualViewport.addEventListener('resize', this._handler);
+        window.visualViewport.addEventListener('scroll', this._handler);
+    },
+
+    register(dropdownId) {
+        this._resetStyles();
+        const dd = document.getElementById(dropdownId);
+        if (!dd) return;
+        this._activeDropdown = dd;
+        setTimeout(() => this._adjust(), 100);
+        setTimeout(() => this._adjust(), 300);
+        setTimeout(() => this._adjust(), 600);
+    },
+
+    unregister() {
+        this._resetStyles();
+        this._activeDropdown = null;
+    },
+
+    _resetStyles() {
+        if (this._activeDropdown) {
+            this._activeDropdown.classList.remove('keyboard-open');
+            this._activeDropdown.style.maxHeight = '';
+            this._activeDropdown.style.top = '';
+            this._activeDropdown.style.bottom = '';
+            this._activeDropdown.style.left = '';
+            this._activeDropdown.style.right = '';
+        }
+    },
+
+    _adjust() {
+        if (!this._activeDropdown || !window.visualViewport) return;
+        
+        const vv = window.visualViewport;
+        const dd = this._activeDropdown;
+        const rect = dd.getBoundingClientRect();
+        
+        const visibleTop = vv.offsetTop;
+        const visibleBottom = vv.offsetTop + vv.height;
+        const visibleHeight = vv.height;
+        const spaceBelow = visibleBottom - rect.top - 8;
+        
+        if (spaceBelow < 150 || rect.top < visibleTop) {
+            dd.classList.add('keyboard-open');
+            dd.style.position = 'fixed';
+            dd.style.top = Math.max(visibleTop + 8, 60) + 'px';
+            dd.style.bottom = 'auto';
+            dd.style.left = rect.left + 'px';
+            dd.style.right = (window.innerWidth - rect.right) + 'px';
+            dd.style.maxHeight = Math.max(200, visibleHeight - 80) + 'px';
+            
+            const searchWrap = dd.querySelector('.article-picker-search');
+            if (searchWrap) {
+                searchWrap.style.position = 'sticky';
+                searchWrap.style.top = '0';
+                searchWrap.style.zIndex = '2';
+            }
+        } else {
+            dd.classList.remove('keyboard-open');
+            dd.style.maxHeight = Math.min(280, spaceBelow) + 'px';
+        }
+    }
+};
+
 const Stock = {
     adjust(name, delta, opts = {}) {
         const a = State.articles.find(x => x.name === name);
@@ -2039,7 +2100,7 @@ const Persistence = {
         try {
             const raw = localStorage.getItem(APP_CONFIG.storageKey);
             if (!raw) {
-                const old = localStorage.getItem('gtrpos_data_v37') || localStorage.getItem('gtrpos_data_v36') || localStorage.getItem('gtrpos_data_v35');
+                const old = localStorage.getItem('gtrpos_data_v38') || localStorage.getItem('gtrpos_data_v37') || localStorage.getItem('gtrpos_data_v36');
                 if (old) { this.deserialize(JSON.parse(old)); this.save(); }
                 return !!old;
             }
@@ -2357,7 +2418,7 @@ const RoleManager = {
 };
 
 // ═══════════════════════════════════════════════════════
-// 📦 ArticlePicker (vi, pi, co)
+// 📦 ArticlePicker
 // ═══════════════════════════════════════════════════════
 const ArticlePicker = {
     _currentPrefix: null,
@@ -2387,15 +2448,20 @@ const ArticlePicker = {
                 document.querySelectorAll('.article-picker-dropdown').forEach(d => d.classList.remove('show'));
                 document.removeEventListener('click', this._handler);
                 this._handler = null;
+                MobileKeyboardHandler.unregister();
             }
         };
         setTimeout(() => document.addEventListener('click', this._handler), 150);
+
+        // ✅ Fix clavier mobile
+        MobileKeyboardHandler.register(prefix + 'ArticleDropdown');
     },
 
     close(prefix) {
         const dropdown = $(prefix + 'ArticleDropdown');
         if (dropdown) dropdown.classList.remove('show');
         if (this._handler) { document.removeEventListener('click', this._handler); this._handler = null; }
+        MobileKeyboardHandler.unregister();
     },
 
     render(prefix) {
@@ -2499,7 +2565,7 @@ const ArticlePicker = {
 };
 
 // ═══════════════════════════════════════════════════════
-// 👤 ClientPicker - قائمة العملاء الذكية
+// 👤 ClientPicker
 // ═══════════════════════════════════════════════════════
 const ClientPicker = {
     _currentPrefix: null,
@@ -2522,15 +2588,18 @@ const ClientPicker = {
                 document.querySelectorAll('.article-picker-dropdown').forEach(d => d.classList.remove('show'));
                 document.removeEventListener('click', this._handler);
                 this._handler = null;
+                MobileKeyboardHandler.unregister();
             }
         };
         setTimeout(() => document.addEventListener('click', this._handler), 150);
+        MobileKeyboardHandler.register(prefix + 'ClientDropdown');
     },
 
     close(prefix) {
         const dropdown = $(prefix + 'ClientDropdown');
         if (dropdown) dropdown.classList.remove('show');
         if (this._handler) { document.removeEventListener('click', this._handler); this._handler = null; }
+        MobileKeyboardHandler.unregister();
     },
 
     render(prefix) {
@@ -2604,7 +2673,7 @@ const ClientPicker = {
 };
 
 // ═══════════════════════════════════════════════════════
-// 🤝 FournisseurPicker - قائمة الموردين الذكية
+// 🤝 FournisseurPicker
 // ═══════════════════════════════════════════════════════
 const FournisseurPicker = {
     _currentPrefix: null,
@@ -2627,15 +2696,18 @@ const FournisseurPicker = {
                 document.querySelectorAll('.article-picker-dropdown').forEach(d => d.classList.remove('show'));
                 document.removeEventListener('click', this._handler);
                 this._handler = null;
+                MobileKeyboardHandler.unregister();
             }
         };
         setTimeout(() => document.addEventListener('click', this._handler), 150);
+        MobileKeyboardHandler.register(prefix + 'SupplierDropdown');
     },
 
     close(prefix) {
         const dropdown = $(prefix + 'SupplierDropdown');
         if (dropdown) dropdown.classList.remove('show');
         if (this._handler) { document.removeEventListener('click', this._handler); this._handler = null; }
+        MobileKeyboardHandler.unregister();
     },
 
     render(prefix) {
@@ -2710,9 +2782,6 @@ const FournisseurPicker = {
     }
 };
 
-// ═══════════════════════════════════════════════════════
-// 📄 تلوين رأس الفاتورة
-// ═══════════════════════════════════════════════════════
 function forceInvoiceHeaderColor() {
     setTimeout(() => {
         const vHeader = document.querySelector('#sheet-ventes .invoice-header-modern');
@@ -2842,7 +2911,6 @@ function createTransactionModule(cfg) {
             this.refreshPartyOptions();
             ArticlePicker.render(prefix);
             this.updateAccountSummary();
-            // ✅ Reset picker
             if (cfg.prefix === 'VTE' && typeof ClientPicker !== 'undefined') ClientPicker.reset('v');
             if (cfg.prefix === 'ACH' && typeof FournisseurPicker !== 'undefined') FournisseurPicker.reset('p');
             setTimeout(() => forceInvoiceHeaderColor(), 50);
@@ -2850,7 +2918,6 @@ function createTransactionModule(cfg) {
         refreshPartyOptions() {
             const s = $(cfg.partySelect);
             if (s) s.innerHTML = '<option value="">-- Choisir --</option>' + cfg.partyList().map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
-            // ✅ تحديث Picker المناسب
             if (cfg.prefix === 'VTE' && typeof ClientPicker !== 'undefined') ClientPicker.reset('v');
             if (cfg.prefix === 'ACH' && typeof FournisseurPicker !== 'undefined') FournisseurPicker.reset('p');
         },
@@ -3202,7 +3269,6 @@ function createTransactionModule(cfg) {
             ArticlePicker.render(prefix);
             this.renderReglements(); this.updateAccountSummary();
             App.openSheet(cfg.sheet);
-            // ✅ تحديث Picker المقابل
             if (cfg.prefix === 'VTE' && typeof ClientPicker !== 'undefined') {
                 const client = State.clients.find(c => c.name === pn);
                 if (client) {
@@ -3344,81 +3410,52 @@ const ArticlesRenderer = {
     }
 };
 
-// ═══════════════════════════════════════════════════════
-// VentesRenderer - مع البحث الذكي + فلاتر التاريخ + بطاقات
-// ═══════════════════════════════════════════════════════
 const VentesRenderer = {
     _dateRange: 'all',
     _customFrom: null,
     _customTo: null,
-
     setDateRange(range) {
         this._dateRange = range;
         document.querySelectorAll('#vDateFilters .date-filter-btn').forEach(b => {
             b.classList.toggle('active', b.dataset.range === range);
         });
-        if (range !== 'custom') {
-            const panel = $('vCustomRange');
-            if (panel) panel.style.display = 'none';
-        }
+        if (range !== 'custom') { const panel = $('vCustomRange'); if (panel) panel.style.display = 'none'; }
         this.render();
     },
-
     toggleCustomRange() {
         const panel = $('vCustomRange');
         if (!panel) return;
         const isVisible = panel.style.display !== 'none';
         panel.style.display = isVisible ? 'none' : 'block';
         if (!isVisible) {
-            if (!this._customFrom) {
-                const d = new Date();
-                d.setDate(d.getDate() - 30);
-                this._customFrom = d.toISOString().slice(0, 10);
-            }
+            if (!this._customFrom) { const d = new Date(); d.setDate(d.getDate() - 30); this._customFrom = d.toISOString().slice(0, 10); }
             if (!this._customTo) this._customTo = Utils.today();
             $('vRangeFrom').value = this._customFrom;
             $('vRangeTo').value = this._customTo;
         }
     },
-
     applyCustomRange() {
         const from = $('vRangeFrom')?.value;
         const to = $('vRangeTo')?.value;
         if (!from || !to) { Toast.show('⚠️ Choisissez les deux dates', 'warning'); return; }
         if (from > to) { Toast.show('⚠️ Date de début après la fin', 'warning'); return; }
-        this._customFrom = from;
-        this._customTo = to;
-        this._dateRange = 'custom';
+        this._customFrom = from; this._customTo = to; this._dateRange = 'custom';
         document.querySelectorAll('#vDateFilters .date-filter-btn').forEach(b => {
             b.classList.toggle('active', b.dataset.range === 'custom');
         });
         Toast.show(`✅ ${Utils.formatDate(from)} → ${Utils.formatDate(to)}`, 'success');
         this.render();
     },
-
     _matchesDateRange(date) {
         if (this._dateRange === 'all') return true;
         const d = new Date(date);
         const today = new Date(); today.setHours(0, 0, 0, 0);
-        if (this._dateRange === 'today') {
-            const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
-            return d >= today && d < tomorrow;
-        }
-        if (this._dateRange === 'week') {
-            const weekAgo = new Date(today); weekAgo.setDate(weekAgo.getDate() - 7);
-            return d >= weekAgo;
-        }
-        if (this._dateRange === 'month') {
-            const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-            const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59);
-            return d >= monthStart && d <= monthEnd;
-        }
-        if (this._dateRange === 'custom' && this._customFrom && this._customTo) {
-            return date >= this._customFrom && date <= this._customTo;
-        }
+        if (this._dateRange === 'today') { const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1); return d >= today && d < tomorrow; }
+        if (this._dateRange === 'week') { const weekAgo = new Date(today); weekAgo.setDate(weekAgo.getDate() - 7); return d >= weekAgo; }
+        if (this._dateRange === 'month') { const monthStart = new Date(today.getFullYear(), today.getMonth(), 1); const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59); return d >= monthStart && d <= monthEnd; }
+        if (this._dateRange === 'custom' && this._customFrom && this._customTo) return date >= this._customFrom && date <= this._customTo;
         return true;
     },
-
     _matchesSearch(v, q) {
         if (!q) return true;
         const ql = q.toLowerCase();
@@ -3430,50 +3467,37 @@ const VentesRenderer = {
         if (v.lines && v.lines.some(l => (l.name || '').toLowerCase().includes(ql))) return true;
         return false;
     },
-
-    clearSearch() {
-        const el = $('vSearch');
-        if (el) { el.value = ''; this.render(); }
-    },
-
+    clearSearch() { const el = $('vSearch'); if (el) { el.value = ''; this.render(); } },
     render() {
         const q = ($('vSearch')?.value || '').trim();
         const list = $('ventesList');
         if (!list) return;
-
         let filtered = State.ventes.filter(v => {
             if (!this._matchesDateRange(v.date)) return false;
             if (!this._matchesSearch(v, q)) return false;
             return true;
         }).sort((a, b) => (a.date < b.date) ? 1 : -1);
-
         this._updateKPIs(filtered);
-
         if (!filtered.length) {
             list.innerHTML = `<div class="empty-state"><span class="empty-icon">📭</span><span class="empty-text">Aucune facture ${q ? 'trouvée' : 'dans cette période'}</span><span class="empty-hint">${q ? 'Essayez un autre mot-clé' : 'Changez la période ci-dessus'}</span></div>`;
             return;
         }
-
         list.innerHTML = filtered.slice(0, 100).map(v => this._renderRow(v)).join('');
     },
-
     _renderRow(v) {
         const paid = (v.reglements || []).reduce((a, r) => a + r.amount, 0);
         const isPaymentOnly = (!v.lines || v.lines.length === 0);
         const rem = isPaymentOnly ? 0 : (v.total - paid);
-
         let badge, badgeClass, badgeIcon;
         if (isPaymentOnly) { badge = 'Règlement'; badgeClass = 'payment-only'; badgeIcon = '💰'; }
         else if (rem <= 0.001) { badge = 'Payée'; badgeClass = 'paid'; badgeIcon = '✅'; }
         else if (rem >= v.total - 0.001) { badge = 'Non payée'; badgeClass = 'pending'; badgeIcon = '⏳'; }
         else { badge = 'Partielle'; badgeClass = 'medium'; badgeIcon = '🔄'; }
-
         const amountDisplay = isPaymentOnly ? paid : v.total;
         const itemCount = (v.lines || []).reduce((s, l) => s + l.qty, 0);
         const linesPreview = (v.lines || []).slice(0, 2).map(l => l.name).join(', ');
         const moreLines = (v.lines || []).length > 2 ? ` +${v.lines.length - 2}` : '';
         const productInfo = isPaymentOnly ? '💰 Règlement uniquement' : `📦 ${itemCount} unité(s)${linesPreview ? ' — ' + Utils.escapeHTML(linesPreview) + moreLines : ''}`;
-
         return `<div class="invoice-card" onclick="VentesModule.load(${v.id})">
             <div class="invoice-card-header">
                 <div class="invoice-num-badge"><span class="invoice-num-icon">📄</span><span class="invoice-num-text">${Utils.escapeHTML(v.num)}</span></div>
@@ -3498,7 +3522,6 @@ const VentesRenderer = {
             </div>
         </div>`;
     },
-
     _updateKPIs(filtered) {
         const count = filtered.length;
         const total = filtered.reduce((s, v) => s + (v.total || 0), 0);
@@ -3508,91 +3531,58 @@ const VentesRenderer = {
             return s + (isPaymentOnly ? 0 : Math.max(0, v.total - paid));
         }, 0);
         const set = (id, val) => { const el = $(id); if (el) el.textContent = val; };
-        set('vKPIcount', count);
-        set('vKPItotal', total.toFixed(3));
-        set('vKPIunpaid', unpaid.toFixed(3));
+        set('vKPIcount', count); set('vKPItotal', total.toFixed(3)); set('vKPIunpaid', unpaid.toFixed(3));
         const mini = $('vStatsMini');
-        if (mini) {
-            mini.innerHTML = `<span class="stat-pill">📄 ${count}</span><span class="stat-pill success">💰 ${total.toFixed(3)}</span>${unpaid > 0 ? `<span class="stat-pill danger">⏳ ${unpaid.toFixed(3)}</span>` : ''}`;
-        }
+        if (mini) mini.innerHTML = `<span class="stat-pill">📄 ${count}</span><span class="stat-pill success">💰 ${total.toFixed(3)}</span>${unpaid > 0 ? `<span class="stat-pill danger">⏳ ${unpaid.toFixed(3)}</span>` : ''}`;
     }
 };
 
-// ═══════════════════════════════════════════════════════
-// AchatsRenderer - مع البحث الذكي + فلاتر التاريخ + بطاقات
-// ═══════════════════════════════════════════════════════
 const AchatsRenderer = {
     _dateRange: 'all',
     _customFrom: null,
     _customTo: null,
-
     setDateRange(range) {
         this._dateRange = range;
         document.querySelectorAll('#pDateFilters .date-filter-btn').forEach(b => {
             b.classList.toggle('active', b.dataset.range === range);
         });
-        if (range !== 'custom') {
-            const panel = $('pCustomRange');
-            if (panel) panel.style.display = 'none';
-        }
+        if (range !== 'custom') { const panel = $('pCustomRange'); if (panel) panel.style.display = 'none'; }
         this.render();
     },
-
     toggleCustomRange() {
         const panel = $('pCustomRange');
         if (!panel) return;
         const isVisible = panel.style.display !== 'none';
         panel.style.display = isVisible ? 'none' : 'block';
         if (!isVisible) {
-            if (!this._customFrom) {
-                const d = new Date();
-                d.setDate(d.getDate() - 30);
-                this._customFrom = d.toISOString().slice(0, 10);
-            }
+            if (!this._customFrom) { const d = new Date(); d.setDate(d.getDate() - 30); this._customFrom = d.toISOString().slice(0, 10); }
             if (!this._customTo) this._customTo = Utils.today();
             $('pRangeFrom').value = this._customFrom;
             $('pRangeTo').value = this._customTo;
         }
     },
-
     applyCustomRange() {
         const from = $('pRangeFrom')?.value;
         const to = $('pRangeTo')?.value;
         if (!from || !to) { Toast.show('⚠️ Choisissez les deux dates', 'warning'); return; }
         if (from > to) { Toast.show('⚠️ Date de début après la fin', 'warning'); return; }
-        this._customFrom = from;
-        this._customTo = to;
-        this._dateRange = 'custom';
+        this._customFrom = from; this._customTo = to; this._dateRange = 'custom';
         document.querySelectorAll('#pDateFilters .date-filter-btn').forEach(b => {
             b.classList.toggle('active', b.dataset.range === 'custom');
         });
         Toast.show(`✅ ${Utils.formatDate(from)} → ${Utils.formatDate(to)}`, 'success');
         this.render();
     },
-
     _matchesDateRange(date) {
         if (this._dateRange === 'all') return true;
         const d = new Date(date);
         const today = new Date(); today.setHours(0, 0, 0, 0);
-        if (this._dateRange === 'today') {
-            const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
-            return d >= today && d < tomorrow;
-        }
-        if (this._dateRange === 'week') {
-            const weekAgo = new Date(today); weekAgo.setDate(weekAgo.getDate() - 7);
-            return d >= weekAgo;
-        }
-        if (this._dateRange === 'month') {
-            const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-            const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59);
-            return d >= monthStart && d <= monthEnd;
-        }
-        if (this._dateRange === 'custom' && this._customFrom && this._customTo) {
-            return date >= this._customFrom && date <= this._customTo;
-        }
+        if (this._dateRange === 'today') { const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1); return d >= today && d < tomorrow; }
+        if (this._dateRange === 'week') { const weekAgo = new Date(today); weekAgo.setDate(weekAgo.getDate() - 7); return d >= weekAgo; }
+        if (this._dateRange === 'month') { const monthStart = new Date(today.getFullYear(), today.getMonth(), 1); const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59); return d >= monthStart && d <= monthEnd; }
+        if (this._dateRange === 'custom' && this._customFrom && this._customTo) return date >= this._customFrom && date <= this._customTo;
         return true;
     },
-
     _matchesSearch(a, q) {
         if (!q) return true;
         const ql = q.toLowerCase();
@@ -3604,50 +3594,37 @@ const AchatsRenderer = {
         if (a.lines && a.lines.some(l => (l.name || '').toLowerCase().includes(ql))) return true;
         return false;
     },
-
-    clearSearch() {
-        const el = $('aSearchP');
-        if (el) { el.value = ''; this.render(); }
-    },
-
+    clearSearch() { const el = $('aSearchP'); if (el) { el.value = ''; this.render(); } },
     render() {
         const q = ($('aSearchP')?.value || '').trim();
         const list = $('achatsList');
         if (!list) return;
-
         let filtered = State.achats.filter(a => {
             if (!this._matchesDateRange(a.date)) return false;
             if (!this._matchesSearch(a, q)) return false;
             return true;
         }).sort((a, b) => (a.date < b.date) ? 1 : -1);
-
         this._updateKPIs(filtered);
-
         if (!filtered.length) {
             list.innerHTML = `<div class="empty-state"><span class="empty-icon">📭</span><span class="empty-text">Aucune facture ${q ? 'trouvée' : 'dans cette période'}</span><span class="empty-hint">${q ? 'Essayez un autre mot-clé' : 'Changez la période ci-dessus'}</span></div>`;
             return;
         }
-
         list.innerHTML = filtered.slice(0, 100).map(a => this._renderRow(a)).join('');
     },
-
     _renderRow(a) {
         const paid = (a.reglements || []).reduce((s, r) => s + r.amount, 0);
         const isPaymentOnly = (!a.lines || a.lines.length === 0);
         const rem = isPaymentOnly ? 0 : (a.total - paid);
-
         let badge, badgeClass, badgeIcon;
         if (isPaymentOnly) { badge = 'Règlement'; badgeClass = 'payment-only'; badgeIcon = '💰'; }
         else if (rem <= 0.001) { badge = 'Payée'; badgeClass = 'paid'; badgeIcon = '✅'; }
         else if (rem >= a.total - 0.001) { badge = 'Non payée'; badgeClass = 'pending'; badgeIcon = '⏳'; }
         else { badge = 'Partielle'; badgeClass = 'medium'; badgeIcon = '🔄'; }
-
         const amountDisplay = isPaymentOnly ? paid : a.total;
         const itemCount = (a.lines || []).reduce((s, l) => s + l.qty, 0);
         const linesPreview = (a.lines || []).slice(0, 2).map(l => l.name).join(', ');
         const moreLines = (a.lines || []).length > 2 ? ` +${a.lines.length - 2}` : '';
         const productInfo = isPaymentOnly ? '💰 Règlement uniquement' : `📦 ${itemCount} unité(s)${linesPreview ? ' — ' + Utils.escapeHTML(linesPreview) + moreLines : ''}`;
-
         return `<div class="invoice-card" onclick="AchatsModule.load(${a.id})">
             <div class="invoice-card-header">
                 <div class="invoice-num-badge"><span class="invoice-num-icon">📄</span><span class="invoice-num-text">${Utils.escapeHTML(a.num)}</span></div>
@@ -3672,19 +3649,14 @@ const AchatsRenderer = {
             </div>
         </div>`;
     },
-
     _updateKPIs(filtered) {
         const count = filtered.length;
         const total = filtered.reduce((s, a) => s + (a.total || 0), 0);
         const paid = filtered.reduce((s, a) => s + (a.reglements || []).reduce((x, r) => x + r.amount, 0), 0);
         const set = (id, val) => { const el = $(id); if (el) el.textContent = val; };
-        set('pKPIcount', count);
-        set('pKPItotal', total.toFixed(3));
-        set('pKPIpaid', paid.toFixed(3));
+        set('pKPIcount', count); set('pKPItotal', total.toFixed(3)); set('pKPIpaid', paid.toFixed(3));
         const mini = $('pStatsMini');
-        if (mini) {
-            mini.innerHTML = `<span class="stat-pill">📄 ${count}</span><span class="stat-pill">💰 ${total.toFixed(3)}</span>${paid > 0 ? `<span class="stat-pill success">💳 ${paid.toFixed(3)}</span>` : ''}`;
-        }
+        if (mini) mini.innerHTML = `<span class="stat-pill">📄 ${count}</span><span class="stat-pill">💰 ${total.toFixed(3)}</span>${paid > 0 ? `<span class="stat-pill success">💳 ${paid.toFixed(3)}</span>` : ''}`;
     }
 };
 
@@ -4996,9 +4968,6 @@ const ClientNotifications = {
     stopWatching() { if (this._watcher) { clearInterval(this._watcher); this._watcher = null; } }
 };
 
-// ═══════════════════════════════════════════════════════
-// CLIENT CHAT
-// ═══════════════════════════════════════════════════════
 const ClientChat = {
     _unsubscribe: null, _messages: [],
     init() {
@@ -5119,9 +5088,6 @@ const ClientChat = {
     stopRealtimeListener() { if (this._unsubscribe) { this._unsubscribe(); this._unsubscribe = null; } }
 };
 
-// ═══════════════════════════════════════════════════════
-// ORDERS (Staff)
-// ═══════════════════════════════════════════════════════
 const Orders = {
     filter: 'pending', _unsubscribe: null,
     startRealtimeListener() {
@@ -5361,9 +5327,6 @@ const Expenses = {
     }
 };
 
-// ═══════════════════════════════════════════════════════
-// HISTORY MODULES
-// ═══════════════════════════════════════════════════════
 function createHistoryModule(cfg) {
     return {
         currentId: null,
@@ -5592,9 +5555,6 @@ const ArticleHistory = {
     }
 };
 
-// ═══════════════════════════════════════════════════════
-// CAISSE HISTORY
-// ═══════════════════════════════════════════════════════
 const CaisseHistory = {
     renderSolde() {
         const container = $('caisseSoldeContent');
@@ -5793,9 +5753,6 @@ const CaisseHistory = {
     }
 };
 
-// ═══════════════════════════════════════════════════════
-// FINANCE JOUR
-// ═══════════════════════════════════════════════════════
 const FinanceJour = {
     data: {},
     init() {
@@ -6596,6 +6553,7 @@ const App = {
     closeSheet() {
         document.querySelectorAll('.sheet').forEach(s => s.classList.remove('show'));
         $('overlay').classList.remove('show');
+        MobileKeyboardHandler.unregister();
     },
     onFabClick() {
         const map = {
@@ -6926,9 +6884,6 @@ const Auth = {
     }
 };
 
-// ═══════════════════════════════════════════════════════
-// IMPORT CLIENTS
-// ═══════════════════════════════════════════════════════
 let importData = [];
 
 function downloadTemplate() {
@@ -7054,9 +7009,6 @@ function cancelImport() {
     Toast.show('❌ Annulé');
 }
 
-// ═══════════════════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════════════════
 function showNotificationPanel() { NotificationSystem.renderPanel(); }
 function closeNotificationPanel() { $('notificationPanel').classList.remove('show'); }
 function openChangePasswordModal() {
@@ -7250,6 +7202,7 @@ Object.assign(window, {
     ClientsRenderer, FournisseursRenderer, ArticlesRenderer, VentesRenderer, AchatsRenderer,
     RoleManager, ClientPortal, Toast, Utils, State, SoundSystem,
     ClientNotifications, ClientChat, ArticlePicker, ClientPicker, FournisseurPicker,
+    MobileKeyboardHandler,
     PDFExporter, MonthlyProfitReport, AutoSync, ImageExporter,
     forceInvoiceHeaderColor, setInvoiceModified,
     downloadTemplate, handleImportFile, confirmImport, cancelImport,
@@ -7322,6 +7275,7 @@ async function bootstrap() {
     CustomConfirm.init();
     CustomConfirm3.init();
     SoundSystem.init();
+    MobileKeyboardHandler.init();
     bindEvents();
     Auth.init();
     Persistence.load();
