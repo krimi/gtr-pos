@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="GTR POS">
 <meta name="theme-color" content="#1e2f66">
-<title>GTR POS V 0.9.4</title>
+<title>GTR POS V 0.9.5</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -35,7 +35,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .appbar .logo-icon .logo-text .pos{font-size:10px;font-weight:700;background:rgba(255,255,255,.2);padding:1px 4px;border-radius:4px;margin-left:1px;letter-spacing:.5px}
 .appbar .logo-icon .badge-dot{position:absolute;bottom:-2px;right:-2px;width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,var(--success),#27ae60);border:2px solid var(--secondary);z-index:2;display:flex;align-items:center;justify-content:center;font-size:6px;color:#fff;font-weight:700}
 .appbar .title{font-size:19px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
-.appbar .sub{font-size:11px;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:4px}
+.appbar .sub{font-size:11px;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
 .appbar-left{display:flex;align-items:center}
 .appbar .menu-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.12);border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:var(--transition);position:relative;z-index:10}
 .appbar .menu-btn .badge{position:absolute;top:-2px;right:-2px;background:var(--danger);color:#fff;border-radius:50%;font-size:9px;padding:1px 5px;display:none}
@@ -87,7 +87,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .btn.outline{background:var(--panel);color:var(--secondary);border:2px solid var(--secondary)}
 .btn.print{background:linear-gradient(135deg,#6c7ae0,#4a56b0)}
 .btn.whatsapp{background:linear-gradient(135deg,#25d366,#128C7E)}
-.btn-invoice-view{background:linear-gradient(135deg,#6b8aff,#4a6cf7);border:none;color:#fff;border-radius:5px;padding:2px 6px;font-size:9px;cursor:pointer;margin-left:4px}
 .invoice-num-link{color:var(--primary);cursor:pointer;text-decoration:underline dotted;font-weight:700}
 .sheet-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);display:none;z-index:20}
 .sheet-overlay.show{display:block}
@@ -122,6 +121,8 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--border)}
 .login-error{color:var(--danger);font-size:12px;min-height:18px}
 .login-toggle{font-size:13px;color:var(--primary);cursor:pointer;font-weight:700;margin-top:4px}
+.login-forgot{font-size:12px;color:var(--muted);cursor:pointer;margin-top:6px;text-align:center;text-decoration:underline}
+.login-forgot:hover{color:var(--primary)}
 .login-loading{font-size:13px;color:var(--muted);margin-top:4px;display:none}
 .cloud-badge{display:inline-block;background:linear-gradient(135deg,#4a6cf7,#2a4ac7);color:#fff;font-size:11px;font-weight:700;padding:6px 14px;border-radius:12px;margin-top:10px}
 .capital-card{background:linear-gradient(135deg,var(--secondary),#2a3f7a);color:#fff;border-radius:var(--card-radius);padding:18px 22px;margin-bottom:12px;text-align:center}
@@ -193,8 +194,9 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .shortcut-help-content table{width:100%;border-collapse:collapse;font-size:13px}
 .shortcut-help-content th{background:var(--secondary);color:#fff;padding:8px 12px;text-align:left}
 .shortcut-help-content td{padding:6px 12px;border-bottom:1px solid var(--border)}
-.role-badge{font-size:9px;padding:2px 8px;border-radius:10px;margin-left:6px;font-weight:700;display:inline-block;color:#fff}
+.role-badge{font-size:9px;padding:2px 8px;border-radius:10px;font-weight:700;display:inline-block;color:#fff}
 .role-badge.admin{background:linear-gradient(135deg,#f39c12,#e67e22)}
+.role-badge.supervisor{background:linear-gradient(135deg,#9b59b6,#8e44ad)}
 .role-badge.staff{background:linear-gradient(135deg,#3498db,#2980b9)}
 .role-badge.client{background:linear-gradient(135deg,#9b59b6,#8e44ad)}
 .role-badge.anonymous{background:linear-gradient(135deg,#95a5a6,#7f8c8d)}/* ═══ INVOICE HEADER MODERN ═══ */
@@ -296,8 +298,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .account-item .status{font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px}
 .account-item .status.approved{background:#d4f4dd;color:#27ae60}
 .account-item .status.pending{background:#fff3cd;color:#856404}
-.account-item .actions{display:flex;gap:4px;grid-column:1/-1}
-.payment-only-notice{display:none!important}
+.account-item .actions{display:flex;gap:4px;grid-column:1/-1;flex-wrap:wrap}
 .preview-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9998;display:none;align-items:center;justify-content:center;padding:12px}
 .preview-modal.show{display:flex}
 .preview-modal-content{background:#fff;border-radius:16px;width:100%;max-width:720px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
@@ -401,10 +402,6 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
     .article-picker-dropdown.show{max-height:60vh}
     .article-picker-dropdown.keyboard-open{max-height:calc(100vh - 120px)!important}
 }
-.stock-negative{color:#c0392b;font-weight:800}
-.stock-zero{color:#e74c5e;font-weight:700}
-.stock-low{color:#e67e22;font-weight:700}
-.stock-ok{color:#27ae60}
 
 /* ═══ CLIENT PORTAL ═══ */
 .client-portal{position:fixed;inset:0;z-index:250;display:none;flex-direction:column;background:var(--bg);color:var(--text);overflow:hidden}
@@ -547,9 +544,7 @@ body.dark-mode{--bg:#0a0e1a;--panel:#141b2d;--text:#f3f4f6;--muted:#9ca3af;--bor
 .login-credentials-box{background:linear-gradient(135deg,#e3f2fd,#bbdefb);border:2px dashed #1976d2;border-radius:10px;padding:12px 14px;margin-top:10px;font-size:11px;color:#0d47a1;text-align:left}
 .login-credentials-box strong{color:#1565c0}
 
-/* ═══════════════════════════════════════════════════
-   🌌 MIDNIGHT THEME — Neon Glow
-   ═══════════════════════════════════════════════════ */
+/* ═══ MIDNIGHT THEME ═══ */
 body.midnight-mode{background:#050810}
 body.midnight-mode .phone{background:#050810}
 body.midnight-mode .appbar{background:linear-gradient(135deg,#0a0e1a 0%,#0f1729 100%);border-bottom:1px solid #00d9ff33;box-shadow:0 0 30px #00d9ff22,0 2px 20px rgba(0,0,0,.5)}
@@ -571,24 +566,16 @@ body.midnight-mode .sheet-handle{background:#00d9ff88;box-shadow:0 0 10px #00d9f
 body.midnight-mode .sheet-header{border-bottom:1px solid #1a2a3a}
 body.midnight-mode .sheet-header h3{color:#00d9ff;text-shadow:0 0 10px #00d9ff66}
 body.midnight-mode .sheet-footer{background:#0a0e1a;border-top:1px solid #1a2a3a}
-body.midnight-mode .menu-btn{background:rgba(0,217,255,.1);border:1px solid #00d9ff44;color:#00d9ff;transition:all .25s ease}
+body.midnight-mode .menu-btn{background:rgba(0,217,255,.1);border:1px solid #00d9ff44;color:#00d9ff}
 body.midnight-mode .menu-btn:hover{background:rgba(0,217,255,.2);box-shadow:0 0 20px rgba(0,217,255,.4)}
 body.midnight-mode .invoice-header-modern{background:linear-gradient(135deg,#0a0e1a,#0f1729) !important;border:1px solid #00d9ff44;box-shadow:0 0 30px rgba(0,217,255,.15)}
-body.midnight-mode .invoice-header-modern.state-saved{background:linear-gradient(135deg,#0a1f15,#0f2918) !important;border-color:#00ff8844;box-shadow:0 0 30px rgba(0,255,136,.2) !important}
-body.midnight-mode .invoice-header-modern.state-modified{background:linear-gradient(135deg,#1a1000,#291800) !important;border-color:#ffcc0044;box-shadow:0 0 30px rgba(255,204,0,.2) !important}
 body.midnight-mode .invoice-title{color:#00d9ff !important;text-shadow:0 0 10px #00d9ff88}
-body.midnight-mode .icon-btn{border:1px solid transparent;transition:all .25s ease}
-body.midnight-mode .icon-btn:hover{transform:scale(1.15);box-shadow:0 0 20px currentColor}
 body.midnight-mode .badge{box-shadow:0 0 15px currentColor;font-weight:800}
 body.midnight-mode .toast-modern{background:#0a0e1a;border:1px solid #00d9ff66;box-shadow:0 0 30px rgba(0,217,255,.4),0 10px 40px rgba(0,0,0,.6);color:#00d9ff;text-shadow:0 0 8px #00d9ff66}
-body.midnight-mode .client-portal{background:#050810}
-body.midnight-mode .cp-balance-card{background:linear-gradient(135deg,#0a0e1a,#00d9ff33);border:1px solid #00d9ff44;box-shadow:0 0 40px rgba(0,217,255,.2)}
-body.midnight-mode .cp-balance{color:#00d9ff;text-shadow:0 0 20px #00d9ff88}
 body.midnight-mode .login-overlay{background:radial-gradient(circle at center,#0a0e1a,#050810)}
 body.midnight-mode .login-box{background:#0a0e1a;border:1px solid #00d9ff44;box-shadow:0 0 60px rgba(0,217,255,.2),0 20px 60px rgba(0,0,0,.5)}
 body.midnight-mode .login-logo-icon{background:linear-gradient(145deg,#00d9ff,#0099cc);box-shadow:0 0 30px #00d9ff88,0 0 60px #00d9ff44;animation:midnight-glow 3s ease-in-out infinite}
 body.midnight-mode .login-logo{color:#00d9ff;text-shadow:0 0 15px #00d9ff88}
-body.midnight-mode #objProgressFill,body.midnight-mode .cp-mini-chart .bar{box-shadow:0 0 15px currentColor}
 body.midnight-mode .history-table th,body.midnight-mode .report-table th{background:#0a0e1a;color:#00d9ff;border-bottom:2px solid #00d9ff44;text-shadow:0 0 8px #00d9ff66}
 body.midnight-mode .history-table td,body.midnight-mode .report-table td{border-color:#1a2a3a}
 body.midnight-mode .modal-box{background:#0a0e1a;border:1px solid #00d9ff44;box-shadow:0 0 60px rgba(0,217,255,.25)}
@@ -603,20 +590,21 @@ body.midnight-mode ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#
 <body><!-- LOGIN OVERLAY -->
 <div class="login-overlay" id="loginOverlay">
 <div class="login-box">
-<div class="login-logo-icon"><div class="logo-content"><span class="gtr-big">GTR</span><span class="pos-badge">POS</span></div><span class="version-tag">V 0.9.4</span></div>
+<div class="login-logo-icon"><div class="logo-content"><span class="gtr-big">GTR</span><span class="pos-badge">POS</span></div><span class="version-tag">V 0.9.5</span></div>
 <div class="login-logo">GTR POS</div>
 <div class="login-sub" id="loginModeLabel">Connexion à votre compte</div>
-<div class="login-hint">👑 <strong>Admin</strong>: Login = <code>admin</code><br>👤 <strong>Staff</strong>: email + mot de passe<br>🧑‍💼 <strong>Client</strong>: Login + mot de passe</div>
+<div class="login-hint">👑 <strong>Admin</strong>: Login = <code>admin</code><br>🎯 <strong>Superviseur</strong>: email + mot de passe<br>👤 <strong>Staff</strong>: email + mot de passe<br>🧑‍💼 <strong>Client</strong>: Login + mot de passe</div>
 <input type="text" id="loginEmail" placeholder="Login / 'admin' / Email" autocomplete="username">
 <div class="password-wrapper"><input type="password" id="loginPassword" placeholder="Mot de passe" autocomplete="current-password"><button class="password-toggle" type="button" onclick="Auth.togglePassword('loginPassword','loginPasswordToggle')" id="loginPasswordToggle">👁️</button></div>
 <button class="login-btn" id="loginMainBtn" onclick="Auth.login()">Se connecter</button>
 <div class="login-toggle" id="loginToggleBtn" onclick="Auth.toggleMode()">Vous n'avez pas de compte ? Créez-en un</div>
+<div class="login-forgot" onclick="Auth.showForgotPassword()">🔑 Mot de passe oublié ?</div>
 <div class="login-divider">Ou</div>
 <button class="login-btn google" onclick="Auth.googleLogin()">Google</button>
 <div class="login-error" id="loginError"></div>
 <div class="login-loading" id="loginLoading">Chargement...</div>
 <div style="text-align:center;"><span class="cloud-badge">☁️ Mode Cloud Sécurisé</span></div>
-<div class="security-info">🔒 <strong>V 0.9.4</strong> — Login client sans email + SHA-256</div>
+<div class="security-info">🔒 <strong>V 0.9.5</strong> — 3 rôles + Journal + Permissions personnalisées</div>
 </div>
 </div>
 
@@ -638,7 +626,7 @@ body.midnight-mode ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#
 <div class="appbar">
 <div class="appbar-left">
 <div class="logo-icon"><span class="logo-text"><span class="gtr">G</span><span class="pos">POS</span></span><span class="badge-dot">✓</span></div>
-<div><div class="title" id="pageTitle">Accueil</div><div class="sub" onclick="App.openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">V 0.9.4</span><span id="roleBadge" class="role-badge anonymous">🚪</span></div></div>
+<div><div class="title" id="pageTitle">Accueil</div><div class="sub" onclick="App.openSheet('company')">GTR POS <span style="opacity:.6;font-weight:400;">V 0.9.5</span><span id="roleBadge" class="role-badge anonymous">🚪</span></div></div>
 </div>
 <div style="display:flex;gap:6px;align-items:center;">
 <span class="offline-badge" id="offlineBadge">📴 Hors ligne</span>
@@ -670,6 +658,7 @@ body.midnight-mode ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#
 <div class="dash-item" data-section="caisse"><span class="dash-icon">💰</span><span class="dash-label">Caisse</span></div>
 <div class="dash-item" data-section="top-produits" style="background:linear-gradient(135deg,#8e44ad,#6c3483);color:#fff;"><span class="dash-icon">🏆</span><span class="dash-label" style="color:#fff;">Top produits</span></div>
 <div class="dash-item" data-section="objectifs" style="background:linear-gradient(135deg,#16a085,#1abc9c);color:#fff;"><span class="dash-icon">🎯</span><span class="dash-label" style="color:#fff;">Objectifs</span></div>
+<div class="dash-item" data-section="activity-log" style="background:linear-gradient(135deg,#8e44ad,#6c3483);color:#fff;" data-admin-only><span class="dash-icon">📜</span><span class="dash-label" style="color:#fff;">Journal</span></div>
 <div class="dash-item" data-section="accounts" id="dashAccounts"><span class="dash-icon">👑</span><span class="dash-label">Comptes</span></div>
 <div class="dash-item" data-section="finance-jour" style="background:linear-gradient(135deg,#1a2a5c,#2a3f7a);color:#fff;"><span class="dash-icon">📊</span><span class="dash-label" style="color:#fff;">Rapport jour</span></div>
 </div>
@@ -888,6 +877,34 @@ body.midnight-mode ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#
 <div id="objStatus" style="text-align:center;font-size:14px;font-weight:800;margin-top:10px;"></div>
 </div>
 
+<!-- ═══ ACTIVITY LOG (Admin only) ═══ -->
+<div class="section" id="sec-activity-log">
+<div class="section-title">📜 Journal d'activité</div>
+<div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+<button class="btn outline small" onclick="ActivityLog.filter='all';ActivityLog.render();" style="flex:1;">📋 Tout</button>
+<button class="btn save small" onclick="ActivityLog.filter='create';ActivityLog.render();" style="flex:1;">➕ Créations</button>
+<button class="btn edit small" onclick="ActivityLog.filter='update';ActivityLog.render();" style="flex:1;">✏️ Modifications</button>
+<button class="btn del small" onclick="ActivityLog.filter='delete';ActivityLog.render();" style="flex:1;">🗑️ Suppressions</button>
+</div>
+<div class="field-row-2">
+<div class="field"><label>📅 Du</label><input type="date" id="activityFrom" onchange="ActivityLog.render()"></div>
+<div class="field"><label>📅 Au</label><input type="date" id="activityTo" onchange="ActivityLog.render()"></div>
+</div>
+<input class="search-box" id="activitySearch" placeholder="🔍 Rechercher (user, action, cible)..." oninput="ActivityLog.render()">
+<div class="kpi-row" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+<div class="kpi-card"><div class="val" id="actKPItotal">0</div><div class="lbl">📊 Total</div></div>
+<div class="kpi-card"><div class="val" id="actKPIcreate" style="color:var(--success);">0</div><div class="lbl">➕ Créations</div></div>
+<div class="kpi-card"><div class="val" id="actKPIupdate" style="color:var(--warning);">0</div><div class="lbl">✏️ Modifs</div></div>
+<div class="kpi-card"><div class="val" id="actKPIdelete" style="color:var(--danger);">0</div><div class="lbl">🗑️ Suppr.</div></div>
+</div>
+<div id="activityList"></div>
+<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
+<button class="btn print small" onclick="ActivityLog.printReport()">🖨️ Imprimer</button>
+<button class="btn outline small" onclick="ActivityLog.exportCSV()">📥 CSV</button>
+<button class="btn del small" onclick="ActivityLog.clearAll()">🗑️ Vider</button>
+</div>
+</div>
+
 <!-- ═══ ACCOUNTS ═══ -->
 <div class="section" id="sec-accounts">
 <div class="account-stats">
@@ -929,7 +946,7 @@ body.midnight-mode ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#
 </div>
 </div>
 
-<!-- ═══ REPORTS (caché, accessible programmatiquement) ═══ -->
+<!-- ═══ REPORTS (caché) ═══ -->
 <div class="section" id="sec-reports">
 <div class="section-title">📊 Rapports et statistiques</div>
 <div class="field-row-3">
@@ -1406,6 +1423,36 @@ body.midnight-mode ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#
 </div>
 </div>
 
+<!-- ═══ MODAL: Mot de passe oublié ═══ -->
+<div class="modal-overlay" id="forgotPasswordModal">
+<div class="modal-box">
+<h3>🔑 Mot de passe oublié</h3>
+<div style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:12px;line-height:1.6;">
+Entrez votre <strong>email</strong> et nous vous enverrons un lien pour réinitialiser votre mot de passe.
+<br><small style="opacity:.8;">⚠️ Valide uniquement pour les comptes Staff/Superviseur</small>
+</div>
+<div class="field"><label>📧 Votre email</label><input type="email" id="forgotEmail" placeholder="votre.email@exemple.com" style="direction:ltr;text-align:left;"></div>
+<div class="modal-error" id="forgotError"></div>
+<div class="modal-actions">
+<button class="btn save" onclick="Auth.sendPasswordReset()">📧 Envoyer</button>
+<button class="btn del" onclick="Auth.closeForgotPassword()">Annuler</button>
+</div>
+</div>
+</div>
+
+<!-- ═══ MODAL: Permissions personnalisées ═══ -->
+<div class="modal-overlay" id="customPermissionsModal">
+<div class="modal-box" style="max-width:500px;">
+<h3>🛡️ Permissions personnalisées</h3>
+<div id="permUserName" style="text-align:center;font-size:13px;font-weight:700;color:var(--primary);margin-bottom:12px;"></div>
+<div style="max-height:55vh;overflow-y:auto;padding-right:4px;" id="permCheckboxes"></div>
+<div class="modal-actions">
+<button class="btn save" onclick="CustomPermissions.save()">💾 Enregistrer</button>
+<button class="btn del" onclick="CustomPermissions.close()">Annuler</button>
+</div>
+</div>
+</div>
+
 <!-- MODAL: Client Order -->
 <div class="modal-overlay" id="clientOrderModal">
 <div class="modal-box" style="max-width:420px;">
@@ -1645,8 +1692,8 @@ body.midnight-mode ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#
 'use strict';
 
 const APP_CONFIG = {
-    version: 'V 0.9.4',
-    storageKey: 'gtrpos_data_v42',
+    version: 'V 0.9.5',
+    storageKey: 'gtrpos_data_v43',
     themeKey: 'gtrpos_theme',
     printKey: 'gtrpos_print_settings',
     dashboardKey: 'gtrpos_dashboard_cols',
@@ -1723,7 +1770,7 @@ const Utils = {
     },
     async hashPassword(password, salt) {
         const enc = new TextEncoder();
-        const data = enc.encode(String(salt) + ':' + String(password) + ':gtrpos_v094');
+        const data = enc.encode(String(salt) + ':' + String(password) + ':gtrpos_v095');
         const buf = await crypto.subtle.digest('SHA-256', data);
         return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
     },
@@ -2086,13 +2133,12 @@ const ClientLoginsSync = {
 };
 
 // ═══════════════════════════════════════════════════
-// 💾 PERSISTENCE (بدون AutoSync — مع debounce)
+// 💾 PERSISTENCE
 // ═══════════════════════════════════════════════════
 const Persistence = {
     _pendingSyncs: [],
     _syncTimer: null,
     _lastSyncHash: null,
-
     serialize() {
         return {
             clients: State.clients, fournisseurs: State.fournisseurs,
@@ -2182,7 +2228,7 @@ const Persistence = {
         try {
             const raw = localStorage.getItem(APP_CONFIG.storageKey);
             if (!raw) {
-                const old = localStorage.getItem('gtrpos_data_v41') || localStorage.getItem('gtrpos_data_v40') || localStorage.getItem('gtrpos_data_v39');
+                const old = localStorage.getItem('gtrpos_data_v42') || localStorage.getItem('gtrpos_data_v41') || localStorage.getItem('gtrpos_data_v40');
                 if (old) { this.deserialize(JSON.parse(old)); this.save(); }
                 return !!old;
             }
@@ -2227,6 +2273,217 @@ const Persistence = {
             } catch(err) { Toast.show('❌ Erreur'); }
         };
         reader.readAsText(file);
+    }
+};
+
+// ═══════════════════════════════════════════════════
+// 📜 ACTIVITY LOG (سجل النشاط)
+// ═══════════════════════════════════════════════════
+const ActivityLog = {
+    KEY: 'gtrpos_activity_log',
+    MAX: 1000,
+    filter: 'all',
+    _data: [],
+    init() {
+        try {
+            const saved = localStorage.getItem(this.KEY);
+            this._data = saved ? JSON.parse(saved) : [];
+        } catch(e) { this._data = []; }
+        const now = new Date();
+        const monthAgo = new Date();
+        monthAgo.setDate(monthAgo.getDate() - 30);
+        if ($('activityFrom')) $('activityFrom').value = monthAgo.toISOString().slice(0, 10);
+        if ($('activityTo')) $('activityTo').value = now.toISOString().slice(0, 10);
+    },
+    log(action, entity, details, entityId = null) {
+        try {
+            const user = State.currentUser || {};
+            const userLabel = user.isLocalAdmin ? 'Admin' : 
+                              user.isSupervisor ? (user.email || 'Superviseur') :
+                              user.isStaff ? (user.email || 'Staff') :
+                              user.login ? user.login :
+                              user.email || 'Inconnu';
+            const role = user.isLocalAdmin ? 'admin' :
+                         user.isSupervisor ? 'supervisor' :
+                         user.isStaff ? 'staff' :
+                         user.isClient ? 'client' : 'unknown';
+            const entry = {
+                id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+                timestamp: new Date().toISOString(),
+                action, entity, entityId, details,
+                user: userLabel, role,
+                staffOwner: user.uid || null
+            };
+            this._data.unshift(entry);
+            if (this._data.length > this.MAX) this._data = this._data.slice(0, this.MAX);
+            localStorage.setItem(this.KEY, JSON.stringify(this._data));
+            if (window.db && !user.isClient && !user.isLocalAdmin) {
+                window.db.collection('activity_log').add(entry).catch(() => {});
+            }
+        } catch(e) {}
+    },
+    getFiltered() {
+        const from = $('activityFrom')?.value;
+        const to = $('activityTo')?.value;
+        const q = ($('activitySearch')?.value || '').trim().toLowerCase();
+        return this._data.filter(e => {
+            if (this.filter !== 'all' && e.action !== this.filter) return false;
+            if (from && e.timestamp.slice(0, 10) < from) return false;
+            if (to && e.timestamp.slice(0, 10) > to) return false;
+            if (q) {
+                const hay = [e.user, e.action, e.entity, e.details, e.role].join(' ').toLowerCase();
+                if (!hay.includes(q)) return false;
+            }
+            return true;
+        });
+    },
+    render() {
+        const list = $('activityList');
+        if (!list) return;
+        const filtered = this.getFiltered();
+        const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+        set('actKPItotal', filtered.length);
+        set('actKPIcreate', filtered.filter(e => e.action === 'create').length);
+        set('actKPIupdate', filtered.filter(e => e.action === 'update').length);
+        set('actKPIdelete', filtered.filter(e => e.action === 'delete').length);
+        if (!filtered.length) {
+            list.innerHTML = '<div class="empty-msg">📭 Aucune activité dans cette période</div>';
+            return;
+        }
+        const actionMap = {
+            create: { icon: '➕', color: '#2ecc71', label: 'Création' },
+            update: { icon: '✏️', color: '#f39c12', label: 'Modification' },
+            delete: { icon: '🗑️', color: '#e74c5e', label: 'Suppression' },
+            login:  { icon: '🔓', color: '#3498db', label: 'Connexion' },
+            logout: { icon: '🔒', color: '#95a5a6', label: 'Déconnexion' },
+            view:   { icon: '👁️', color: '#9b59b6', label: 'Consultation' }
+        };
+        list.innerHTML = filtered.slice(0, 200).map(e => {
+            const a = actionMap[e.action] || actionMap.view;
+            const date = new Date(e.timestamp);
+            const timeStr = date.toLocaleDateString('fr-FR') + ' ' + date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            const roleIcon = e.role === 'admin' ? '👑' : e.role === 'supervisor' ? '🎯' : e.role === 'staff' ? '👤' : e.role === 'client' ? '🧑' : '❓';
+            return `<div style="background:var(--panel);border:1px solid var(--border);border-left:4px solid ${a.color};border-radius:10px;padding:10px 12px;margin-bottom:6px;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+                    <div style="flex:1;min-width:0;">
+                        <div style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:13px;color:var(--text);">
+                            <span>${a.icon}</span>
+                            <span style="color:${a.color};">${a.label}</span>
+                            <span style="color:var(--muted);font-weight:400;font-size:11px;">${Utils.escapeHTML(e.entity)}</span>
+                        </div>
+                        <div style="font-size:12px;color:var(--text);margin-top:4px;">${Utils.escapeHTML(e.details)}</div>
+                        <div style="font-size:10px;color:var(--muted);margin-top:4px;">
+                            ${roleIcon} <strong>${Utils.escapeHTML(e.user)}</strong> • 📅 ${timeStr}
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    },
+    async clearAll() {
+        if (!this._data.length) { Toast.show('⚠️ Aucune activité'); return; }
+        const ok = await CustomConfirm.show(`Supprimer les ${this._data.length} entrées du journal ?`, '🗑️ Vider le journal');
+        if (!ok) return;
+        this._data = [];
+        localStorage.removeItem(this.KEY);
+        this.render();
+        Toast.show('✅ Journal vidé', 'success');
+    },
+    printReport() {
+        const filtered = this.getFiltered();
+        const rows = filtered.slice(0, 100).map(e => {
+            const date = new Date(e.timestamp);
+            const timeStr = date.toLocaleDateString('fr-FR') + ' ' + date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            return `<tr><td>${timeStr}</td><td>${Utils.escapeHTML(e.user)}</td><td>${Utils.escapeHTML(e.action)}</td><td>${Utils.escapeHTML(e.entity)}</td><td>${Utils.escapeHTML(e.details)}</td></tr>`;
+        }).join('');
+        const content = `<table><thead><tr><th>Date</th><th>Utilisateur</th><th>Action</th><th>Entité</th><th>Détails</th></tr></thead><tbody>${rows}</tbody></table>`;
+        PrintSystem.openPrintWindow('Journal d\'activité', content);
+    },
+    exportCSV() {
+        const filtered = this.getFiltered();
+        if (!filtered.length) { Toast.show('⚠️ Aucune donnée'); return; }
+        let csv = 'Timestamp,Utilisateur,Rôle,Action,Entité,Détails\n';
+        filtered.forEach(e => {
+            csv += `"${e.timestamp}","${(e.user || '').replace(/"/g, '""')}","${e.role}","${e.action}","${e.entity}","${(e.details || '').replace(/"/g, '""')}"\n`;
+        });
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `activite_${Utils.today()}.csv`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        Toast.show('✅ Exporté', 'success');
+    }
+};
+
+// ═══════════════════════════════════════════════════
+// 🎨 CUSTOM PERMISSIONS
+// ═══════════════════════════════════════════════════
+const CustomPermissions = {
+    KEY: 'gtrpos_custom_permissions',
+    _data: {},
+    _currentUid: null,
+    _currentUserName: '',
+    TOGGLEABLE_FEATURES: [
+        { key: 'caisse',        label: '💰 Voir Caisse' },
+        { key: 'expenses',      label: '💸 Voir Dépenses' },
+        { key: 'finance-jour',  label: '📊 Voir Rapport jour' },
+        { key: 'reports',       label: '📈 Voir Rapports' },
+        { key: 'marges',        label: '📊 Voir Marges' },
+        { key: 'top-produits',  label: '🏆 Voir Top produits' },
+        { key: 'objectifs',     label: '🎯 Voir Objectifs' },
+        { key: 'activity-log',  label: '📜 Voir Journal' },
+        { key: 'delete-client', label: '🗑️ Peut supprimer un client' },
+        { key: 'delete-article',label: '🗑️ Peut supprimer un article' },
+        { key: 'delete-invoice',label: '🗑️ Peut supprimer une facture' },
+        { key: 'change-prices', label: '✏️ Peut modifier les prix' }
+    ],
+    init() {
+        try {
+            const saved = localStorage.getItem(this.KEY);
+            this._data = saved ? JSON.parse(saved) : {};
+        } catch(e) { this._data = {}; }
+    },
+    open(uid, userName) {
+        this._currentUid = uid;
+        this._currentUserName = userName;
+        $('permUserName').textContent = `👤 ${userName}`;
+        const currentPerms = this._data[uid] || {};
+        const checkboxes = this.TOGGLEABLE_FEATURES.map(f => {
+            const checked = currentPerms[f.key] === true;
+            return `<label style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg);border-radius:8px;margin-bottom:6px;cursor:pointer;">
+                <input type="checkbox" data-feature="${f.key}" ${checked ? 'checked' : ''} style="width:18px;height:18px;cursor:pointer;">
+                <span style="font-size:13px;font-weight:600;">${f.label}</span>
+            </label>`;
+        }).join('');
+        $('permCheckboxes').innerHTML = checkboxes;
+        $('customPermissionsModal').classList.add('show');
+    },
+    close() {
+        $('customPermissionsModal').classList.remove('show');
+        this._currentUid = null;
+    },
+    save() {
+        if (!this._currentUid) return;
+        const perms = {};
+        document.querySelectorAll('#permCheckboxes input[type="checkbox"]').forEach(cb => {
+            perms[cb.dataset.feature] = cb.checked;
+        });
+        this._data[this._currentUid] = perms;
+        try { localStorage.setItem(this.KEY, JSON.stringify(this._data)); } catch(e) {}
+        if (window.db) {
+            window.db.collection('custom_permissions').doc(this._currentUid).set(perms).catch(() => {});
+        }
+        Toast.show('✅ Permissions enregistrées', 'success');
+        ActivityLog.log('update', 'permissions', `Permissions modifiées pour ${this._currentUserName}`);
+        this.close();
+        if (typeof Accounts !== 'undefined') Accounts.render();
+    },
+    get(uid) { return this._data[uid] || {}; },
+    has(uid, feature) {
+        const perms = this._data[uid];
+        if (!perms) return false;
+        return perms[feature] === true;
     }
 };
 
@@ -2506,69 +2763,123 @@ const RoleManager = {
         if (!user) return 'anonymous';
         if (user.isClient) return 'client';
         if (user.isLocalAdmin) return 'admin';
-        if (user.email && (user.email.toLowerCase().trim() === APP_CONFIG.adminEmail.toLowerCase() || user.email.toLowerCase().trim() === APP_CONFIG.adminLogin)) return 'admin';
+        if (user.email && user.email.toLowerCase().trim() === APP_CONFIG.adminEmail.toLowerCase()) return 'admin';
+        if (user.customRole === 'supervisor') return 'supervisor';
         if (user.isStaff) return 'staff';
+        if (user.customRole === 'staff') return 'staff';
         const client = State.clients.find(c => (c.login || '').toLowerCase() === (user.login || '').toLowerCase());
         if (client) { State.currentClient = client; return 'client'; }
         return 'staff';
     },
     isAdmin() { return this.getRole() === 'admin'; },
+    isSupervisor() { return this.getRole() === 'supervisor'; },
     isStaff() { return this.getRole() === 'staff'; },
     isClient() { return this.getRole() === 'client'; }
 };
 
 // ═══════════════════════════════════════════════════
-// 🔐 PERMISSIONS SYSTEM
+// 🔐 PERMISSIONS (3 RÔLES)
 // ═══════════════════════════════════════════════════
 const Permissions = {
-    ROLES: { ADMIN:'admin', STAFF:'staff', CLIENT:'client', ANONYMOUS:'anonymous' },
-    ADMIN_ONLY_FEATURES: ['accounts','caisse','expenses','finance-jour','reports','marges','top-produits','objectifs','delete-invoice','delete-client','delete-article','delete-supplier','change-prices','see-all-data','manage-staff','view-company-info','export-backup'],
-    COMMON_FEATURES: ['dashboard','clients','client-history','fournisseurs','fournisseur-history','articles','article-history','ventes','achats','orders','point-jour'],
+    ROLES: { ADMIN: 'admin', SUPERVISOR: 'supervisor', STAFF: 'staff', CLIENT: 'client', ANONYMOUS: 'anonymous' },
+
+    ADMIN_ONLY: [
+        'accounts', 'manage-staff',
+        'delete-invoice', 'delete-client', 'delete-article', 'delete-supplier', 'delete-expense',
+        'change-prices', 'export-backup', 'delete-activity-log'
+    ],
+
+    ADMIN_SUPERVISOR: [
+        'caisse', 'expenses', 'finance-jour', 'reports', 'marges',
+        'top-produits', 'objectifs', 'activity-log', 'see-financials'
+    ],
+
+    COMMON: [
+        'dashboard',
+        'clients', 'client-history',
+        'fournisseurs', 'fournisseur-history',
+        'articles', 'article-history',
+        'ventes', 'achats',
+        'orders', 'point-jour'
+    ],
+
     getCurrentRole() { return RoleManager.getRole(); },
     isAdmin() { return this.getCurrentRole() === this.ROLES.ADMIN; },
+    isSupervisor() { return this.getCurrentRole() === this.ROLES.SUPERVISOR; },
     isStaff() { return this.getCurrentRole() === this.ROLES.STAFF; },
     isClient() { return this.getCurrentRole() === this.ROLES.CLIENT; },
+
     can(feature) {
         const role = this.getCurrentRole();
+        const user = State.currentUser;
         if (role === this.ROLES.ADMIN) return true;
-        if (role === this.ROLES.STAFF) return this.COMMON_FEATURES.includes(feature);
+        if (role === this.ROLES.CLIENT) return false;
+        // فحص الصلاحيات المخصصة أولاً
+        if (user && user.uid && typeof CustomPermissions !== 'undefined') {
+            const custom = CustomPermissions.get(user.uid);
+            if (custom[feature] === true) return true;
+            if (custom[feature] === false) return false;
+        }
+        if (role === this.ROLES.SUPERVISOR) {
+            if (this.ADMIN_ONLY.includes(feature)) return false;
+            return true;
+        }
+        if (role === this.ROLES.STAFF) return this.COMMON.includes(feature);
         return false;
     },
-    canDelete() { return this.isAdmin(); },
-    canChangePrices() { return this.isAdmin(); },
-    canSeeFinancials() { return this.isAdmin(); },
+
+    canDelete() {
+        if (this.isAdmin()) return true;
+        const user = State.currentUser;
+        if (user && user.uid && typeof CustomPermissions !== 'undefined') {
+            const custom = CustomPermissions.get(user.uid);
+            if (custom['delete-client'] === true || custom['delete-invoice'] === true || custom['delete-article'] === true) return true;
+        }
+        return false;
+    },
+
+    canChangePrices() {
+        if (this.isAdmin()) return true;
+        const user = State.currentUser;
+        if (user && user.uid && typeof CustomPermissions !== 'undefined') {
+            return CustomPermissions.get(user.uid)['change-prices'] === true;
+        }
+        return false;
+    },
+
+    canSeeFinancials() { return this.isAdmin() || this.isSupervisor(); },
+    canManageStaff() { return this.isAdmin(); },
+
     filterClients(clients) {
-        if (this.isAdmin()) return clients;
+        if (this.isAdmin() || this.isSupervisor()) return clients;
         const user = State.currentUser;
         if (!user) return [];
         if (!user.uid && !user.isLocalAdmin) return clients;
         return clients.filter(c => !c.staffOwner || c.staffOwner === 'admin' || c.staffOwner === user.uid);
     },
+
     applyUI() {
         const role = this.getCurrentRole();
-        const isAdmin = role === this.ROLES.ADMIN;
         document.querySelectorAll('.dash-item').forEach(item => {
             const section = item.dataset.section;
-            const adminOnly = this.ADMIN_ONLY_FEATURES.includes(section);
-            item.style.display = (adminOnly && !isAdmin) ? 'none' : 'flex';
+            const adminOnly = this.ADMIN_ONLY.includes(section);
+            item.style.display = (adminOnly && !this.isAdmin()) ? 'none' : 'flex';
         });
         document.querySelectorAll('[data-admin-only]').forEach(el => {
-            el.style.display = isAdmin ? '' : 'none';
+            el.style.display = this.isAdmin() ? '' : 'none';
+        });
+        document.querySelectorAll('[data-supervisor-only]').forEach(el => {
+            el.style.display = this.canSeeFinancials() ? '' : 'none';
         });
         this._addRoleBadge(role);
     },
+
     _addRoleBadge(role) {
         let badge = document.getElementById('roleBadge');
-        if (!badge) {
-            const appbar = document.querySelector('.appbar .sub');
-            if (!appbar) return;
-            badge = document.createElement('span');
-            badge.id = 'roleBadge';
-            badge.className = 'role-badge';
-            appbar.appendChild(badge);
-        }
+        if (!badge) return;
         const config = {
             admin: { text: '👑 ADMIN', cls: 'admin' },
+            supervisor: { text: '🎯 SUPERVISEUR', cls: 'supervisor' },
             staff: { text: '👤 STAFF', cls: 'staff' },
             client: { text: '🧑 CLIENT', cls: 'client' },
             anonymous: { text: '🚪', cls: 'anonymous' }
@@ -2577,45 +2888,58 @@ const Permissions = {
         badge.textContent = c.text;
         badge.className = 'role-badge ' + c.cls;
     },
+
     guardDelete(entityType, entityName) {
         if (this.canDelete()) return true;
         SoundSystem.error();
         Toast.show(`🚫 Seul l'Admin peut supprimer "${entityName}"`, 'error');
-        if (typeof NotificationSystem !== 'undefined' && NotificationSystem.addForAdmin) {
-            const staffName = State.currentUser?.email || State.currentUser?.login || 'Staff';
-            NotificationSystem.addForAdmin('🚫 Tentative de suppression', `${staffName} a essayé de supprimer ${entityType}: ${entityName}`, 'WARNING');
-        }
+        ActivityLog.log('delete', 'refused', `Tentative refusée: ${entityType} — ${entityName}`);
         return false;
     },
+
     guardPriceChange() {
         if (this.canChangePrices()) return true;
-        Toast.show('🚫 Seul l\'Admin peut modifier les prix', 'warning');
+        Toast.show('🚫 Pas autorisé à modifier les prix', 'warning');
         return false;
     },
+
     guardSectionAccess(section) {
         if (this.can(section)) return true;
         SoundSystem.error();
-        Toast.show('⛔ Accès réservé à l\'Admin', 'error');
+        Toast.show('⛔ Accès refusé', 'error');
         return false;
     },
+
     showMatrix() {
-        const adminFeatures = this.ADMIN_ONLY_FEATURES.map(f => `<tr><td>${f}</td><td style="text-align:center;color:var(--success);font-weight:800;">✅</td><td style="text-align:center;color:var(--danger);font-weight:800;">❌</td></tr>`).join('');
-        const commonFeatures = this.COMMON_FEATURES.map(f => `<tr><td>${f}</td><td style="text-align:center;color:var(--success);font-weight:800;">✅</td><td style="text-align:center;color:var(--success);font-weight:800;">✅</td></tr>`).join('');
-        const html = `<div style="max-height:60vh;overflow-y:auto;">
-            <h4 style="margin:10px 0;color:var(--danger);">🔒 Admin uniquement</h4>
-            <table style="width:100%;border-collapse:collapse;font-size:11px;">
-                <thead><tr style="background:var(--secondary);color:#fff;"><th style="padding:6px;text-align:left;">Fonction</th><th style="padding:6px;">👑 Admin</th><th style="padding:6px;">👤 Staff</th></tr></thead>
-                <tbody>${adminFeatures}</tbody>
-            </table>
-            <h4 style="margin:14px 0 10px;color:var(--success);">✅ Commun</h4>
-            <table style="width:100%;border-collapse:collapse;font-size:11px;">
-                <thead><tr style="background:var(--secondary);color:#fff;"><th style="padding:6px;text-align:left;">Fonction</th><th style="padding:6px;">👑 Admin</th><th style="padding:6px;">👤 Staff</th></tr></thead>
-                <tbody>${commonFeatures}</tbody>
-            </table>
-        </div>`;
+        const roles = ['admin', 'supervisor', 'staff'];
+        const allFeatures = [...new Set([...this.ADMIN_ONLY, ...this.ADMIN_SUPERVISOR, ...this.COMMON])];
+        const rows = allFeatures.map(f => {
+            const cells = roles.map(r => {
+                let has = false;
+                if (r === 'admin') has = true;
+                else if (r === 'supervisor') has = !this.ADMIN_ONLY.includes(f);
+                else if (r === 'staff') has = this.COMMON.includes(f);
+                return `<td style="text-align:center;color:${has ? 'var(--success)' : 'var(--danger)'};font-weight:800;">${has ? '✅' : '❌'}</td>`;
+            }).join('');
+            return `<tr><td>${f}</td>${cells}</tr>`;
+        }).join('');
         const modal = document.createElement('div');
         modal.className = 'modal-overlay show';
-        modal.innerHTML = `<div class="modal-box" style="max-width:520px;"><h3>🛡️ Matrice des permissions</h3>${html}<div class="modal-actions"><button class="btn save" onclick="this.closest('.modal-overlay').remove()">Fermer</button></div></div>`;
+        modal.innerHTML = `<div class="modal-box" style="max-width:600px;">
+            <h3>🛡️ Matrice des permissions</h3>
+            <div style="max-height:60vh;overflow-y:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:11px;">
+                    <thead><tr style="background:var(--secondary);color:#fff;">
+                        <th style="padding:6px;text-align:left;">Fonction</th>
+                        <th style="padding:6px;">👑 Admin</th>
+                        <th style="padding:6px;">🎯 Superviseur</th>
+                        <th style="padding:6px;">👤 Staff</th>
+                    </tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+            <div class="modal-actions"><button class="btn save" onclick="this.closest('.modal-overlay').remove()">Fermer</button></div>
+        </div>`;
         document.body.appendChild(modal);
     }
 };
@@ -2713,6 +3037,7 @@ const EmailService = {
                 SoundSystem.cash();
                 Toast.show(`✅ Email envoyé à ${email}`, 'success');
                 NotificationSystem.add('📧 Facture envoyée', `${rec.num} → ${email}`, 'SUCCESS');
+                ActivityLog.log('view', 'email', `Facture ${rec.num} envoyée à ${email}`);
                 this._logSend(rec, email, isPurchase);
                 return true;
             } else throw new Error('Erreur HTTP ' + response.status);
@@ -2786,7 +3111,7 @@ const EmailService = {
         input.addEventListener('keypress', e => { if (e.key === 'Enter') modal.querySelector('#emailPromptOk').click(); });
     }
 };// ═══════════════════════════════════════════════════
-// 🎯 PICKER FACTORY (يوحّد ArticlePicker / ClientPicker / FournisseurPicker)
+// 🎯 PICKER FACTORY
 // ═══════════════════════════════════════════════════
 function createPicker(cfg) {
     return {
@@ -2966,7 +3291,7 @@ const FournisseurPicker = createPicker({
 });
 
 // ═══════════════════════════════════════════════════
-// 🏭 SIMPLE RENDERER FACTORY (Clients / Fournisseurs / Articles)
+// 🏭 SIMPLE RENDERER FACTORY
 // ═══════════════════════════════════════════════════
 function createSimpleRenderer(cfg) {
     return {
@@ -3201,7 +3526,7 @@ const VentesRenderer = createListRenderer({ isPurchase: false, partyKey: 'client
 const AchatsRenderer = createListRenderer({ isPurchase: true, partyKey: 'supplier', table: 'achats', listId: 'achatsList', searchInputId: 'aSearchP', filterSelector: '#pDateFilters', customPanelId: 'pCustomRange', rangeFromId: 'pRangeFrom', rangeToId: 'pRangeTo' });
 
 // ═══════════════════════════════════════════════════
-// 🛠️ HELPERS: Invoice header color + modified flag
+// 🛠️ HELPERS
 // ═══════════════════════════════════════════════════
 function forceInvoiceHeaderColor() {
     setTimeout(() => {
@@ -3220,7 +3545,7 @@ function setInvoiceModified(type) {
 }
 
 // ═══════════════════════════════════════════════════
-// 🏭 ENTITY MODULE FACTORY
+// 🏭 ENTITY MODULE FACTORY (مع ActivityLog)
 // ═══════════════════════════════════════════════════
 function createEntityModule(cfg) {
     return {
@@ -3244,6 +3569,7 @@ function createEntityModule(cfg) {
         async save() {
             if (cfg.validate) { const ok = await cfg.validate.call(this); if (!ok) return; }
             const data = await cfg.collect.call(this);
+            const isEdit = !!this.editingId;
             if (this.editingId) {
                 const idx = this.list().findIndex(x => x.id === this.editingId);
                 if (idx !== -1) this.list()[idx] = { ...data, id: this.editingId };
@@ -3253,7 +3579,8 @@ function createEntityModule(cfg) {
             cfg.renderer.render();
             App.closeSheet();
             SoundSystem.success();
-            Toast.show(this.editingId ? '✅ Modifié' : '✅ Enregistré');
+            Toast.show(isEdit ? '✅ Modifié' : '✅ Enregistré');
+            ActivityLog.log(isEdit ? 'update' : 'create', cfg.table, `${isEdit ? 'Modification' : 'Création'}: ${data.name}`, this.editingId);
         },
         edit() { if (this.editingId == null) { Toast.show('⚠️ Choisissez'); return; } this.save(); },
         async remove() {
@@ -3272,6 +3599,7 @@ function createEntityModule(cfg) {
             App.closeSheet();
             SoundSystem.error();
             Toast.show('🗑️ Supprimé');
+            ActivityLog.log('delete', cfg.table, `Suppression: ${item.name}`, item.id);
         },
         load(id) {
             const item = this.list().find(x => x.id === id);
@@ -3292,7 +3620,7 @@ function createEntityModule(cfg) {
 }
 
 // ═══════════════════════════════════════════════════
-// 🏭 TRANSACTION MODULE FACTORY
+// 🏭 TRANSACTION MODULE FACTORY (مع ActivityLog)
 // ═══════════════════════════════════════════════════
 function createTransactionModule(cfg) {
     return {
@@ -3614,6 +3942,7 @@ function createTransactionModule(cfg) {
                 if (header) { header.classList.remove('state-new', 'state-modified'); header.classList.add('state-saved'); }
                 SoundSystem.success();
                 Toast.show(isNew ? '✅ Enregistré' : '✅ Modifié avec succès', 'success');
+                ActivityLog.log(isNew ? 'create' : 'update', cfg.table, `${isNew ? 'Création' : 'Modification'}: ${rec.num} — ${pn} — ${total.toFixed(3)} TND`, rec.id);
             } catch(e) {
                 deltasApplied.forEach(([name, delta]) => Stock.adjust(name, -delta, { silent: true, allowNegative: true }));
                 Toast.show('❌ Erreur — stock restauré', 'error');
@@ -3649,6 +3978,7 @@ function createTransactionModule(cfg) {
             App.closeSheet();
             SoundSystem.error();
             Toast.show('🗑️ Supprimé');
+            ActivityLog.log('delete', cfg.table, `Suppression: ${rec.num} — ${rec[cfg.partyKey]}`, rec.id);
         },
         load(id) {
             const r = cfg.list().find(x => x.id === id);
@@ -4022,6 +4352,7 @@ Object.assign(ArticlesModule, {
         Persistence.save();
         ArticlesRenderer.render();
         Toast.show(`✅ Stock: ${ns}${ns < 0 ? ' ⚠️' : ''}`, 'success');
+        ActivityLog.log('update', 'articles', `Correction stock: ${a.name} → ${ns}`, a.id);
     },
     recalculateStock(articleName) {
         const article = State.articles.find(a => a.name === articleName);
@@ -4756,7 +5087,7 @@ const Orders = {
                     ${o.status === 'pending' ? `<button class="btn save small" style="flex:1;padding:5px;font-size:10px;" onclick="Orders.approve('${keyStr}')">✅ Accepter</button><button class="btn del small" style="flex:1;padding:5px;font-size:10px;" onclick="Orders.reject('${keyStr}')">❌ Refuser</button>` : ''}
                     ${o.status === 'approved' ? `<button class="btn save small" style="flex:1;padding:5px;font-size:10px;" onclick="Orders.convertToSale('${keyStr}')">📄 → Facture</button>` : ''}
                     <button class="btn outline small" style="flex:1;padding:5px;font-size:10px;" onclick="Orders.callClient('${keyStr}')">📞</button>
-                    <button class="btn del small" style="padding:5px;font-size:10px;" onclick="Orders.remove('${keyStr}')">🗑️</button>
+                    <button class="btn del small" style="padding:5px;font-size:10px;" onclick="Orders.remove('${keyStr}')" data-admin-only>🗑️</button>
                 </div>
             </div>`;
         }).join('');
@@ -4777,6 +5108,7 @@ const Orders = {
         SoundSystem.success();
         Toast.show('✅ Commande acceptée', 'success');
         NotificationSystem.add('Commande acceptée', `${o.num} — ${o.clientName}`, 'SUCCESS');
+        ActivityLog.log('update', 'orders', `Commande acceptée: ${o.num}`, o.id);
     },
     reject(id) {
         const o = this.get(id);
@@ -4789,10 +5121,12 @@ const Orders = {
         this.render();
         SoundSystem.error();
         Toast.show('❌ Commande refusée');
+        ActivityLog.log('update', 'orders', `Commande refusée: ${o.num}`, o.id);
     },
     async remove(id) {
         const o = this.get(id);
         if (!o) return;
+        if (!Permissions.canDelete()) { Toast.show('🚫 Seul l\'Admin peut supprimer', 'error'); return; }
         const ok = await CustomConfirm.show(`Supprimer ${o.num} ?`);
         if (!ok) return;
         if (o.stockDecremented) o.lines.forEach(line => Stock.adjust(line.name, line.qty, { silent: true, allowNegative: true }));
@@ -4802,6 +5136,7 @@ const Orders = {
         Persistence.save();
         this.render();
         Toast.show('🗑️ Supprimée');
+        ActivityLog.log('delete', 'orders', `Commande supprimée: ${o.num}`, o.id);
     },
     callClient(id) { const o = this.get(id); if (!o || !o.phone) { Toast.show('⚠️ Pas de téléphone'); return; } window.location.href = `tel:${o.phone.replace(/\D/g, '')}`; },
     convertToSale(id) {
@@ -4827,6 +5162,7 @@ const Orders = {
         Persistence.save();
         this.updateCloudStatus(o, 'delivered');
         Toast.show('📄 Commande chargée', 'success');
+        ActivityLog.log('update', 'orders', `Commande → Facture: ${o.num}`, o.id);
     }
 };
 
@@ -4839,12 +5175,14 @@ const Expenses = {
     save() {
         const amount = parseFloat($('exAmount').value) || 0;
         if (amount <= 0) { Toast.show('Montant invalide'); return; }
+        const isEdit = !!this.editingId;
         const rec = { id: this.editingId || State.nextId.expenses++, code: $('exCode').value.trim(), date: $('exDate').value, category: $('exCategory').options[$('exCategory').selectedIndex].textContent, amount, description: $('exDesc').value.trim() || '-' };
         if (this.editingId) { const i = State.expenses.findIndex(e => e.id === this.editingId); if (i !== -1) State.expenses[i] = rec; }
         else State.expenses.push(rec);
         Persistence.save(); this.render(); App.closeSheet();
         SoundSystem.success();
-        Toast.show(this.editingId ? '✅ Modifié' : '✅ Enregistré');
+        Toast.show(isEdit ? '✅ Modifié' : '✅ Enregistré');
+        ActivityLog.log(isEdit ? 'update' : 'create', 'expenses', `${isEdit ? 'Modification' : 'Création'} dépense: ${rec.category} — ${rec.amount.toFixed(3)} TND`, rec.id);
     },
     edit() { if (!this.editingId) return; this.save(); },
     async remove() {
@@ -4859,6 +5197,7 @@ const Expenses = {
         Persistence.save(); this.render(); App.closeSheet();
         SoundSystem.error();
         Toast.show('🗑️ Supprimé');
+        ActivityLog.log('delete', 'expenses', `Suppression dépense: ${e.category} — ${e.amount.toFixed(3)} TND`, e.id);
     },
     load(id) {
         const e = State.expenses.find(x => x.id === id);
@@ -5317,6 +5656,7 @@ const Objectifs = {
         this._data[month] = target;
         try { localStorage.setItem(this.KEY, JSON.stringify(this._data)); } catch(e) {}
         Toast.show('✅ Objectif enregistré', 'success');
+        ActivityLog.log('create', 'objectifs', `Objectif ${month}: ${target.toFixed(3)} TND`);
         this.render();
     },
     render() {
@@ -5582,13 +5922,14 @@ const CompanyInfo = {
             };
             Persistence.save();
             Toast.show('✅ Enregistré');
+            ActivityLog.log('update', 'company', 'Informations entreprise modifiées');
             App.closeSheet();
         } catch(e) { Toast.show('❌ Erreur'); }
     }
 };
 
 // ═══════════════════════════════════════════════════
-// 👑 ACCOUNTS
+// 👑 ACCOUNTS (3 rôles + Permissions personnalisées)
 // ═══════════════════════════════════════════════════
 const Accounts = {
     render() {
@@ -5610,8 +5951,34 @@ const Accounts = {
                 const div = document.createElement('div');
                 div.className = 'account-item';
                 const safeUid = Utils.escapeAttr(uid);
-                if (d.approved === true) { ac++; div.innerHTML = `<span class="email">${esc(email)}</span><span class="date">${esc(date)}</span><span class="status approved">✅</span><div class="actions"><button class="btn del small" onclick="Accounts.setApproved('${safeUid}', false)">Annuler</button></div>`; approved.appendChild(div); }
-                else { pc++; div.innerHTML = `<span class="email">${esc(email)}</span><span class="date">${esc(date)}</span><span class="status pending">⏳</span><div class="actions"><button class="btn save small" onclick="Accounts.setApproved('${safeUid}', true)">Approuver</button><button class="btn del small" onclick="Accounts.setApproved('${safeUid}', false)">Refuser</button></div>`; pending.appendChild(div); }
+                const safeName = Utils.escapeAttr(email);
+                if (d.approved === true) {
+                    ac++;
+                    const currentRole = d.role || 'staff';
+                    const roleIcon = currentRole === 'supervisor' ? '🎯' : '👤';
+                    div.innerHTML = `<span class="email">${esc(email)} ${roleIcon}</span>
+                        <span class="date">${esc(date)}</span>
+                        <span class="status approved">✅ ${currentRole}</span>
+                        <div class="actions">
+                            <button class="btn edit small" onclick="Accounts.changeRole('${safeUid}', '${currentRole === 'supervisor' ? 'staff' : 'supervisor'}')">
+                                ${currentRole === 'supervisor' ? '→ Staff' : '→ Superviseur'}
+                            </button>
+                            <button class="btn save small" onclick="CustomPermissions.open('${safeUid}', '${safeName}')">🛡️ Permissions</button>
+                            <button class="btn del small" onclick="Accounts.setApproved('${safeUid}', false)">Annuler</button>
+                        </div>`;
+                    approved.appendChild(div);
+                } else {
+                    pc++;
+                    div.innerHTML = `<span class="email">${esc(email)}</span>
+                        <span class="date">${esc(date)}</span>
+                        <span class="status pending">⏳</span>
+                        <div class="actions">
+                            <button class="btn save small" onclick="Accounts.setApproved('${safeUid}', true, 'staff')">✅ Staff</button>
+                            <button class="btn edit small" onclick="Accounts.setApproved('${safeUid}', true, 'supervisor')">🎯 Superviseur</button>
+                            <button class="btn del small" onclick="Accounts.setApproved('${safeUid}', false)">Refuser</button>
+                        </div>`;
+                    pending.appendChild(div);
+                }
             });
             if (!pc) pending.innerHTML = '<div class="empty-msg">✅ Aucune demande</div>';
             if (!ac) approved.innerHTML = '<div class="empty-msg">Aucun compte</div>';
@@ -5620,9 +5987,21 @@ const Accounts = {
             $('statPending').textContent = pc;
         }).catch(() => {});
     },
-    setApproved(uid, val) {
+    setApproved(uid, val, role = 'staff') {
         if (!window.db) return;
-        window.db.collection('approvals').doc(uid).update({ approved: val }).then(() => { Toast.show(val ? '✅ Approuvé' : '🗑️ Annulé'); Accounts.render(); }).catch(() => Toast.show('❌ Erreur'));
+        window.db.collection('approvals').doc(uid).update({ approved: val, role: role }).then(() => {
+            Toast.show(val ? `✅ Approuvé (${role})` : '🗑️ Annulé');
+            ActivityLog.log(val ? 'create' : 'delete', 'compte', `${val ? 'Approbation' : 'Rejet'}: ${uid} (${role})`);
+            Accounts.render();
+        }).catch(() => Toast.show('❌ Erreur'));
+    },
+    changeRole(uid, newRole) {
+        if (!window.db) return;
+        window.db.collection('approvals').doc(uid).update({ role: newRole }).then(() => {
+            Toast.show(`✅ Rôle changé: ${newRole}`, 'success');
+            ActivityLog.log('update', 'compte', `Changement de rôle: ${uid} → ${newRole}`);
+            Accounts.render();
+        }).catch(() => Toast.show('❌ Erreur'));
     }
 };
 
@@ -5678,7 +6057,7 @@ const App = {
         const t = $('sec-' + id);
         if (t) t.classList.add('active');
         $('backBtn').style.display = id === 'dashboard' ? 'none' : 'flex';
-        const names = { dashboard:'Accueil', clients:'Clients', 'client-history':'Relevé client', fournisseurs:'Fournisseurs', 'fournisseur-history':'Relevé fournisseur', articles:'Articles', 'article-history':'Historique article', ventes:'Ventes', achats:'Achats', expenses:'Dépenses', caisse:'Caisse', accounts:'Comptes', orders:'Commandes', 'finance-jour':'Rapport du jour', reports:'Rapports', marges:'Marge bénéficiaire', 'point-jour':'Point du jour', 'top-produits':'Top produits', objectifs:'Objectifs' };
+        const names = { dashboard:'Accueil', clients:'Clients', 'client-history':'Relevé client', fournisseurs:'Fournisseurs', 'fournisseur-history':'Relevé fournisseur', articles:'Articles', 'article-history':'Historique article', ventes:'Ventes', achats:'Achats', expenses:'Dépenses', caisse:'Caisse', accounts:'Comptes', orders:'Commandes', 'finance-jour':'Rapport du jour', reports:'Rapports', marges:'Marge bénéficiaire', 'point-jour':'Point du jour', 'top-produits':'Top produits', objectifs:'Objectifs', 'activity-log':'Journal d\'activité' };
         $('pageTitle').textContent = names[id] || id;
         State.currentSection = id;
         this.updateFabVisibility(id);
@@ -5700,7 +6079,8 @@ const App = {
             marges: () => setTimeout(() => { Marges.init(); Marges.render(); }, 200),
             'point-jour': () => PointJour.init(),
             'top-produits': () => { TopProduits.init(); TopProduits.render(); },
-            objectifs: () => Objectifs.init()
+            objectifs: () => Objectifs.init(),
+            'activity-log': () => { ActivityLog.init(); ActivityLog.render(); }
         };
         if (loaders[id]) loaders[id]();
     },
@@ -5742,7 +6122,7 @@ const App = {
 };
 
 // ═══════════════════════════════════════════════════
-// 🔐 AUTH
+// 🔐 AUTH (3 rôles + Forgot Password)
 // ═══════════════════════════════════════════════════
 const Auth = {
     isSignup: false,
@@ -5770,6 +6150,33 @@ const Auth = {
         const isPwd = input.type === 'password';
         input.type = isPwd ? 'text' : 'password';
         if (btnId) $(btnId).textContent = isPwd ? '🙈' : '👁️';
+    },
+    showForgotPassword() {
+        $('forgotPasswordModal').classList.add('show');
+        $('forgotEmail').value = $('loginEmail').value.trim() || '';
+        $('forgotError').textContent = '';
+    },
+    closeForgotPassword() { $('forgotPasswordModal').classList.remove('show'); },
+    async sendPasswordReset() {
+        const email = $('forgotEmail').value.trim().toLowerCase();
+        const error = $('forgotError');
+        if (!email) { error.textContent = '⚠️ Entrez votre email'; return; }
+        if (!Utils.isValidEmail(email)) { error.textContent = '⚠️ Email invalide'; return; }
+        if (!window.auth) { error.textContent = '❌ Firebase non disponible'; return; }
+        try {
+            await window.auth.sendPasswordResetEmail(email);
+            error.style.color = 'var(--success)';
+            error.textContent = '✅ Email envoyé! Vérifiez votre boîte.';
+            Toast.show('📧 Email de réinitialisation envoyé', 'success');
+            ActivityLog.log('view', 'auth', `Demande reset mot de passe: ${email}`);
+            setTimeout(() => this.closeForgotPassword(), 2500);
+        } catch (err) {
+            error.style.color = 'var(--danger)';
+            let msg = err.message;
+            if (err.code === 'auth/user-not-found') msg = '⚠️ Aucun compte avec cet email';
+            else if (err.code === 'auth/too-many-requests') msg = '⚠️ Trop de tentatives. Attendez.';
+            error.textContent = '❌ ' + msg;
+        }
     },
     async _tryClientLogin() {
         const l = $('loginEmail').value.trim();
@@ -5859,7 +6266,7 @@ const Auth = {
         const ok = await CustomConfirm.show('Créer un compte Staff ?\n\nEmail: ' + e, '👤 Nouveau Staff');
         if (!ok) return;
         window.auth.createUserWithEmailAndPassword(e, p).then(async (cred) => {
-            try { if (window.db) await window.db.collection('approvals').doc(cred.user.uid).set({ email: e, requestedAt: new Date().toISOString(), approved: false, role: 'staff' }); Toast.show('✅ Demande envoyée', 'success'); } catch(err) { this._showPending(); }
+            try { if (window.db) await window.db.collection('approvals').doc(cred.user.uid).set({ email: e, requestedAt: new Date().toISOString(), approved: false, role: 'staff' }); Toast.show('✅ Demande envoyée', 'success'); ActivityLog.log('create', 'compte', `Nouvelle demande de compte: ${e}`); } catch(err) { this._showPending(); }
         }).catch(err => { $('loginError').textContent = '❌ ' + err.message; });
     },
     googleLogin() {
@@ -5868,6 +6275,7 @@ const Auth = {
         window.auth.signInWithPopup(provider).catch(err => { $('loginError').textContent = err.message; });
     },
     async logout() {
+        ActivityLog.log('logout', 'auth', `Déconnexion: ${State.currentUser?.email || State.currentUser?.loginName || 'utilisateur'}`);
         const ok = await CustomConfirm.show('⚠️ Quitter ?');
         if (!ok) return;
         Persistence.save();
@@ -5887,7 +6295,7 @@ const Auth = {
         const user = window.auth?.currentUser;
         if (!user) return;
         const cred = firebase.auth.EmailAuthProvider.credential(user.email, c);
-        user.reauthenticateWithCredential(cred).then(() => user.updatePassword(n)).then(() => { err.textContent = ''; $('passwordModal').classList.remove('show'); Toast.show('✅ Changé'); }).catch(e => { err.textContent = '❌ ' + e.message; });
+        user.reauthenticateWithCredential(cred).then(() => user.updatePassword(n)).then(() => { err.textContent = ''; $('passwordModal').classList.remove('show'); Toast.show('✅ Changé'); ActivityLog.log('update', 'auth', 'Mot de passe changé'); }).catch(e => { err.textContent = '❌ ' + e.message; });
     },
     changeStaffPassword() {
         const c = $('staffCurrentPassword').value; const n = $('staffNewPassword').value; const cf = $('staffConfirmPassword').value; const err = $('staffPasswordError');
@@ -5897,7 +6305,7 @@ const Auth = {
         const user = window.auth?.currentUser;
         if (user && user.email) {
             const cred = firebase.auth.EmailAuthProvider.credential(user.email, c);
-            user.reauthenticateWithCredential(cred).then(() => user.updatePassword(n)).then(() => { err.textContent = ''; $('staffPasswordModal').classList.remove('show'); Toast.show('✅ Changé', 'success'); }).catch(e => { err.textContent = '❌ ' + (e.message || 'Erreur'); });
+            user.reauthenticateWithCredential(cred).then(() => user.updatePassword(n)).then(() => { err.textContent = ''; $('staffPasswordModal').classList.remove('show'); Toast.show('✅ Changé', 'success'); ActivityLog.log('update', 'auth', 'Mot de passe staff changé'); }).catch(e => { err.textContent = '❌ ' + (e.message || 'Erreur'); });
         } else { err.textContent = '❌ Aucun utilisateur'; }
     },
     _watchAuthState() {
@@ -5914,9 +6322,21 @@ const Auth = {
                 if (window.db) {
                     try {
                         const doc = await window.db.collection('approvals').doc(user.uid).get();
-                        if (!doc.exists) { await window.db.collection('approvals').doc(user.uid).set({ email: user.email || '', requestedAt: new Date().toISOString(), approved: false, role: 'staff' }); this._showPending(); }
-                        else if (doc.data().approved === true) { State.currentUser.isStaff = true; this._showApp(); }
-                        else this._showPending();
+                        if (!doc.exists) {
+                            await window.db.collection('approvals').doc(user.uid).set({ email: user.email || '', requestedAt: new Date().toISOString(), approved: false, role: 'staff' });
+                            this._showPending();
+                        } else if (doc.data().approved === true) {
+                            State.currentUser.isStaff = true;
+                            State.currentUser.customRole = doc.data().role || 'staff';
+                            // تحميل الصلاحيات المخصصة
+                            try {
+                                const permsDoc = await window.db.collection('custom_permissions').doc(user.uid).get();
+                                if (permsDoc.exists) { CustomPermissions._data[user.uid] = permsDoc.data(); CustomPermissions.save(); }
+                            } catch(e) {}
+                            this._showApp();
+                        } else {
+                            this._showPending();
+                        }
                     } catch(e) { this._showPending(); }
                 } else this._showPending();
             } else {
@@ -5940,8 +6360,9 @@ const Auth = {
         Dashboard.load();
         setTimeout(() => { if (typeof ClientOrder !== 'undefined' && ClientOrder.syncPendingOrders) ClientOrder.syncPendingOrders(); }, 1500);
         const role = Permissions.getCurrentRole();
-        const welcomeMsg = { admin: '👑 Connecté en tant qu\'Administrateur', staff: '👤 Connecté en tant qu\'Agent', client: '🧑 Connecté en tant que Client' };
+        const welcomeMsg = { admin: '👑 Connecté en tant qu\'Administrateur', supervisor: '🎯 Connecté en tant que Superviseur', staff: '👤 Connecté en tant qu\'Agent', client: '🧑 Connecté en tant que Client' };
         Toast.show(welcomeMsg[role] || '☁️ Connecté', 'success');
+        ActivityLog.log('login', 'auth', `Connexion: ${State.currentUser?.email || State.currentUser?.loginName || 'utilisateur'}`);
     },
     _showPending() {
         $('loginOverlay').classList.add('hide'); $('pendingOverlay').classList.remove('hide');
@@ -5954,7 +6375,6 @@ const Auth = {
 // 📥 IMPORT / EXPORT HELPERS
 // ═══════════════════════════════════════════════════
 let importData = [];
-
 function downloadTemplate() {
     const headers = ['Login','Nom','Téléphone 1','Téléphone 2','Email','Adresse','MF',"Solde d'ouverture",'Mot de passe'];
     const sample = [['Amine_2026','Amine','12345678','','amine@email.com','Tunis','1234567','0','AZRDG234']];
@@ -5964,7 +6384,6 @@ function downloadTemplate() {
     XLSX.writeFile(wb, 'modele_import_clients.xlsx');
     Toast.show('📄 Modèle téléchargé', 'success');
 }
-
 function handleImportFile(input) {
     const file = input.files[0];
     if (!file) return;
@@ -5984,7 +6403,6 @@ function handleImportFile(input) {
     reader.readAsArrayBuffer(file);
     input.value = '';
 }
-
 function showImportPreview(data) {
     const preview = $('importPreview'); const cb = $('importConfirmBtn'); const xb = $('importCancelBtn');
     if (!data.length) { preview.style.display = 'none'; cb.style.display = 'none'; xb.style.display = 'none'; return; }
@@ -5997,7 +6415,6 @@ function showImportPreview(data) {
     preview.innerHTML = `<div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:11px;"><span>📊 ${data.length} clients</span></div><div style="max-height:200px;overflow:auto;border:1px solid var(--border);border-radius:6px;"><table style="width:100%;border-collapse:collapse;font-size:10px;"><thead><tr style="background:var(--secondary);color:#fff;position:sticky;top:0;">${headers.map(h => `<th style="padding:4px 6px;font-size:9px;">${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
     preview.style.display = 'block'; cb.style.display = 'block'; xb.style.display = 'block';
 }
-
 async function confirmImport() {
     if (!importData.length) { Toast.show('⚠️ Aucune donnée'); return; }
     const pd = $('importProgress'); const pf = $('importProgressFill'); const st = $('importStatus');
@@ -6029,10 +6446,10 @@ async function confirmImport() {
         pf.style.width = '100%';
         st.textContent = `✅ ${imported} importés, ${errors} erreurs`;
         Toast.show(`✅ ${imported} clients importés`, 'success');
+        ActivityLog.log('create', 'clients', `Import massif: ${imported} clients (${errors} erreurs)`);
         setTimeout(() => { pd.style.display = 'none'; $('importPreview').style.display = 'none'; importData = []; }, 3000);
     }, 500);
 }
-
 function cancelImport() {
     importData = [];
     ['importPreview','importConfirmBtn','importCancelBtn','importProgress'].forEach(id => { const el = $(id); if (el) el.style.display = 'none'; });
@@ -6053,7 +6470,6 @@ function showShortcutHelp() { $('shortcutHelp').classList.add('show'); const l =
 function closeShortcutHelp() { $('shortcutHelp').classList.remove('show'); }
 function showPendingOrders() { const pending = JSON.parse(localStorage.getItem('gtrpos_pending_orders') || '[]'); if (!pending.length) { Toast.show('✅ Aucune en attente'); return; } Toast.show(`📦 ${pending.length} en attente`); }
 function updatePendingCount() { const pending = JSON.parse(localStorage.getItem('gtrpos_pending_orders') || '[]'); const el = document.getElementById('pendingOrdersCount'); if (el) el.textContent = pending.length; }
-
 function printStatement(type, id) {
     if (!type || !id) return;
     const numericId = parseInt(id, 10);
@@ -6080,7 +6496,6 @@ function printStatement(type, id) {
         showPreviewReleve('fournisseur', f, docs, pays);
     }
 }
-
 function showPreviewReleve(type, entity, docs, payments, pendingOrders) {
     pendingOrders = pendingOrders || [];
     const isClient = type === 'client';
@@ -6112,6 +6527,7 @@ function bindEvents() {
         item.addEventListener('click', function() {
             const id = this.dataset.section;
             if (id === 'accounts' && !Permissions.isAdmin()) { Toast.show('⛔ Réservé à l\'admin'); return; }
+            if (id === 'activity-log' && !Permissions.isAdmin()) { Toast.show('⛔ Réservé à l\'admin'); return; }
             App.showSection(id);
         });
     });
@@ -6124,7 +6540,7 @@ function bindEvents() {
         if (e.ctrlKey && e.key === 'p') { e.preventDefault(); if ($('sheet-ventes').classList.contains('show') && VentesModule.editingId) VentesModule.printInvoice(); else if ($('sheet-achats').classList.contains('show') && AchatsModule.editingId) AchatsModule.printInvoice(); }
         if (e.ctrlKey && e.key === 'n') { e.preventDefault(); VentesModule.reset(); App.openSheet('ventes'); }
         if (e.ctrlKey && e.key === 'f') { e.preventDefault(); const activeSection = document.querySelector('.section.active'); if (activeSection) { const searchInput = activeSection.querySelector('.smart-search-input, .search-box'); if (searchInput) { searchInput.focus(); searchInput.select(); } } }
-        if (e.key === 'Escape') { if ($('shortcutHelp').classList.contains('show')) closeShortcutHelp(); if ($('notificationPanel').classList.contains('show')) closeNotificationPanel(); if ($('previewModal').classList.contains('show')) PreviewModal.close(); if ($('customConfirmModal').classList.contains('show')) CustomConfirm.handle(false); }
+        if (e.key === 'Escape') { if ($('shortcutHelp').classList.contains('show')) closeShortcutHelp(); if ($('notificationPanel').classList.contains('show')) closeNotificationPanel(); if ($('previewModal').classList.contains('show')) PreviewModal.close(); if ($('customConfirmModal').classList.contains('show')) CustomConfirm.handle(false); if ($('forgotPasswordModal').classList.contains('show')) Auth.closeForgotPassword(); }
     });
     const dz = $('fileDropZone');
     if (dz) { ['dragover','dragleave','drop'].forEach(evt => { dz.addEventListener(evt, e => { e.preventDefault(); dz.style.borderColor = evt === 'dragover' ? 'var(--primary)' : 'var(--border)'; if (evt === 'drop' && e.dataTransfer.files.length) { $('importFileInput').files = e.dataTransfer.files; handleImportFile($('importFileInput')); } }); }); }
@@ -6140,7 +6556,7 @@ Object.assign(window, {
     Auth, App, Theme, PrintSystem, PreviewModal, CustomConfirm, CustomConfirm3, NotificationSystem,
     Dashboard, Fullscreen, Persistence, BalanceCalculator,
     ClientsRenderer, FournisseursRenderer, ArticlesRenderer, VentesRenderer, AchatsRenderer,
-    RoleManager, Permissions, ClientPortal, Toast, Utils, State, SoundSystem,
+    RoleManager, Permissions, CustomPermissions, ActivityLog, ClientPortal, Toast, Utils, State, SoundSystem,
     ClientNotifications, ClientChat, ArticlePicker, ClientPicker, FournisseurPicker,
     MobileKeyboardHandler, PDFExporter, ImageExporter, EmailService,
     PointJour, TopProduits, Objectifs,
@@ -6161,7 +6577,6 @@ async function migratePasswords() {
     for (const c of State.clients) { if (c.password && !c.passwordHash) { c.passwordSalt = Utils.generateSalt(); c.passwordHash = await Utils.hashPassword(c.password, c.passwordSalt); delete c.password; migrated++; } }
     if (migrated > 0) Persistence.save();
 }
-
 async function migrateClientLogins() {
     let migrated = 0;
     for (const c of State.clients) {
@@ -6192,6 +6607,8 @@ async function bootstrap() {
     CustomConfirm3.init();
     SoundSystem.init();
     MobileKeyboardHandler.init();
+    ActivityLog.init();
+    CustomPermissions.init();
     bindEvents();
     Auth.init();
     Persistence.load();
