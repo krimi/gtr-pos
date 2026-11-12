@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="fr" dir="ltr">
 <head>
 <meta charset="UTF-8">
@@ -5814,18 +5814,60 @@ const CaisseHistory = {
     renderSolde() {
         const container = $('caisseSoldeContent');
         if (!container) return;
-        const soldes = { 'Espèces':{in:0,out:0}, 'Chèque':{in:0,out:0}, 'Virement':{in:0,out:0}, 'Mobile':{in:0,out:0}, 'Carte':{in:0,out:0} };
-        State.caisseClients.forEach(c => { const m = c.regType || 'Espèces'; if (!soldes[m]) soldes[m] = { in: 0, out: 0 }; soldes[m].in += c.amount || 0; });
-        State.caisseFournisseurs.forEach(c => { const m = c.regType || 'Espèces'; if (!soldes[m]) soldes[m] = { in: 0, out: 0 }; soldes[m].out += c.amount || 0; });
+        
+        const soldes = { 
+            'Espèces': {in:0, out:0, exp:0}, 
+            'Chèque': {in:0, out:0, exp:0}, 
+            'Virement': {in:0, out:0, exp:0}, 
+            'Mobile': {in:0, out:0, exp:0}, 
+            'Carte': {in:0, out:0, exp:0} 
+        };
+        
+        State.caisseClients.forEach(c => { 
+            const m = c.regType || 'Espèces'; 
+            if (!soldes[m]) soldes[m] = {in:0, out:0, exp:0}; 
+            soldes[m].in += c.amount || 0; 
+        });
+        
+        State.caisseFournisseurs.forEach(c => { 
+            const m = c.regType || 'Espèces'; 
+            if (!soldes[m]) soldes[m] = {in:0, out:0, exp:0}; 
+            soldes[m].out += c.amount || 0; 
+        });
+        
+        State.expenses.forEach(e => {
+            soldes['Espèces'].exp += e.amount || 0;
+        });
+
         soldes['Espèces'].in += State.companyInfo.cashOpening || 0;
+        
         const icons = { 'Espèces': '💵', 'Chèque': '🧾', 'Virement': '🏦', 'Mobile': '📱', 'Carte': '💳' };
         const colors = { 'Espèces': '#2ecc71', 'Chèque': '#3498db', 'Virement': '#9b59b6', 'Mobile': '#e67e22', 'Carte': '#1abc9c' };
+        
         let total = 0;
         let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">';
-        Object.entries(soldes).forEach(([m, d]) => { const s = d.in - d.out; total += s; const c = colors[m] || '#4a6cf7'; const ic = icons[m] || '💳'; html += `<div style="background:var(--panel);border:2px solid ${c};border-radius:12px;padding:12px;text-align:center;"><div style="font-weight:700;color:${c};font-size:14px;margin-bottom:6px;">${ic} ${esc(m)}</div><div style="font-size:20px;font-weight:800;color:${s >= 0 ? 'var(--success)' : 'var(--danger)'};">${s.toFixed(3)}</div></div>`; });
+        
+        Object.entries(soldes).forEach(([m, d]) => { 
+            const s = d.in - d.out - d.exp; 
+            total += s; 
+            const c = colors[m] || '#4a6cf7'; 
+            const ic = icons[m] || '💳'; 
+            const expDetails = d.exp > 0 ? '<div style="font-size:9px;color:var(--danger);margin-top:2px;">💸 Dépenses: -' + d.exp.toFixed(3) + '</div>' : '';
+
+            html += '<div style="background:var(--panel);border:2px solid ' + c + ';border-radius:12px;padding:12px;text-align:center;">';
+            html += '<div style="font-weight:700;color:' + c + ';font-size:14px;margin-bottom:6px;">' + ic + ' ' + esc(m) + '</div>';
+            html += '<div style="font-size:20px;font-weight:800;color:' + (s >= 0 ? 'var(--success)' : 'var(--danger)') + ';">' + s.toFixed(3) + '</div>';
+            html += expDetails;
+            html += '</div>'; 
+        });
+        
         html += '</div>';
         const tc = total >= 0 ? 'var(--success)' : 'var(--danger)';
-        html += `<div style="background:linear-gradient(135deg,#1a2a5c,#2a3f7a);color:#fff;border-radius:16px;padding:20px;text-align:center;"><div style="font-size:12px;text-transform:uppercase;opacity:.85;">💰 Total en Caisse</div><div style="font-size:36px;font-weight:800;margin-top:8px;color:${tc};">${total.toFixed(3)} TND</div></div>`;
+        html += '<div style="background:linear-gradient(135deg,#1a2a5c,#2a3f7a);color:#fff;border-radius:16px;padding:20px;text-align:center;">';
+        html += '<div style="font-size:12px;text-transform:uppercase;opacity:.85;">💰 Total en Caisse (Net)</div>';
+        html += '<div style="font-size:36px;font-weight:800;margin-top:8px;color:' + tc + ';">' + total.toFixed(3) + ' TND</div>';
+        html += '<div style="font-size:10px;opacity:.7;margin-top:4px;">(Entrées - Sorties - Dépenses)</div></div>';
+        
         container.innerHTML = html;
     },
     render() {
